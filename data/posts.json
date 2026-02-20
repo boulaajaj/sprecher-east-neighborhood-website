@@ -1,0 +1,39 @@
+{
+  "posts": [
+    {
+      "id": "post-001",
+      "title": "WisDOT Holds Public Hearings on I-39/90/94 Corridor Study",
+      "slug": "wisdot-i39-corridor-hearings-2024",
+      "date": "2024-07-25",
+      "author": "SENA",
+      "category": "announcement",
+      "tags": [
+        "government",
+        "transportation",
+        "i-39",
+        "public-hearing"
+      ],
+      "featured": true,
+      "image": "/images/I39_Corridor_Study_Logo.png",
+      "excerpt": "The Wisconsin Department of Transportation is holding public hearings to gather community feedback on major corridor improvements to I-39/90/94. Residents are encouraged to participate — in person or virtually.",
+      "content": "The Wisconsin Department of Transportation (WisDOT) held three public hearings to update the community on the I-39/90/94 Corridor Study's Draft Environmental Impact Statement and preferred alternatives.\n\nA virtual hearing took place July 29, 2024 via YouTube Live. An in-person hearing was held July 30, 2024 at Madison College Truax Building, 1701 Wright Street, Madison, WI 53704.\n\nFor questions or to provide testimony, contact David Schmidt, WisDOT Project Manager at (608) 246-3867 or David2Schmidt@dot.wi.gov.\n\nMore information is available at the WisDOT project page."
+    },
+    {
+      "id": "post-002",
+      "title": "Welcome to the New Sprecher East Neighborhood Website",
+      "slug": "welcome-new-website",
+      "date": "2024-02-01",
+      "author": "SENA Board",
+      "category": "about-sena",
+      "tags": [
+        "welcome",
+        "neighborhood",
+        "sena"
+      ],
+      "featured": false,
+      "image": "/images/photo.jpeg",
+      "excerpt": "We've refreshed our neighborhood website to make it easier to find events, news, and resources. Sprecher East has been a great community since 2006 — and we're excited to keep growing together.",
+      "content": "Sprecher East is one of the newest neighborhoods on the far east side of Madison. We are bounded by I-94 to the north, Door Creek Park to the east, Sprecher Road to the west, and Cottage Grove Road to the south.\n\nOur neighborhood includes the Meadowlands, Door Creek, and Reston Heights subdivisions. The Sprecher East Neighborhood Association (SENA) has served this community since 2006.\n\nMembership in SENA is open to any resident within our boundaries, and it's always free and optional. We're here to represent neighborhood interests, keep everyone informed, and build a great community together.\n\nStay connected — check this site for upcoming events and news!"
+    }
+  ]
+}

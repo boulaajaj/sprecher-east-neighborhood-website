@@ -1,0 +1,76 @@
+{
+  "events": [
+    {
+      "id": "evt-001",
+      "title": "I-39/90/94 Virtual Public Hearing",
+      "slug": "i39-virtual-hearing-july-2024",
+      "date": "2024-07-29",
+      "time_start": "5:00 PM",
+      "time_end": "7:00 PM",
+      "category": "government",
+      "status": "past",
+      "location": {
+        "type": "virtual",
+        "name": "YouTube Live — WisDOT Public Forums",
+        "address": null,
+        "city": null,
+        "state": null,
+        "zip": null,
+        "maps_url": null
+      },
+      "description": "The Wisconsin Department of Transportation (WisDOT) held three public hearings — one virtual and two in-person — to update the study's Draft Environmental Impact Statement, preferred alternative, and corridor improvements for the I-39/90/94 corridor.",
+      "details": "Instructions for submitting verbal and written testimony were provided. The virtual public hearing began at 5 p.m. and ended when all interested persons had provided testimony or 7 p.m., whichever occurred first.",
+      "phone_access": "(608) 571-2209 — Conference ID: 588 603 889#",
+      "contact": {
+        "name": "David Schmidt",
+        "title": "WisDOT Project Manager",
+        "phone": "(608) 246-3867",
+        "email": "David2Schmidt@dot.wi.gov"
+      },
+      "resources": [
+        {
+          "label": "WisDOT I-39/90/94 Project Page",
+          "url": "https://wisconsindot.gov/Pages/projects/by-region/sw/399094/public.aspx"
+        }
+      ],
+      "featured": false,
+      "image": "/images/I39_Corridor_Study_Logo.png"
+    },
+    {
+      "id": "evt-002",
+      "title": "I-39/90/94 In-Person Public Hearing",
+      "slug": "i39-inperson-hearing-july-2024",
+      "date": "2024-07-30",
+      "time_start": "5:00 PM",
+      "time_end": "7:00 PM",
+      "category": "government",
+      "status": "past",
+      "location": {
+        "type": "in-person",
+        "name": "Madison College Truax Building — Conference Room D1630",
+        "address": "1701 Wright Street",
+        "city": "Madison",
+        "state": "WI",
+        "zip": "53704",
+        "maps_url": "https://maps.google.com?q=1701+Wright+Street+Madison,+WI+53704"
+      },
+      "description": "An in-person public hearing for the I-39/90/94 Corridor Study, providing updates on the Draft Environmental Impact Statement, recommended preferred alternative, and corridor improvements.",
+      "details": "The same information was shared at all three hearings. Instructions for presenting verbal and written testimony were provided at the hearing.",
+      "phone_access": null,
+      "contact": {
+        "name": "David Schmidt",
+        "title": "WisDOT Project Manager",
+        "phone": "(608) 246-3867",
+        "email": "David2Schmidt@dot.wi.gov"
+      },
+      "resources": [
+        {
+          "label": "WisDOT I-39/90/94 Project Page",
+          "url": "https://wisconsindot.gov/Pages/projects/by-region/sw/399094/public.aspx"
+        }
+      ],
+      "featured": false,
+      "image": "/images/I39_Corridor_Study_Logo.png"
+    }
+  ]
+}
