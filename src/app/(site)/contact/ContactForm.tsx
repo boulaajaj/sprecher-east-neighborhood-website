@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Send, CheckCircle } from 'lucide-react'
+import { Send, CheckCircle, ChevronDown } from 'lucide-react'
 
 type Status = 'idle' | 'submitting' | 'success' | 'error'
 
@@ -54,6 +54,8 @@ export default function ContactForm() {
 
   const inputClass =
     'w-full px-4 py-2.5 bg-white border border-border rounded-xl text-foreground text-sm placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors'
+  const selectClass =
+    'w-full pl-4 pr-10 py-2.5 bg-white border border-border rounded-xl text-foreground text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors'
   const labelClass = 'block text-xs font-semibold text-foreground mb-1.5'
 
   return (
@@ -108,17 +110,20 @@ export default function ContactForm() {
       {/* Subject */}
       <div>
         <label htmlFor="subject" className={labelClass}>What's this about?</label>
-        <select id="subject" name="subject" required className={inputClass}>
-          <option value="" disabled>Select a topic…</option>
-          <option value="membership">Joining SENA / Membership</option>
-          <option value="events">Events &amp; Calendar</option>
-          <option value="issue">Neighborhood Issue or Concern</option>
-          <option value="board">Board of Directors</option>
-          <option value="resources">Resources &amp; Referrals</option>
-          <option value="volunteer">Volunteering</option>
-          <option value="general">General Question</option>
-          <option value="other">Other</option>
-        </select>
+        <div className="relative">
+          <select id="subject" name="subject" required className={selectClass}>
+            <option value="" disabled>Select a topic…</option>
+            <option value="membership">Joining SENA / Membership</option>
+            <option value="events">Events &amp; Calendar</option>
+            <option value="issue">Neighborhood Issue or Concern</option>
+            <option value="board">Board of Directors</option>
+            <option value="resources">Resources &amp; Referrals</option>
+            <option value="volunteer">Volunteering</option>
+            <option value="general">General Question</option>
+            <option value="other">Other</option>
+          </select>
+          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
+        </div>
       </div>
 
       {/* Message */}
