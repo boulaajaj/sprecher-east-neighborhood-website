@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getPosts } from '@/lib/data'
-import PostCard from '@/components/PostCard'
+import { PageHeader } from '@/components/ui/page-header'
+import { PostGrid } from '@/components/features/posts/post-grid'
 
 export const metadata: Metadata = {
   title: 'News & Announcements',
@@ -13,9 +14,9 @@ export const revalidate = 3600
 
 const CATEGORIES = [
   { value: 'announcement', label: 'Announcements' },
-  { value: 'government', label: 'Government' },
-  { value: 'community', label: 'Community' },
-  { value: 'about-sena', label: 'About SENA' },
+  { value: 'government',   label: 'Government' },
+  { value: 'community',    label: 'Community' },
+  { value: 'about-sena',   label: 'About SENA' },
 ]
 
 export default async function NewsPage() {
@@ -23,48 +24,18 @@ export default async function NewsPage() {
 
   return (
     <>
-      {/* Page header */}
-      <header className="bg-surface border-b border-border py-14 md:py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">
-            Neighborhood Updates
-          </p>
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            News &amp; Announcements
-          </h1>
-          <p className="text-muted text-lg max-w-2xl leading-relaxed">
-            Stay informed about what's happening in Sprecher East — from neighborhood issues
-            and city updates to community highlights and SENA announcements.
-          </p>
-        </div>
-      </header>
+      <PageHeader
+        eyebrow="Neighborhood Updates"
+        title="News & Announcements"
+        description="Stay informed about what's happening in Sprecher East — from neighborhood issues and city updates to community highlights and SENA announcements."
+      />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         <div className="grid lg:grid-cols-[1fr_280px] gap-10 lg:gap-12 items-start">
 
-          {/* Main post list */}
-          <div>
-            {posts.length > 0 ? (
-              <div className="grid sm:grid-cols-2 gap-6">
-                {posts.map((post) => (
-                  <PostCard key={post.id ?? post._id} post={post} variant="card" />
-                ))}
-              </div>
-            ) : (
-              <div className="bg-surface rounded-2xl border border-border p-12 text-center">
-                <div className="text-4xl mb-4">📰</div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">No posts yet</h3>
-                <p className="text-muted text-sm">
-                  Neighborhood news and updates will appear here.
-                </p>
-              </div>
-            )}
-          </div>
+          <PostGrid posts={posts} />
 
-          {/* Sidebar */}
           <aside className="lg:sticky lg:top-20 flex flex-col gap-5">
-
-            {/* Categories */}
             <div className="bg-surface rounded-2xl border border-border p-5">
               <h3 className="font-bold text-foreground mb-4">Categories</h3>
               <ul className="flex flex-col gap-2">
@@ -84,7 +55,6 @@ export default async function NewsPage() {
               </ul>
             </div>
 
-            {/* Events link */}
             <div className="bg-surface rounded-2xl border border-border p-5">
               <h3 className="font-bold text-foreground mb-2">Upcoming Events</h3>
               <p className="text-sm text-muted mb-4">
@@ -98,7 +68,6 @@ export default async function NewsPage() {
               </Link>
             </div>
 
-            {/* Forum */}
             <div className="bg-primary rounded-2xl p-5 text-white">
               <h3 className="font-bold text-white mb-2">Neighbor Forum</h3>
               <p className="text-white/70 text-sm mb-4 leading-relaxed">
@@ -113,11 +82,9 @@ export default async function NewsPage() {
                 Visit Forum
               </a>
             </div>
-
           </aside>
         </div>
 
-        {/* Contribute section */}
         <div className="mt-16 bg-surface rounded-2xl border border-border p-10 text-center">
           <div className="text-4xl mb-4">✍️</div>
           <h2 className="text-xl font-bold text-foreground mb-2">Have Something to Share?</h2>

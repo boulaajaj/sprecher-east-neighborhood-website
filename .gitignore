@@ -24,3 +24,6 @@ Thumbs.db
 .vscode/settings.json
 *.swp
 *.swo
+
+# Legacy backup (local only — filenames too long for Windows Git)
+_legacy/

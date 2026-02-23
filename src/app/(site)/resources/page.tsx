@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ExternalLink } from 'lucide-react'
+import { PageHeader } from '@/components/ui/page-header'
 
 export const metadata: Metadata = {
   title: 'Resources',
@@ -48,19 +49,11 @@ function ResourceGrid({ items }: { items: ResourceCard[] }) {
 export default function ResourcesPage() {
   return (
     <>
-      {/* Page header */}
-      <header className="bg-surface border-b border-border py-14 md:py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">
-            Community Resources
-          </p>
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Resources</h1>
-          <p className="text-muted text-lg max-w-2xl leading-relaxed">
-            Helpful links and contacts for Sprecher East residents — from elected officials to
-            public safety, childcare, renting, and more.
-          </p>
-        </div>
-      </header>
+      <PageHeader
+        eyebrow="Community Resources"
+        title="Resources"
+        description="Helpful links and contacts for Sprecher East residents — from elected officials to public safety, childcare, renting, and more."
+      />
 
       {/* Quick nav */}
       <div className="sticky top-16 z-30 bg-white border-b border-border">

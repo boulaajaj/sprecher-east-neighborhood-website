@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import Link from 'next/link'
-import { MapPin, ArrowRight } from 'lucide-react'
+import { MapPin } from 'lucide-react'
+import { PageHeader } from '@/components/ui/page-header'
+import { CtaBanner } from '@/components/sections/cta-banner'
 
 export const metadata: Metadata = {
   title: 'About',
   description:
-    'Learn about the Sprecher East neighborhood — its boundaries, history, subdivisions, and community character on Madison\'s Far East Side.',
+    "Learn about the Sprecher East neighborhood — its boundaries, history, subdivisions, and community character on Madison's Far East Side.",
 }
 
 const SUBDIVISIONS = [
@@ -24,24 +25,28 @@ const SUBDIVISIONS = [
   },
 ]
 
+const BOUNDARIES = [
+  { dir: 'North', road: 'Cottage Grove Road' },
+  { dir: 'South', road: 'Milwaukee Street' },
+  { dir: 'East', road: 'Sprecher Road' },
+  { dir: 'West', road: 'Femrite Drive' },
+]
+
+const PHOTOS = [
+  { src: '/images/441519955_18435399844044029_8893742456448624265_n.jpg', alt: 'Sprecher East community gathering' },
+  { src: '/images/451962546_18443909296044029_4679884066375857301_n.jpg', alt: 'Neighborhood event' },
+  { src: '/images/452236518_18443909287044029_3867824997287597586_n.jpg', alt: 'Sprecher East residents' },
+]
+
 export default function AboutPage() {
   return (
     <>
-      {/* Page header */}
-      <header className="bg-surface border-b border-border py-14 md:py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">
-            Our Neighborhood
-          </p>
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">About Sprecher East</h1>
-          <p className="text-muted text-lg max-w-2xl leading-relaxed">
-            A welcoming residential community on Madison's Far East Side, organized by neighbors
-            for neighbors since 2006.
-          </p>
-        </div>
-      </header>
+      <PageHeader
+        eyebrow="Our Neighborhood"
+        title="About Sprecher East"
+        description="A welcoming residential community on Madison's Far East Side, organized by neighbors for neighbors since 2006."
+      />
 
-      {/* Overview */}
       <section className="py-16 md:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-10 lg:gap-16 items-start">
@@ -70,7 +75,6 @@ export default function AboutPage() {
             </div>
 
             <div className="space-y-4">
-              {/* Map image */}
               <div className="relative rounded-2xl overflow-hidden aspect-[4/3] border border-border shadow-sm">
                 <Image
                   src="/images/East_Madison_NAs.png"
@@ -88,7 +92,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Boundaries */}
       <section className="bg-surface py-14 md:py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-10 items-center">
@@ -98,12 +101,7 @@ export default function AboutPage() {
               </p>
               <h2 className="text-3xl font-bold text-foreground mb-5">Neighborhood Boundaries</h2>
               <div className="grid grid-cols-2 gap-3">
-                {[
-                  { dir: 'North', road: 'Cottage Grove Road' },
-                  { dir: 'South', road: 'Milwaukee Street' },
-                  { dir: 'East', road: 'Sprecher Road' },
-                  { dir: 'West', road: 'Femrite Drive' },
-                ].map((b) => (
+                {BOUNDARIES.map((b) => (
                   <div key={b.dir} className="bg-white rounded-xl border border-border p-4">
                     <div className="text-xs font-bold text-primary uppercase tracking-wide mb-1">
                       {b.dir}
@@ -132,12 +130,9 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Subdivisions */}
       <section className="py-16 md:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">
-            Sub-Areas
-          </p>
+          <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">Sub-Areas</p>
           <h2 className="text-3xl font-bold text-foreground mb-10">Neighborhood Subdivisions</h2>
           <div className="grid sm:grid-cols-3 gap-6">
             {SUBDIVISIONS.map((sub) => (
@@ -153,15 +148,10 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Photos */}
       <section className="bg-surface py-12">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {[
-              { src: '/images/441519955_18435399844044029_8893742456448624265_n.jpg', alt: 'Sprecher East community gathering' },
-              { src: '/images/451962546_18443909296044029_4679884066375857301_n.jpg', alt: 'Neighborhood event' },
-              { src: '/images/452236518_18443909287044029_3867824997287597586_n.jpg', alt: 'Sprecher East residents' },
-            ].map((img) => (
+            {PHOTOS.map((img) => (
               <div key={img.src} className="relative rounded-xl overflow-hidden aspect-[4/3]">
                 <Image
                   src={img.src}
@@ -177,26 +167,14 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-primary py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Want to Get Involved?</h2>
-          <p className="text-white/80 max-w-xl mx-auto mb-8 leading-relaxed">
-            SENA is your neighborhood association. Come to a meeting, join the mailing list,
-            or reach out — we'd love to meet you.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/get-involved"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white text-primary font-bold rounded-xl hover:bg-surface transition-colors">
-              Get Involved <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link href="/contact"
-              className="inline-flex items-center gap-2 px-6 py-3 border-2 border-white/40 text-white font-semibold rounded-xl hover:border-white/70 hover:bg-white/10 transition-colors">
-              Contact Us
-            </Link>
-          </div>
-        </div>
-      </section>
+      <CtaBanner
+        title="Want to Get Involved?"
+        description="SENA is your neighborhood association. Come to a meeting, join the mailing list, or reach out — we'd love to meet you."
+        primaryHref="/get-involved"
+        primaryLabel="Get Involved"
+        secondaryHref="/contact"
+        secondaryLabel="Contact Us"
+      />
     </>
   )
 }

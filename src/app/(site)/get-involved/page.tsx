@@ -3,6 +3,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { getBoardMembers } from '@/lib/data'
+import { PageHeader } from '@/components/ui/page-header'
+import { CtaBanner } from '@/components/sections/cta-banner'
 
 export const metadata: Metadata = {
   title: 'Get Involved',
@@ -34,19 +36,11 @@ export default async function GetInvolvedPage() {
 
   return (
     <>
-      {/* Page header */}
-      <header className="bg-surface border-b border-border py-14 md:py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">
-            Membership &amp; Participation
-          </p>
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Get Involved</h1>
-          <p className="text-muted text-lg max-w-2xl leading-relaxed">
-            Your neighborhood association is made up of neighbors just like you. There are no
-            barriers, no obligations — just community.
-          </p>
-        </div>
-      </header>
+      <PageHeader
+        eyebrow="Membership & Participation"
+        title="Get Involved"
+        description="Your neighborhood association is made up of neighbors just like you. There are no barriers, no obligations — just community."
+      />
 
       {/* Membership */}
       <section id="membership" className="py-16 md:py-20">
@@ -175,29 +169,14 @@ export default async function GetInvolvedPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-primary py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to Join?</h2>
-          <p className="text-white/80 max-w-lg mx-auto mb-8 leading-relaxed">
-            It takes just a few minutes to connect with SENA. Reach out and we'll get you started.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link
-              href="/contact"
-              className="inline-flex items-center gap-2 px-7 py-3.5 bg-white text-primary font-bold rounded-xl hover:bg-surface transition-colors shadow-md"
-            >
-              Contact Us to Join
-            </Link>
-            <Link
-              href="/events"
-              className="inline-flex items-center gap-2 px-7 py-3.5 border-2 border-white/40 text-white font-semibold rounded-xl hover:border-white/70 hover:bg-white/10 transition-colors"
-            >
-              See Upcoming Events
-            </Link>
-          </div>
-        </div>
-      </section>
+      <CtaBanner
+        title="Ready to Join?"
+        description="It takes just a few minutes to connect with SENA. Reach out and we'll get you started."
+        primaryHref="/contact"
+        primaryLabel="Contact Us to Join"
+        secondaryHref="/events"
+        secondaryLabel="See Upcoming Events"
+      />
     </>
   )
 }

@@ -1,0 +1,5 @@
+export { Hero } from './hero'
+export { FeatureStrip } from './feature-strip'
+export { AboutPreview } from './about-preview'
+export { EventsNews } from './events-news'
+export { CtaBanner } from './cta-banner'
