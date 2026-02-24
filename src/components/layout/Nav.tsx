@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Menu, X } from 'lucide-react'
+import { UserMenu } from './UserMenu'
 
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
@@ -83,6 +84,11 @@ export default function Nav() {
               </li>
             </ul>
 
+            {/* Auth widget — desktop */}
+            <div className="hidden md:flex items-center ml-2">
+              <UserMenu />
+            </div>
+
             {/* Mobile toggle */}
             <button
               className="md:hidden p-2 rounded-lg text-muted hover:bg-surface transition-colors"
@@ -150,8 +156,11 @@ export default function Nav() {
               </ul>
             </nav>
 
-            {/* Footer CTA */}
-            <div className="p-4 border-t border-border">
+            {/* Footer: auth + CTA */}
+            <div className="p-4 border-t border-border flex flex-col gap-3">
+              <div className="flex items-center justify-center">
+                <UserMenu />
+              </div>
               <Link
                 href="/get-involved"
                 className="flex justify-center items-center w-full py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition-colors"

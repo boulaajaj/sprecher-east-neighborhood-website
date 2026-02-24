@@ -1,19 +1,11 @@
-import path from 'path'
+import { withPayload } from '@payloadcms/next/withPayload'
 import type { NextConfig } from 'next'
 
-const config: NextConfig = {
-  // Silence the "multiple lockfiles" workspace root warning
-  outputFileTracingRoot: path.resolve(__dirname),
+const nextConfig: NextConfig = {
+  outputFileTracingRoot: new URL('.', import.meta.url).pathname,
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'cdn.sanity.io',
-        port: '',
-        pathname: '/images/**',
-      },
-    ],
+    remotePatterns: [],
   },
 }
 
-export default config
+export default withPayload(nextConfig)

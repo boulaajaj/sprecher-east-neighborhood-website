@@ -9,24 +9,29 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@payloadcms/db-sqlite": "^3.77.0",
+    "@payloadcms/next": "^3.77.0",
+    "@payloadcms/richtext-lexical": "^3.77.0",
+    "better-auth": "^1.4.19",
+    "better-sqlite3": "^12.6.2",
+    "graphql": "^16.12.0",
+    "lucide-react": "^0.469.0",
     "next": "^15.1.0",
+    "payload": "^3.77.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next-sanity": "^9.8.0",
-    "@sanity/image-url": "^1.1.0",
-    "sanity": "^3.66.0",
-    "@sanity/vision": "^3.66.0",
-    "lucide-react": "^0.469.0"
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
-    "typescript": "^5.7.2",
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
-    "@types/node": "^22.10.2",
-    "tailwindcss": "^4.0.0",
-    "@tailwindcss/postcss": "^4.0.0",
-    "postcss": "^8.5.1",
     "eslint": "^9.17.0",
-    "eslint-config-next": "^15.1.0"
+    "eslint-config-next": "^15.1.0",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.2"
   }
 }

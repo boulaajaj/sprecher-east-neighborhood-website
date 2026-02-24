@@ -1,82 +1,132 @@
 /**
  * Data abstraction layer.
  *
- * Currently reads from static JSON files so the site works with zero config.
- * When you're ready to switch to Sanity CMS:
- *   1. Create a Sanity project (sanity.io)
- *   2. Copy .env.local.example → .env.local and fill in your project ID
- *   3. Push your content via `npx sanity@latest dataset import`
- *   4. Uncomment the Sanity branches below and delete the JSON imports
+ * Reads from Payload CMS (SQLite) when available.
+ * Falls back to static JSON files so the site works during initial setup
+ * or if the database has not been seeded yet.
  */
 
 import type { Event, Post, BoardMember } from './types'
 
-// ─── JSON fallback (works without any CMS setup) ────────────────────────────
+// ─── Payload CMS (primary source) ────────────────────────────────────────────
+
+async function getEventsFromPayload(): Promise<Event[]> {
+  const { getPayload } = await import('payload')
+  const config = await import('@payload-config')
+  const payload = await getPayload({ config: config.default })
+  const { docs } = await payload.find({
+    collection: 'events',
+    sort: '-date',
+    limit: 200,
+    overrideAccess: true,
+  })
+  return docs.map((doc) => ({
+    id: String(doc.id),
+    title: doc.title,
+    slug: doc.slug,
+    date: typeof doc.date === 'string' ? doc.date.split('T')[0] : String(doc.date),
+    timeStart: doc.timeStart ?? undefined,
+    timeEnd: doc.timeEnd ?? undefined,
+    category: doc.category as Event['category'],
+    locationType: (doc.locationType as Event['locationType']) ?? 'in-person',
+    locationName: doc.locationName ?? undefined,
+    locationAddress: doc.locationAddress ?? undefined,
+    locationCity: doc.locationCity ?? undefined,
+    mapsUrl: doc.mapsUrl ?? undefined,
+    registrationUrl: doc.registrationUrl ?? undefined,
+    description: doc.description,
+    featured: doc.featured ?? false,
+  }))
+}
+
+async function getPostsFromPayload(): Promise<Post[]> {
+  const { getPayload } = await import('payload')
+  const config = await import('@payload-config')
+  const payload = await getPayload({ config: config.default })
+  const { docs } = await payload.find({
+    collection: 'posts',
+    sort: '-publishedAt',
+    limit: 200,
+    overrideAccess: true,
+  })
+  return docs.map((doc) => ({
+    id: String(doc.id),
+    title: doc.title,
+    slug: doc.slug,
+    publishedAt: typeof doc.publishedAt === 'string' ? doc.publishedAt : String(doc.publishedAt),
+    author: doc.author ?? 'SENA',
+    category: doc.category ?? undefined,
+    tags: Array.isArray(doc.tags)
+      ? (doc.tags as { tag: string }[]).map((t) => t.tag).filter(Boolean)
+      : [],
+    featured: doc.featured ?? false,
+    excerpt: doc.excerpt,
+  }))
+}
+
+async function getBoardFromPayload(): Promise<BoardMember[]> {
+  const { getPayload } = await import('payload')
+  const config = await import('@payload-config')
+  const payload = await getPayload({ config: config.default })
+  const { docs } = await payload.find({
+    collection: 'board-members',
+    sort: 'order',
+    limit: 100,
+    overrideAccess: true,
+  })
+  return docs.map((doc) => ({
+    id: String(doc.id),
+    name: doc.name,
+    role: doc.role,
+    bio: doc.bio ?? undefined,
+    email: doc.email ?? undefined,
+    order: doc.order ?? 99,
+  }))
+}
+
+// ─── JSON fallback (works without any CMS/DB setup) ──────────────────────────
 
 async function getEventsFromJson(): Promise<Event[]> {
   const data = await import('../../data/events.json')
-  // JSON shape: { "events": [...] }
   const raw = data.default as { events: Event[] }
   return Array.isArray(raw) ? raw : (raw.events ?? [])
 }
 
 async function getPostsFromJson(): Promise<Post[]> {
   const data = await import('../../data/posts.json')
-  // JSON shape: { "posts": [...] }
   const raw = data.default as { posts: Post[] }
   return Array.isArray(raw) ? raw : (raw.posts ?? [])
 }
 
 async function getBoardFromJson(): Promise<BoardMember[]> {
   const data = await import('../../data/board.json')
-  // JSON shape: { "board": [...] }
   const raw = data.default as { board: BoardMember[] }
   return Array.isArray(raw) ? raw : (raw.board ?? [])
 }
 
-// ─── Sanity (uncomment when CMS is configured) ───────────────────────────────
-
-// async function getEventsFromSanity(): Promise<Event[]> {
-//   const { client } = await import('@/sanity/lib/client')
-//   const { eventsQuery } = await import('@/sanity/lib/queries')
-//   return client.fetch(eventsQuery)
-// }
-
-// async function getPostsFromSanity(): Promise<Post[]> {
-//   const { client } = await import('@/sanity/lib/client')
-//   const { postsQuery } = await import('@/sanity/lib/queries')
-//   return client.fetch(postsQuery)
-// }
-
-// async function getBoardFromSanity(): Promise<BoardMember[]> {
-//   const { client } = await import('@/sanity/lib/client')
-//   const { boardQuery } = await import('@/sanity/lib/queries')
-//   return client.fetch(boardQuery)
-// }
-
 // ─── Public API ──────────────────────────────────────────────────────────────
 
-const useSanity = !!process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
-
-export async function getEvents(): Promise<Event[]> {
-  if (!useSanity) return getEventsFromJson()
-  const { client } = await import('@/sanity/lib/client')
-  const { eventsQuery } = await import('@/sanity/lib/queries')
-  return client.fetch(eventsQuery) as Promise<Event[]>
+async function withJsonFallback<T>(
+  primary: () => Promise<T[]>,
+  fallback: () => Promise<T[]>,
+): Promise<T[]> {
+  try {
+    return await primary()
+  } catch {
+    return fallback()
+  }
 }
 
-export async function getPosts(): Promise<Post[]> {
-  if (!useSanity) return getPostsFromJson()
-  const { client } = await import('@/sanity/lib/client')
-  const { postsQuery } = await import('@/sanity/lib/queries')
-  return client.fetch(postsQuery) as Promise<Post[]>
+export function getEvents(): Promise<Event[]> {
+  return withJsonFallback(getEventsFromPayload, getEventsFromJson)
 }
 
-export async function getBoardMembers(): Promise<BoardMember[]> {
-  if (!useSanity) return getBoardFromJson()
-  const { client } = await import('@/sanity/lib/client')
-  const { boardQuery } = await import('@/sanity/lib/queries')
-  return client.fetch(boardQuery) as Promise<BoardMember[]>
+export function getPosts(): Promise<Post[]> {
+  return withJsonFallback(getPostsFromPayload, getPostsFromJson)
+}
+
+export function getBoardMembers(): Promise<BoardMember[]> {
+  return withJsonFallback(getBoardFromPayload, getBoardFromJson)
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

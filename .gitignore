@@ -28,6 +28,17 @@ Thumbs.db
 # Legacy backup (local only — filenames too long for Windows Git)
 _legacy/
 
+# Payload CMS + Auth SQLite databases (local data, never commit)
+data/payload.db
+data/payload.db-shm
+data/payload.db-wal
+data/auth.db
+data/auth.db-shm
+data/auth.db-wal
+
+# Uploaded media (managed by Payload, preserved on VPS separately)
+public/media/
+
 # SSH keys — NEVER commit private keys
 *.pem
 id_rsa
