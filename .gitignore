@@ -47,3 +47,13 @@ id_ed25519
 id_ed25519.*
 sprecher-east
 sprecher-east.pub
+
+# Claude Code — local settings (project settings.json is OK to commit)
+.claude/settings.local.json
+CLAUDE.local.md
+
+# Playwright MCP
+.playwright-mcp/
+
+# Local screenshots
+homepage-local.png
