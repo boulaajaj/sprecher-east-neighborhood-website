@@ -25,13 +25,12 @@ export default async function EventsPage() {
         description="Community meetings, public hearings, social gatherings, and more. Open to all Sprecher East residents."
       />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 md:py-16 lg:px-8">
         <section id="upcoming" className="mb-14">
-          <div className="flex items-center gap-3 mb-6">
+          <div className="mb-6 flex items-center gap-3">
             <h2 className="text-2xl font-bold text-foreground">Upcoming Events</h2>
             {upcoming.length > 0 && (
-              <span className="px-2.5 py-0.5 bg-primary text-white text-xs font-bold rounded-full">
+              <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white">
                 {upcoming.length}
               </span>
             )}
@@ -52,15 +51,15 @@ export default async function EventsPage() {
           )}
         </section>
 
-        <section className="bg-primary/8 border border-primary/20 rounded-2xl p-8 mb-14">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+        <section className="mb-14 rounded-2xl border border-primary/20 bg-primary/8 p-8">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div>
-              <h3 className="font-bold text-foreground mb-1">Have an event to add?</h3>
+              <h3 className="mb-1 font-bold text-foreground">Have an event to add?</h3>
               <p className="text-sm text-muted">Reach out and we'll get it on the calendar.</p>
             </div>
             <Link
               href="/contact"
-              className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors"
+              className="inline-flex flex-shrink-0 items-center gap-2 rounded-xl bg-primary px-5 py-2.5 font-semibold text-white transition-colors hover:bg-primary-dark"
             >
               Suggest an Event
             </Link>
@@ -69,7 +68,7 @@ export default async function EventsPage() {
 
         {past.length > 0 && (
           <section id="past">
-            <h2 className="text-2xl font-bold text-foreground mb-6">Past Events</h2>
+            <h2 className="mb-6 text-2xl font-bold text-foreground">Past Events</h2>
             <div className="flex flex-col gap-4">
               {past.map((event) => (
                 <EventDetailCard key={event.id ?? event._id} event={event} past />
@@ -77,7 +76,6 @@ export default async function EventsPage() {
             </div>
           </section>
         )}
-
       </div>
     </>
   )

@@ -35,8 +35,10 @@ const auth = betterAuth({
 console.log('Running Better Auth migrations...')
 const { runMigrations, toBeCreated, toBeAdded } = await getMigrations(auth.options)
 
-console.log(`Tables to create: ${toBeCreated.map(t => t.table).join(', ') || '(none)'}`)
-console.log(`Fields to add: ${toBeAdded.length > 0 ? toBeAdded.map(t => t.table).join(', ') : '(none)'}`)
+console.log(`Tables to create: ${toBeCreated.map((t) => t.table).join(', ') || '(none)'}`)
+console.log(
+  `Fields to add: ${toBeAdded.length > 0 ? toBeAdded.map((t) => t.table).join(', ') : '(none)'}`,
+)
 
 await runMigrations()
 console.log('✓ Auth DB migrations complete!')

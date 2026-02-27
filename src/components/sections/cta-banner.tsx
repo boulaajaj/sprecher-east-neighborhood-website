@@ -20,20 +20,20 @@ export function CtaBanner({
 }: CtaBannerProps) {
   return (
     <section className="bg-primary py-16 md:py-20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{title}</h2>
-        <p className="text-white/80 text-lg max-w-xl mx-auto mb-8 leading-relaxed">{description}</p>
+      <div className="mx-auto max-w-6xl px-4 text-center sm:px-6 lg:px-8">
+        <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">{title}</h2>
+        <p className="mx-auto mb-8 max-w-xl text-lg leading-relaxed text-white/80">{description}</p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link
             href={primaryHref}
-            className="inline-flex items-center gap-2 px-7 py-3.5 bg-white text-primary font-bold rounded-xl hover:bg-surface transition-colors shadow-md"
+            className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 font-bold text-primary shadow-md transition-colors hover:bg-surface"
           >
-            <Users className="w-4 h-4" />
+            <Users className="h-4 w-4" />
             {primaryLabel}
           </Link>
           <Link
             href={secondaryHref}
-            className="inline-flex items-center gap-2 px-7 py-3.5 border-2 border-white/40 text-white font-semibold rounded-xl hover:border-white/70 hover:bg-white/10 transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl border-2 border-white/40 px-7 py-3.5 font-semibold text-white transition-colors hover:border-white/70 hover:bg-white/10"
           >
             {secondaryLabel}
           </Link>

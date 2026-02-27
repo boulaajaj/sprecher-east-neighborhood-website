@@ -35,15 +35,15 @@ export default async function AssociationPage() {
   return (
     <>
       {/* Page header */}
-      <header className="bg-surface border-b border-border py-14 md:py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">SENA</p>
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">The Association</h1>
-          <p className="text-muted text-lg max-w-2xl leading-relaxed">
-            The Sprecher East Neighborhood Association is a volunteer, non-HOA organization
-            that exists to serve and connect our community.
+      <header className="border-b border-border bg-surface py-14 md:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">SENA</p>
+          <h1 className="mb-4 text-4xl font-bold text-foreground md:text-5xl">The Association</h1>
+          <p className="max-w-2xl text-lg leading-relaxed text-muted">
+            The Sprecher East Neighborhood Association is a volunteer, non-HOA organization that
+            exists to serve and connect our community.
           </p>
-          <nav className="flex gap-4 mt-6" aria-label="Page sections">
+          <nav className="mt-6 flex gap-4" aria-label="Page sections">
             {[
               ['#mission', 'Mission'],
               ['#board', 'Board'],
@@ -52,7 +52,7 @@ export default async function AssociationPage() {
               <a
                 key={href}
                 href={href}
-                className="text-sm font-medium text-primary hover:text-primary-dark hover:underline transition-colors"
+                className="text-sm font-medium text-primary transition-colors hover:text-primary-dark hover:underline"
               >
                 {label}
               </a>
@@ -62,21 +62,21 @@ export default async function AssociationPage() {
       </header>
 
       {/* Mission */}
-      <section id="mission" className="py-16 md:py-20 scroll-mt-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">Purpose</p>
-          <h2 className="text-3xl font-bold text-foreground mb-4">Our Mission</h2>
-          <p className="text-muted leading-relaxed max-w-2xl mb-10">
+      <section id="mission" className="scroll-mt-20 py-16 md:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">Purpose</p>
+          <h2 className="mb-4 text-3xl font-bold text-foreground">Our Mission</h2>
+          <p className="mb-10 max-w-2xl leading-relaxed text-muted">
             The Sprecher East Neighborhood Association exists to improve the quality of life for all
             residents in the Sprecher East neighborhood by promoting community involvement,
             communication, and advocacy.
           </p>
-          <div className="grid sm:grid-cols-3 gap-6">
+          <div className="grid gap-6 sm:grid-cols-3">
             {MISSION_PILLARS.map((p) => (
-              <div key={p.title} className="bg-surface rounded-2xl border border-border p-6">
-                <div className="text-3xl mb-4">{p.icon}</div>
-                <h3 className="font-bold text-foreground mb-2">{p.title}</h3>
-                <p className="text-sm text-muted leading-relaxed">{p.desc}</p>
+              <div key={p.title} className="rounded-2xl border border-border bg-surface p-6">
+                <div className="mb-4 text-3xl">{p.icon}</div>
+                <h3 className="mb-2 font-bold text-foreground">{p.title}</h3>
+                <p className="text-sm leading-relaxed text-muted">{p.desc}</p>
               </div>
             ))}
           </div>
@@ -84,24 +84,26 @@ export default async function AssociationPage() {
       </section>
 
       {/* Board */}
-      <section id="board" className="bg-surface py-16 md:py-20 scroll-mt-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">Leadership</p>
-          <h2 className="text-3xl font-bold text-foreground mb-2">Board of Directors</h2>
-          <p className="text-muted mb-10 leading-relaxed max-w-xl">
-            SENA is led by a volunteer board elected by the membership. Board members serve
-            one-year terms and can be re-elected.
+      <section id="board" className="scroll-mt-20 bg-surface py-16 md:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">
+            Leadership
+          </p>
+          <h2 className="mb-2 text-3xl font-bold text-foreground">Board of Directors</h2>
+          <p className="mb-10 max-w-xl leading-relaxed text-muted">
+            SENA is led by a volunteer board elected by the membership. Board members serve one-year
+            terms and can be re-elected.
           </p>
 
           {board.length > 0 ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {board.map((member) => (
                 <div
                   key={member.id ?? member._id}
-                  className="bg-white rounded-2xl border border-border p-5 flex flex-col"
+                  className="flex flex-col rounded-2xl border border-border bg-white p-5"
                 >
                   {/* Avatar */}
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-lg mb-4">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-lg font-bold text-primary">
                     {member.initials ??
                       member.name
                         .split(' ')
@@ -111,16 +113,16 @@ export default async function AssociationPage() {
                         .toUpperCase()}
                   </div>
                   <div className="font-bold text-foreground">{member.name}</div>
-                  <div className="text-xs font-medium text-primary mb-2">{member.role}</div>
+                  <div className="mb-2 text-xs font-medium text-primary">{member.role}</div>
                   {member.bio && (
-                    <p className="text-xs text-muted leading-relaxed flex-1">{member.bio}</p>
+                    <p className="flex-1 text-xs leading-relaxed text-muted">{member.bio}</p>
                   )}
                   {member.email && (
                     <a
                       href={`mailto:${member.email}`}
-                      className="mt-3 flex items-center gap-1.5 text-xs text-muted hover:text-primary transition-colors"
+                      className="mt-3 flex items-center gap-1.5 text-xs text-muted transition-colors hover:text-primary"
                     >
-                      <Mail className="w-3 h-3" />
+                      <Mail className="h-3 w-3" />
                       {member.email}
                     </a>
                   )}
@@ -128,8 +130,8 @@ export default async function AssociationPage() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-2xl border border-border p-10 text-center">
-              <p className="text-muted text-sm">
+            <div className="rounded-2xl border border-border bg-white p-10 text-center">
+              <p className="text-sm text-muted">
                 Board member information coming soon.{' '}
                 <Link href="/contact" className="text-primary underline hover:text-primary-dark">
                   Contact us
@@ -139,7 +141,7 @@ export default async function AssociationPage() {
             </div>
           )}
 
-          <p className="text-xs text-muted mt-6">
+          <p className="mt-6 text-xs text-muted">
             Interested in serving on the board?{' '}
             <Link href="/contact" className="text-primary underline hover:text-primary-dark">
               Reach out to learn more.
@@ -149,31 +151,31 @@ export default async function AssociationPage() {
       </section>
 
       {/* Bylaws */}
-      <section id="bylaws" className="py-16 md:py-20 scroll-mt-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-[1fr_280px] gap-10 items-start">
-
+      <section id="bylaws" className="scroll-mt-20 py-16 md:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="grid items-start gap-10 lg:grid-cols-[1fr_280px]">
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">Governing Documents</p>
-              <h2 className="text-3xl font-bold text-foreground mb-8">Bylaws</h2>
+              <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">
+                Governing Documents
+              </p>
+              <h2 className="mb-8 text-3xl font-bold text-foreground">Bylaws</h2>
 
               <article className="prose-content space-y-8">
-
                 <section>
-                  <h3 className="text-xl font-bold text-foreground border-b border-border pb-3 mb-4">
+                  <h3 className="mb-4 border-b border-border pb-3 text-xl font-bold text-foreground">
                     Article I — Name
                   </h3>
-                  <p className="text-muted leading-relaxed">
-                    The name of this organization shall be the Sprecher East Neighborhood Association,
-                    hereinafter referred to as "SENA" or "the Association."
+                  <p className="leading-relaxed text-muted">
+                    The name of this organization shall be the Sprecher East Neighborhood
+                    Association, hereinafter referred to as "SENA" or "the Association."
                   </p>
                 </section>
 
                 <section>
-                  <h3 className="text-xl font-bold text-foreground border-b border-border pb-3 mb-4">
+                  <h3 className="mb-4 border-b border-border pb-3 text-xl font-bold text-foreground">
                     Article II — Purpose
                   </h3>
-                  <p className="text-muted leading-relaxed mb-3">
+                  <p className="mb-3 leading-relaxed text-muted">
                     The purpose of SENA shall be to:
                   </p>
                   <ul className="space-y-2 text-muted">
@@ -185,7 +187,7 @@ export default async function AssociationPage() {
                       'Encourage civic participation and community involvement',
                     ].map((item) => (
                       <li key={item} className="flex gap-3 leading-relaxed">
-                        <span className="text-primary mt-0.5 flex-shrink-0">→</span>
+                        <span className="mt-0.5 flex-shrink-0 text-primary">→</span>
                         {item}
                       </li>
                     ))}
@@ -193,10 +195,10 @@ export default async function AssociationPage() {
                 </section>
 
                 <section>
-                  <h3 className="text-xl font-bold text-foreground border-b border-border pb-3 mb-4">
+                  <h3 className="mb-4 border-b border-border pb-3 text-xl font-bold text-foreground">
                     Article III — Membership
                   </h3>
-                  <div className="space-y-4 text-muted leading-relaxed">
+                  <div className="space-y-4 leading-relaxed text-muted">
                     <p>
                       <strong className="text-foreground">Section 1 — Eligibility.</strong> Any
                       person who is a resident of the Sprecher East neighborhood and is at least 18
@@ -211,26 +213,26 @@ export default async function AssociationPage() {
                     <p>
                       <strong className="text-foreground">Section 3 — Household Membership.</strong>{' '}
                       All adult members of a household are entitled to attend and participate in
-                      meetings when dues are paid for that household. Each household in good standing
-                      shall have one vote on matters brought before the membership.
+                      meetings when dues are paid for that household. Each household in good
+                      standing shall have one vote on matters brought before the membership.
                     </p>
                     <p>
                       <strong className="text-foreground">Section 4 — Associate Membership.</strong>{' '}
                       Businesses with a permanent presence within the neighborhood boundaries may
                       become associate members by paying an annual dues amount set by the Board of
-                      Directors. Associate members may participate in meetings but do not have voting
-                      rights.
+                      Directors. Associate members may participate in meetings but do not have
+                      voting rights.
                     </p>
                     <p>
                       <strong className="text-foreground">Section 5 — Good Standing.</strong> A
-                      member shall be considered in good standing when their dues are current. Members
-                      in good standing may vote at membership meetings and are eligible to serve on
-                      committees and the Board of Directors.
+                      member shall be considered in good standing when their dues are current.
+                      Members in good standing may vote at membership meetings and are eligible to
+                      serve on committees and the Board of Directors.
                     </p>
                   </div>
                 </section>
 
-                <p className="text-xs text-muted border-t border-border pt-4">
+                <p className="border-t border-border pt-4 text-xs text-muted">
                   This is a summary of key articles. For the complete bylaws or questions about
                   governance, please{' '}
                   <Link href="/contact" className="text-primary underline hover:text-primary-dark">
@@ -242,9 +244,9 @@ export default async function AssociationPage() {
             </div>
 
             {/* Sidebar */}
-            <aside className="lg:sticky lg:top-24 flex flex-col gap-5">
-              <div className="bg-surface rounded-2xl border border-border p-5">
-                <h3 className="font-bold text-foreground mb-4">Quick Links</h3>
+            <aside className="flex flex-col gap-5 lg:sticky lg:top-24">
+              <div className="rounded-2xl border border-border bg-surface p-5">
+                <h3 className="mb-4 font-bold text-foreground">Quick Links</h3>
                 <ul className="flex flex-col gap-2.5">
                   {[
                     { href: '#mission', label: 'Mission & Purpose' },
@@ -256,7 +258,7 @@ export default async function AssociationPage() {
                     <li key={link.href}>
                       <a
                         href={link.href}
-                        className="text-sm text-primary hover:text-primary-dark hover:underline transition-colors"
+                        className="text-sm text-primary transition-colors hover:text-primary-dark hover:underline"
                       >
                         {link.label} →
                       </a>
@@ -265,20 +267,19 @@ export default async function AssociationPage() {
                 </ul>
               </div>
 
-              <div className="bg-primary rounded-2xl p-5 text-white">
-                <h3 className="font-bold text-white mb-2">Free to Join</h3>
-                <p className="text-white/70 text-sm mb-4 leading-relaxed">
+              <div className="rounded-2xl bg-primary p-5 text-white">
+                <h3 className="mb-2 font-bold text-white">Free to Join</h3>
+                <p className="mb-4 text-sm leading-relaxed text-white/70">
                   SENA membership is free and completely optional for all neighborhood residents.
                 </p>
                 <Link
                   href="/get-involved"
-                  className="flex justify-center items-center w-full py-2.5 bg-white text-primary text-sm font-semibold rounded-xl hover:bg-surface transition-colors"
+                  className="flex w-full items-center justify-center rounded-xl bg-white py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-surface"
                 >
                   Learn More
                 </Link>
               </div>
             </aside>
-
           </div>
         </div>
       </section>

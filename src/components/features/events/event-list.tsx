@@ -11,12 +11,14 @@ interface EventListProps {
 
 export function EventList({ events, past = false, emptyMessage, children }: EventListProps) {
   if (events.length === 0) {
-    return children ?? (
-      <EmptyState
-        icon="📅"
-        title="No events right now"
-        description={emptyMessage ?? 'Check back soon — more events are planned.'}
-      />
+    return (
+      children ?? (
+        <EmptyState
+          icon="📅"
+          title="No events right now"
+          description={emptyMessage ?? 'Check back soon — more events are planned.'}
+        />
+      )
     )
   }
 

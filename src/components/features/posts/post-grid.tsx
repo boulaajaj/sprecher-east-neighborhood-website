@@ -19,7 +19,7 @@ export function PostGrid({ posts }: PostGridProps) {
   }
 
   return (
-    <div className="grid sm:grid-cols-2 gap-6">
+    <div className="grid gap-6 sm:grid-cols-2">
       {posts.map((post) => (
         <PostCard key={post.id ?? post._id} post={post} />
       ))}

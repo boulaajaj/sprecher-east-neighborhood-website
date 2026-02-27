@@ -22,16 +22,16 @@ export function UserMenu() {
   }, [])
 
   if (isPending) {
-    return <div className="w-8 h-8 rounded-full bg-surface animate-pulse" />
+    return <div className="h-8 w-8 animate-pulse rounded-full bg-surface" />
   }
 
   if (!session) {
     return (
       <Link
         href="/login"
-        className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-primary border border-primary rounded-lg hover:bg-primary hover:text-white transition-colors"
+        className="flex items-center gap-1.5 rounded-lg border border-primary px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-white"
       >
-        <LogIn className="w-3.5 h-3.5" />
+        <LogIn className="h-3.5 w-3.5" />
         Sign In
       </Link>
     )
@@ -39,30 +39,37 @@ export function UserMenu() {
 
   const user = session.user
   const initials = user.name
-    ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
+    ? user.name
+        .split(' ')
+        .map((n: string) => n[0])
+        .join('')
+        .slice(0, 2)
+        .toUpperCase()
     : user.email[0].toUpperCase()
 
   return (
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-1.5 group"
+        className="group flex items-center gap-1.5"
         aria-label="User menu"
       >
-        <div className="w-8 h-8 rounded-full bg-primary text-white text-xs font-bold flex items-center justify-center select-none">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-white select-none">
           {initials}
         </div>
         <ChevronDown
-          className={`w-3.5 h-3.5 text-muted transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`h-3.5 w-3.5 text-muted transition-transform ${open ? 'rotate-180' : ''}`}
         />
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-border rounded-xl shadow-lg py-1 z-50">
+        <div className="absolute top-full right-0 z-50 mt-2 w-56 rounded-xl border border-border bg-white py-1 shadow-lg">
           {/* User info */}
-          <div className="px-4 py-3 border-b border-border">
-            <p className="text-sm font-semibold text-foreground truncate">{user.name ?? 'Neighbor'}</p>
-            <p className="text-xs text-muted truncate">{user.email}</p>
+          <div className="border-b border-border px-4 py-3">
+            <p className="truncate text-sm font-semibold text-foreground">
+              {user.name ?? 'Neighbor'}
+            </p>
+            <p className="truncate text-xs text-muted">{user.email}</p>
           </div>
 
           {/* Menu items */}
@@ -70,9 +77,9 @@ export function UserMenu() {
             <Link
               href="/profile"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 px-4 py-2 text-sm text-foreground hover:bg-surface transition-colors"
+              className="flex items-center gap-2.5 px-4 py-2 text-sm text-foreground transition-colors hover:bg-surface"
             >
-              <User className="w-4 h-4 text-muted" />
+              <User className="h-4 w-4 text-muted" />
               My Profile
             </Link>
           </div>
@@ -84,9 +91,9 @@ export function UserMenu() {
                 setOpen(false)
                 await signOut()
               }}
-              className="flex items-center gap-2.5 px-4 py-2 w-full text-sm text-red-600 hover:bg-red-50 transition-colors"
+              className="flex w-full items-center gap-2.5 px-4 py-2 text-sm text-red-600 transition-colors hover:bg-red-50"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="h-4 w-4" />
               Sign Out
             </button>
           </div>

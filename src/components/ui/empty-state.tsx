@@ -9,10 +9,10 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon, title, description, className }: EmptyStateProps) {
   return (
-    <div className={cn('bg-surface rounded-2xl border border-border p-10 text-center', className)}>
-      <div className="text-4xl mb-4">{icon}</div>
-      <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
-      <p className="text-muted text-sm max-w-sm mx-auto">{description}</p>
+    <div className={cn('rounded-2xl border border-border bg-surface p-10 text-center', className)}>
+      <div className="mb-4 text-4xl">{icon}</div>
+      <h3 className="mb-2 text-lg font-semibold text-foreground">{title}</h3>
+      <p className="mx-auto max-w-sm text-sm text-muted">{description}</p>
     </div>
   )
 }

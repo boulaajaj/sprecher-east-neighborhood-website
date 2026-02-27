@@ -27,16 +27,14 @@ export default function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="bg-foreground text-white/80 mt-auto">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-
+    <footer className="mt-auto bg-foreground text-white/80">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         {/* Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12 mb-10">
-
+        <div className="mb-10 grid grid-cols-2 gap-8 md:grid-cols-4 lg:gap-12">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <div className="text-white font-bold text-lg leading-tight mb-1">Sprecher East</div>
-            <div className="text-white/60 text-sm mb-4">
+            <div className="mb-1 text-lg leading-tight font-bold text-white">Sprecher East</div>
+            <div className="mb-4 text-sm text-white/60">
               Neighborhood Association · Madison, Wisconsin
             </div>
             <div className="text-sm text-white/50">🏡 Established 2006</div>
@@ -45,7 +43,7 @@ export default function Footer() {
                 href="https://www.sprechereast.org/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-white/60 hover:text-white transition-colors underline"
+                className="text-sm text-white/60 underline transition-colors hover:text-white"
               >
                 Visit Neighbor Forum →
               </a>
@@ -54,7 +52,7 @@ export default function Footer() {
 
           {/* Pages */}
           <div>
-            <div className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-4">
+            <div className="mb-4 text-xs font-semibold tracking-wider text-white/40 uppercase">
               Pages
             </div>
             <ul className="flex flex-col gap-2.5">
@@ -62,7 +60,7 @@ export default function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-white/70 hover:text-white transition-colors"
+                    className="text-sm text-white/70 transition-colors hover:text-white"
                   >
                     {link.label}
                   </Link>
@@ -73,7 +71,7 @@ export default function Footer() {
 
           {/* Association */}
           <div>
-            <div className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-4">
+            <div className="mb-4 text-xs font-semibold tracking-wider text-white/40 uppercase">
               Association
             </div>
             <ul className="flex flex-col gap-2.5">
@@ -81,7 +79,7 @@ export default function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-white/70 hover:text-white transition-colors"
+                    className="text-sm text-white/70 transition-colors hover:text-white"
                   >
                     {link.label}
                   </Link>
@@ -92,7 +90,7 @@ export default function Footer() {
 
           {/* Resources */}
           <div>
-            <div className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-4">
+            <div className="mb-4 text-xs font-semibold tracking-wider text-white/40 uppercase">
               Resources
             </div>
             <ul className="flex flex-col gap-2.5">
@@ -103,14 +101,14 @@ export default function Footer() {
                       href={link.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-white/70 hover:text-white transition-colors"
+                      className="text-sm text-white/70 transition-colors hover:text-white"
                     >
                       {link.label}
                     </a>
                   ) : (
                     <Link
                       href={link.href}
-                      className="text-sm text-white/70 hover:text-white transition-colors"
+                      className="text-sm text-white/70 transition-colors hover:text-white"
                     >
                       {link.label}
                     </Link>
@@ -122,15 +120,19 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-white/40">
-            © {year} Sprecher East Neighborhood Association
-          </p>
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 sm:flex-row">
+          <p className="text-sm text-white/40">© {year} Sprecher East Neighborhood Association</p>
           <div className="flex items-center gap-6">
-            <Link href="/association#bylaws" className="text-sm text-white/40 hover:text-white/70 transition-colors">
+            <Link
+              href="/association#bylaws"
+              className="text-sm text-white/40 transition-colors hover:text-white/70"
+            >
               Bylaws
             </Link>
-            <Link href="/contact" className="text-sm text-white/40 hover:text-white/70 transition-colors">
+            <Link
+              href="/contact"
+              className="text-sm text-white/40 transition-colors hover:text-white/70"
+            >
               Contact
             </Link>
           </div>

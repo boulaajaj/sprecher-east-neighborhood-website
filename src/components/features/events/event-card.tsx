@@ -14,28 +14,30 @@ export function EventCard({ event, past = false }: EventCardProps) {
   const locLabel = getEventLocationLabel(event)
 
   return (
-    <article className={`flex gap-4 bg-white rounded-xl border border-border p-4 transition-shadow hover:shadow-md ${past ? 'opacity-70' : ''}`}>
+    <article
+      className={`flex gap-4 rounded-xl border border-border bg-white p-4 transition-shadow hover:shadow-md ${past ? 'opacity-70' : ''}`}
+    >
       <EventDateBadge date={event.date} />
 
-      <div className="flex-1 min-w-0">
-        <h3 className="text-sm font-semibold text-foreground leading-snug line-clamp-2 mb-1.5">
+      <div className="min-w-0 flex-1">
+        <h3 className="mb-1.5 line-clamp-2 text-sm leading-snug font-semibold text-foreground">
           {event.title}
         </h3>
 
-        <div className="flex flex-col gap-1 text-xs text-muted mb-2">
+        <div className="mb-2 flex flex-col gap-1 text-xs text-muted">
           {time && (
             <span className="flex items-center gap-1.5">
-              <Clock className="w-3 h-3" />
+              <Clock className="h-3 w-3" />
               {time}
             </span>
           )}
           <span className="flex items-center gap-1.5">
-            <MapPin className="w-3 h-3" />
+            <MapPin className="h-3 w-3" />
             {locType === 'virtual' ? 'Virtual / Online' : locLabel}
           </span>
         </div>
 
-        <p className="text-xs text-muted line-clamp-2 leading-relaxed">{event.description}</p>
+        <p className="line-clamp-2 text-xs leading-relaxed text-muted">{event.description}</p>
       </div>
     </article>
   )

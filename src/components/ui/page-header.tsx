@@ -6,12 +6,12 @@ interface PageHeaderProps {
 
 export function PageHeader({ eyebrow, title, description }: PageHeaderProps) {
   return (
-    <header className="bg-surface border-b border-border py-14 md:py-20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">{eyebrow}</p>
-        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">{title}</h1>
+    <header className="border-b border-border bg-surface py-14 md:py-20">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">{eyebrow}</p>
+        <h1 className="mb-4 text-4xl font-bold text-foreground md:text-5xl">{title}</h1>
         {description && (
-          <p className="text-muted text-lg max-w-2xl leading-relaxed">{description}</p>
+          <p className="max-w-2xl text-lg leading-relaxed text-muted">{description}</p>
         )}
       </div>
     </header>

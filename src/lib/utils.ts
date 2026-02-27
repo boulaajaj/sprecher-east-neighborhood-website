@@ -1,6 +1,9 @@
 export function formatDate(dateStr: string, opts?: Intl.DateTimeFormatOptions): string {
   const d = new Date(dateStr.includes('T') ? dateStr : dateStr + 'T00:00:00')
-  return d.toLocaleDateString('en-US', opts ?? { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' })
+  return d.toLocaleDateString(
+    'en-US',
+    opts ?? { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' },
+  )
 }
 
 export function formatDateShort(dateStr: string): string {
