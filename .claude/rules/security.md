@@ -39,7 +39,7 @@
 
 ## Dependency Security Guardrails
 
-Three layers of protection against vulnerable dependencies:
+Four layers of protection against vulnerable dependencies:
 
 1. **Agent rules** (during development): Check packages before installing, run audit after install, fix before committing
 2. **Pre-commit hook** (local): `npm audit --audit-level=high --omit=dev` warns if production deps have high/critical vulnerabilities
