@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* ─── Design tokens ─────────────────────────────────────────────────────────
    These generate Tailwind utility classes automatically:
@@ -7,29 +7,29 @@
    ──────────────────────────────────────────────────────────────────────── */
 @theme {
   /* Brand */
-  --color-primary:       #3d7a5e;
-  --color-primary-dark:  #2e5e47;
+  --color-primary: #3d7a5e;
+  --color-primary-dark: #2e5e47;
   --color-primary-light: #4f9974;
-  --color-accent:        #e8923a;
-  --color-accent-dark:   #c97830;
+  --color-accent: #e8923a;
+  --color-accent-dark: #c97830;
 
   /* Surfaces */
-  --color-background:    #f9f8f5;
-  --color-surface:       #f0ede6;
+  --color-background: #f9f8f5;
+  --color-surface: #f0ede6;
 
   /* Text */
-  --color-foreground:    #1a1a1a;
-  --color-muted:         #6b6b6b;
+  --color-foreground: #1a1a1a;
+  --color-muted: #6b6b6b;
 
   /* Borders */
-  --color-border:        #e2ddd6;
+  --color-border: #e2ddd6;
 
   /* Typography */
   --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 
   /* Shadows */
   --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.04);
-  --shadow-card-hover: 0 4px 12px 0 rgb(0 0 0 / 0.10), 0 2px 4px -1px rgb(0 0 0 / 0.06);
+  --shadow-card-hover: 0 4px 12px 0 rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06);
 }
 
 /* ─── Base styles ─────────────────────────────────────────────────────────── */
@@ -39,13 +39,18 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background font-sans text-foreground antialiased;
     font-size: 1rem;
     line-height: 1.6;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold leading-tight text-foreground;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply leading-tight font-semibold text-foreground;
   }
 
   a {
@@ -54,35 +59,58 @@
 
   /* Prettier focus rings */
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-primary rounded;
+    @apply rounded outline-2 outline-offset-2 outline-primary;
   }
 }
 
 /* ─── Prose styles for Sanity portable text ──────────────────────────────── */
 @layer components {
   .prose-content {
-    @apply text-foreground leading-relaxed;
+    @apply leading-relaxed text-foreground;
   }
 
-  .prose-content p { @apply mb-4 last:mb-0; }
-  .prose-content ul { @apply mb-4 pl-5 list-disc space-y-1; }
-  .prose-content ol { @apply mb-4 pl-5 list-decimal space-y-1; }
-  .prose-content strong { @apply font-semibold; }
-  .prose-content a { @apply text-primary underline hover:text-primary-dark; }
-  .prose-content h2 { @apply text-xl font-semibold mt-6 mb-3; }
-  .prose-content h3 { @apply text-lg font-semibold mt-5 mb-2; }
+  .prose-content p {
+    @apply mb-4 last:mb-0;
+  }
+  .prose-content ul {
+    @apply mb-4 list-disc space-y-1 pl-5;
+  }
+  .prose-content ol {
+    @apply mb-4 list-decimal space-y-1 pl-5;
+  }
+  .prose-content strong {
+    @apply font-semibold;
+  }
+  .prose-content a {
+    @apply text-primary underline hover:text-primary-dark;
+  }
+  .prose-content h2 {
+    @apply mt-6 mb-3 text-xl font-semibold;
+  }
+  .prose-content h3 {
+    @apply mt-5 mb-2 text-lg font-semibold;
+  }
 }
 
 /* ─── Loading shimmer ─────────────────────────────────────────────────────── */
 @layer utilities {
   .shimmer {
-    background: linear-gradient(90deg, var(--color-surface) 25%, var(--color-border) 50%, var(--color-surface) 75%);
+    background: linear-gradient(
+      90deg,
+      var(--color-surface) 25%,
+      var(--color-border) 50%,
+      var(--color-surface) 75%
+    );
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
   }
 
   @keyframes shimmer {
-    0%   { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
   }
 }

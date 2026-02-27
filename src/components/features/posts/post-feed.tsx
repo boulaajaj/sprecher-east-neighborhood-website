@@ -9,11 +9,7 @@ interface PostFeedProps {
 export function PostFeed({ posts }: PostFeedProps) {
   if (posts.length === 0) {
     return (
-      <EmptyState
-        icon="📰"
-        title="No posts yet"
-        description="Check back for neighborhood news."
-      />
+      <EmptyState icon="📰" title="No posts yet" description="Check back for neighborhood news." />
     )
   }
 

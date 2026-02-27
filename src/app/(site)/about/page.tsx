@@ -33,9 +33,18 @@ const BOUNDARIES = [
 ]
 
 const PHOTOS = [
-  { src: '/images/441519955_18435399844044029_8893742456448624265_n.jpg', alt: 'Sprecher East community gathering' },
-  { src: '/images/451962546_18443909296044029_4679884066375857301_n.jpg', alt: 'Neighborhood event' },
-  { src: '/images/452236518_18443909287044029_3867824997287597586_n.jpg', alt: 'Sprecher East residents' },
+  {
+    src: '/images/441519955_18435399844044029_8893742456448624265_n.jpg',
+    alt: 'Sprecher East community gathering',
+  },
+  {
+    src: '/images/451962546_18443909296044029_4679884066375857301_n.jpg',
+    alt: 'Neighborhood event',
+  },
+  {
+    src: '/images/452236518_18443909287044029_3867824997287597586_n.jpg',
+    alt: 'Sprecher East residents',
+  },
 ]
 
 export default function AboutPage() {
@@ -48,18 +57,18 @@ export default function AboutPage() {
       />
 
       <section className="py-16 md:py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-10 lg:gap-16 items-start">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="grid items-start gap-10 md:grid-cols-2 lg:gap-16">
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">
+              <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">
                 Neighborhood Overview
               </p>
-              <h2 className="text-3xl font-bold text-foreground mb-5">Who We Are</h2>
-              <div className="space-y-4 text-muted leading-relaxed">
+              <h2 className="mb-5 text-3xl font-bold text-foreground">Who We Are</h2>
+              <div className="space-y-4 leading-relaxed text-muted">
                 <p>
                   Sprecher East is a residential neighborhood located on the Far East Side of
-                  Madison, Wisconsin. It is bounded by Milwaukee Street to the south, Sprecher
-                  Road to the east, Cottage Grove Road to the north, and Femrite Drive to the west.
+                  Madison, Wisconsin. It is bounded by Milwaukee Street to the south, Sprecher Road
+                  to the east, Cottage Grove Road to the north, and Femrite Drive to the west.
                 </p>
                 <p>
                   The Sprecher East Neighborhood Association (SENA) was founded in 2006 to give
@@ -75,7 +84,7 @@ export default function AboutPage() {
             </div>
 
             <div className="space-y-4">
-              <div className="relative rounded-2xl overflow-hidden aspect-[4/3] border border-border shadow-sm">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border shadow-sm">
                 <Image
                   src="/images/East_Madison_NAs.png"
                   alt="Map of Sprecher East neighborhood boundaries"
@@ -84,7 +93,7 @@ export default function AboutPage() {
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
               </div>
-              <p className="text-xs text-muted text-center">
+              <p className="text-center text-xs text-muted">
                 Sprecher East neighborhood boundaries within East Madison
               </p>
             </div>
@@ -93,17 +102,17 @@ export default function AboutPage() {
       </section>
 
       <section className="bg-surface py-14 md:py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-10 items-center">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="grid items-center gap-10 md:grid-cols-2">
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">
+              <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">
                 Where We Are
               </p>
-              <h2 className="text-3xl font-bold text-foreground mb-5">Neighborhood Boundaries</h2>
+              <h2 className="mb-5 text-3xl font-bold text-foreground">Neighborhood Boundaries</h2>
               <div className="grid grid-cols-2 gap-3">
                 {BOUNDARIES.map((b) => (
-                  <div key={b.dir} className="bg-white rounded-xl border border-border p-4">
-                    <div className="text-xs font-bold text-primary uppercase tracking-wide mb-1">
+                  <div key={b.dir} className="rounded-xl border border-border bg-white p-4">
+                    <div className="mb-1 text-xs font-bold tracking-wide text-primary uppercase">
                       {b.dir}
                     </div>
                     <div className="text-sm font-medium text-foreground">{b.road}</div>
@@ -112,15 +121,15 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-border p-6 shadow-sm">
-              <div className="flex items-start gap-3 mb-4">
-                <MapPin className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+            <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+              <div className="mb-4 flex items-start gap-3">
+                <MapPin className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
                 <div>
-                  <div className="font-semibold text-foreground mb-1">Location</div>
-                  <div className="text-muted text-sm">Far East Side, Madison, Wisconsin</div>
+                  <div className="mb-1 font-semibold text-foreground">Location</div>
+                  <div className="text-sm text-muted">Far East Side, Madison, Wisconsin</div>
                 </div>
               </div>
-              <div className="text-sm text-muted leading-relaxed">
+              <div className="text-sm leading-relaxed text-muted">
                 Sprecher East sits within Dane County's City of Madison, near the intersection of
                 Milwaukee Street and Sprecher Road. The neighborhood is easily accessible via
                 Highway 30 and has convenient access to the East Towne area.
@@ -131,17 +140,17 @@ export default function AboutPage() {
       </section>
 
       <section className="py-16 md:py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">Sub-Areas</p>
-          <h2 className="text-3xl font-bold text-foreground mb-10">Neighborhood Subdivisions</h2>
-          <div className="grid sm:grid-cols-3 gap-6">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">Sub-Areas</p>
+          <h2 className="mb-10 text-3xl font-bold text-foreground">Neighborhood Subdivisions</h2>
+          <div className="grid gap-6 sm:grid-cols-3">
             {SUBDIVISIONS.map((sub) => (
-              <div key={sub.name} className="bg-surface rounded-2xl border border-border p-6">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                  <span className="text-primary text-lg">🏘️</span>
+              <div key={sub.name} className="rounded-2xl border border-border bg-surface p-6">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                  <span className="text-lg text-primary">🏘️</span>
                 </div>
-                <h3 className="font-bold text-foreground mb-2">{sub.name}</h3>
-                <p className="text-sm text-muted leading-relaxed">{sub.desc}</p>
+                <h3 className="mb-2 font-bold text-foreground">{sub.name}</h3>
+                <p className="text-sm leading-relaxed text-muted">{sub.desc}</p>
               </div>
             ))}
           </div>
@@ -149,10 +158,10 @@ export default function AboutPage() {
       </section>
 
       <section className="bg-surface py-12">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
             {PHOTOS.map((img) => (
-              <div key={img.src} className="relative rounded-xl overflow-hidden aspect-[4/3]">
+              <div key={img.src} className="relative aspect-[4/3] overflow-hidden rounded-xl">
                 <Image
                   src={img.src}
                   alt={img.alt}

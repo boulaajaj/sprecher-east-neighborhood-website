@@ -8,20 +8,25 @@ interface SectionHeaderProps {
   viewAllLabel?: string
 }
 
-export function SectionHeader({ eyebrow, title, viewAllHref, viewAllLabel = 'View all' }: SectionHeaderProps) {
+export function SectionHeader({
+  eyebrow,
+  title,
+  viewAllHref,
+  viewAllLabel = 'View all',
+}: SectionHeaderProps) {
   return (
-    <div className="flex items-center justify-between mb-6">
+    <div className="mb-6 flex items-center justify-between">
       <div>
-        <p className="text-xs font-bold uppercase tracking-widest text-primary mb-1">{eyebrow}</p>
+        <p className="mb-1 text-xs font-bold tracking-widest text-primary uppercase">{eyebrow}</p>
         <h2 className="text-2xl font-bold text-foreground">{title}</h2>
       </div>
       {viewAllHref && (
         <Link
           href={viewAllHref}
-          className="text-sm font-medium text-primary hover:text-primary-dark transition-colors flex items-center gap-1"
+          className="flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary-dark"
         >
           {viewAllLabel}
-          <ArrowRight className="w-3.5 h-3.5" />
+          <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       )}
     </div>

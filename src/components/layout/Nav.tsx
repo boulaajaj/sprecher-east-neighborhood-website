@@ -24,11 +24,15 @@ export default function Nav() {
   const pathname = usePathname()
 
   // Close mobile menu on route change
-  useEffect(() => { setOpen(false) }, [pathname])
+  useEffect(() => {
+    setOpen(false)
+  }, [pathname])
 
   // Close on Escape key
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
   }, [])
@@ -36,34 +40,35 @@ export default function Nav() {
   // Lock body scroll when menu is open
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
+    return () => {
+      document.body.style.overflow = ''
+    }
   }, [open])
 
   return (
     <>
       {/* ── Desktop + Mobile nav bar ── */}
-      <nav className="fixed top-0 inset-x-0 z-40 bg-white/95 backdrop-blur-sm border-b border-border shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-
+      <nav className="fixed inset-x-0 top-0 z-40 border-b border-border bg-white/95 shadow-sm backdrop-blur-sm">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <Link href="/" className="flex flex-col leading-none group">
-              <span className="text-base font-bold text-primary group-hover:text-primary-dark transition-colors">
+            <Link href="/" className="group flex flex-col leading-none">
+              <span className="text-base font-bold text-primary transition-colors group-hover:text-primary-dark">
                 Sprecher East
               </span>
               <span className="text-xs text-muted">Neighborhood Association</span>
             </Link>
 
             {/* Desktop links */}
-            <ul className="hidden md:flex items-center gap-0.5">
+            <ul className="hidden items-center gap-0.5 md:flex">
               {NAV_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                       isActive(pathname, link.href)
-                        ? 'text-primary bg-primary/10'
-                        : 'text-muted hover:text-foreground hover:bg-surface'
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-muted hover:bg-surface hover:text-foreground'
                     }`}
                   >
                     {link.label}
@@ -73,7 +78,7 @@ export default function Nav() {
               <li className="ml-2">
                 <Link
                   href="/contact"
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                  className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
                     isActive(pathname, '/contact')
                       ? 'bg-primary-dark text-white'
                       : 'bg-primary text-white hover:bg-primary-dark'
@@ -85,19 +90,19 @@ export default function Nav() {
             </ul>
 
             {/* Auth widget — desktop */}
-            <div className="hidden md:flex items-center ml-2">
+            <div className="ml-2 hidden items-center md:flex">
               <UserMenu />
             </div>
 
             {/* Mobile toggle */}
             <button
-              className="md:hidden p-2 rounded-lg text-muted hover:bg-surface transition-colors"
+              className="rounded-lg p-2 text-muted transition-colors hover:bg-surface md:hidden"
               onClick={() => setOpen(true)}
               aria-label="Open navigation menu"
               aria-expanded={open}
               aria-controls="mobile-nav"
             >
-              <Menu className="w-5 h-5" />
+              <Menu className="h-5 w-5" />
             </button>
           </div>
         </div>
@@ -120,19 +125,19 @@ export default function Nav() {
           />
 
           {/* Panel */}
-          <div className="absolute right-0 top-0 bottom-0 w-72 bg-white flex flex-col shadow-2xl">
+          <div className="absolute top-0 right-0 bottom-0 flex w-72 flex-col bg-white shadow-2xl">
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+            <div className="flex items-center justify-between border-b border-border px-6 py-4">
               <div>
                 <div className="font-bold text-primary">Sprecher East</div>
                 <div className="text-xs text-muted">Neighborhood Association</div>
               </div>
               <button
                 onClick={() => setOpen(false)}
-                className="p-2 rounded-lg text-muted hover:bg-surface transition-colors"
+                className="rounded-lg p-2 text-muted transition-colors hover:bg-surface"
                 aria-label="Close navigation menu"
               >
-                <X className="w-5 h-5" />
+                <X className="h-5 w-5" />
               </button>
             </div>
 
@@ -143,9 +148,9 @@ export default function Nav() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className={`flex items-center px-4 py-3 rounded-lg font-medium transition-colors ${
+                      className={`flex items-center rounded-lg px-4 py-3 font-medium transition-colors ${
                         isActive(pathname, link.href)
-                          ? 'text-primary bg-primary/10'
+                          ? 'bg-primary/10 text-primary'
                           : 'text-foreground hover:bg-surface'
                       }`}
                     >
@@ -157,13 +162,13 @@ export default function Nav() {
             </nav>
 
             {/* Footer: auth + CTA */}
-            <div className="p-4 border-t border-border flex flex-col gap-3">
+            <div className="flex flex-col gap-3 border-t border-border p-4">
               <div className="flex items-center justify-center">
                 <UserMenu />
               </div>
               <Link
                 href="/get-involved"
-                className="flex justify-center items-center w-full py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition-colors"
+                className="flex w-full items-center justify-center rounded-lg bg-primary py-3 font-semibold text-white transition-colors hover:bg-primary-dark"
               >
                 Join the Association
               </Link>

@@ -7,13 +7,13 @@
 
 ## Stack
 
-| Layer | Choice | Reason |
-|-------|--------|--------|
-| Framework | **Next.js 15** (App Router, TypeScript) | Most popular React framework, SSG + SSR, Vercel-native |
-| CSS | **Tailwind CSS v4** | Utility-first, co-developed with Next.js team, huge ecosystem |
-| CMS | **Sanity v3** | React-based Studio embedded in app at `/studio`, Git-friendly, free tier |
-| Icons | **Lucide React** | Standard in the Next.js/React ecosystem |
-| Hosting | **Vercel** (recommended) | Made by the Next.js team, free tier, auto-deploy from GitHub |
+| Layer     | Choice                                  | Reason                                                                   |
+| --------- | --------------------------------------- | ------------------------------------------------------------------------ |
+| Framework | **Next.js 15** (App Router, TypeScript) | Most popular React framework, SSG + SSR, Vercel-native                   |
+| CSS       | **Tailwind CSS v4**                     | Utility-first, co-developed with Next.js team, huge ecosystem            |
+| CMS       | **Sanity v3**                           | React-based Studio embedded in app at `/studio`, Git-friendly, free tier |
+| Icons     | **Lucide React**                        | Standard in the Next.js/React ecosystem                                  |
+| Hosting   | **Vercel** (recommended)                | Made by the Next.js team, free tier, auto-deploy from GitHub             |
 
 ---
 
@@ -77,11 +77,13 @@ public/
 ## First-Time Setup
 
 ### 1. Install dependencies
+
 ```bash
 npm install
 ```
 
 ### 2. Migrate images (CRITICAL — images won't load without this)
+
 ```bash
 # Windows PowerShell:
 Copy-Item -Recurse "assets\images" "public\images"
@@ -93,6 +95,7 @@ cp -r assets/images public/images
 Images are referenced in components as `/images/filename.jpg` (served from `public/images/`).
 
 ### 3. Start dev server
+
 ```bash
 npm run dev
 # → http://localhost:3000
@@ -101,6 +104,7 @@ npm run dev
 The site works fully without Sanity configured — it reads from `data/*.json` automatically.
 
 ### 4. (Optional) Connect Sanity CMS
+
 ```bash
 # Create a free Sanity project
 npx sanity@latest init
@@ -121,16 +125,16 @@ npm run dev
 All design tokens live in `src/app/globals.css` inside the `@theme {}` block.
 Tailwind v4 auto-generates utility classes from them:
 
-| Token | Value | Generated class |
-|-------|-------|-----------------|
-| `--color-primary` | `#3d7a5e` | `bg-primary`, `text-primary`, `border-primary` |
-| `--color-accent` | `#e8923a` | `bg-accent`, `text-accent` |
-| `--color-background` | `#f9f8f5` | `bg-background` |
-| `--color-surface` | `#f0ede6` | `bg-surface` |
-| `--color-foreground` | `#1a1a1a` | `text-foreground` |
-| `--color-muted` | `#6b6b6b` | `text-muted` |
-| `--color-border` | `#e2ddd6` | `border-border` |
-| `--font-sans` | Poppins var | `font-sans` |
+| Token                | Value       | Generated class                                |
+| -------------------- | ----------- | ---------------------------------------------- |
+| `--color-primary`    | `#3d7a5e`   | `bg-primary`, `text-primary`, `border-primary` |
+| `--color-accent`     | `#e8923a`   | `bg-accent`, `text-accent`                     |
+| `--color-background` | `#f9f8f5`   | `bg-background`                                |
+| `--color-surface`    | `#f0ede6`   | `bg-surface`                                   |
+| `--color-foreground` | `#1a1a1a`   | `text-foreground`                              |
+| `--color-muted`      | `#6b6b6b`   | `text-muted`                                   |
+| `--color-border`     | `#e2ddd6`   | `border-border`                                |
+| `--font-sans`        | Poppins var | `font-sans`                                    |
 
 To change a color site-wide: edit one line in `globals.css`.
 
@@ -139,6 +143,7 @@ To change a color site-wide: edit one line in `globals.css`.
 ## Data Layer
 
 `src/lib/data.ts` auto-detects whether Sanity is configured:
+
 - **No env var set** → reads from `data/*.json` (zero-config, works immediately)
 - **Env var set** → fetches from Sanity API via GROQ
 
@@ -148,23 +153,24 @@ Switching to Sanity is just adding 3 env vars — no code changes needed.
 
 ## Pages
 
-| Route | File | Data source |
-|-------|------|------------|
-| `/` | `(site)/page.tsx` | events + posts |
-| `/about` | `(site)/about/page.tsx` | static |
-| `/association` | `(site)/association/page.tsx` | board members |
-| `/events` | `(site)/events/page.tsx` | events |
-| `/news` | `(site)/news/page.tsx` | posts |
-| `/resources` | `(site)/resources/page.tsx` | static |
-| `/get-involved` | `(site)/get-involved/page.tsx` | board members |
-| `/contact` | `(site)/contact/page.tsx` | static |
-| `/studio` | `studio/[[...tool]]/page.tsx` | Sanity Studio |
+| Route           | File                           | Data source    |
+| --------------- | ------------------------------ | -------------- |
+| `/`             | `(site)/page.tsx`              | events + posts |
+| `/about`        | `(site)/about/page.tsx`        | static         |
+| `/association`  | `(site)/association/page.tsx`  | board members  |
+| `/events`       | `(site)/events/page.tsx`       | events         |
+| `/news`         | `(site)/news/page.tsx`         | posts          |
+| `/resources`    | `(site)/resources/page.tsx`    | static         |
+| `/get-involved` | `(site)/get-involved/page.tsx` | board members  |
+| `/contact`      | `(site)/contact/page.tsx`      | static         |
+| `/studio`       | `studio/[[...tool]]/page.tsx`  | Sanity Studio  |
 
 ---
 
 ## Adding Content Without a CMS
 
 Edit the JSON files in `data/`:
+
 - `data/events.json` — add new events
 - `data/posts.json` — add news posts
 - `data/board.json` — update board members with real names
@@ -176,15 +182,19 @@ Edit the JSON files in `data/`:
 Currently the form POSTs to `/api/contact/route.ts` which logs to the server console.
 
 **Option A — Formspree (simplest, free tier):**
+
 1. Create account at formspree.io, create a form, copy the form ID
 2. In `ContactForm.tsx`, change `fetch('/api/contact', ...)` to `fetch('https://formspree.io/f/YOUR_ID', ...)`
 3. Delete `src/app/api/contact/route.ts`
 
 **Option B — Resend (developer-friendly, generous free tier):**
+
 ```bash
 npm install resend
 ```
+
 Then add to `route.ts`:
+
 ```typescript
 import { Resend } from 'resend'
 const resend = new Resend(process.env.RESEND_API_KEY)
@@ -208,13 +218,13 @@ await resend.emails.send({ from: 'noreply@yourdomain.com', to: 'board@sena.org',
 
 ## What Still Needs Real Data
 
-| Item | Location | Current State |
-|------|---------|---------------|
-| Board member names | `data/board.json` | Placeholder roles only |
-| More events | `data/events.json` | 2 events from July 2024 |
-| More news posts | `data/posts.json` | 2 placeholder posts |
-| Contact email delivery | `src/app/api/contact/route.ts` | Console.log only |
-| Sanity project | `.env.local` | Not configured |
+| Item                   | Location                       | Current State           |
+| ---------------------- | ------------------------------ | ----------------------- |
+| Board member names     | `data/board.json`              | Placeholder roles only  |
+| More events            | `data/events.json`             | 2 events from July 2024 |
+| More news posts        | `data/posts.json`              | 2 placeholder posts     |
+| Contact email delivery | `src/app/api/contact/route.ts` | Console.log only        |
+| Sanity project         | `.env.local`                   | Not configured          |
 
 ---
 
@@ -231,6 +241,6 @@ await resend.emails.send({ from: 'noreply@yourdomain.com', to: 'board@sena.org',
 
 ## Session History
 
-- **Session 1**: Full static site rebuilt (8 HTML pages, data/*.json, main.css, main.js)
+- **Session 1**: Full static site rebuilt (8 HTML pages, data/\*.json, main.css, main.js)
 - **Session 2**: User requested React. Full Next.js 15 + Tailwind v4 + Sanity v3 app built.
 - Old static HTML files still exist in root but are ignored by Next.js routing.

@@ -55,8 +55,18 @@ export const Events: CollectionConfig = {
     {
       type: 'row',
       fields: [
-        { name: 'timeStart', type: 'text', label: 'Start Time', admin: { width: '50%', placeholder: '6:00 PM' } },
-        { name: 'timeEnd', type: 'text', label: 'End Time', admin: { width: '50%', placeholder: '8:00 PM' } },
+        {
+          name: 'timeStart',
+          type: 'text',
+          label: 'Start Time',
+          admin: { width: '50%', placeholder: '6:00 PM' },
+        },
+        {
+          name: 'timeEnd',
+          type: 'text',
+          label: 'End Time',
+          admin: { width: '50%', placeholder: '8:00 PM' },
+        },
       ],
     },
     {
@@ -102,7 +112,12 @@ export const Events: CollectionConfig = {
       type: 'row',
       fields: [
         { name: 'mapsUrl', type: 'text', label: 'Google Maps URL', admin: { width: '50%' } },
-        { name: 'registrationUrl', type: 'text', label: 'Registration URL', admin: { width: '50%' } },
+        {
+          name: 'registrationUrl',
+          type: 'text',
+          label: 'Registration URL',
+          admin: { width: '50%' },
+        },
       ],
     },
     {

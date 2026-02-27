@@ -17,19 +17,21 @@ export function EventDetailCard({ event, past = false }: EventDetailCardProps) {
   const mapsUrl = event.mapsUrl ?? event.location?.maps_url
 
   return (
-    <article className={`bg-white rounded-2xl border border-border shadow-sm overflow-hidden ${past ? 'opacity-75' : ''}`}>
+    <article
+      className={`overflow-hidden rounded-2xl border border-border bg-white shadow-sm ${past ? 'opacity-75' : ''}`}
+    >
       <div className="p-6 sm:p-8">
-        <div className="flex flex-wrap items-center gap-2 mb-4">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
           <CategoryBadge category={event.category} />
           {past && <StatusBadge label="Past Event" />}
         </div>
 
-        <h2 className="text-2xl font-bold text-foreground mb-4">{event.title}</h2>
+        <h2 className="mb-4 text-2xl font-bold text-foreground">{event.title}</h2>
 
-        <dl className="flex flex-col gap-3 mb-6 text-sm text-muted">
+        <dl className="mb-6 flex flex-col gap-3 text-sm text-muted">
           <div className="flex items-start gap-3">
             <dt className="sr-only">Date</dt>
-            <span className="w-4 h-4 mt-0.5 flex-shrink-0">📅</span>
+            <span className="mt-0.5 h-4 w-4 flex-shrink-0">📅</span>
             <dd>
               <span className="font-medium text-foreground">{parts.weekday}, </span>
               {formatDate(event.date)}
@@ -39,14 +41,14 @@ export function EventDetailCard({ event, past = false }: EventDetailCardProps) {
           {time && (
             <div className="flex items-center gap-3">
               <dt className="sr-only">Time</dt>
-              <Clock className="w-4 h-4 text-primary flex-shrink-0" />
+              <Clock className="h-4 w-4 flex-shrink-0 text-primary" />
               <dd>{time}</dd>
             </div>
           )}
 
           <div className="flex items-start gap-3">
             <dt className="sr-only">Location</dt>
-            <MapPin className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+            <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
             <dd>
               {locType === 'virtual' ? (
                 <span>Virtual / Online</span>
@@ -65,17 +67,17 @@ export function EventDetailCard({ event, past = false }: EventDetailCardProps) {
           </div>
         </dl>
 
-        <p className="text-foreground leading-relaxed">{event.description}</p>
+        <p className="leading-relaxed text-foreground">{event.description}</p>
 
-        <div className="flex flex-wrap gap-3 mt-6">
+        <div className="mt-6 flex flex-wrap gap-3">
           {mapsUrl && locType !== 'virtual' && (
             <a
               href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border border-border rounded-lg hover:bg-surface transition-colors text-muted"
+              className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface"
             >
-              <MapPin className="w-4 h-4" />
+              <MapPin className="h-4 w-4" />
               View Map
             </a>
           )}
@@ -84,10 +86,10 @@ export function EventDetailCard({ event, past = false }: EventDetailCardProps) {
               href={event.registrationUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark"
             >
               Register
-              <ExternalLink className="w-3.5 h-3.5" />
+              <ExternalLink className="h-3.5 w-3.5" />
             </a>
           )}
         </div>

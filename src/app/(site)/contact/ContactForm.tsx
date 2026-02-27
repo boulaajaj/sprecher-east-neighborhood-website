@@ -36,15 +36,15 @@ export default function ContactForm() {
 
   if (status === 'success') {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center bg-primary/5 border border-primary/20 rounded-2xl">
-        <CheckCircle className="w-12 h-12 text-primary mb-4" />
-        <h3 className="text-xl font-bold text-foreground mb-2">Message Sent!</h3>
-        <p className="text-muted text-sm max-w-sm leading-relaxed">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-primary/20 bg-primary/5 py-16 text-center">
+        <CheckCircle className="mb-4 h-12 w-12 text-primary" />
+        <h3 className="mb-2 text-xl font-bold text-foreground">Message Sent!</h3>
+        <p className="max-w-sm text-sm leading-relaxed text-muted">
           Thanks for reaching out. We typically respond within a few business days.
         </p>
         <button
           onClick={() => setStatus('idle')}
-          className="mt-6 text-sm text-primary hover:underline font-medium"
+          className="mt-6 text-sm font-medium text-primary hover:underline"
         >
           Send another message
         </button>
@@ -61,15 +61,17 @@ export default function ContactForm() {
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </div>
       )}
 
       {/* Name row */}
-      <div className="grid sm:grid-cols-2 gap-4">
+      <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="first_name" className={labelClass}>First Name</label>
+          <label htmlFor="first_name" className={labelClass}>
+            First Name
+          </label>
           <input
             id="first_name"
             name="first_name"
@@ -81,7 +83,9 @@ export default function ContactForm() {
           />
         </div>
         <div>
-          <label htmlFor="last_name" className={labelClass}>Last Name</label>
+          <label htmlFor="last_name" className={labelClass}>
+            Last Name
+          </label>
           <input
             id="last_name"
             name="last_name"
@@ -95,7 +99,9 @@ export default function ContactForm() {
 
       {/* Email */}
       <div>
-        <label htmlFor="email" className={labelClass}>Email Address</label>
+        <label htmlFor="email" className={labelClass}>
+          Email Address
+        </label>
         <input
           id="email"
           name="email"
@@ -109,10 +115,14 @@ export default function ContactForm() {
 
       {/* Subject */}
       <div>
-        <label htmlFor="subject" className={labelClass}>What's this about?</label>
+        <label htmlFor="subject" className={labelClass}>
+          What's this about?
+        </label>
         <div className="relative">
           <select id="subject" name="subject" required className={selectClass}>
-            <option value="" disabled>Select a topic…</option>
+            <option value="" disabled>
+              Select a topic…
+            </option>
             <option value="membership">Joining SENA / Membership</option>
             <option value="events">Events &amp; Calendar</option>
             <option value="issue">Neighborhood Issue or Concern</option>
@@ -122,13 +132,15 @@ export default function ContactForm() {
             <option value="general">General Question</option>
             <option value="other">Other</option>
           </select>
-          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
+          <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-muted" />
         </div>
       </div>
 
       {/* Message */}
       <div>
-        <label htmlFor="message" className={labelClass}>Your Message</label>
+        <label htmlFor="message" className={labelClass}>
+          Your Message
+        </label>
         <textarea
           id="message"
           name="message"
@@ -141,13 +153,13 @@ export default function ContactForm() {
       </div>
 
       {/* Opt-in */}
-      <label className="flex gap-3 items-start cursor-pointer">
+      <label className="flex cursor-pointer items-start gap-3">
         <input
           type="checkbox"
           name="join_list"
-          className="mt-0.5 w-4 h-4 rounded border-border accent-primary"
+          className="mt-0.5 h-4 w-4 rounded border-border accent-primary"
         />
-        <span className="text-sm text-muted leading-relaxed">
+        <span className="text-sm leading-relaxed text-muted">
           I'd like to receive occasional neighborhood updates and event announcements from SENA.
         </span>
       </label>
@@ -156,22 +168,24 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={status === 'submitting'}
-        className="flex items-center justify-center gap-2 w-full py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60"
       >
         {status === 'submitting' ? (
           <>
-            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
             Sending…
           </>
         ) : (
           <>
-            <Send className="w-4 h-4" />
+            <Send className="h-4 w-4" />
             Send Message
           </>
         )}
       </button>
 
-      <p className="text-xs text-muted text-center">We typically respond within a few business days.</p>
+      <p className="text-center text-xs text-muted">
+        We typically respond within a few business days.
+      </p>
     </form>
   )
 }
