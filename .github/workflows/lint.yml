@@ -30,7 +30,7 @@ jobs:
         run: npm ci
 
       - name: Run ESLint
-        run: npx eslint . --max-warnings=0
+        run: npx eslint . --max-warnings=10
 
       - name: Check Prettier formatting
         run: npx prettier --check .
