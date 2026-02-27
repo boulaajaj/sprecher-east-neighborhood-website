@@ -1,0 +1,9 @@
+.next
+out
+build
+node_modules
+data
+_legacy
+*.db
+package-lock.json
+src/app/(payload)

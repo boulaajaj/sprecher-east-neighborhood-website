@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 
 /**
  * Contact form API route.
@@ -40,12 +40,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Please select a topic.' }, { status: 400 })
     }
     if (!body.message?.trim() || body.message.trim().length < 10) {
-      return NextResponse.json({ error: 'Please include a message (at least 10 characters).' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Please include a message (at least 10 characters).' },
+        { status: 400 },
+      )
     }
 
     // TODO: Send email via Resend, SendGrid, Postmark, etc.
     // For now, log it server-side
-    console.log('[Contact form submission]', {
+    console.warn('[Contact form submission — email not configured]', {
       name: `${body.first_name} ${body.last_name ?? ''}`.trim(),
       email: body.email,
       subject: body.subject,

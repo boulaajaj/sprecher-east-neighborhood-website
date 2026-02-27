@@ -1,0 +1,33 @@
+language: en-US
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  path_instructions:
+    - path: 'src/components/ui/**'
+      instructions: |
+        These are Level 1 atomic, domain-agnostic UI primitives.
+        They must NOT import from features/, sections/, or layout/.
+        They should be pure presentational with no domain knowledge.
+    - path: 'src/components/features/**'
+      instructions: |
+        These are Level 2 domain-specific components.
+        They can import from ui/ but NOT from sections/ or layout/.
+    - path: 'src/components/sections/**'
+      instructions: |
+        These are Level 3 page sections.
+        They can import from ui/ and features/ but NOT from layout/.
+    - path: 'src/components/layout/**'
+      instructions: |
+        App shell components (Nav, Footer, UserMenu).
+        They can import from ui/ only.
+    - path: 'src/lib/**'
+      instructions: |
+        Utility and data layer. Must not import from components/.
+    - path: '.github/**'
+      instructions: |
+        CI/CD and GitHub configuration. Review for security implications.
+chat:
+  auto_reply: true
