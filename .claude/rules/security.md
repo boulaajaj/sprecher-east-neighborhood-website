@@ -43,7 +43,7 @@ Four layers of protection against vulnerable dependencies:
 
 1. **Agent rules** (during development): Check packages before installing, run audit after install, fix before committing
 2. **Pre-commit hook** (local): `npm audit --audit-level=high --omit=dev` warns if production deps have high/critical vulnerabilities
-3. **CI pipeline** (PR gate): `npm audit --audit-level=high` blocks merging if any high/critical vulnerabilities are found
+3. **CI pipeline** (PR gate): `npm audit --audit-level=high --omit=dev` blocks merging if any high/critical production vulnerabilities are found
 4. **Dependabot** (ongoing): Weekly scans with grouped PRs — patches batched together, majors get individual PRs
 
 When fixing transitive vulnerabilities:
