@@ -36,6 +36,9 @@ This is an unofficial grassroots initiative. Always be transparent about AI assi
   - Snapshot endpoint: `POST /api/vps/v1/virtual-machines/1371281/snapshot`
 - **SSH**: User `root`, port 22, key at `~/.ssh/id_ed25519_sprecher`
 - **CI/CD**: GitHub Actions → SSH deploy → `npm ci && npm run build && pm2 reload`
+- **Caddy config**: `/etc/caddy/Caddyfile` — NEVER overwrite, only append new server blocks
+- **Live domains**: `sprecher-east.org` + `www.sprecher-east.org` (HTTPS) + IP `:80` (HTTP)
+- **Caddy rule**: Always `cp Caddyfile Caddyfile.bak` before editing, always `caddy validate` before reload
 
 ## Architecture (DDD / Fractal Components)
 
