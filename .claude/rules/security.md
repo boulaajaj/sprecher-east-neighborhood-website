@@ -58,6 +58,10 @@ When fixing transitive vulnerabilities:
 - Caddy handles SSL/TLS automatically when domain is configured
 - PM2 runs the app as a managed process (auto-restart on crash)
 - GitHub Actions secrets store VPS credentials (never in code)
+- **NEVER overwrite `/etc/caddy/Caddyfile`** — always read it first, then ADD new server blocks
+- Always back up before editing: `cp /etc/caddy/Caddyfile /etc/caddy/Caddyfile.bak`
+- Always validate before reloading: `caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy`
+- Live domains (`sprecher-east.org`, `www.sprecher-east.org`) must NEVER be removed from the Caddyfile
 
 ## GitHub Security Features (Active)
 
