@@ -226,9 +226,10 @@ export default async function AssociationPage() {
                     </p>
                     <p>
                       <strong className="text-foreground">Section 5 — Good Standing.</strong> A
-                      member shall be considered in good standing when their dues are current.
-                      Members in good standing may vote at membership meetings and are eligible to
-                      serve on committees and the Board of Directors.
+                      member shall be considered in good standing when they are an active
+                      participant in the Association. Members in good standing may vote at
+                      membership meetings and are eligible to serve on committees and the Board of
+                      Directors.
                     </p>
                   </div>
                 </section>
