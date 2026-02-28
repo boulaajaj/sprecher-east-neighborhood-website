@@ -29,7 +29,7 @@ The Sprecher East events calendar requires manual research and updates to stay c
 1. Create a script at `scripts/fetch-meetings.ts` that queries the Legistar API
 2. Filter results by body (Common Council, Plan Commission, etc.)
 3. Enrich with District 16 relevance notes
-4. Also scrape Alder O'Brien's blog at `cityofmadison.com/council/district16/blog` for local events
+4. Also scrape Alder O'Brien's blog at `https://www.cityofmadison.com/council/district16/blog` for local events
 5. Output to `data/events.json` or directly into Payload CMS via Local API
 6. Run weekly as a Claude Code session or GitHub Action
 

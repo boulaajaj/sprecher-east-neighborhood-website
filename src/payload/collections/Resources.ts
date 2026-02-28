@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { publishedOrAuthenticated } from '../access'
 
 export const Resources: CollectionConfig = {
   slug: 'resources',
@@ -7,7 +8,7 @@ export const Resources: CollectionConfig = {
     defaultColumns: ['title', 'category', 'contentStatus'],
   },
   access: {
-    read: () => true,
+    read: publishedOrAuthenticated,
     create: ({ req: { user } }) => Boolean(user),
     update: ({ req: { user } }) => Boolean(user),
     delete: ({ req: { user } }) => (user as any)?.role === 'admin',
@@ -28,7 +29,21 @@ export const Resources: CollectionConfig = {
       name: 'url',
       type: 'text',
       required: true,
-      admin: { description: 'External URL for this resource.' },
+      admin: {
+        description: 'External URL for this resource (must start with http:// or https://).',
+      },
+      validate: (value: string | null | undefined) => {
+        if (!value || typeof value !== 'string') return 'A valid URL is required.'
+        try {
+          const parsed = new URL(value)
+          if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+            return 'URL must use http or https.'
+          }
+          return true
+        } catch {
+          return 'A valid URL is required.'
+        }
+      },
     },
     {
       name: 'phone',

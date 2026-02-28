@@ -207,23 +207,22 @@ export default async function AssociationPage() {
                       years of age shall be eligible for membership in the Association.
                     </p>
                     <p>
-                      <strong className="text-foreground">Section 2 — Dues.</strong> Membership dues
-                      shall be set by the Board of Directors. Dues shall be paid on a fiscal year
-                      basis (April 1 through March 30). Membership shall be considered active upon
-                      payment of dues.
+                      <strong className="text-foreground">Section 2 — Dues.</strong> Membership is
+                      currently free and voluntary for all residents of the neighborhood. If dues
+                      are introduced in the future, they will be proposed and approved by the
+                      membership before taking effect.
                     </p>
                     <p>
                       <strong className="text-foreground">Section 3 — Household Membership.</strong>{' '}
                       All adult members of a household are entitled to attend and participate in
-                      meetings when dues are paid for that household. Each household in good
-                      standing shall have one vote on matters brought before the membership.
+                      meetings. Each household shall have one vote on matters brought before the
+                      membership.
                     </p>
                     <p>
                       <strong className="text-foreground">Section 4 — Associate Membership.</strong>{' '}
                       Businesses with a permanent presence within the neighborhood boundaries may
-                      become associate members by paying an annual dues amount set by the Board of
-                      Directors. Associate members may participate in meetings but do not have
-                      voting rights.
+                      become associate members. Associate members may participate in meetings but do
+                      not have voting rights.
                     </p>
                     <p>
                       <strong className="text-foreground">Section 5 — Good Standing.</strong> A

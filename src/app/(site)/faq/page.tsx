@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
+import { Plus } from 'lucide-react'
 import { PageHeader } from '@/components/ui/page-header'
 import { CtaBanner } from '@/components/sections/cta-banner'
 
@@ -70,21 +72,8 @@ export default function FaqPage() {
               >
                 <summary className="flex cursor-pointer items-center justify-between gap-4 px-6 py-5 text-left font-semibold text-foreground select-none">
                   <span className="text-base md:text-lg">{item.question}</span>
-                  <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform group-open:rotate-45">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <line x1="12" y1="5" x2="12" y2="19" />
-                      <line x1="5" y1="12" x2="19" y2="12" />
-                    </svg>
+                  <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <Plus className="h-4 w-4 transition-transform group-open:rotate-45" />
                   </span>
                 </summary>
                 <div className="px-6 pt-0 pb-6">
@@ -99,12 +88,12 @@ export default function FaqPage() {
             <p className="mb-5 text-muted">
               We&apos;re real people and we actually read our messages. Reach out anytime.
             </p>
-            <a
+            <Link
               href="/contact"
               className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-white shadow-sm transition-colors hover:bg-primary/90"
             >
               Send Us a Message
-            </a>
+            </Link>
           </div>
         </div>
       </section>

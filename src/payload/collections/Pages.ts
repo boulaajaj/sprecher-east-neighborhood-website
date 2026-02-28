@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { publishedOrAuthenticated } from '../access'
 
 function slugify(title: string) {
   return title
@@ -14,7 +15,7 @@ export const Pages: CollectionConfig = {
     defaultColumns: ['title', 'slug', 'contentStatus', 'updatedAt'],
   },
   access: {
-    read: () => true,
+    read: publishedOrAuthenticated,
     create: ({ req: { user } }) => Boolean(user),
     update: ({ req: { user } }) => Boolean(user),
     delete: ({ req: { user } }) => (user as any)?.role === 'admin',

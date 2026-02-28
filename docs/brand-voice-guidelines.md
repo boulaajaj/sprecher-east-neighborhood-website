@@ -170,7 +170,7 @@ We swap out stiff, bureaucratic language for words real people actually use.
 
 These are non-negotiable. Every piece of content follows them.
 
-1. **Always "Sprecher East."** Never abbreviate to "SENA," "SE," or "the association." The full name is our identity.
+1. **Prefer "Sprecher East" in public-facing copy.** Never abbreviate to "SENA" or "SE." In legal/bylaw contexts, "the Association" is acceptable where formal wording requires it.
 
 2. **Always disclose AI assistance.** We use AI tools to help build and maintain this platform. We say so openly. A simple line like "Built with AI assistance" or "This content was drafted with AI help and reviewed by neighbors" is enough. No hiding it.
 
