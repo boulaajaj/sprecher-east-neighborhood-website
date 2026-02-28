@@ -16,7 +16,7 @@ const CATEGORIES = [
   { value: 'announcement', label: 'Announcements' },
   { value: 'government', label: 'Government' },
   { value: 'community', label: 'Community' },
-  { value: 'about-sena', label: 'About SENA' },
+  { value: 'about-sena', label: 'About Sprecher East' },
 ]
 
 export default async function NewsPage() {
@@ -27,7 +27,7 @@ export default async function NewsPage() {
       <PageHeader
         eyebrow="Neighborhood Updates"
         title="News & Announcements"
-        description="Stay informed about what's happening in Sprecher East — from neighborhood issues and city updates to community highlights and SENA announcements."
+        description="Stay informed about what's happening in Sprecher East — from neighborhood issues and city updates to community highlights and association announcements."
       />
 
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 md:py-16 lg:px-8">

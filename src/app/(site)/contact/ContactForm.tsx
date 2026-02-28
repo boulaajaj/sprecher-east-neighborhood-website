@@ -123,7 +123,7 @@ export default function ContactForm() {
             <option value="" disabled>
               Select a topic…
             </option>
-            <option value="membership">Joining SENA / Membership</option>
+            <option value="membership">Joining Sprecher East / Membership</option>
             <option value="events">Events &amp; Calendar</option>
             <option value="issue">Neighborhood Issue or Concern</option>
             <option value="board">Board of Directors</option>
@@ -160,7 +160,8 @@ export default function ContactForm() {
           className="mt-0.5 h-4 w-4 rounded border-border accent-primary"
         />
         <span className="text-sm leading-relaxed text-muted">
-          I'd like to receive occasional neighborhood updates and event announcements from SENA.
+          I'd like to receive occasional neighborhood updates and event announcements from Sprecher
+          East.
         </span>
       </label>
 

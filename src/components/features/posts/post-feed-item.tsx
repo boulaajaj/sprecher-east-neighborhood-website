@@ -5,7 +5,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   announcement: 'Announcement',
   government: 'Government',
   community: 'Community',
-  'about-sena': 'About SENA',
+  'about-sena': 'About Sprecher East',
 }
 
 function getPostDate(post: Post): string {

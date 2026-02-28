@@ -51,7 +51,7 @@ export const Posts: CollectionConfig = {
     {
       type: 'row',
       fields: [
-        { name: 'author', type: 'text', defaultValue: 'SENA', admin: { width: '50%' } },
+        { name: 'author', type: 'text', defaultValue: 'Sprecher East', admin: { width: '50%' } },
         {
           name: 'category',
           type: 'select',
@@ -61,7 +61,7 @@ export const Posts: CollectionConfig = {
             { label: 'Announcement', value: 'announcement' },
             { label: 'Government', value: 'government' },
             { label: 'Community', value: 'community' },
-            { label: 'About SENA', value: 'about-sena' },
+            { label: 'About Sprecher East', value: 'about-sena' },
           ],
         },
       ],
@@ -70,6 +70,18 @@ export const Posts: CollectionConfig = {
       name: 'tags',
       type: 'array',
       fields: [{ name: 'tag', type: 'text' }],
+    },
+    {
+      name: 'contentStatus',
+      type: 'select',
+      label: 'Status',
+      defaultValue: 'draft',
+      options: [
+        { label: 'Draft', value: 'draft' },
+        { label: 'In Review', value: 'review' },
+        { label: 'Published', value: 'published' },
+      ],
+      admin: { position: 'sidebar' },
     },
     {
       name: 'featured',

@@ -26,10 +26,10 @@ const SUBDIVISIONS = [
 ]
 
 const BOUNDARIES = [
-  { dir: 'North', road: 'Cottage Grove Road' },
-  { dir: 'South', road: 'Milwaukee Street' },
-  { dir: 'East', road: 'Sprecher Road' },
-  { dir: 'West', road: 'Femrite Drive' },
+  { dir: 'North', road: 'I-94' },
+  { dir: 'South', road: 'Cottage Grove Road' },
+  { dir: 'East', road: 'Door Creek Park' },
+  { dir: 'West', road: 'Sprecher Road' },
 ]
 
 const PHOTOS = [
@@ -66,14 +66,14 @@ export default function AboutPage() {
               <h2 className="mb-5 text-3xl font-bold text-foreground">Who We Are</h2>
               <div className="space-y-4 leading-relaxed text-muted">
                 <p>
-                  Sprecher East is a residential neighborhood located on the Far East Side of
-                  Madison, Wisconsin. It is bounded by Milwaukee Street to the south, Sprecher Road
-                  to the east, Cottage Grove Road to the north, and Femrite Drive to the west.
+                  Sprecher East is a residential neighborhood on the Far East Side of Madison,
+                  Wisconsin. We're bounded by I-94 to the north, Door Creek Park to the east,
+                  Cottage Grove Road to the south, and Sprecher Road to the west.
                 </p>
                 <p>
-                  The Sprecher East Neighborhood Association (SENA) was founded in 2006 to give
-                  residents a collective voice in city planning decisions, connect neighbors
-                  socially, and provide community resources.
+                  The Sprecher East Neighborhood Association was founded in 2006 to give residents a
+                  collective voice in city planning decisions, connect neighbors socially, and
+                  provide community resources.
                 </p>
                 <p>
                   We're organized as a non-HOA neighborhood association — membership is completely
@@ -130,9 +130,9 @@ export default function AboutPage() {
                 </div>
               </div>
               <div className="text-sm leading-relaxed text-muted">
-                Sprecher East sits within Dane County's City of Madison, near the intersection of
-                Milwaukee Street and Sprecher Road. The neighborhood is easily accessible via
-                Highway 30 and has convenient access to the East Towne area.
+                Sprecher East sits within Dane County's City of Madison, between I-94 and Cottage
+                Grove Road. The neighborhood is easily accessible via Highway 30 and has convenient
+                access to the East Towne area.
               </div>
             </div>
           </div>
@@ -178,7 +178,7 @@ export default function AboutPage() {
 
       <CtaBanner
         title="Want to Get Involved?"
-        description="SENA is your neighborhood association. Come to a meeting, join the mailing list, or reach out — we'd love to meet you."
+        description="Sprecher East is your neighborhood association. Come to a meeting, join the mailing list, or reach out — we'd love to meet you."
         primaryHref="/get-involved"
         primaryLabel="Get Involved"
         secondaryHref="/contact"

@@ -18,7 +18,7 @@ const BENEFITS = [
   {
     icon: '🗣️',
     title: 'A Voice in Your Neighborhood',
-    desc: 'Vote on association decisions and help shape the direction of SENA.',
+    desc: 'Vote on association decisions and help shape the direction of Sprecher East.',
   },
   {
     icon: '📢',
@@ -33,12 +33,12 @@ const BENEFITS = [
   {
     icon: '🏛️',
     title: 'Collective Advocacy',
-    desc: 'SENA speaks with a unified voice to local government on behalf of all residents.',
+    desc: 'Sprecher East speaks with a unified voice to local government on behalf of all residents.',
   },
   {
     icon: '🎉',
     title: 'Community Events',
-    desc: 'SENA organizes social events, meetings, and activities that bring the neighborhood together.',
+    desc: 'Sprecher East organizes social events, meetings, and activities that bring the neighborhood together.',
   },
   {
     icon: '🧑‍💼',
@@ -51,7 +51,7 @@ const WAYS_TO_HELP = [
   {
     icon: '📅',
     title: 'Attend Meetings',
-    desc: "Show up to general membership meetings to hear what's going on and vote on association matters.",
+    desc: "Show up to meetings to hear what's going on and have your voice heard on neighborhood matters.",
   },
   {
     icon: '🙋',
@@ -61,7 +61,7 @@ const WAYS_TO_HELP = [
   {
     icon: '📣',
     title: 'Spread the Word',
-    desc: 'Tell your neighbors about SENA. The more people who know and participate, the stronger our community voice.',
+    desc: 'Tell your neighbors about Sprecher East. The more people who know and participate, the stronger our community voice.',
   },
   {
     icon: '💡',
@@ -71,7 +71,7 @@ const WAYS_TO_HELP = [
   {
     icon: '🏛️',
     title: 'Engage with Local Gov',
-    desc: 'Attend city council meetings and public hearings — SENA can help you navigate this.',
+    desc: 'Attend city council meetings and public hearings — we can help you navigate the process.',
   },
 ]
 
@@ -92,7 +92,7 @@ export default async function GetInvolvedPage() {
           <div className="grid items-center gap-10 md:grid-cols-2 lg:gap-16">
             <div>
               <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">
-                Join SENA
+                Join Sprecher East
               </p>
               <h2 className="mb-5 text-3xl font-bold text-foreground">
                 Membership is Open to Everyone
@@ -104,20 +104,16 @@ export default async function GetInvolvedPage() {
                   <strong className="text-foreground">always free and always optional</strong>.
                 </p>
                 <p>
-                  Dues are paid on a fiscal year basis (April 1 through March 30). All adult members
-                  of a household are entitled to attend and participate in meetings. Members in good
-                  standing may vote and serve on committees.
-                </p>
-                <p>
-                  Businesses with a permanent presence within the neighborhood boundaries can also
-                  become associate members by paying an annual dues amount set by the Board.
+                  All adult members of a household are entitled to attend and participate in
+                  meetings. There are no dues requirements and no mandates — just neighbors helping
+                  neighbors.
                 </p>
               </div>
               <Link
                 href="/contact"
                 className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-bold text-white transition-colors hover:bg-primary-dark"
               >
-                Join SENA Today
+                Join Sprecher East
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -227,7 +223,7 @@ export default async function GetInvolvedPage() {
 
       <CtaBanner
         title="Ready to Join?"
-        description="It takes just a few minutes to connect with SENA. Reach out and we'll get you started."
+        description="It takes just a few minutes to connect with Sprecher East. Reach out and we'll get you started."
         primaryHref="/contact"
         primaryLabel="Contact Us to Join"
         secondaryHref="/events"

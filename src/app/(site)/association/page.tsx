@@ -37,7 +37,9 @@ export default async function AssociationPage() {
       {/* Page header */}
       <header className="border-b border-border bg-surface py-14 md:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">SENA</p>
+          <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">
+            Sprecher East
+          </p>
           <h1 className="mb-4 text-4xl font-bold text-foreground md:text-5xl">The Association</h1>
           <p className="max-w-2xl text-lg leading-relaxed text-muted">
             The Sprecher East Neighborhood Association is a volunteer, non-HOA organization that
@@ -91,8 +93,8 @@ export default async function AssociationPage() {
           </p>
           <h2 className="mb-2 text-3xl font-bold text-foreground">Board of Directors</h2>
           <p className="mb-10 max-w-xl leading-relaxed text-muted">
-            SENA is led by a volunteer board elected by the membership. Board members serve one-year
-            terms and can be re-elected.
+            Sprecher East is led by a volunteer board elected by the membership. Board members serve
+            one-year terms and can be re-elected.
           </p>
 
           {board.length > 0 ? (
@@ -167,7 +169,7 @@ export default async function AssociationPage() {
                   </h3>
                   <p className="leading-relaxed text-muted">
                     The name of this organization shall be the Sprecher East Neighborhood
-                    Association, hereinafter referred to as "SENA" or "the Association."
+                    Association, hereinafter referred to as "the Association."
                   </p>
                 </section>
 
@@ -176,7 +178,7 @@ export default async function AssociationPage() {
                     Article II — Purpose
                   </h3>
                   <p className="mb-3 leading-relaxed text-muted">
-                    The purpose of SENA shall be to:
+                    The purpose of the Association shall be to:
                   </p>
                   <ul className="space-y-2 text-muted">
                     {[
@@ -252,7 +254,7 @@ export default async function AssociationPage() {
                     { href: '#mission', label: 'Mission & Purpose' },
                     { href: '#board', label: 'Board of Directors' },
                     { href: '#bylaws', label: 'Bylaws' },
-                    { href: '/get-involved', label: 'Join SENA' },
+                    { href: '/get-involved', label: 'Get Involved' },
                     { href: '/contact', label: 'Contact the Board' },
                   ].map((link) => (
                     <li key={link.href}>
@@ -270,7 +272,7 @@ export default async function AssociationPage() {
               <div className="rounded-2xl bg-primary p-5 text-white">
                 <h3 className="mb-2 font-bold text-white">Free to Join</h3>
                 <p className="mb-4 text-sm leading-relaxed text-white/70">
-                  SENA membership is free and completely optional for all neighborhood residents.
+                  Membership is free and completely optional for all neighborhood residents.
                 </p>
                 <Link
                   href="/get-involved"

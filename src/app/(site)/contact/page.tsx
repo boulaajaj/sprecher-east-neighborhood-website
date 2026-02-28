@@ -16,8 +16,8 @@ export default function ContactPage() {
           <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">Say Hello</p>
           <h1 className="mb-4 text-4xl font-bold text-foreground md:text-5xl">Contact Us</h1>
           <p className="max-w-2xl text-lg leading-relaxed text-muted">
-            We're your neighbors. Whether you have a question, an idea, want to join SENA, or just
-            want to introduce yourself — we'd love to hear from you.
+            We're your neighbors. Whether you have a question, an idea, want to get involved, or
+            just want to introduce yourself — we'd love to hear from you.
           </p>
         </div>
       </header>
@@ -35,9 +35,9 @@ export default function ContactPage() {
 
           {/* Sidebar */}
           <aside className="flex flex-col gap-5 lg:sticky lg:top-24">
-            {/* About SENA */}
+            {/* About Sprecher East */}
             <div className="rounded-2xl border border-border bg-surface p-6">
-              <h3 className="mb-4 font-bold text-foreground">About SENA</h3>
+              <h3 className="mb-4 font-bold text-foreground">About Sprecher East</h3>
               <div className="flex flex-col gap-3">
                 {[
                   {
@@ -86,7 +86,7 @@ export default function ContactPage() {
               <h3 className="mb-4 font-bold text-foreground">You Might Also Want</h3>
               <ul className="flex flex-col gap-2.5">
                 {[
-                  { href: '/get-involved', label: 'Join SENA' },
+                  { href: '/get-involved', label: 'Get Involved' },
                   { href: '/events', label: 'Upcoming Events' },
                   { href: '/resources', label: 'Community Resources' },
                   { href: '/association#bylaws', label: 'Read the Bylaws' },

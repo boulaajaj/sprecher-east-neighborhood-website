@@ -54,7 +54,7 @@ async function getPostsFromPayload(): Promise<Post[]> {
     title: doc.title,
     slug: doc.slug,
     publishedAt: typeof doc.publishedAt === 'string' ? doc.publishedAt : String(doc.publishedAt),
-    author: doc.author ?? 'SENA',
+    author: doc.author ?? 'Sprecher East',
     category: doc.category ?? undefined,
     tags: Array.isArray(doc.tags)
       ? (doc.tags as { tag: string }[]).map((t) => t.tag).filter(Boolean)

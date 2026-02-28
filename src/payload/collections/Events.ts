@@ -132,6 +132,18 @@ export const Events: CollectionConfig = {
       label: 'Full Details (optional)',
     },
     {
+      name: 'contentStatus',
+      type: 'select',
+      label: 'Status',
+      defaultValue: 'published',
+      options: [
+        { label: 'Draft', value: 'draft' },
+        { label: 'In Review', value: 'review' },
+        { label: 'Published', value: 'published' },
+      ],
+      admin: { position: 'sidebar' },
+    },
+    {
       name: 'featured',
       type: 'checkbox',
       defaultValue: false,
