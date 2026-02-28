@@ -19,6 +19,7 @@ async function getEventsFromPayload(): Promise<Event[]> {
     sort: '-date',
     limit: 200,
     overrideAccess: true,
+    where: { contentStatus: { equals: 'published' } },
   })
   return docs.map((doc) => ({
     id: String(doc.id),
@@ -48,13 +49,14 @@ async function getPostsFromPayload(): Promise<Post[]> {
     sort: '-publishedAt',
     limit: 200,
     overrideAccess: true,
+    where: { contentStatus: { equals: 'published' } },
   })
   return docs.map((doc) => ({
     id: String(doc.id),
     title: doc.title,
     slug: doc.slug,
     publishedAt: typeof doc.publishedAt === 'string' ? doc.publishedAt : String(doc.publishedAt),
-    author: doc.author ?? 'SENA',
+    author: doc.author ?? 'Sprecher East',
     category: doc.category ?? undefined,
     tags: Array.isArray(doc.tags)
       ? (doc.tags as { tag: string }[]).map((t) => t.tag).filter(Boolean)

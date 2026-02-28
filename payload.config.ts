@@ -8,6 +8,8 @@ import { fileURLToPath } from 'url'
 import { Events } from './src/payload/collections/Events'
 import { Posts } from './src/payload/collections/Posts'
 import { BoardMembers } from './src/payload/collections/BoardMembers'
+import { Pages } from './src/payload/collections/Pages'
+import { Resources } from './src/payload/collections/Resources'
 import { Users } from './src/payload/collections/Users'
 import { Media } from './src/payload/collections/Media'
 
@@ -21,7 +23,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Events, Posts, BoardMembers, Users, Media],
+  collections: [Events, Posts, BoardMembers, Pages, Resources, Users, Media],
   editor: lexicalEditor({}),
   secret: process.env.PAYLOAD_SECRET ?? 'local-dev-secret-change-me-in-production',
   typescript: {

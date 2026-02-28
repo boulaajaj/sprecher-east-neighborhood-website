@@ -8,11 +8,11 @@ function slugify(title: string) {
     .replace(/(^-|-$)/g, '')
 }
 
-export const Posts: CollectionConfig = {
-  slug: 'posts',
+export const Pages: CollectionConfig = {
+  slug: 'pages',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'publishedAt', 'category', 'featured'],
+    defaultColumns: ['title', 'slug', 'contentStatus', 'updatedAt'],
   },
   access: {
     read: publishedOrAuthenticated,
@@ -41,36 +41,17 @@ export const Posts: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
-      admin: { description: 'Auto-generated from title.' },
+      admin: { description: 'URL path for this page.' },
     },
     {
-      name: 'publishedAt',
-      type: 'date',
-      required: true,
-      defaultValue: () => new Date().toISOString(),
+      name: 'description',
+      type: 'textarea',
+      admin: { description: 'Short description for SEO and page headers.' },
     },
     {
-      type: 'row',
-      fields: [
-        { name: 'author', type: 'text', defaultValue: 'Sprecher East', admin: { width: '50%' } },
-        {
-          name: 'category',
-          type: 'select',
-          defaultValue: 'announcement',
-          admin: { width: '50%' },
-          options: [
-            { label: 'Announcement', value: 'announcement' },
-            { label: 'Government', value: 'government' },
-            { label: 'Community', value: 'community' },
-            { label: 'About Sprecher East', value: 'about-sena' },
-          ],
-        },
-      ],
-    },
-    {
-      name: 'tags',
-      type: 'array',
-      fields: [{ name: 'tag', type: 'text' }],
+      name: 'body',
+      type: 'richText',
+      label: 'Page Content',
     },
     {
       name: 'contentStatus',
@@ -85,25 +66,9 @@ export const Posts: CollectionConfig = {
       admin: { position: 'sidebar' },
     },
     {
-      name: 'featured',
-      type: 'checkbox',
-      defaultValue: false,
-    },
-    {
       name: 'image',
       type: 'upload',
       relationTo: 'media',
-    },
-    {
-      name: 'excerpt',
-      type: 'textarea',
-      required: true,
-      admin: { description: 'Short summary shown in feeds and cards.' },
-    },
-    {
-      name: 'body',
-      type: 'richText',
-      label: 'Post Content',
     },
   ],
 }

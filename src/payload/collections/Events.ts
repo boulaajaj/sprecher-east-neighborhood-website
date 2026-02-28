@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { publishedOrAuthenticated } from '../access'
 
 function slugify(title: string) {
   return title
@@ -14,7 +15,7 @@ export const Events: CollectionConfig = {
     defaultColumns: ['title', 'date', 'category', 'featured'],
   },
   access: {
-    read: () => true,
+    read: publishedOrAuthenticated,
     create: ({ req: { user } }) => Boolean(user),
     update: ({ req: { user } }) => Boolean(user),
     delete: ({ req: { user } }) => (user as any)?.role === 'admin',
@@ -130,6 +131,18 @@ export const Events: CollectionConfig = {
       name: 'body',
       type: 'richText',
       label: 'Full Details (optional)',
+    },
+    {
+      name: 'contentStatus',
+      type: 'select',
+      label: 'Status',
+      defaultValue: 'published',
+      options: [
+        { label: 'Draft', value: 'draft' },
+        { label: 'In Review', value: 'review' },
+        { label: 'Published', value: 'published' },
+      ],
+      admin: { position: 'sidebar' },
     },
     {
       name: 'featured',

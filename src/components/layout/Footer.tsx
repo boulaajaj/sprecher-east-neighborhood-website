@@ -119,10 +119,34 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Disclaimer */}
+        <div className="mb-6 rounded-xl border border-white/10 bg-white/5 px-5 py-4">
+          <p className="text-xs leading-relaxed text-white/50">
+            Sprecher East is an unofficial, grassroots neighborhood initiative — not a government
+            entity. This website is maintained by volunteers with the assistance of AI tools. While
+            we strive for accuracy, please verify important information with{' '}
+            <a
+              href="https://www.cityofmadison.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/70 underline hover:text-white"
+            >
+              official city sources
+            </a>
+            .
+          </p>
+        </div>
+
         {/* Bottom bar */}
         <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 sm:flex-row">
           <p className="text-sm text-white/40">© {year} Sprecher East Neighborhood Association</p>
           <div className="flex items-center gap-6">
+            <Link
+              href="/faq"
+              className="text-sm text-white/40 transition-colors hover:text-white/70"
+            >
+              FAQ
+            </Link>
             <Link
               href="/association#bylaws"
               className="text-sm text-white/40 transition-colors hover:text-white/70"

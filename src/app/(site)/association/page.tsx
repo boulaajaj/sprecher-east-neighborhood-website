@@ -37,7 +37,9 @@ export default async function AssociationPage() {
       {/* Page header */}
       <header className="border-b border-border bg-surface py-14 md:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">SENA</p>
+          <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">
+            Sprecher East
+          </p>
           <h1 className="mb-4 text-4xl font-bold text-foreground md:text-5xl">The Association</h1>
           <p className="max-w-2xl text-lg leading-relaxed text-muted">
             The Sprecher East Neighborhood Association is a volunteer, non-HOA organization that
@@ -91,8 +93,8 @@ export default async function AssociationPage() {
           </p>
           <h2 className="mb-2 text-3xl font-bold text-foreground">Board of Directors</h2>
           <p className="mb-10 max-w-xl leading-relaxed text-muted">
-            SENA is led by a volunteer board elected by the membership. Board members serve one-year
-            terms and can be re-elected.
+            Sprecher East is led by a volunteer board elected by the membership. Board members serve
+            one-year terms and can be re-elected.
           </p>
 
           {board.length > 0 ? (
@@ -167,7 +169,7 @@ export default async function AssociationPage() {
                   </h3>
                   <p className="leading-relaxed text-muted">
                     The name of this organization shall be the Sprecher East Neighborhood
-                    Association, hereinafter referred to as "SENA" or "the Association."
+                    Association, hereinafter referred to as "the Association."
                   </p>
                 </section>
 
@@ -176,7 +178,7 @@ export default async function AssociationPage() {
                     Article II — Purpose
                   </h3>
                   <p className="mb-3 leading-relaxed text-muted">
-                    The purpose of SENA shall be to:
+                    The purpose of the Association shall be to:
                   </p>
                   <ul className="space-y-2 text-muted">
                     {[
@@ -205,29 +207,29 @@ export default async function AssociationPage() {
                       years of age shall be eligible for membership in the Association.
                     </p>
                     <p>
-                      <strong className="text-foreground">Section 2 — Dues.</strong> Membership dues
-                      shall be set by the Board of Directors. Dues shall be paid on a fiscal year
-                      basis (April 1 through March 30). Membership shall be considered active upon
-                      payment of dues.
+                      <strong className="text-foreground">Section 2 — Dues.</strong> Membership is
+                      currently free and voluntary for all residents of the neighborhood. If dues
+                      are introduced in the future, they will be proposed and approved by the
+                      membership before taking effect.
                     </p>
                     <p>
                       <strong className="text-foreground">Section 3 — Household Membership.</strong>{' '}
                       All adult members of a household are entitled to attend and participate in
-                      meetings when dues are paid for that household. Each household in good
-                      standing shall have one vote on matters brought before the membership.
+                      meetings. Each household shall have one vote on matters brought before the
+                      membership.
                     </p>
                     <p>
                       <strong className="text-foreground">Section 4 — Associate Membership.</strong>{' '}
                       Businesses with a permanent presence within the neighborhood boundaries may
-                      become associate members by paying an annual dues amount set by the Board of
-                      Directors. Associate members may participate in meetings but do not have
-                      voting rights.
+                      become associate members. Associate members may participate in meetings but do
+                      not have voting rights.
                     </p>
                     <p>
                       <strong className="text-foreground">Section 5 — Good Standing.</strong> A
-                      member shall be considered in good standing when their dues are current.
-                      Members in good standing may vote at membership meetings and are eligible to
-                      serve on committees and the Board of Directors.
+                      member shall be considered in good standing when they are an active
+                      participant in the Association. Members in good standing may vote at
+                      membership meetings and are eligible to serve on committees and the Board of
+                      Directors.
                     </p>
                   </div>
                 </section>
@@ -252,7 +254,7 @@ export default async function AssociationPage() {
                     { href: '#mission', label: 'Mission & Purpose' },
                     { href: '#board', label: 'Board of Directors' },
                     { href: '#bylaws', label: 'Bylaws' },
-                    { href: '/get-involved', label: 'Join SENA' },
+                    { href: '/get-involved', label: 'Get Involved' },
                     { href: '/contact', label: 'Contact the Board' },
                   ].map((link) => (
                     <li key={link.href}>
@@ -270,7 +272,7 @@ export default async function AssociationPage() {
               <div className="rounded-2xl bg-primary p-5 text-white">
                 <h3 className="mb-2 font-bold text-white">Free to Join</h3>
                 <p className="mb-4 text-sm leading-relaxed text-white/70">
-                  SENA membership is free and completely optional for all neighborhood residents.
+                  Membership is free and completely optional for all neighborhood residents.
                 </p>
                 <Link
                   href="/get-involved"

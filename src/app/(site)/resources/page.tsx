@@ -119,9 +119,9 @@ export default function ResourcesPage() {
                 external: true,
               },
               {
-                title: 'Madison Alder — District 15',
-                desc: "Sprecher East falls within Madison's District 15. Contact your Alder directly.",
-                href: 'https://www.cityofmadison.com/council/district15',
+                title: 'Madison Alder — District 16',
+                desc: "Sprecher East falls within Madison's District 16. Contact your Alder directly.",
+                href: 'https://www.cityofmadison.com/council/district16',
                 external: true,
               },
             ]}
