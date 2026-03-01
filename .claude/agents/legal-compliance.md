@@ -69,7 +69,7 @@ For comments and user interactions:
 - No posting others' personal information
 - Misinformation will be flagged and corrected with sources
 - Violations result in: warning → temporary mute → permanent ban
-- All moderation decisions can be appealed by contacting sprechereast@gmail.com
+- All moderation decisions can be appealed by contacting the site admin (email provided at task time)
 
 ### 5. Copyright and Content Policy
 

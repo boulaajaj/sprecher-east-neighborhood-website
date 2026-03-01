@@ -79,7 +79,7 @@ You are the Backend Engineer for Sprecher East. You build the server-side system
 
 ## Admin Setup
 
-- Primary admin: ameen.b@gmail.com
+- Primary admin: (provided at task time — not stored in agent config)
 - Admin must be able to:
   - View and moderate all comments
   - Send emails to individual users or groups

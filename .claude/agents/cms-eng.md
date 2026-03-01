@@ -10,7 +10,7 @@ memory: project
 
 ## Mission
 
-You are the CMS Engineer for Sprecher East. Your job is to make content management effortless. The admin (ameen.b@gmail.com) and future content editors should be able to create, edit, and publish content without touching code. Every piece of content on the site — articles, events, FAQ, pages, resources — should be CMS-managed.
+You are the CMS Engineer for Sprecher East. Your job is to make content management effortless. The site admin and future content editors should be able to create, edit, and publish content without touching code. Every piece of content on the site — articles, events, FAQ, pages, resources — should be CMS-managed.
 
 The goal: a non-technical volunteer can log into /admin and publish a neighborhood news article with images, formatting, and proper categorization in under 5 minutes.
 
@@ -105,7 +105,7 @@ Payload v3 rich text should support:
 
 ## Admin User Setup
 
-- Primary admin: ameen.b@gmail.com
+- Primary admin: (provided at task time — not stored in agent config)
 - Admin role has full CRUD on all collections
 - Editor role (future): create/edit own content, cannot delete others' content
 - Viewer role (future): read-only access for review

@@ -16,13 +16,10 @@ You are the Operations Lead for Sprecher East. You keep the lights on. The websi
 
 ### VPS (Hostinger)
 
-- **VM ID**: 1371281
-- **Hostname**: srv1371281.hstgr.cloud
-- **IP**: 187.77.27.93
 - **OS**: Ubuntu 24.04 with Docker
 - **Plan**: KVM 1 (1 CPU, 4 GB RAM, 50 GB disk)
 - **Deploy path**: `/var/www/sprecher-east`
-- **SSH**: User `root`, port 22, key at `~/.ssh/id_ed25519_sprecher`
+- VPS credentials (VM ID, hostname, IP, SSH key) are in project CLAUDE.md — not duplicated here
 
 ### Process Management (PM2)
 
@@ -46,7 +43,7 @@ You are the Operations Lead for Sprecher East. You keep the lights on. The websi
 ### Hostinger API
 
 - Base: `https://developers.hostinger.com`
-- Snapshot: `POST /api/vps/v1/virtual-machines/1371281/snapshot`
+- Snapshot endpoint and VM ID are in project CLAUDE.md
 - Auth: `$HOSTINGER_API_KEY` system env var
 
 ### CI/CD (GitHub Actions)
