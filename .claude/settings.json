@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "Read(*)",
+      "Edit(*)",
+      "Write(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "mcp__*",
+      "Agent(*)",
+      "Skill(*)",
+      "NotebookEdit(*)"
+    ],
+    "deny": [
+      "Bash(gh pr review --approve *)",
+      "Bash(gh pr review -a *)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\ameen\\.claude\\projects\\c--Users-ameen-OneDrive-sprecher-east-neighborhood-website\\memory",
+      "C:\\Users\\ameen\\OneDrive\\sprecher-east-neighborhood-website\\src\\app\\(payload)\\admin",
+      "C:\\Users\\ameen\\OneDrive\\sprecher-east-neighborhood-website\\src\\app\\api\\auth"
+    ]
+  }
+}
