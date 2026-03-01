@@ -76,7 +76,7 @@ const WAYS_TO_HELP = [
 ]
 
 export default async function GetInvolvedPage() {
-  const board = await getBoardMembers()
+  const _board = await getBoardMembers()
 
   return (
     <>
