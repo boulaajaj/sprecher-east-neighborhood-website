@@ -8,7 +8,7 @@ A development or content task is only marked **complete** in Asana when its PR i
 
 Every task that produces code or content changes must have a PR link in the Asana task notes. Format:
 
-```
+```text
 **PR**: https://github.com/boulaajaj/sprecher-east-neighborhood-website/pull/<number> (status)
 ```
 

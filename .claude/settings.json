@@ -16,14 +16,7 @@
       "Bash(gh pr review --approve *)",
       "Bash(gh pr review -a *)",
       "Bash(gh pr merge *)",
-      "Bash(gh pr close *)",
-      "Bash(npm install *)",
-      "Bash(npm i *)",
-      "Bash(npm add *)",
-      "Bash(npm uninstall *)",
-      "Bash(npm remove *)",
-      "Bash(npm rm *)",
-      "Bash(npm update *)"
+      "Bash(gh pr close *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\ameen\\.claude\\projects\\c--Users-ameen-OneDrive-sprecher-east-neighborhood-website\\memory",
