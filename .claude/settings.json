@@ -12,7 +12,12 @@
       "Skill(*)",
       "NotebookEdit(*)"
     ],
-    "deny": ["Bash(gh pr review --approve *)", "Bash(gh pr review -a *)"],
+    "deny": [
+      "Bash(gh pr review --approve *)",
+      "Bash(gh pr review -a *)",
+      "Bash(gh pr merge *)",
+      "Bash(gh pr close *)"
+    ],
     "additionalDirectories": [
       "c:\\Users\\ameen\\.claude\\projects\\c--Users-ameen-OneDrive-sprecher-east-neighborhood-website\\memory",
       "C:\\Users\\ameen\\OneDrive\\sprecher-east-neighborhood-website\\src\\app\\(payload)\\admin",

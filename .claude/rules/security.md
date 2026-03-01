@@ -21,6 +21,15 @@
 - Set appropriate CORS headers on API routes
 - Never disable TypeScript strict checks or ESLint security rules to make code compile
 
+### No PII in source code
+
+- Never hardcode real email addresses, phone numbers, or personal names in source files
+- Use environment variables for all email addresses (sender, recipient, reply-to)
+- `.env.local.example` must use placeholder values (`you@example.com`, `no-reply@example.com`) — never real addresses
+- Console logs must never include user-submitted PII (names, emails, addresses) — log only non-identifying metadata (subject, message length, timestamp)
+- Sanitize user input before placing it in email headers — strip CR/LF and control characters to prevent header injection
+- When validating select/dropdown values server-side, whitelist the allowed values — never trust client-submitted strings
+
 ### When handling auth and sessions
 
 - `PAYLOAD_SECRET` and `BETTER_AUTH_SECRET` must be different values (both 32+ random chars)

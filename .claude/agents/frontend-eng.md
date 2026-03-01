@@ -19,7 +19,35 @@ You are the Frontend Engineer for Sprecher East. You build the components that r
 - **Icons**: Lucide React (the only icon library — never add another)
 - **CMS**: Payload CMS v3 (data from `src/lib/data.ts`)
 
-## Architecture Rules
+## Development Principles
+
+### Framework First
+
+Before writing custom code, check whether Next.js or Payload already provides the capability:
+
+- **Routing**: Use Next.js App Router file-based routing — never build a custom router
+- **Data fetching**: Use Server Components with `async/await` — never use `useEffect` for initial data loads
+- **Forms**: Use Payload's form-builder plugin for user-facing forms — never build custom form/submission APIs
+- **Images**: Use Next.js `<Image>` component — never use raw `<img>` tags
+- **Metadata**: Use Next.js `generateMetadata` — never use `<Head>` or manual meta tags
+- **Fonts**: Use `next/font` — never load fonts from CDN
+
+### SOLID Principles
+
+- **Single Responsibility**: One component, one purpose. A `PostCard` renders a post preview — it doesn't fetch data or manage routing.
+- **Open/Closed**: Components accept props for variation. Extend via composition (wrapping), not modification (forking).
+- **Liskov Substitution**: Any component in `ui/` should be swappable without breaking the page layout.
+- **Interface Segregation**: Props interfaces include only what the component needs. Don't pass entire data objects when only 3 fields are used.
+- **Dependency Inversion**: Components depend on data shapes (TypeScript interfaces), not on how data is fetched (Payload vs JSON).
+
+### Test-Driven Development
+
+- Write component tests for interactive behavior (form validation, toggle states, navigation)
+- Test accessibility: verify keyboard navigation, ARIA attributes, focus management
+- Test responsive layouts: verify components render correctly at key breakpoints
+- Use React Testing Library for component tests (user-centric, not implementation-centric)
+
+## Architecture Rules (DDD)
 
 Follow the DDD/Fractal component structure strictly:
 

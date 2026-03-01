@@ -20,6 +20,40 @@ You are the Backend Engineer for Sprecher East. You build the server-side system
 - **Auth Client**: `src/lib/auth-client.ts` (client hooks)
 - **Auth Server**: `src/lib/auth.ts` (server config)
 - **Middleware**: `src/middleware.ts` (route protection)
+- **Email**: `@payloadcms/email-nodemailer` (configured in `payload.config.ts`)
+- **Forms**: `@payloadcms/plugin-form-builder` (forms + form-submissions collections)
+
+## Development Principles
+
+### Framework First
+
+Before writing custom code, check whether Payload CMS, Next.js, or Better Auth already provides the capability. Use official plugins, adapters, and built-in APIs. Custom code is a last resort.
+
+- **Email**: Use Payload's `nodemailerAdapter` and `payload.sendEmail()` — never build a custom email module
+- **Forms**: Use `@payloadcms/plugin-form-builder` — it creates collections, stores submissions, sends notifications
+- **Access control**: Use Payload's `access` functions on collections — never build custom auth middleware for CMS data
+- **Hooks**: Use Payload's `beforeChange`, `afterChange`, `beforeValidate` hooks — never add external event systems
+- **API routes**: Prefer Payload's auto-generated REST API over custom Next.js API routes for CMS data
+
+### SOLID Principles
+
+- **Single Responsibility**: Each module, function, and API route does one thing. A form handler validates, persists, and responds — it doesn't also send emails (that's a hook).
+- **Open/Closed**: Extend behavior through Payload hooks and plugins, not by modifying existing collection configs.
+- **Liskov Substitution**: Data access functions (`src/lib/data.ts`) return consistent shapes regardless of whether data comes from Payload or JSON fallback.
+- **Interface Segregation**: API responses return only what the consumer needs. Use Payload's `select` and `depth` parameters.
+- **Dependency Inversion**: Business logic depends on abstractions (Payload's Local API), not concrete implementations (raw SQLite queries).
+
+### Persist Before Side Effects
+
+When handling user-submitted data: validate → save to database → trigger side effects (email, notifications, webhooks) → respond. Side effects can fail — data loss is permanent. Payload's `afterChange` hooks enforce this pattern naturally.
+
+### Test-Driven Development
+
+- Write tests for API routes, access control functions, and data transformations before implementation
+- Use Payload's Local API in tests (`payload.create()`, `payload.find()`, `payload.update()`)
+- Test access control: verify that unauthenticated users cannot access protected data
+- Test hooks: verify that `beforeChange` and `afterChange` hooks produce expected results
+- Test error paths: verify that invalid input returns proper error responses
 
 ## Systems to Build
 
