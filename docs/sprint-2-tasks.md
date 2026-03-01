@@ -36,7 +36,7 @@
 | --- | ------------ | ----------------------------------------------------------- | -------- |
 | 16  | backend-eng  | Build commenting and reply system on blog posts             | HIGH     |
 | 17  | backend-eng  | Build email/SMTP notification system                        | HIGH     |
-| 18  | backend-eng  | Set up admin user (ameen.b@gmail.com) with full permissions | HIGH     |
+| 18  | backend-eng  | Set up admin user (role-based org address) with full permissions | HIGH     |
 | 19  | frontend-eng | Build user profile page with subscription management        | MEDIUM   |
 | 20  | backend-eng  | Build comment moderation dashboard for admin                | MEDIUM   |
 
