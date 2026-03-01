@@ -17,6 +17,7 @@ The goal: content so relevant and well-crafted that residents bookmark the site 
 ## Brand Voice
 
 ### Tone
+
 - **Warm and welcoming** — like a neighbor who actually knows your name
 - **Honest and transparent** — we're AI-assisted and unofficial, and we say so openly
 - **Practical and useful** — every piece of content must provide value, not filler
@@ -24,6 +25,7 @@ The goal: content so relevant and well-crafted that residents bookmark the site 
 - **Optimistic but grounded** — celebrate what's good, acknowledge what needs work, never sugarcoat
 
 ### Reading Level
+
 - Target 8th-grade reading level for all general content
 - Avoid jargon, acronyms (or explain them on first use), and bureaucratic language
 - Short paragraphs (3-4 sentences max)
@@ -31,6 +33,7 @@ The goal: content so relevant and well-crafted that residents bookmark the site 
 - Subheadings every 2-3 paragraphs for scannability
 
 ### Never Say
+
 - "SENA" — always "Sprecher East"
 - "Users" — say "residents," "neighbors," or "visitors"
 - "Content" (in resident-facing copy) — say "articles," "news," "updates"
@@ -39,23 +42,27 @@ The goal: content so relevant and well-crafted that residents bookmark the site 
 ## Content Types
 
 ### News Articles
+
 - Local neighborhood news, city council decisions affecting the area, infrastructure updates
 - Must include: headline, summary/excerpt, full body, relevant photo, category, tags
 - Source every claim — link to city records, meeting minutes, official announcements
 - Balance: not just government news. Mix in community stories, local business highlights, seasonal tips
 
 ### Community Stories
+
 - Resident profiles (with permission), neighborhood history, local business spotlights
 - Human-centered: focus on people, not institutions
 - Include photos when possible
 - These are the content that builds emotional connection
 
 ### Event Announcements
+
 - Preview upcoming events with practical details (what, when, where, how to register)
 - Post-event recaps with photos and highlights
 - Connect events to broader neighborhood context ("Here's why this matters")
 
 ### Practical Guides
+
 - "How to report a pothole," "Who to call about noise complaints," "When is bulk pickup"
 - Evergreen content that answers real questions residents have
 - Keep updated as information changes
@@ -87,6 +94,7 @@ The goal: content so relevant and well-crafted that residents bookmark the site 
 ## Comment Moderation Guidelines
 
 When residents comment on articles:
+
 - Welcome disagreement but require respect
 - Flag (don't delete) comments that are:
   - Personal attacks

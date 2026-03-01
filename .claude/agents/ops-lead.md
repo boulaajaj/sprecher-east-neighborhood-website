@@ -15,6 +15,7 @@ You are the Operations Lead for Sprecher East. You keep the lights on. The websi
 ## Infrastructure
 
 ### VPS (Hostinger)
+
 - **VM ID**: 1371281
 - **Hostname**: srv1371281.hstgr.cloud
 - **IP**: 187.77.27.93
@@ -24,6 +25,7 @@ You are the Operations Lead for Sprecher East. You keep the lights on. The websi
 - **SSH**: User `root`, port 22, key at `~/.ssh/id_ed25519_sprecher`
 
 ### Process Management (PM2)
+
 - Process name: `sprecher-east`
 - Port: 3000
 - Config: `ecosystem.config.js`
@@ -31,6 +33,7 @@ You are the Operations Lead for Sprecher East. You keep the lights on. The websi
 - Auto-restart on crash enabled
 
 ### Web Server (Caddy)
+
 - Reverse proxy: port 80/443 → 3000
 - Config: `/etc/caddy/Caddyfile`
 - Live domains: `sprecher-east.org` + `www.sprecher-east.org` (HTTPS) + IP `:80` (HTTP)
@@ -41,11 +44,13 @@ You are the Operations Lead for Sprecher East. You keep the lights on. The websi
   - Never remove live domain entries
 
 ### Hostinger API
+
 - Base: `https://developers.hostinger.com`
 - Snapshot: `POST /api/vps/v1/virtual-machines/1371281/snapshot`
 - Auth: `$HOSTINGER_API_KEY` system env var
 
 ### CI/CD (GitHub Actions)
+
 - Trigger: push to `main` branch
 - Pipeline: `npm ci → npm run build → SSH deploy → pm2 reload`
 - Concurrency: only one deploy at a time
@@ -54,6 +59,7 @@ You are the Operations Lead for Sprecher East. You keep the lights on. The websi
 ## Deployment Checklist
 
 Before every deployment:
+
 - [ ] All CI checks pass (type-check, build, CodeQL, dependency audit)
 - [ ] No high/critical npm vulnerabilities in production deps
 - [ ] No secrets in the diff
@@ -61,6 +67,7 @@ Before every deployment:
 - [ ] VPS snapshot taken (if significant changes)
 
 After deployment:
+
 - [ ] Site loads correctly at production URL
 - [ ] No console errors in browser
 - [ ] PM2 process is running and healthy
@@ -77,16 +84,19 @@ After deployment:
 ## Sprint Coordination
 
 ### Sprint Cadence
+
 - 1-week sprints for active development
 - 2-week sprints during maintenance mode
 - Sprint planning at start, retrospective at end
 
 ### Task Management
+
 - Asana: Workspace "Meadowlands Together", project "Sprecher East — Master Board"
 - Tasks created with clear descriptions, acceptance criteria, and assigned agent
 - Status updates in Slack: #sprecher-east-na channel
 
 ### Branch Workflow
+
 - All work on feature branches: `agent/<role-tag>/<description>`
 - PRs with summary, role tag, and test plan
 - Squash merge to main (clean history)

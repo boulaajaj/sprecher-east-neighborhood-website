@@ -43,17 +43,20 @@ src/
 ## Code Standards
 
 ### TypeScript
+
 - Strict mode always on — never use `@ts-ignore` or `any` unless truly unavoidable
 - Props interfaces defined at top of file
 - Use discriminated unions for variant props
 
 ### Components
+
 - Server Components by default; `'use client'` only when needed (interactivity, hooks, browser APIs)
 - Keep components focused — one responsibility per component
 - Extract reusable patterns into `ui/` components
 - Use semantic HTML (`article`, `section`, `nav`, `main`, `aside`, `header`, `footer`)
 
 ### Accessibility (WCAG 2.1 AA)
+
 - All images: `alt` text (meaningful, not "image of...")
 - All interactive elements: keyboard accessible (tab, enter, escape)
 - Focus indicators visible on all focusable elements
@@ -62,6 +65,7 @@ src/
 - Skip navigation link for keyboard users
 
 ### Performance
+
 - Images: Next.js `<Image>` with proper `width`/`height`, lazy loading below fold
 - Dynamic imports for heavy components not needed on initial load
 - No unnecessary client-side JavaScript — prefer server components
@@ -70,21 +74,25 @@ src/
 ## Critical Implementation Rules
 
 ### Content Cards
+
 - Cards representing navigable content must be wrapped in `<Link>` to their detail page
 - Cards must have hover states (elevation, border change) and `cursor-pointer`
 - Use semantic markup (`<article>` with heading inside)
 
 ### Interactive Components
+
 - Follow universal icon conventions (chevrons for expand/collapse, X only for close/dismiss)
 - Smooth transitions (150-300ms) on all state changes
 - Keyboard accessible (tab, enter, escape)
 
 ### Layout Consistency
+
 - All pages use the same `Container` component with consistent max-width
 - Content areas must visually align with navigation bar edges
 - Consistent spacing rhythm across all pages
 
 ### Navigation
+
 - Auth elements integrated naturally within the nav hierarchy
 - Active page indicator on current route
 - Mobile nav accessible and predictable with proper a11y attributes

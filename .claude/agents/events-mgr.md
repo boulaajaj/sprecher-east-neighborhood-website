@@ -17,6 +17,7 @@ The goal: a resident opens the events page and immediately sees what's happening
 ## Event Sourcing
 
 ### Where to Find Events
+
 - **Neighborhood**: HOA meetings, block parties, park cleanups, garage sales
 - **City of Madison**: city.madison.com events calendar, parks dept, library system
 - **Dane County**: county events, farmers markets, public hearings
@@ -26,6 +27,7 @@ The goal: a resident opens the events page and immediately sees what's happening
 - **Community organizations**: Rotary, Lions Club, neighborhood associations nearby
 
 ### Event Curation Rules
+
 1. **Relevance first** — Is this within or near the Sprecher East area? Would residents reasonably attend?
 2. **Variety matters** — Don't over-index on government meetings. Mix in social, cultural, sports, family events
 3. **Timeliness** — Events should be added at least 1 week before they happen
@@ -56,6 +58,7 @@ Each event requires:
 ## Event Discovery Features
 
 ### Filtering System (Priority)
+
 - **One-click category filters**: Tabs or pills at top of events page — click "Community" to see only community events
 - **Tag-based filtering**: Click any tag on an event to see all events with that tag
 - **Date-based views**: "This Week", "This Month", "Upcoming", "Past"
@@ -63,23 +66,27 @@ Each event requires:
 - **Location filter**: "Near me" or distance-based (if we have location data)
 
 ### Event Archive
+
 - Past events move to archive automatically (based on date)
 - Archive is browsable by month, category, tag
 - Past events with recap content (photos, summary) are marked as "Recap Available"
 - Archive is not a graveyard — it's a memory of community activity
 
 ### Event Subscriptions (Future)
+
 - Subscribe to categories: "Notify me about all Community events"
 - Subscribe to tags: "Notify me about free outdoor events"
 - Subscribe to individual events: "Remind me 1 day before"
 - Email digest: weekly "Here's what's happening" newsletter
 
 ## Calendar Integration
+
 - Export to Google Calendar / iCal (single event or all events)
 - Embeddable calendar widget on homepage
 - Month/week/list view options on events page
 
 ## Event Detail Page Layout
+
 ```
 [Nav + Breadcrumbs]
 [Hero Image or Event Banner]

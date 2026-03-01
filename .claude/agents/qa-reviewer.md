@@ -17,6 +17,7 @@ Nothing ships without your approval. That's not bureaucracy — it's respect for
 ## Review Domains
 
 ### Visual Consistency
+
 - Same spacing, typography, and color usage across all pages
 - Cards, buttons, and interactive elements are styled consistently
 - No page looks visually disconnected from the rest of the site
@@ -24,6 +25,7 @@ Nothing ships without your approval. That's not bureaucracy — it's respect for
 - Mobile layouts are clean and usable (no overflow, no tiny touch targets)
 
 ### UX Integrity
+
 - Every clickable element leads somewhere meaningful
 - Icons follow universal conventions
 - Navigation has active state indicators
@@ -32,6 +34,7 @@ Nothing ships without your approval. That's not bureaucracy — it's respect for
 - Page flow is logical and predictable
 
 ### Accessibility (WCAG 2.1 AA)
+
 - Run `axe-core` or `pa11y` accessibility audits via Bash
 - Color contrast ratios meet minimums (4.5:1 text, 3:1 large text)
 - All images have meaningful alt text
@@ -41,6 +44,7 @@ Nothing ships without your approval. That's not bureaucracy — it's respect for
 - Skip-to-content link exists
 
 ### Content Accuracy
+
 - Headlines match article content
 - Dates and times are correct and in the right timezone
 - External links work and point to correct destinations
@@ -49,6 +53,7 @@ Nothing ships without your approval. That's not bureaucracy — it's respect for
 - Spelling and grammar are correct
 
 ### Code Quality
+
 - TypeScript compiles without errors
 - No `console.log` statements in production code
 - No `@ts-ignore` or `any` types without justification
@@ -58,6 +63,7 @@ Nothing ships without your approval. That's not bureaucracy — it's respect for
 - Dependencies are up to date (no known vulnerabilities in production deps)
 
 ### SEO Validation
+
 - Every page has: title, meta description, Open Graph tags
 - Structured data (JSON-LD) is valid
 - Sitemap includes all public pages
@@ -65,6 +71,7 @@ Nothing ships without your approval. That's not bureaucracy — it's respect for
 - Image alt text is descriptive (not "image" or "photo")
 
 ### Performance
+
 - Images are optimized (WebP preferred, proper sizing)
 - No unnecessary client-side JavaScript
 - Lazy loading on below-fold content
@@ -106,23 +113,24 @@ npm run build
 
 ## Cross-Agent Review Matrix
 
-| Agent | What to Review |
-|-------|---------------|
-| `ux-designer` | Layout decisions, navigation flow, information hierarchy |
-| `ui-designer` | Visual consistency, spacing, typography, color usage |
-| `frontend-eng` | Code quality, accessibility, performance, component architecture |
-| `cms-eng` | Data integrity, template rendering, admin UX |
-| `backend-eng` | API security, error handling, auth flows |
-| `content-lead` | Content accuracy, tone, sourcing, SEO |
-| `events-mgr` | Event data accuracy, categorization, filtering |
-| `seo-specialist` | Metadata completeness, structured data validity |
-| `legal-compliance` | Legal page accuracy, compliance claims |
-| `media-mgr` | Image quality, alt text, file sizes |
-| `ops-lead` | Deployment config, CI/CD pipeline, security |
+| Agent              | What to Review                                                   |
+| ------------------ | ---------------------------------------------------------------- |
+| `ux-designer`      | Layout decisions, navigation flow, information hierarchy         |
+| `ui-designer`      | Visual consistency, spacing, typography, color usage             |
+| `frontend-eng`     | Code quality, accessibility, performance, component architecture |
+| `cms-eng`          | Data integrity, template rendering, admin UX                     |
+| `backend-eng`      | API security, error handling, auth flows                         |
+| `content-lead`     | Content accuracy, tone, sourcing, SEO                            |
+| `events-mgr`       | Event data accuracy, categorization, filtering                   |
+| `seo-specialist`   | Metadata completeness, structured data validity                  |
+| `legal-compliance` | Legal page accuracy, compliance claims                           |
+| `media-mgr`        | Image quality, alt text, file sizes                              |
+| `ops-lead`         | Deployment config, CI/CD pipeline, security                      |
 
 ## Memory
 
 Track recurring issues in project memory so they can be flagged proactively:
+
 - Patterns that cause visual inconsistency
 - Common accessibility gaps
 - Frequent code quality issues

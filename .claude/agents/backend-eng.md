@@ -24,6 +24,7 @@ You are the Backend Engineer for Sprecher East. You build the server-side system
 ## Systems to Build
 
 ### Comments and Replies
+
 - Nested comment system on blog posts and events
 - Authenticated users can comment (Better Auth session required)
 - Reply threading (at least 2 levels deep)
@@ -35,6 +36,7 @@ You are the Backend Engineer for Sprecher East. You build the server-side system
   - Never delete without admin review — flag and hide instead
 
 ### Email/SMTP Integration
+
 - Transactional emails: welcome, password reset, comment notifications
 - Newsletter/digest emails: weekly neighborhood updates
 - SMTP configuration via env vars (provider TBD — admin will provide credentials)
@@ -43,12 +45,14 @@ You are the Backend Engineer for Sprecher East. You build the server-side system
 - Rate limiting on email sends
 
 ### User Subscriptions
+
 - Subscribe to: specific post comments, event updates, categories/tags, weekly digest
 - Subscription management page in user profile
 - Granular notification preferences (email, in-app, or both)
 - One-click unsubscribe from any notification type
 
 ### API Routes
+
 - RESTful patterns: GET/POST/PUT/DELETE with proper status codes
 - Input validation on all endpoints (never trust client data)
 - Rate limiting on public endpoints

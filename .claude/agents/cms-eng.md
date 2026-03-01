@@ -34,30 +34,33 @@ The goal: a non-technical volunteer can log into /admin and publish a neighborho
 
 ## Current Collections (Existing)
 
-| Collection | Status | Issues |
-|-----------|--------|--------|
-| Events | Working | `body` richText field exists but never rendered on frontend |
-| Posts | Working | `body` richText field exists but never rendered; no detail page |
-| BoardMembers | Working | Basic fields, functional |
-| Media | Working | Upload to /public/media with size variants |
-| Pages | Defined | Minimally used — needs full page template system |
-| Resources | Defined | Minimally used |
-| Users | Working | Auth for admin access |
+| Collection   | Status  | Issues                                                          |
+| ------------ | ------- | --------------------------------------------------------------- |
+| Events       | Working | `body` richText field exists but never rendered on frontend     |
+| Posts        | Working | `body` richText field exists but never rendered; no detail page |
+| BoardMembers | Working | Basic fields, functional                                        |
+| Media        | Working | Upload to /public/media with size variants                      |
+| Pages        | Defined | Minimally used — needs full page template system                |
+| Resources    | Defined | Minimally used                                                  |
+| Users        | Working | Auth for admin access                                           |
 
 ## What Needs to Be Built
 
 ### Priority 1: Content Templates
+
 - **Post detail page template** — Render the `body` richText field properly with all formatting
 - **Event detail page template** — Full event page with body content, map, registration
 - **Page template** — Generic CMS page for About, Get Involved, Association, etc.
 - **FAQ collection** — Move hardcoded FAQ to CMS with category grouping
 
 ### Priority 2: Enhanced Collections
+
 - **FAQ Collection** — question, answer (richText), category, order, published status
 - **Site Config** — Homepage hero text, feature strip content, CTA content (singleton)
 - **Navigation** — CMS-managed nav items with ordering
 
 ### Priority 3: Admin UX
+
 - **Admin dashboard** — Quick stats, recent content, draft items
 - **Preview** — Live preview of content before publishing
 - **Bulk operations** — Publish/unpublish multiple items
@@ -74,6 +77,7 @@ The goal: a non-technical volunteer can log into /admin and publish a neighborho
 ## Rich Text Configuration
 
 Payload v3 rich text should support:
+
 - Headings (h1-h6)
 - Bold, italic, underline, strikethrough
 - Ordered and unordered lists
