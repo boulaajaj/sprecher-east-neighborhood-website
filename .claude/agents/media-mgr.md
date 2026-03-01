@@ -91,7 +91,7 @@ Every image must have alt text that:
 
 ### Attribution Requirements
 
-- Community photos: "Photo by [Name]" credit in caption or alt text
+- Community photos: "Photo by [Name]" credit in caption (never in alt text — alt text is for describing the image, not attribution)
 - Licensed photos: Follow license terms exactly
 - Public domain: No attribution required but appreciated
 - AI-generated images: Label as "AI-generated illustration" — transparency always

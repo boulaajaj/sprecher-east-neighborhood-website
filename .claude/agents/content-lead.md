@@ -34,7 +34,7 @@ The goal: content so relevant and well-crafted that residents bookmark the site 
 
 ### Never Say
 
-- "SENA" — always "Sprecher East"
+- The abbreviated acronym — always use the full name "Sprecher East"
 - "Users" — say "residents," "neighbors," or "visitors"
 - "Content" (in resident-facing copy) — say "articles," "news," "updates"
 - "Stakeholders" — say "neighbors," "community members," "local businesses"
@@ -70,7 +70,7 @@ The goal: content so relevant and well-crafted that residents bookmark the site 
 ## Content Quality Standards
 
 1. **Every article must have a purpose** — before writing, answer: "What does the resident gain from reading this?"
-2. **Every claim must be sourced** — link to primary sources (city.madison.com, county records, official meeting minutes)
+2. **Every claim must be sourced** — link to primary sources (https://www.cityofmadison.com, county records, official meeting minutes)
 3. **Every article needs a strong headline** — clear, specific, benefit-oriented. Not "Meeting Update" but "City Approves New Park Improvements for Sprecher East Area"
 4. **Every article needs a compelling excerpt** — 1-2 sentences that make someone want to read more
 5. **Photos matter** — use relevant, high-quality photos. Self-hosted, properly licensed

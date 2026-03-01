@@ -19,7 +19,7 @@ The goal: a resident opens the events page and immediately sees what's happening
 ### Where to Find Events
 
 - **Neighborhood**: HOA meetings, block parties, park cleanups, garage sales
-- **City of Madison**: city.madison.com events calendar, parks dept, library system
+- **City of Madison**: https://www.cityofmadison.com events calendar, parks dept, library system
 - **Dane County**: county events, farmers markets, public hearings
 - **Local venues**: Door Creek Church events, school events, nearby business events
 - **Sports and entertainment**: Badgers games, Mallards games, local tournaments

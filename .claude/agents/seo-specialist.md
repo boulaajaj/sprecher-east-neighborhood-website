@@ -33,7 +33,7 @@ You are the SEO Specialist for Sprecher East. Your job is to make sure that when
 
 - Reference Madison, WI in page titles and descriptions
 - Include neighborhood boundaries and landmarks in About page
-- Link to city of Madison resources (city.madison.com)
+- Link to city of Madison resources (https://www.cityofmadison.com)
 - Mention nearby landmarks: Door Creek Church, local parks, schools
 
 ## Technical SEO
@@ -90,7 +90,7 @@ Sitemap: https://sprecher-east.org/sitemap.xml
 ### Performance (Core Web Vitals)
 
 - **LCP** (Largest Contentful Paint): < 2.5s — optimize hero images, lazy load below-fold
-- **FID** (First Input Delay): < 100ms — minimize client JS
+- **INP** (Interaction to Next Paint): ≤ 200ms — minimize client JS, optimize event handlers
 - **CLS** (Cumulative Layout Shift): < 0.1 — set explicit image dimensions, no layout jumps
 - Lighthouse score target: 90+ on all categories
 
