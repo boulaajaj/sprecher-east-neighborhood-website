@@ -1,16 +1,9 @@
 import { type NextRequest, NextResponse } from 'next/server'
+import { isEmailConfigured, sendContactEmail } from '@/lib/email'
 
-/**
- * Contact form API route.
- *
- * Currently: logs submissions server-side (safe for dev / staging).
- *
- * To wire up real email delivery:
- *   Option A — Formspree: Replace this route with a direct Formspree endpoint in ContactForm.tsx
- *              (no API route needed, just POST to https://formspree.io/f/YOUR_FORM_ID)
- *   Option B — Netlify Forms: Add data-netlify="true" to the form element and remove this route
- *   Option C — Resend / SendGrid: Install the SDK and send via SMTP here
- */
+// ---------------------------------------------------------------------------
+// Contact form API route — sends via AWS SES SMTP
+// ---------------------------------------------------------------------------
 
 interface ContactPayload {
   first_name: string
@@ -29,7 +22,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as ContactPayload
 
-    // Basic validation
+    // --- Validation --------------------------------------------------------
     if (!body.first_name?.trim()) {
       return NextResponse.json({ error: 'First name is required.' }, { status: 400 })
     }
@@ -46,21 +39,34 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // TODO: Send email via Resend, SendGrid, Postmark, etc.
-    // For now, log it server-side
-    console.warn('[Contact form submission — email not configured]', {
-      name: `${body.first_name} ${body.last_name ?? ''}`.trim(),
-      email: body.email,
-      subject: body.subject,
-      message: body.message,
-      wantsUpdates: body.join_list === 'on',
-      timestamp: new Date().toISOString(),
-    })
+    // --- Send email --------------------------------------------------------
+    if (isEmailConfigured()) {
+      await sendContactEmail({
+        firstName: body.first_name.trim(),
+        lastName: body.last_name?.trim(),
+        email: body.email.trim(),
+        subject: body.subject.trim(),
+        message: body.message.trim(),
+        wantsUpdates: body.join_list === 'on',
+      })
+    } else {
+      // Fallback: log to server console when SMTP is not configured (dev mode)
+      console.warn('[Contact form — SMTP not configured, logging only]', {
+        name: `${body.first_name} ${body.last_name ?? ''}`.trim(),
+        email: body.email,
+        subject: body.subject,
+        wantsUpdates: body.join_list === 'on',
+        timestamp: new Date().toISOString(),
+      })
+    }
 
     return NextResponse.json({ ok: true }, { status: 200 })
   } catch (err) {
     console.error('[Contact form error]', err)
-    return NextResponse.json({ error: 'Internal server error.' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to send message. Please try again later.' },
+      { status: 500 },
+    )
   }
 }
 
