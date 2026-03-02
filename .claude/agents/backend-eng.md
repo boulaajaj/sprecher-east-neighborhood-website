@@ -15,11 +15,11 @@ You are the Backend Engineer for Sprecher East. You build the server-side system
 ## Tech Stack
 
 - **Framework**: Next.js 15 App Router (API routes, Server Actions)
-- **CMS**: Payload CMS v3 (SQLite at `data/payload.db`)
-- **Auth**: Better Auth (social login + email/password, SQLite at `data/auth.db`)
-- **Auth Client**: `src/lib/auth-client.ts` (client hooks)
-- **Auth Server**: `src/lib/auth.ts` (server config)
-- **Middleware**: `src/middleware.ts` (route protection)
+- **CMS**: Payload CMS v3 Website Template (SQLite at `data/payload.db`)
+- **Auth**: Payload native auth (`auth: true` on Users collection) — single database, no separate auth.db
+- **OAuth**: `payload-oauth2` plugin by Wilson Le — provider-agnostic OAuth2 (Google tested, others via custom config)
+- **Middleware**: `src/middleware.ts` (route protection via Payload JWT/session cookies)
+- **Docs Reference**: https://payloadcms.com/llms-full.txt (complete Payload CMS documentation)
 - **Email**: `@payloadcms/email-nodemailer` (configured in `payload.config.ts`)
 - **Forms**: `@payloadcms/plugin-form-builder` (forms + form-submissions collections)
 
@@ -27,7 +27,7 @@ You are the Backend Engineer for Sprecher East. You build the server-side system
 
 ### Framework First
 
-Before writing custom code, check whether Payload CMS, Next.js, or Better Auth already provides the capability. Use official plugins, adapters, and built-in APIs. Custom code is a last resort.
+Before writing custom code, check whether Payload CMS or Next.js already provides the capability. Use official plugins, adapters, and built-in APIs. Custom code is a last resort.
 
 - **Email**: Use Payload's `nodemailerAdapter` and `payload.sendEmail()` — never build a custom email module
 - **Forms**: Use `@payloadcms/plugin-form-builder` — it creates collections, stores submissions, sends notifications
@@ -60,7 +60,7 @@ When handling user-submitted data: validate → save to database → trigger sid
 ### Comments and Replies
 
 - Nested comment system on blog posts and events
-- Authenticated users can comment (Better Auth session required)
+- Authenticated users can comment (Payload auth session required)
 - Reply threading (at least 2 levels deep)
 - Admin moderation: approve, flag, hide, delete comments
 - Content moderation rules:
@@ -98,18 +98,53 @@ When handling user-submitted data: validate → save to database → trigger sid
 - Never log passwords, tokens, API keys, or PII — even in dev
 - All user input: validate and sanitize at the boundary
 - SQL: always use parameterized queries (Payload handles this, but raw queries must too)
-- Auth: httpOnly cookies only (Better Auth handles this — never override)
+- Auth: httpOnly cookies only (Payload handles this — never override)
 - Never expose internal error details to clients
 - `overrideAccess: true` only in server-side code, never in client-accessible paths
 - CSRF protection on all state-changing operations
 - Rate limit login attempts (prevent brute force)
 
-## Better Auth Gotchas
+## Payload Auth & OAuth Patterns
 
-- `nextCookies()` plugin required for Next.js 15 App Router
-- `BETTER_AUTH_SECRET` must be different from `PAYLOAD_SECRET` (both 32+ chars)
-- Run `node scripts/migrate-auth.mjs` before first use
-- `NEXT_PUBLIC_APP_URL` must match actual running port or CORS fails
+### payload-oauth2 Plugin Setup (per provider)
+
+```typescript
+import { OAuth2Plugin } from 'payload-oauth2'
+
+export const googleOAuth = OAuth2Plugin({
+  strategyName: 'google',
+  useEmailAsIdentity: true,
+  authCollection: 'users',
+  clientId: process.env.GOOGLE_CLIENT_ID || '',
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+  tokenEndpoint: 'https://oauth2.googleapis.com/token',
+  providerAuthorizationUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+  scopes: ['openid', 'email', 'profile'],
+  getUserInfo: async (accessToken) => {
+    const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    const user = await res.json()
+    return { email: user.email, sub: user.sub }
+  },
+  successRedirect: () => '/',
+  failureRedirect: (req, err) => '/login',
+})
+```
+
+### User Roles (Access Control)
+
+- **admin**: Full CRUD on all collections, access to `/admin`
+- **editor**: Create/edit content, cannot delete others' content
+- **resident**: Read published content, comment, manage own profile
+
+### Key Differences from Better Auth
+
+- Single database (`payload.db`) — no separate `auth.db`
+- No `nextCookies()` plugin needed — Payload handles cookies natively
+- No separate `auth.ts` or `auth-client.ts` files — auth is in `payload.config.ts`
+- Session managed by Payload JWT (delivered via httpOnly cookies), not Better Auth session cookies
+- OAuth configured as Payload plugins, not in a separate auth config
 
 ## Admin Setup
 
@@ -136,3 +171,40 @@ When handling user-submitted data: validate → save to database → trigger sid
 - [ ] Auth-protected routes use middleware properly
 - [ ] Email templates have unsubscribe links
 - [ ] Rate limiting configured on public endpoints
+
+## Sprint Retrospective
+
+### Practice
+
+Every two weeks, the team conducts a sprint retrospective. Every agent participates by logging observations throughout the sprint.
+
+### What to Track
+
+During every work session, note anything that should be discussed at retro:
+
+- **Issues encountered**: Bugs, broken workflows, tooling problems, unclear requirements
+- **Friction points**: Tasks that took longer than expected and why
+- **Feedback received**: Input from residents, neighbors, or Amine (project lead)
+- **Architectural impacts**: Decisions or events that caused significant rework or pivots
+- **Incomplete work**: Tasks left undone and the reason (blocked, deprioritized, out of scope)
+- **Wins**: Things that went well, patterns worth repeating, tools that helped
+
+### Where to Log
+
+Append observations to the shared sprint retro file: `docs/memory/retro/sprint-{N}.md`
+
+Entry format:
+
+```markdown
+### [Date] — [Agent Role]
+
+- **Observation**: What happened
+- **Impact**: How it affected the work
+- **Recommendation**: What to change or continue
+```
+
+### Cadence
+
+- **Every session**: Log observations to the retro file before ending work
+- **Weekly review**: Amine reviews the retro file at end of week
+- **Biweekly retrospective**: Full team retro — review all observations, decide on changes, update processes

@@ -57,67 +57,54 @@ Full static HTML site deployed to VPS.
 
 ---
 
+### Session: Mar 1, 2026 — Payload CMS Migration Planning
+
+- [x] Evaluated auth alternatives: Payload native, NextAuth, Lucia, Clerk, payload-oauth2
+- [x] Selected payload-oauth2 by Wilson Le (176 stars, ~14.6K monthly npm, zero-dependency)
+- [x] Decided on Option A: Payload CMS v3 Website Template (fresh scaffold, same repo)
+- [x] Single SQLite database replaces dual-DB architecture (removed auth.db)
+- [x] Updated all 12 agent profiles with Payload CMS knowledge
+- [x] Superseded 30 Sprint 2.x Asana tasks with migration notes
+- [x] Marked 3 Sprint 1 carried-over tasks as ON HOLD
+- [x] Created new Asana project: "Sprint 2 — Payload CMS Migration" (5 phases, 20 tasks)
+- [x] Added Sprint Retrospective section to all 12 agent profiles
+- [x] Created `docs/memory/retro/sprint-2.md` retro file
+- [x] Updated all memory files (MEMORY.md, progress.md, next-session-plan.md)
+
+---
+
 ## Open Issues / Next Steps
 
-### 🔴 Bugs to Fix
+### 🔴 Critical (Migration Blockers)
 
-1. **Email sign-up hangs in browser** ("Creating account…" never resolves)
-   - Tested via Playwright: submitting the register form freezes the button indefinitely
-   - Confirmed via curl: sign-up API works when `!` is NOT in the password
-   - Root cause unclear: may be auth-client `baseURL` mismatch OR a Better Auth body-parsing bug
-   - **Investigate**: Check network tab during browser sign-up; compare curl vs browser request body format
-   - **Possible fix**: Upgrade better-auth (check if >1.4.19 released), or intercept/validate body in the API route
+1. **Update CLAUDE.md** — Must reflect new Payload Website Template architecture before scaffolding
+2. **Scaffold Website Template** — Create feature branch, install template, configure for Sprecher East
+3. **VPS Snapshot** — Take snapshot before any migration deployment
 
-2. **Better Auth `!` character in passwords causes 500**
-   - `betterJSONParse` in `better-auth/dist/client/parser.mjs` crashes on `!` at certain positions
-   - Confirmed via curl: `{"password":"TestPass123!"}` → `SyntaxError: Bad escaped character at position N`
-   - Workaround: passwords without `!` work fine
-   - **Possible fix**: Upgrade better-auth, or add password validation to disallow certain special chars until fixed
+### 🟡 Migration Tasks (Sprint 2)
 
-3. **`npx payload run scripts/seed.ts` fails on Node v24**
-   - `payload/dist/bin/loadEnv.js` does `const { loadEnvConfig } = nextEnvImport` but `nextEnvImport` is `undefined` in CJS interop mode on Node 24
-   - Workaround created: `node scripts/migrate-auth.mjs` (for auth DB only, not Payload seeding)
-   - **Remaining gap**: Payload DB (events/posts/board) still empty — site runs on JSON fallback data
-   - **Fix options**:
-     a. Build a dev-only seed API endpoint (`/api/dev/seed`) that runs Payload Local API in Next.js context
-     b. Seed manually via `/admin` UI (create events/posts one by one)
-     c. Wait for Payload to fix `loadEnv.js` Node 24 compat
+4. **CMS Collections** — Events, BoardMembers, FAQ as Payload collections with Lexical rich text
+5. **Header/Footer Globals** — Nav links + site branding as Payload globals
+6. **Design Tokens** — Port Sprecher East brand colors to template theme
+7. **Auth Integration** — Remove Better Auth, configure payload-oauth2 for Google/GitHub
+8. **Login/Register Pages** — Custom login/register with Payload auth
+9. **Profile Page** — Resident profile page with Payload user data
 
-### 🟡 Infrastructure / Setup
+### 🟢 Post-Migration
 
-4. **Payload DB not seeded** (consequence of #3)
-   - `/events`, `/news`, homepage show data from `data/*.json` fallback (correct behavior)
-   - Payload admin at `/admin` shows 0 records — content management requires seeding
-   - Not user-facing bug, but needs resolution before content editors can use the CMS
+10. **Google OAuth URL update** — Re-register OAuth callback URLs for new auth system
+11. **Contact form** — Rebuild with Payload Form Builder plugin
+12. **Content migration** — Seed existing events/posts/board data via CMS
+13. **VPS deploy** — Deploy migrated site, configure Caddy
+14. **Favicon** — Add to public directory
+15. **Social media launch** — Resume after migration complete
 
-5. **GitHub Actions secrets not added**
-   - CI/CD pipeline is written but VPS secrets not in GitHub repo settings yet
-   - Secrets needed: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `VPS_PORT`
-   - Auto-deploy to VPS won't work until these are added at: GitHub repo → Settings → Secrets
+### ~~OBSOLETE (Better Auth bugs — removed by migration)~~
 
-6. **VPS not yet running Phase 2**
-   - VPS still runs the Phase 1 static HTML build (or nothing new)
-   - To deploy Phase 2: add secrets → push → CI/CD handles the rest
-   - VPS also needs: `mkdir -p data`, env vars set, `node scripts/migrate-auth.mjs`, visit `/admin` for first admin setup
-
-### 🟢 Nice to Have (future)
-
-7. **Google/GitHub OAuth credentials**
-   - `.env.local` has blank `GOOGLE_CLIENT_ID`, `GITHUB_CLIENT_ID` etc.
-   - Social login buttons exist but won't work until OAuth apps are created and keys added
-   - Not blocking — email/password login works
-
-8. **Contact form email delivery**
-   - `api/contact/route.ts` logs submissions but doesn't send email
-   - Needs an email provider (Resend, SendGrid, or Nodemailer + SMTP)
-
-9. **Profile page**
-   - `middleware.ts` protects `/profile` routes but the page doesn't exist yet
-   - Residents who sign in have no destination after login
-
-10. **Favicon**
-    - Browser shows 404 for `/favicon.ico`
-    - Need to add a `favicon.ico` (or `icon.png`) to `/public` or `src/app/`
+- ~~Email sign-up hangs in browser~~
+- ~~Better Auth `!` character in passwords causes 500~~
+- ~~`npx payload run scripts/seed.ts` fails on Node v24~~
+- ~~Payload DB not seeded~~
 
 ---
 

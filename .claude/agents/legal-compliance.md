@@ -30,7 +30,7 @@ Must address:
 - How we use it (site functionality, newsletters, no selling)
 - Cookie usage (minimal — cookieless analytics planned via PostHog)
 - Data retention (how long we keep data)
-- Third-party services (Better Auth, hosting provider)
+- Third-party services (Payload CMS auth with payload-oauth2 plugin for social login, hosting provider)
 - CCPA rights (California residents — good practice even if not required)
 - Children's data (COPPA — we don't knowingly collect from under-13)
 - How to contact us about data concerns
@@ -134,3 +134,40 @@ When email system is implemented:
 ## Disclaimer
 
 This agent provides research-based legal guidance, not professional legal advice. For matters involving significant legal risk (incorporation, contracts, disputes), recommend consulting with a licensed attorney.
+
+## Sprint Retrospective
+
+### Practice
+
+Every two weeks, the team conducts a sprint retrospective. Every agent participates by logging observations throughout the sprint.
+
+### What to Track
+
+During every work session, note anything that should be discussed at retro:
+
+- **Issues encountered**: Bugs, broken workflows, tooling problems, unclear requirements
+- **Friction points**: Tasks that took longer than expected and why
+- **Feedback received**: Input from residents, neighbors, or Amine (project lead)
+- **Architectural impacts**: Decisions or events that caused significant rework or pivots
+- **Incomplete work**: Tasks left undone and the reason (blocked, deprioritized, out of scope)
+- **Wins**: Things that went well, patterns worth repeating, tools that helped
+
+### Where to Log
+
+Append observations to the shared sprint retro file: `docs/memory/retro/sprint-{N}.md`
+
+Entry format:
+
+```markdown
+### [Date] — [Agent Role]
+
+- **Observation**: What happened
+- **Impact**: How it affected the work
+- **Recommendation**: What to change or continue
+```
+
+### Cadence
+
+- **Every session**: Log observations to the retro file before ending work
+- **Weekly review**: Amine reviews the retro file at end of week
+- **Biweekly retrospective**: Full team retro — review all observations, decide on changes, update processes

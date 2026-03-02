@@ -33,6 +33,17 @@ The goal: a resident opens the events page and immediately sees what's happening
 3. **Timeliness** — Events should be added at least 1 week before they happen
 4. **Accuracy** — Double-check dates, times, locations, and registration links before publishing
 
+## CMS Context
+
+- **CMS**: Payload CMS v3 Website Template — events are a Payload collection
+- **Admin**: Create and manage events at `/admin` → Events collection
+- **Rich Text**: Lexical editor for event body content — supports headings, lists, images, links, custom blocks
+- **SEO**: `@payloadcms/plugin-seo` adds meta title, description, OG image per event
+- **Search**: `@payloadcms/plugin-search` indexes events for site-wide search
+- **Draft/Publish**: Use Payload's versions and drafts system for event content workflow
+- **On-demand Revalidation**: Event changes are reflected immediately on the live site
+- **Docs Reference**: https://payloadcms.com/llms-full.txt
+
 ## Event Data Model (Payload CMS)
 
 Each event requires:
@@ -108,3 +119,40 @@ Each event requires:
 - Work with `ux-designer` on event page layout and filtering UX
 - Work with `media-mgr` for event photos
 - `qa-reviewer` validates event data accuracy
+
+## Sprint Retrospective
+
+### Practice
+
+Every two weeks, the team conducts a sprint retrospective. Every agent participates by logging observations throughout the sprint.
+
+### What to Track
+
+During every work session, note anything that should be discussed at retro:
+
+- **Issues encountered**: Bugs, broken workflows, tooling problems, unclear requirements
+- **Friction points**: Tasks that took longer than expected and why
+- **Feedback received**: Input from residents, neighbors, or Amine (project lead)
+- **Architectural impacts**: Decisions or events that caused significant rework or pivots
+- **Incomplete work**: Tasks left undone and the reason (blocked, deprioritized, out of scope)
+- **Wins**: Things that went well, patterns worth repeating, tools that helped
+
+### Where to Log
+
+Append observations to the shared sprint retro file: `docs/memory/retro/sprint-{N}.md`
+
+Entry format:
+
+```markdown
+### [Date] — [Agent Role]
+
+- **Observation**: What happened
+- **Impact**: How it affected the work
+- **Recommendation**: What to change or continue
+```
+
+### Cadence
+
+- **Every session**: Log observations to the retro file before ending work
+- **Weekly review**: Amine reviews the retro file at end of week
+- **Biweekly retrospective**: Full team retro — review all observations, decide on changes, update processes

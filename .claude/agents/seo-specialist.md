@@ -131,11 +131,28 @@ Sitemap: https://sprecher-east.org/sitemap.xml
 - Breadcrumbs provide structural linking
 - Footer links to all major sections
 
+## Payload SEO Plugin
+
+The project uses `@payloadcms/plugin-seo` which automatically adds SEO fields to configured collections:
+
+- **meta.title** — Page title for search results (auto-generation function available)
+- **meta.description** — Meta description with character count
+- **meta.image** — Open Graph image (relationship to Media collection)
+- **Search engine preview** — Built into admin panel, shows how the page will appear in Google
+- **Plugin docs**: https://payloadcms.com/docs/plugins/seo
+
+### Related Plugins
+
+- `@payloadcms/plugin-search` — Creates indexed search collection for fast server-side search. Docs: https://payloadcms.com/docs/plugins/search
+- `@payloadcms/plugin-redirects` — Manages URL redirects with HTTP status codes for SEO-safe URL changes. Docs: https://payloadcms.com/docs/plugins/redirects
+- `@payloadcms/plugin-nested-docs` — Auto-generates breadcrumbs for hierarchical content. Docs: https://payloadcms.com/docs/plugins/nested-docs
+- **Payload docs reference**: https://payloadcms.com/llms-full.txt
+
 ## Collaboration
 
 - Review `content-lead` headlines and excerpts for SEO optimization
 - Work with `frontend-eng` on metadata implementation and structured data
-- Work with `cms-eng` to ensure SEO fields exist on all content types
+- Work with `cms-eng` to ensure SEO fields exist on all content types (via plugin config)
 - Work with `media-mgr` on image optimization and naming
 - `qa-reviewer` validates metadata completeness and structured data validity
 
@@ -145,3 +162,40 @@ Sitemap: https://sprecher-east.org/sitemap.xml
 - Google Search Console integration (when domain is live)
 - Check for crawl errors, index coverage, mobile usability
 - Monthly SEO health check: broken links, missing metadata, duplicate content
+
+## Sprint Retrospective
+
+### Practice
+
+Every two weeks, the team conducts a sprint retrospective. Every agent participates by logging observations throughout the sprint.
+
+### What to Track
+
+During every work session, note anything that should be discussed at retro:
+
+- **Issues encountered**: Bugs, broken workflows, tooling problems, unclear requirements
+- **Friction points**: Tasks that took longer than expected and why
+- **Feedback received**: Input from residents, neighbors, or Amine (project lead)
+- **Architectural impacts**: Decisions or events that caused significant rework or pivots
+- **Incomplete work**: Tasks left undone and the reason (blocked, deprioritized, out of scope)
+- **Wins**: Things that went well, patterns worth repeating, tools that helped
+
+### Where to Log
+
+Append observations to the shared sprint retro file: `docs/memory/retro/sprint-{N}.md`
+
+Entry format:
+
+```markdown
+### [Date] — [Agent Role]
+
+- **Observation**: What happened
+- **Impact**: How it affected the work
+- **Recommendation**: What to change or continue
+```
+
+### Cadence
+
+- **Every session**: Log observations to the retro file before ending work
+- **Weekly review**: Amine reviews the retro file at end of week
+- **Biweekly retrospective**: Full team retro — review all observations, decide on changes, update processes

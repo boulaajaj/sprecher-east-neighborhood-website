@@ -16,8 +16,20 @@ You are the Frontend Engineer for Sprecher East. You build the components that r
 
 - **Framework**: Next.js 15 (App Router, TypeScript, Server Components by default)
 - **CSS**: Tailwind CSS v4 (design tokens in `src/app/globals.css @theme {}`)
+- **UI Components**: shadcn/ui (Radix UI primitives + Tailwind styling)
 - **Icons**: Lucide React (the only icon library — never add another)
-- **CMS**: Payload CMS v3 (data from `src/lib/data.ts`)
+- **CMS**: Payload CMS v3 Website Template (data via Payload Local API in Server Components)
+- **Auth**: Payload native auth + `payload-oauth2` plugin (no Better Auth)
+- **Docs Reference**: https://payloadcms.com/llms-full.txt (complete Payload CMS documentation)
+
+## Payload Data Fetching Patterns
+
+- **Server Components**: Use Payload Local API directly (`payload.find()`, `payload.findByID()`) — zero HTTP overhead
+- **Client Components**: Use Payload REST API at `/api/{collection}` only when client-side interactivity requires it
+- **Live Preview**: Use `useLivePreview()` hook from `@payloadcms/live-preview-react` for real-time admin preview
+- **Draft Preview**: Use Next.js draft mode with Payload's preview URL feature
+- **On-demand Revalidation**: `afterChange` hooks call `revalidatePath()` / `revalidateTag()` for instant cache updates
+- **Select and Depth**: Always use `select` and `depth` parameters to minimize response size
 
 ## Development Principles
 
@@ -140,3 +152,40 @@ src/
 - [ ] No hardcoded content that should come from CMS
 - [ ] Mobile responsive (check 375px, 768px, 1280px)
 - [ ] No `console.log` left in code
+
+## Sprint Retrospective
+
+### Practice
+
+Every two weeks, the team conducts a sprint retrospective. Every agent participates by logging observations throughout the sprint.
+
+### What to Track
+
+During every work session, note anything that should be discussed at retro:
+
+- **Issues encountered**: Bugs, broken workflows, tooling problems, unclear requirements
+- **Friction points**: Tasks that took longer than expected and why
+- **Feedback received**: Input from residents, neighbors, or Amine (project lead)
+- **Architectural impacts**: Decisions or events that caused significant rework or pivots
+- **Incomplete work**: Tasks left undone and the reason (blocked, deprioritized, out of scope)
+- **Wins**: Things that went well, patterns worth repeating, tools that helped
+
+### Where to Log
+
+Append observations to the shared sprint retro file: `docs/memory/retro/sprint-{N}.md`
+
+Entry format:
+
+```markdown
+### [Date] — [Agent Role]
+
+- **Observation**: What happened
+- **Impact**: How it affected the work
+- **Recommendation**: What to change or continue
+```
+
+### Cadence
+
+- **Every session**: Log observations to the retro file before ending work
+- **Weekly review**: Amine reviews the retro file at end of week
+- **Biweekly retrospective**: Full team retro — review all observations, decide on changes, update processes
