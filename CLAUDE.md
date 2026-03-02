@@ -108,6 +108,7 @@ System-level env vars (not in .env.local):
 | Var | Purpose |
 |-----|---------|
 | `HOSTINGER_API_KEY` | Hostinger API for VPS snapshots and management |
+| `ASANA_PAT` | Asana Personal Access Token for REST API (comments, full CRUD) |
 
 ## Known Gotchas
 
@@ -124,6 +125,6 @@ System-level env vars (not in .env.local):
 
 ## Connected Tools
 
-- **Asana**: Workspace "Meadowlands Together", project "Sprecher East — Master Board"
-- **Slack**: sprechereast.slack.com, channel #sprecher-east-na
+- **Asana** (REST API): `$ASANA_PAT` user env var. Workspace "Meadowlands Together" (GID: 1207130419401827), project "Sprecher East — Sprint Board" (GID: 1213444671237732). Use `curl` with Bearer auth. On Windows, pass JSON via temp file (`-d @/tmp/file.json`).
+- **Slack** (MCP): sprechereast.slack.com, channel #sprecher-east-na (ID: C0AJ124LBB2)
 - **Analytics**: PostHog (planned — cookieless mode, free cloud tier)
