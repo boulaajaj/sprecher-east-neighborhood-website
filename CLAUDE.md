@@ -125,6 +125,6 @@ System-level env vars (not in .env.local):
 
 ## Connected Tools
 
-- **Asana** (REST API): `$ASANA_PAT` user env var. Workspace "Meadowlands Together" (GID: 1207130419401827), project "Sprecher East — Sprint Board" (GID: 1213444671237732). Use `curl` with Bearer auth. On Windows, pass JSON via temp file (`-d @/tmp/file.json`).
+- **Asana** (REST API): `$ASANA_PAT` user env var. GIDs stored in `$ASANA_WORKSPACE_GID` and `$ASANA_PROJECT_GID` env vars. Use `curl` with Bearer auth. On Windows, pass JSON via temp file (`-d @/tmp/file.json`).
 - **Slack** (MCP): sprechereast.slack.com, channel #sprecher-east-na (ID: C0AJ124LBB2)
 - **Analytics**: PostHog (planned — cookieless mode, free cloud tier)

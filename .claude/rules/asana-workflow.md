@@ -44,8 +44,10 @@ Keep comments concise. One comment per work session, not per commit.
 Use the Asana REST API via `$ASANA_PAT` (Personal Access Token, user env var) for all task operations:
 
 ```bash
-# Load PAT (Windows — needed once per shell session)
+# Load env vars (Windows — needed once per shell session)
 ASANA_PAT=$(powershell -Command "[Environment]::GetEnvironmentVariable('ASANA_PAT', 'User')")
+ASANA_WORKSPACE_GID=$(powershell -Command "[Environment]::GetEnvironmentVariable('ASANA_WORKSPACE_GID', 'User')")
+ASANA_PROJECT_GID=$(powershell -Command "[Environment]::GetEnvironmentVariable('ASANA_PROJECT_GID', 'User')")
 
 # Add a comment to a task
 echo '{"data":{"text":"Your comment here"}}' > /tmp/asana_comment.json
@@ -66,10 +68,10 @@ curl -s -H "Authorization: Bearer $ASANA_PAT" \
   "https://app.asana.com/api/1.0/projects/{project_gid}/tasks?opt_fields=name,completed,assignee.name,due_on"
 ```
 
-Key GIDs:
+Key GIDs (set as user env vars — see onboarding docs in strategy repo):
 
-- Workspace: `1207130419401827` (Meadowlands Together)
-- Sprint Board project: `1213444671237732`
+- Workspace: `$ASANA_WORKSPACE_GID`
+- Sprint Board project: `$ASANA_PROJECT_GID`
 
 **Why REST API over MCP**: The Asana MCP connector lacks comment/story support, subtask creation, and has limited filtering. The PAT gives full API access including comments, attachments, sections, and custom fields.
 

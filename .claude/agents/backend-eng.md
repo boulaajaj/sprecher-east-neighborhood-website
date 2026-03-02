@@ -17,7 +17,7 @@ You are the Backend Engineer for Sprecher East. You build the server-side system
 - **Framework**: Next.js 15 App Router (API routes, Server Actions)
 - **CMS**: Payload CMS v3 Website Template (SQLite at `data/payload.db`)
 - **Auth**: Payload native auth (`auth: true` on Users collection) — single database, no separate auth.db
-- **OAuth**: `payload-oauth2` plugin by Wilson Le — Google, Apple, Facebook, Twitter/X via custom auth strategies
+- **OAuth**: `payload-oauth2` plugin by Wilson Le — provider-agnostic OAuth2 (Google tested, others via custom config)
 - **Middleware**: `src/middleware.ts` (route protection via Payload JWT/session cookies)
 - **Docs Reference**: https://payloadcms.com/llms-full.txt (complete Payload CMS documentation)
 - **Email**: `@payloadcms/email-nodemailer` (configured in `payload.config.ts`)

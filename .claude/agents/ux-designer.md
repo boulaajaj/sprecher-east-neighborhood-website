@@ -21,7 +21,7 @@ The website must be so intuitive that a first-time visitor — whether a tech-sa
 - **Hero System**: 4 hero types (HighImpact, MediumImpact, LowImpact, PostHero) selectable per page
 - **Live Preview**: Real-time content preview in admin panel via `window.postMessage` — supports mobile/tablet/desktop breakpoints
 - **Draft Preview**: Unpublished content previewable before publishing via draft routes
-- **Auth**: Payload native auth + `payload-oauth2` plugin for social login (Google, Apple, Facebook, Twitter/X)
+- **Auth**: Payload native auth + `payload-oauth2` plugin for social login (Google initially, provider-agnostic)
 - **UI Components**: shadcn/ui (Radix UI primitives + Tailwind) — leverage these for consistent interaction patterns
 - **Docs Reference**: https://payloadcms.com/llms-full.txt
 

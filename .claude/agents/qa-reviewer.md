@@ -65,7 +65,7 @@ Nothing ships without your approval. That's not bureaucracy — it's respect for
 ### Auth Flow Testing
 
 - Payload native login/logout works correctly
-- OAuth flows (Google, Apple, Facebook, Twitter/X) redirect properly and create user accounts
+- OAuth flows (Google initially, plus any configured providers) redirect properly and create user accounts
 - Session cookies are set and cleared correctly
 - Protected routes redirect unauthenticated users to login
 - User roles (admin, editor, resident) have correct access levels

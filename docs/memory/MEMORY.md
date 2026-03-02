@@ -126,7 +126,7 @@ npm run dev                         # → http://localhost:3000 (dev server also
 - **Single database**: All data (content + users + auth) in `data/payload.db` (SQLite)
 - **Better Auth REMOVED**: Was causing sign-up hangs, password bugs, dual-DB complexity
 - **Payload native auth**: `auth: true` on Users collection, JWT sessions, built-in login/register
-- **payload-oauth2**: Plugin by Wilson Le (supports Google, Apple, Facebook, Twitter/X). Starting with Google/GitHub; more providers added later.
+- **payload-oauth2**: Plugin by Wilson Le (provider-agnostic OAuth2; Google tested with examples, Apple has example config). Starting with Google; more providers configured as needed.
 - First Payload admin created by visiting `/admin` on a fresh DB (one-time setup UI)
 - `overrideAccess: true` required in all server-side Payload reads (no session in RSC)
 - Website Template provides: layout builder, live preview, draft system, SEO plugin, form builder
