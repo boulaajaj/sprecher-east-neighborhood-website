@@ -45,9 +45,10 @@ Use the Asana REST API via `$ASANA_PAT` (Personal Access Token, user env var) fo
 
 ```bash
 # Load env vars (Windows — needed once per shell session)
-ASANA_PAT=$(powershell -Command "[Environment]::GetEnvironmentVariable('ASANA_PAT', 'User')")
-ASANA_WORKSPACE_GID=$(powershell -Command "[Environment]::GetEnvironmentVariable('ASANA_WORKSPACE_GID', 'User')")
-ASANA_PROJECT_GID=$(powershell -Command "[Environment]::GetEnvironmentVariable('ASANA_PROJECT_GID', 'User')")
+# CRITICAL: use powershell.exe (not powershell) and pipe through tr -d '\r\n' to strip Windows line endings
+ASANA_PAT=$(powershell.exe -Command "[System.Environment]::GetEnvironmentVariable('ASANA_PAT', 'User')" | tr -d '\r\n')
+ASANA_WORKSPACE_GID=$(powershell.exe -Command "[System.Environment]::GetEnvironmentVariable('ASANA_WORKSPACE_GID', 'User')" | tr -d '\r\n')
+ASANA_PROJECT_GID=$(powershell.exe -Command "[System.Environment]::GetEnvironmentVariable('ASANA_PROJECT_GID', 'User')" | tr -d '\r\n')
 
 # Add a comment to a task
 echo '{"data":{"text":"Your comment here"}}' > /tmp/asana_comment.json
