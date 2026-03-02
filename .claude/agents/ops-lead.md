@@ -70,6 +70,22 @@ After deployment:
 - [ ] PM2 process is running and healthy
 - [ ] Caddy is serving HTTPS correctly
 
+## Database Architecture
+
+- **Single database**: `data/payload.db` (SQLite) — contains ALL data: CMS content, user accounts, sessions, form submissions
+- **No separate auth.db** — auth migrated from Better Auth to Payload native auth
+- **Backup strategy**: VPS snapshots via Hostinger API + SQLite file backup before deploys
+- **Payload docs reference**: https://payloadcms.com/llms-full.txt
+
+## Environment Variables (Post-Migration)
+
+- `PAYLOAD_SECRET` — JWT signing for Payload auth (32+ random chars)
+- `DATABASE_URI` — `file:./data/payload.db`
+- `NEXT_PUBLIC_SERVER_URL` — production URL or localhost
+- `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — for payload-oauth2 Google provider
+- Removed: `BETTER_AUTH_SECRET`, `NEXT_PUBLIC_APP_URL` (no longer needed)
+- Future: Facebook, Apple, Twitter OAuth credentials when providers are enabled
+
 ## Monitoring
 
 - Check PM2 logs for runtime errors: `pm2 logs sprecher-east --lines 50`
@@ -124,3 +140,37 @@ After deployment:
 - Work with `cms-eng` on database management and backups
 - `qa-reviewer` validates deployment health
 - Escalate to Amine for: infrastructure cost decisions, domain changes, security incidents
+
+## Sprint Retrospective
+
+### Practice
+
+Every two weeks, the team conducts a sprint retrospective. Every agent participates by logging observations throughout the sprint.
+
+### What to Track
+
+During every work session, note anything that should be discussed at retro:
+
+- **Issues encountered**: Bugs, broken workflows, tooling problems, unclear requirements
+- **Friction points**: Tasks that took longer than expected and why
+- **Feedback received**: Input from residents, neighbors, or Amine (project lead)
+- **Architectural impacts**: Decisions or events that caused significant rework or pivots
+- **Incomplete work**: Tasks left undone and the reason (blocked, deprioritized, out of scope)
+- **Wins**: Things that went well, patterns worth repeating, tools that helped
+
+### Where to Log
+
+Append observations to the shared sprint retro file: `docs/memory/retro/sprint-{N}.md`
+
+Entry format:
+
+    ### [Date] — [Agent Role]
+    - **Observation**: What happened
+    - **Impact**: How it affected the work
+    - **Recommendation**: What to change or continue
+
+### Cadence
+
+- **Every session**: Log observations to the retro file before ending work
+- **Weekly review**: Amine reviews the retro file at end of week
+- **Biweekly retrospective**: Full team retro — review all observations, decide on changes, update processes
