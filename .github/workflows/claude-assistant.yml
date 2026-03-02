@@ -1,0 +1,77 @@
+name: Claude Code Assistant
+
+on:
+  # Respond to @claude mentions in PR comments and review comments
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+  # Auto-address PR reviews requesting changes
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  # ─────────────────────────────────────────────
+  # Interactive: respond to @claude mentions
+  # ─────────────────────────────────────────────
+  respond-to-mention:
+    if: >
+      (github.event_name == 'issue_comment' || github.event_name == 'pull_request_review_comment') &&
+      contains(github.event.comment.body, '@claude')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          trigger_phrase: "@claude"
+          claude_args: |
+            --model claude-sonnet-4-20250514
+            --max-turns 15
+
+  # ─────────────────────────────────────────────
+  # Automation: address PR review feedback
+  # ─────────────────────────────────────────────
+  address-review:
+    if: >
+      github.event_name == 'pull_request_review' &&
+      github.event.review.state == 'changes_requested'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            A PR review has requested changes. Read ALL review comments carefully,
+            understand the requested changes, and implement fixes.
+
+            Rules:
+            - Follow the project's CLAUDE.md and .claude/rules/ guidelines
+            - Make focused, minimal changes that address each comment
+            - Do NOT modify files unrelated to the review feedback
+            - Commit with a clear message referencing the review
+            - If a comment is unclear or you disagree, leave a reply explaining why
+
+            Review body:
+            ${{ github.event.review.body }}
+          claude_args: |
+            --model claude-sonnet-4-20250514
+            --max-turns 20
