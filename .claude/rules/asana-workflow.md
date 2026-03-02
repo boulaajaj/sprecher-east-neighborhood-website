@@ -6,7 +6,7 @@ A development or content task is only marked **complete** in Asana when its PR i
 
 ## PR Linking
 
-Every task that produces code or content changes must have a PR link in the Asana task notes. Format:
+Every task that produces code or content changes must have a PR link posted as an Asana task comment. Format:
 
 ```text
 **PR**: https://github.com/boulaajaj/sprecher-east-neighborhood-website/pull/<number> (status)
@@ -28,14 +28,14 @@ Keep comments concise. One comment per work session, not per commit.
 ## When to Update Asana
 
 - **Starting work on a task**: Add a comment noting work has begun and the branch name
-- **PR created**: Add the PR link to the task notes
+- **PR created**: Add the PR link as a task comment
 - **PR blocked or needs changes**: Comment with the blocker and what's needed
 - **PR merged to main**: Mark the task complete and add the final PR link with `(merged to main)`
 - **Task blocked by external dependency**: Comment with what's blocking and leave task open
 
 ## Task-PR Traceability
 
-- Asana task notes contain the PR URL
+- Asana task comments contain the PR URL
 - PR descriptions contain the Asana task URL (format: `Asana: https://app.asana.com/...`)
 - This two-way linking makes it easy to navigate between project management and code
 

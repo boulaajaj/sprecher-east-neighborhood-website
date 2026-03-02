@@ -103,7 +103,7 @@ public/images/               (must copy from assets/images — see setup)
 
 ```bash
 npm install
-cp .env.local.example .env.local   # fill in PAYLOAD_SECRET (32 char random string)
+cp .env.local.example .env.local   # fill in PAYLOAD_SECRET + DATABASE_URI + SERVER_URL (see env vars below)
 mkdir -p data                       # already exists if repo was cloned with data/
 npm run dev                         # → http://localhost:3000 (dev server also generates importMap.js)
 # First visit to /admin → one-time "Create first admin" setup screen (creates payload.db)
@@ -126,7 +126,7 @@ npm run dev                         # → http://localhost:3000 (dev server also
 - **Single database**: All data (content + users + auth) in `data/payload.db` (SQLite)
 - **Better Auth REMOVED**: Was causing sign-up hangs, password bugs, dual-DB complexity
 - **Payload native auth**: `auth: true` on Users collection, JWT sessions, built-in login/register
-- **payload-oauth2**: Plugin by Wilson Le for Google/GitHub social login (176 GitHub stars, ~14.6K npm monthly)
+- **payload-oauth2**: Plugin by Wilson Le (supports Google, Apple, Facebook, Twitter/X). Starting with Google/GitHub; more providers added later.
 - First Payload admin created by visiting `/admin` on a fresh DB (one-time setup UI)
 - `overrideAccess: true` required in all server-side Payload reads (no session in RSC)
 - Website Template provides: layout builder, live preview, draft system, SEO plugin, form builder

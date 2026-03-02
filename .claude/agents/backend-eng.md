@@ -143,7 +143,7 @@ export const googleOAuth = OAuth2Plugin({
 - Single database (`payload.db`) — no separate `auth.db`
 - No `nextCookies()` plugin needed — Payload handles cookies natively
 - No separate `auth.ts` or `auth-client.ts` files — auth is in `payload.config.ts`
-- Session managed by Payload JWT, not Better Auth cookies
+- Session managed by Payload JWT (delivered via httpOnly cookies), not Better Auth session cookies
 - OAuth configured as Payload plugins, not in a separate auth config
 
 ## Admin Setup
