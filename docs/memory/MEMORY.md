@@ -51,7 +51,7 @@ src/components/
     UserMenu.tsx              'use client' — shows Sign In or user avatar + dropdown
 ```
 
-## Project File Structure (PRE-MIGRATION — will change after template scaffold)
+## Project File Structure (Legacy — will be replaced by Website Template scaffold)
 
 ```
 src/
@@ -99,29 +99,27 @@ public/images/               (must copy from assets/images — see setup)
 - `--color-muted: #6b6b6b` → `text-muted`
 - `--color-border: #e2ddd6` → `border-border`
 
-## First-Time Local Setup (PRE-MIGRATION — will simplify after template scaffold)
+## Local Setup (Post-Migration)
 
 ```bash
 npm install
-cp .env.local.example .env.local   # fill in PAYLOAD_SECRET + BETTER_AUTH_SECRET (32 char random strings)
+cp .env.local.example .env.local   # fill in PAYLOAD_SECRET (32 char random string)
 mkdir -p data                       # already exists if repo was cloned with data/
-node scripts/migrate-auth.mjs      # creates auth.db schema (user/session/account/verification tables)
 npm run dev                         # → http://localhost:3000 (dev server also generates importMap.js)
 # First visit to /admin → one-time "Create first admin" setup screen (creates payload.db)
-# Seed content via /admin UI or wait for npx payload run fix on Node 24
 ```
 
-## Env Vars Required (PRE-MIGRATION — BETTER_AUTH_SECRET will be removed)
+## Env Vars Required (Post-Migration)
 
-| Var                       | Purpose                                                       |
-| ------------------------- | ------------------------------------------------------------- |
-| `PAYLOAD_SECRET`          | Payload JWT signing (32+ chars)                               |
-| `DATABASE_URI`            | `file:./data/payload.db`                                      |
-| `NEXT_PUBLIC_SERVER_URL`  | `http://localhost:3000` (dev)                                 |
-| `BETTER_AUTH_SECRET`      | Better Auth session signing (32+ chars, different from above) |
-| `NEXT_PUBLIC_APP_URL`     | `http://localhost:3000` (dev)                                 |
-| `GOOGLE_CLIENT_ID/SECRET` | Google OAuth (optional — social login)                        |
-| `GITHUB_CLIENT_ID/SECRET` | GitHub OAuth (optional — social login)                        |
+| Var                       | Purpose                                         |
+| ------------------------- | ----------------------------------------------- |
+| `PAYLOAD_SECRET`          | Payload JWT signing (32+ chars)                 |
+| `DATABASE_URI`            | `file:./data/payload.db`                        |
+| `NEXT_PUBLIC_SERVER_URL`  | `http://localhost:3000` (dev) or production URL |
+| `GOOGLE_CLIENT_ID/SECRET` | Google OAuth via payload-oauth2 (optional)      |
+| `GITHUB_CLIENT_ID/SECRET` | GitHub OAuth via payload-oauth2 (optional)      |
+
+> **Legacy note:** `BETTER_AUTH_SECRET` and `NEXT_PUBLIC_APP_URL` are no longer needed. Better Auth was removed in Sprint 2.
 
 ## CMS & Auth Key Notes
 
@@ -170,6 +168,7 @@ VPS first-deploy extra steps: create `data/` dir, set env vars, run seed script,
 **Status**: In progress (started March 1, 2026)
 
 **Key Decisions Made:**
+
 - Migrate from Better Auth to Payload native auth + payload-oauth2
 - Rebuild from Payload CMS v3 Website Template (Option A — fresh scaffold, same repo)
 - Single SQLite database (no more separate auth.db)
@@ -177,6 +176,7 @@ VPS first-deploy extra steps: create `data/` dir, set env vars, run seed script,
 - Sprint retrospective practice added to all 12 agents (biweekly cycle)
 
 **Current Priorities:**
+
 1. Update CLAUDE.md to reflect new architecture
 2. Scaffold website template on feature branch
 3. Configure CMS collections (Events, BoardMembers, FAQ)

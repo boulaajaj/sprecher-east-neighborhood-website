@@ -31,6 +31,7 @@ Sprint dates: March 1 - March 14, 2026
 <!-- Amine: add your weekly review notes here -->
 
 ### Week of March 1, 2026
+
 - _Pending review_
 
 ---
@@ -40,7 +41,9 @@ Sprint dates: March 1 - March 14, 2026
 <!-- Filled in during the biweekly retrospective meeting -->
 
 ### Actions Decided
+
 - _Pending first retro_
 
 ### Process Changes
+
 - _Pending first retro_

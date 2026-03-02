@@ -17,6 +17,7 @@
 ## Priority 1: Update CLAUDE.md
 
 Before any scaffolding, update the project CLAUDE.md to reflect:
+
 - New stack (Payload Website Template, payload-oauth2, shadcn/ui, single DB)
 - Removed Better Auth references and gotchas
 - New file structure from the website template
