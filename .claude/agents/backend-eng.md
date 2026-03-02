@@ -109,27 +109,27 @@ When handling user-submitted data: validate → save to database → trigger sid
 ### payload-oauth2 Plugin Setup (per provider)
 
 ```typescript
-import { OAuth2Plugin } from "payload-oauth2";
+import { OAuth2Plugin } from 'payload-oauth2'
 
 export const googleOAuth = OAuth2Plugin({
-  strategyName: "google",
+  strategyName: 'google',
   useEmailAsIdentity: true,
-  authCollection: "users",
-  clientId: process.env.GOOGLE_CLIENT_ID || "",
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-  tokenEndpoint: "https://oauth2.googleapis.com/token",
-  providerAuthorizationUrl: "https://accounts.google.com/o/oauth2/v2/auth",
-  scopes: ["openid", "email", "profile"],
+  authCollection: 'users',
+  clientId: process.env.GOOGLE_CLIENT_ID || '',
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+  tokenEndpoint: 'https://oauth2.googleapis.com/token',
+  providerAuthorizationUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+  scopes: ['openid', 'email', 'profile'],
   getUserInfo: async (accessToken) => {
-    const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+    const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
       headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    const user = await res.json();
-    return { email: user.email, sub: user.sub };
+    })
+    const user = await res.json()
+    return { email: user.email, sub: user.sub }
   },
-  successRedirect: () => "/",
-  failureRedirect: (req, err) => "/login",
-});
+  successRedirect: () => '/',
+  failureRedirect: (req, err) => '/login',
+})
 ```
 
 ### User Roles (Access Control)
@@ -195,10 +195,13 @@ Append observations to the shared sprint retro file: `docs/memory/retro/sprint-{
 
 Entry format:
 
-    ### [Date] — [Agent Role]
-    - **Observation**: What happened
-    - **Impact**: How it affected the work
-    - **Recommendation**: What to change or continue
+```markdown
+### [Date] — [Agent Role]
+
+- **Observation**: What happened
+- **Impact**: How it affected the work
+- **Recommendation**: What to change or continue
+```
 
 ### Cadence
 

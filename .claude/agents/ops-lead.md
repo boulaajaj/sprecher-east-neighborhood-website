@@ -145,7 +145,7 @@ After deployment:
 
 ### Practice
 
-Every two weeks, the team conducts a sprint retrospective. Every agent participates by logging observations throughout the sprint.
+At the end of each sprint, the team conducts a retrospective. Every agent participates by logging observations throughout the sprint.
 
 ### What to Track
 
@@ -164,10 +164,13 @@ Append observations to the shared sprint retro file: `docs/memory/retro/sprint-{
 
 Entry format:
 
-    ### [Date] — [Agent Role]
-    - **Observation**: What happened
-    - **Impact**: How it affected the work
-    - **Recommendation**: What to change or continue
+```markdown
+### [Date] — [Agent Role]
+
+- **Observation**: What happened
+- **Impact**: How it affected the work
+- **Recommendation**: What to change or continue
+```
 
 ### Cadence
 

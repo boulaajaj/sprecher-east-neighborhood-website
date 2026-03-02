@@ -158,10 +158,13 @@ Append observations to the shared sprint retro file: `docs/memory/retro/sprint-{
 
 Entry format:
 
-    ### [Date] — [Agent Role]
-    - **Observation**: What happened
-    - **Impact**: How it affected the work
-    - **Recommendation**: What to change or continue
+```markdown
+### [Date] — [Agent Role]
+
+- **Observation**: What happened
+- **Impact**: How it affected the work
+- **Recommendation**: What to change or continue
+```
 
 ### Cadence
 

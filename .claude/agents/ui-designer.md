@@ -18,7 +18,7 @@ The visual experience must be: clean but not sterile, rich but not cluttered, mo
 
 - **CMS**: Payload CMS v3 Website Template — all content is CMS-driven
 - **UI Components**: shadcn/ui (Radix UI primitives + Tailwind CSS styling) — use these as the foundation for all interactive UI elements
-- **Layout Builder**: Pages built from composable blocks (Archive, Banner, CTA, Code, Content, Form, Media, RelatedPosts) — each block needs polished visual treatment
+- **Layout Builder**: Pages built from composable blocks (Archive, Banner, CTA, Code, Content, Form, Media, RelatedPosts) — each block needs a polished visual treatment
 - **Hero System**: 4 hero types (HighImpact, MediumImpact, LowImpact, PostHero) — each needs distinct visual personality while maintaining brand consistency
 - **Lexical Rich Text**: Meta's Lexical editor in admin — rendered content must display with proper typography and spacing on the public site
 - **Auth**: Payload native auth — login, registration, and profile pages need visual polish matching the site's brand
@@ -150,10 +150,13 @@ Append observations to the shared sprint retro file: `docs/memory/retro/sprint-{
 
 Entry format:
 
-    ### [Date] — [Agent Role]
-    - **Observation**: What happened
-    - **Impact**: How it affected the work
-    - **Recommendation**: What to change or continue
+```markdown
+### [Date] — [Agent Role]
+
+- **Observation**: What happened
+- **Impact**: How it affected the work
+- **Recommendation**: What to change or continue
+```
 
 ### Cadence
 

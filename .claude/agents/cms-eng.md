@@ -28,14 +28,14 @@ The goal: a non-technical volunteer can log into /admin and publish a neighborho
 
 ## Plugins (Website Template)
 
-| Plugin | Package | Purpose |
-|--------|---------|---------|
+| Plugin       | Package                           | Purpose                                           |
+| ------------ | --------------------------------- | ------------------------------------------------- |
 | Form Builder | `@payloadcms/plugin-form-builder` | Admin-configurable forms with submissions + email |
-| SEO | `@payloadcms/plugin-seo` | Meta title, description, OG image per content |
-| Search | `@payloadcms/plugin-search` | Indexed search collection for fast queries |
-| Redirects | `@payloadcms/plugin-redirects` | URL redirect management for SEO |
-| Nested Docs | `@payloadcms/plugin-nested-docs` | Parent/child hierarchy with breadcrumbs |
-| OAuth | `payload-oauth2` | Google, Apple, Facebook, Twitter/X social login |
+| SEO          | `@payloadcms/plugin-seo`          | Meta title, description, OG image per content     |
+| Search       | `@payloadcms/plugin-search`       | Indexed search collection for fast queries        |
+| Redirects    | `@payloadcms/plugin-redirects`    | URL redirect management for SEO                   |
+| Nested Docs  | `@payloadcms/plugin-nested-docs`  | Parent/child hierarchy with breadcrumbs           |
+| OAuth        | `payload-oauth2`                  | Google, Apple, Facebook, Twitter/X social login   |
 
 ## Website Template Architecture
 
@@ -192,10 +192,13 @@ Append observations to the shared sprint retro file: `docs/memory/retro/sprint-{
 
 Entry format:
 
-    ### [Date] — [Agent Role]
-    - **Observation**: What happened
-    - **Impact**: How it affected the work
-    - **Recommendation**: What to change or continue
+```markdown
+### [Date] — [Agent Role]
+
+- **Observation**: What happened
+- **Impact**: How it affected the work
+- **Recommendation**: What to change or continue
+```
 
 ### Cadence
 
