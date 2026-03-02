@@ -1,3 +1,4 @@
+#!/bin/sh
 npx lint-staged
 
 # Warn (non-blocking) if production deps have high/critical vulnerabilities
