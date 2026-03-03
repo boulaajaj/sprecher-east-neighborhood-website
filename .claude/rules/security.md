@@ -29,6 +29,8 @@
 - Console logs must never include user-submitted PII (names, emails, addresses) — log only non-identifying metadata (subject, message length, timestamp)
 - Sanitize user input before placing it in email headers — strip CR/LF and control characters to prevent header injection
 - When validating select/dropdown values server-side, whitelist the allowed values — never trust client-submitted strings
+- Seed data passwords must use `process.env.SEED_PASSWORD || crypto.randomUUID()` — never hardcode passwords like `'password'`
+- All seed email addresses must use `@example.com` domain — never use real addresses
 
 ### When handling auth and sessions
 
