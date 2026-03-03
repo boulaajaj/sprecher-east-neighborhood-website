@@ -75,12 +75,14 @@ If a Payload plugin exists for the capability, use it. Check the [Payload plugin
 - **Interface Segregation**: Use Payload's `select` and `depth` to return only needed fields. Different API consumers get different response shapes.
 - **Dependency Inversion**: Frontend reads data through `src/lib/data.ts` (abstraction), not directly from Payload's API (implementation).
 
-### Test-Driven Development
+### Payload CMS Patterns
 
-- Test collection hooks: verify `beforeValidate` generates correct slugs, `beforeChange` sets defaults
-- Test access control: verify role-based permissions work correctly for each collection
-- Test data transformations: verify `src/lib/data.ts` returns consistent shapes from both Payload and JSON fallback
-- Use Payload's Local API in tests for realistic CRUD operations
+- **Layout Builder**: Pages and Posts use the `blocks` field for flexible content layout — each block has its own schema in `src/blocks/` and corresponding React component
+- **Hero System**: 4 hero types in `src/heros/` (HighImpact, MediumImpact, LowImpact, PostHero) — selectable per page/post
+- **Live Preview**: Real-time content preview in admin via `window.postMessage` — supports mobile/tablet/desktop breakpoints
+- **On-demand Revalidation**: `afterChange` hooks call `revalidatePath()` / `revalidateTag()` for instant content updates
+- **Access Control**: Use `authenticatedOrPublished` pattern from `src/access/` for content collections
+- **Field Groups**: Reusable field configs in `src/fields/` (slug, link, hero) — compose into collections
 
 ## Content Modeling Principles
 

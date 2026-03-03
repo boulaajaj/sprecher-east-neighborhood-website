@@ -14,9 +14,10 @@ This is an unofficial grassroots initiative. Always be transparent about AI assi
 ## Current Stack
 
 - **Framework**: Next.js 15 (App Router, TypeScript)
-- **CSS**: Tailwind CSS v4 (design tokens in `src/app/globals.css @theme {}`)
-- **CMS**: Payload CMS v3 at `/admin` (self-hosted, SQLite `data/payload.db`)
-- **Auth**: Better Auth (social login + email/password, SQLite `data/auth.db`)
+- **CSS**: Tailwind CSS v4 (design tokens in `src/app/(frontend)/globals.css @theme {}`)
+- **CMS**: Payload CMS v3 Website Template at `/admin` (self-hosted, SQLite `data/payload.db`)
+- **Auth**: Payload native auth (Users collection with `auth: true`) + `payload-oauth2` plugin for social login
+- **Rich Text**: Lexical editor with slash menu, toolbars, inline images, and custom blocks
 - **Icons**: Lucide React
 - **Hosting**: Hostinger VPS (Ubuntu 24.04, PM2 + Caddy)
 
@@ -25,7 +26,7 @@ This is an unofficial grassroots initiative. Always be transparent about AI assi
 - **VM ID**: 1371281
 - **Hostname**: srv1371281.hstgr.cloud
 - **IP**: 187.77.27.93
-- **Domain**: sprechereast.com (transfer pending — currently served by IP)
+- **Domain**: sprecher-east.org (live)
 - **OS**: Ubuntu 24.04 with Docker
 - **Plan**: KVM 1 (1 CPU, 4 GB RAM, 50 GB disk)
 - **Deploy path**: /var/www/sprecher-east
@@ -40,35 +41,54 @@ This is an unofficial grassroots initiative. Always be transparent about AI assi
 - **Live domains**: `sprecher-east.org` + `www.sprecher-east.org` (HTTPS) + IP `:80` (HTTP)
 - **Caddy rule**: Always `cp Caddyfile Caddyfile.bak` before editing, always `caddy validate` before reload
 
-## Architecture (DDD / Fractal Components)
+## Architecture (Payload CMS Website Template)
 
 ```
-src/components/
-  ui/              Atomic, domain-agnostic primitives (Badge, PageHeader, EmptyState, etc.)
-  features/
-    events/        Event domain components (EventCard, EventList, etc.)
-    posts/         Post domain components (PostCard, PostGrid, etc.)
-  sections/        Full-width page sections (Hero, FeatureStrip, CTA, etc.)
-  layout/          App shell (Nav, Footer, UserMenu)
+src/
+  access/          Access control helpers (authenticatedOrPublished, etc.)
+  app/             Next.js App Router pages and layouts
+    (frontend)/    Public-facing routes (home, posts, events, etc.)
+    (payload)/     Payload admin panel routes
+  blocks/          Layout builder block components (Archive, Banner, CTA, Content, Form, Media, etc.)
+  collections/     Payload CMS collection configs (Pages, Posts, Events, Users, Media, etc.)
+  components/      Shared React components (UI, Link, RichText, Media, etc.)
+  endpoints/       Custom API endpoints
+  fields/          Reusable Payload field groups (slug, link, hero)
+  Footer/          Footer global component
+  globals/         Payload global configs (Header, Footer)
+  Header/          Header global component
+  heros/           Hero block components (HighImpact, MediumImpact, LowImpact, PostHero)
+  hooks/           Server-side hooks (revalidation, format slug, etc.)
+  plugins/         Payload plugin configs
+  providers/       React context providers (Theme, LivePreview, etc.)
+  search/          Search plugin config
+  utilities/       Shared utility functions
 ```
 
-- `ui/` = pure presentational, no domain knowledge
-- `features/{domain}/` = domain-specific, composed from ui primitives
-- `sections/` = full-page sections, composed from features + ui
-- Barrel exports in `index.ts` per folder; files max ~300 lines
+- **Blocks**: Each block in `src/blocks/` has a Payload config and a React component — pages compose content from these
+- **Heros**: Hero components in `src/heros/` render per-page hero sections (4 types)
+- **Collections**: Payload collection configs in `src/collections/` define data models with access control and hooks
+- **Globals**: Singleton data (Header nav, Footer) in `src/globals/`
+- **Components**: Shared UI in `src/components/` — no strict layer boundaries
 
 ## Key Files
 
-| File                     | Purpose                                                      |
-| ------------------------ | ------------------------------------------------------------ |
-| `src/app/globals.css`    | Tailwind v4 @theme block — all design tokens                 |
-| `src/lib/data.ts`        | Reads Payload first, falls back to JSON (`withJsonFallback`) |
-| `src/lib/auth.ts`        | Better Auth server config                                    |
-| `src/lib/auth-client.ts` | Better Auth client hooks                                     |
-| `src/middleware.ts`      | Protects /profile routes                                     |
-| `payload.config.ts`      | Payload CMS config (SQLite, collections)                     |
-| `ecosystem.config.js`    | PM2 config for VPS                                           |
-| `data/*.json`            | Seed data (events, posts, board, site config)                |
+| File                             | Purpose                                           |
+| -------------------------------- | ------------------------------------------------- |
+| `payload.config.ts`              | Payload CMS config (SQLite, collections, plugins) |
+| `src/app/(frontend)/globals.css` | Tailwind v4 @theme block — all design tokens      |
+| `src/collections/Pages.ts`       | Pages collection with layout builder blocks       |
+| `src/collections/Posts.ts`       | Blog posts collection                             |
+| `src/collections/Events.ts`      | Events collection (custom)                        |
+| `src/collections/Users.ts`       | Users collection with Payload native auth         |
+| `src/collections/Media.ts`       | Media uploads with size variants                  |
+| `src/blocks/`                    | Layout builder block configs + React components   |
+| `src/heros/`                     | Hero block configs + React components             |
+| `src/access/`                    | Access control helpers                            |
+| `src/fields/`                    | Reusable field groups (slug, link, hero)          |
+| `src/Header/`                    | Header global component                           |
+| `src/Footer/`                    | Footer global component                           |
+| `ecosystem.config.js`            | PM2 config for VPS                                |
 
 ## Design Tokens
 
@@ -82,27 +102,35 @@ src/components/
 | `--color-muted`      | `#6b6b6b` | `text-muted`                                   |
 | `--color-border`     | `#e2ddd6` | `border-border`                                |
 
+## Payload CMS Plugins
+
+| Plugin       | Package                           | Purpose                                           |
+| ------------ | --------------------------------- | ------------------------------------------------- |
+| Form Builder | `@payloadcms/plugin-form-builder` | Admin-configurable forms with submissions + email |
+| SEO          | `@payloadcms/plugin-seo`          | Meta title, description, OG image per content     |
+| Search       | `@payloadcms/plugin-search`       | Indexed search collection for fast queries        |
+| Redirects    | `@payloadcms/plugin-redirects`    | URL redirect management for SEO                   |
+| Nested Docs  | `@payloadcms/plugin-nested-docs`  | Parent/child hierarchy with breadcrumbs           |
+| OAuth        | `payload-oauth2`                  | Provider-agnostic OAuth2 social login             |
+
 ## Local Dev Setup
 
 ```bash
 npm install
 cp .env.local.example .env.local   # fill in secrets (see Env Vars below)
-node scripts/migrate-auth.mjs      # creates auth.db schema
 npm run dev                         # → http://localhost:3000
-# Visit /admin for first-time Payload admin setup
+# Visit /admin for first-time Payload admin setup (create first admin user)
 ```
 
 ## Env Vars (all secrets go in `.env.local`, never commit)
 
-| Var                       | Purpose                                                  |
-| ------------------------- | -------------------------------------------------------- |
-| `PAYLOAD_SECRET`          | Payload JWT signing (32+ random chars)                   |
-| `DATABASE_URI`            | `file:./data/payload.db`                                 |
-| `NEXT_PUBLIC_SERVER_URL`  | `http://localhost:3000` (dev) or production URL          |
-| `BETTER_AUTH_SECRET`      | Session signing (32+ random chars, different from above) |
-| `NEXT_PUBLIC_APP_URL`     | Must match actual running port                           |
-| `GOOGLE_CLIENT_ID/SECRET` | Google OAuth (optional)                                  |
-| `GITHUB_CLIENT_ID/SECRET` | GitHub OAuth (optional)                                  |
+| Var                       | Purpose                                         |
+| ------------------------- | ----------------------------------------------- |
+| `PAYLOAD_SECRET`          | Payload JWT signing (32+ random chars)          |
+| `DATABASE_URI`            | `file:./data/payload.db`                        |
+| `NEXT_PUBLIC_SERVER_URL`  | `http://localhost:3000` (dev) or production URL |
+| `PREVIEW_SECRET`          | Draft preview URL signing                       |
+| `GOOGLE_CLIENT_ID/SECRET` | Google OAuth via payload-oauth2 (optional)      |
 
 System-level env vars (not in .env.local):
 | Var | Purpose |
@@ -116,12 +144,11 @@ System-level env vars (not in .env.local):
 - **Payload REST route**: `REST_GET(config)` — curried, NOT `REST_GET(req, config)`
 - **Payload importMap**: Auto-generated on dev server start at `src/app/(payload)/admin/importMap.js`
 - **`defaultSort`**: Must be on collection root, NOT inside `admin: {}`
-- **Better Auth cookies**: `nextCookies()` plugin required for Next.js 15 App Router
-- **Better Auth DB init**: Run `node scripts/migrate-auth.mjs` before first use
 - **`npx payload run` broken on Node v24**: Use direct node scripts instead
-- **Two separate secrets**: `PAYLOAD_SECRET` ≠ `BETTER_AUTH_SECRET`
 - **`graphql` package**: Must install separately from `@payloadcms/graphql`
-- **Port mismatch**: `NEXT_PUBLIC_APP_URL` must match actual running port or auth CORS fails
+- **`overrideAccess: true`**: Only in server-side Payload reads — never expose to client
+- **Live Preview**: Uses `window.postMessage` — component must use `useLivePreview()` hook
+- **Draft Preview**: Requires `PREVIEW_SECRET` env var for signed preview URLs
 
 ## Connected Tools
 

@@ -4,11 +4,22 @@ frontend:
 
 cms:
   - changed-files:
-      - any-glob-to-any-file: ['src/payload/**', 'payload.config.ts', 'src/app/(payload)/**']
+      - any-glob-to-any-file:
+          [
+            'src/payload.config.ts',
+            'src/collections/**',
+            'src/blocks/**',
+            'src/fields/**',
+            'src/globals/**',
+            'src/access/**',
+            'src/hooks/**',
+            'src/plugins/**',
+            'src/app/(payload)/**',
+          ]
 
 auth:
   - changed-files:
-      - any-glob-to-any-file: ['src/lib/auth*.ts', 'src/middleware.ts', 'src/app/api/auth/**']
+      - any-glob-to-any-file: ['src/collections/Users/**', 'src/access/**']
 
 documentation:
   - changed-files:
@@ -24,7 +35,8 @@ dependencies:
 
 styling:
   - changed-files:
-      - any-glob-to-any-file: ['src/app/globals.css', 'tailwind.config.*', 'postcss.config.*']
+      - any-glob-to-any-file:
+          ['src/app/(frontend)/globals.css', 'tailwind.config.*', 'postcss.config.*']
 
 config:
   - changed-files:

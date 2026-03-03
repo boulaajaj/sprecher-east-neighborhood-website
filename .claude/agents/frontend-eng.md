@@ -19,7 +19,7 @@ You are the Frontend Engineer for Sprecher East. You build the components that r
 - **UI Components**: shadcn/ui (Radix UI primitives + Tailwind styling)
 - **Icons**: Lucide React (the only icon library — never add another)
 - **CMS**: Payload CMS v3 Website Template (data via Payload Local API in Server Components)
-- **Auth**: Payload native auth + `payload-oauth2` plugin (no Better Auth)
+- **Auth**: Payload native auth + `payload-oauth2` plugin
 - **Docs Reference**: https://payloadcms.com/llms-full.txt (complete Payload CMS documentation)
 
 ## Payload Data Fetching Patterns
@@ -52,32 +52,30 @@ Before writing custom code, check whether Next.js or Payload already provides th
 - **Interface Segregation**: Props interfaces include only what the component needs. Don't pass entire data objects when only 3 fields are used.
 - **Dependency Inversion**: Components depend on data shapes (TypeScript interfaces), not on how data is fetched (Payload vs JSON).
 
-### Test-Driven Development
+### Payload Template Architecture
 
-- Write component tests for interactive behavior (form validation, toggle states, navigation)
-- Test accessibility: verify keyboard navigation, ARIA attributes, focus management
-- Test responsive layouts: verify components render correctly at key breakpoints
-- Use React Testing Library for component tests (user-centric, not implementation-centric)
-
-## Architecture Rules (DDD)
-
-Follow the DDD/Fractal component structure strictly:
+Follow the Payload CMS Website Template component structure:
 
 ```
 src/
-  components/
-   ui/              Pure presentational, domain-agnostic (Badge, PageHeader, Container)
-  features/
-    events/        Event domain (EventCard, EventList, EventDetailPage)
-    posts/         Post domain (PostCard, PostGrid, PostDetailPage)
-  sections/        Full-width page sections (Hero, FeatureStrip, CTA)
-  layout/          App shell (Nav, Footer, UserMenu)
+  app/             Next.js App Router pages and layouts
+  blocks/          Layout builder block components (Archive, Banner, CTA, Content, Form, Media, etc.)
+  collections/     Payload CMS collection configs
+  components/      Shared React components (UI, Link, RichText, Media, etc.)
+  fields/          Reusable Payload field groups (slug, link, hero)
+  Footer/          Footer global component
+  globals/         Payload global configs (Header, Footer)
+  Header/          Header global component
+  heros/           Hero block components (HighImpact, MediumImpact, LowImpact, PostHero)
+  hooks/           Server-side hooks (revalidation, format slug, etc.)
+  plugins/         Payload plugin configs
+  providers/       React context providers (Theme, LivePreview, etc.)
+  utilities/       Shared utility functions
 ```
 
-- `ui/` components never import from `features/` or `sections/`
-- `features/` components compose from `ui/` primitives
-- `sections/` compose from `features/` and `ui/`
-- Barrel exports in `index.ts` per folder
+- **Blocks**: Each block in `src/blocks/` has a Payload config and a React component — pages compose from these
+- **Heros**: Hero components in `src/heros/` render per-page hero sections
+- **Components**: Shared UI in `src/components/` — no strict layer boundaries, but keep components focused
 - Max ~300 lines per file — split if larger
 
 ## Code Standards
@@ -148,7 +146,7 @@ src/
 
 - [ ] TypeScript compiles with no errors
 - [ ] All interactive elements are keyboard accessible
-- [ ] Components follow the architecture rules (correct folder, barrel export updated)
+- [ ] Components follow the template architecture (blocks in src/blocks/, heros in src/heros/, shared in src/components/)
 - [ ] No hardcoded content that should come from CMS
 - [ ] Mobile responsive (check 375px, 768px, 1280px)
 - [ ] No `console.log` left in code

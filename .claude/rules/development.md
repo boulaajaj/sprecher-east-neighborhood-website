@@ -16,32 +16,25 @@ When evaluating whether to build vs. use:
 
 - **Single Responsibility**: Each module, component, collection, and function does one thing well. A form handler validates and persists — it doesn't also send emails (that's a hook).
 - **Open/Closed**: Extend behavior through hooks, plugins, and composition — not by modifying existing modules. Payload hooks and Next.js middleware are the extension points.
-- **Liskov Substitution**: Data access functions return consistent shapes regardless of the underlying source. Components in `ui/` are interchangeable without breaking layouts.
+- **Liskov Substitution**: Data access functions return consistent shapes regardless of the underlying source. Shared components are interchangeable without breaking layouts.
 - **Interface Segregation**: API responses and component props include only what the consumer needs. Use Payload's `select` and `depth` parameters. Don't pass entire objects when 3 fields suffice.
 - **Dependency Inversion**: Business logic depends on abstractions (Payload Local API, data layer interfaces), not concrete implementations (raw SQL, direct file reads).
 
-## Domain-Driven Design
+## Payload CMS Template Architecture
 
-The codebase follows DDD boundaries. Code belongs in the layer that matches its responsibility:
+The codebase follows the official Payload CMS v3 Website Template structure. Code belongs where the template convention places it:
 
-- `ui/` — Pure presentational primitives, no domain knowledge
-- `features/{domain}/` — Domain-specific components composed from `ui/` primitives
-- `sections/` — Full-page sections composed from `features/` and `ui/`
-- `layout/` — App shell (Nav, Footer, UserMenu)
-- `lib/` — Shared infrastructure (data access, auth, utilities)
-- `payload/collections/` — CMS domain models with access control and hooks
-
-ESLint boundary rules enforce import direction. Respect them.
-
-## Test-Driven Development
-
-Write tests before or alongside implementation. Focus on behavior, not implementation details.
-
-- **API routes and access control**: Verify auth requirements, input validation, and error responses
-- **Collection hooks**: Verify transformations (slug generation, defaults, computed fields)
-- **Components**: Test interactive behavior (form validation, state changes, keyboard navigation)
-- **Data layer**: Verify consistent output from both Payload and JSON fallback sources
-- Use framework-native testing tools: Payload Local API for CMS tests, React Testing Library for components
+- `src/blocks/` — Layout builder block components (config + React component per block)
+- `src/heros/` — Hero block components (HighImpact, MediumImpact, LowImpact, PostHero)
+- `src/collections/` — Payload CMS collection configs with access control and hooks
+- `src/globals/` — Payload global configs (Header, Footer)
+- `src/components/` — Shared React components (UI, Link, RichText, Media, etc.)
+- `src/access/` — Access control helpers (authenticatedOrPublished, etc.)
+- `src/fields/` — Reusable Payload field groups (slug, link, hero)
+- `src/hooks/` — Server-side hooks (revalidation, format slug, etc.)
+- `src/Header/` and `src/Footer/` — Global header and footer components
+- `src/utilities/` — Shared utility functions
+- `src/app/` — Next.js App Router pages and layouts
 
 ## Configuration Over Code
 
@@ -77,13 +70,16 @@ In production, operations should either succeed or fail clearly. Never return a 
 
 In development, failures should be visible and informative (console warnings, fallback UI with explanation).
 
-## Respect Module Boundaries
+## Respect Template Conventions
 
-The DDD architecture (`ui/` → `features/` → `sections/` → `layout/` → `app/`, with `lib/` as shared infrastructure) exists for a reason. ESLint boundary rules enforce import direction. When adding new code:
+The Payload CMS Website Template has established patterns for where code belongs. When adding new code:
 
-- Determine which architectural layer it belongs to
-- Respect the import rules for that layer
-- If something needs to be shared across layers, it belongs in `lib/`
+- **New block types** go in `src/blocks/` (config + React component)
+- **New collections** go in `src/collections/` (with access control and hooks)
+- **Shared components** go in `src/components/`
+- **Reusable field patterns** go in `src/fields/`
+- **Server-side hooks** go in `src/hooks/`
+- **Shared utilities** go in `src/utilities/`
 
 ## Keep Dependencies Lean
 

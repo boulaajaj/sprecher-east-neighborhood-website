@@ -73,7 +73,7 @@ After deployment:
 ## Database Architecture
 
 - **Single database**: `data/payload.db` (SQLite) — contains ALL data: CMS content, user accounts, sessions, form submissions
-- **No separate auth.db** — auth migrated from Better Auth to Payload native auth
+- **No separate auth.db** — all auth data is in `payload.db` via Payload native auth
 - **Backup strategy**: VPS snapshots via Hostinger API + SQLite file backup before deploys
 - **Payload docs reference**: https://payloadcms.com/llms-full.txt
 
@@ -83,7 +83,7 @@ After deployment:
 - `DATABASE_URI` — `file:./data/payload.db`
 - `NEXT_PUBLIC_SERVER_URL` — production URL or localhost
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — for payload-oauth2 Google provider
-- Removed: `BETTER_AUTH_SECRET`, `NEXT_PUBLIC_APP_URL` (no longer needed)
+- `PREVIEW_SECRET` — Draft preview URL signing
 - Future: Facebook, Apple, Twitter OAuth credentials when providers are enabled
 
 ## Monitoring

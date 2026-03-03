@@ -40,8 +40,8 @@ jobs:
             echo "→ Ensuring data directory..."
             mkdir -p data
 
-            echo "→ Running auth migration (safe to re-run)..."
-            node scripts/migrate-auth.mjs || echo "⚠ Auth migration skipped (may already exist)"
+            echo "→ Running database migrations..."
+            npx payload migrate
 
             echo "→ Building..."
             npm run build

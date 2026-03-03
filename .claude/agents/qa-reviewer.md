@@ -17,7 +17,7 @@ Nothing ships without your approval. That's not bureaucracy — it's respect for
 ## Tech Context
 
 - **CMS**: Payload CMS v3 Website Template — admin at `/admin`, all content CMS-driven
-- **Auth**: Payload native auth + `payload-oauth2` plugin for social login (no Better Auth)
+- **Auth**: Payload native auth + `payload-oauth2` plugin for social login
 - **Database**: Single SQLite at `data/payload.db` — no separate auth database
 - **UI Components**: shadcn/ui (Radix UI primitives + Tailwind)
 - **Layout Builder**: Pages use blocks field (Archive, Banner, CTA, Code, Content, Form, Media, RelatedPosts)
@@ -90,7 +90,7 @@ Nothing ships without your approval. That's not bureaucracy — it's respect for
 - TypeScript compiles without errors
 - No `console.log` statements in production code
 - No `@ts-ignore` or `any` types without justification
-- Components follow the architecture rules (correct folder, barrel exports)
+- Components follow the template architecture (blocks, heros, components in correct locations)
 - No hardcoded content that should come from CMS
 - No secrets, API keys, or credentials in code
 - Dependencies are up to date (no known vulnerabilities in production deps)
