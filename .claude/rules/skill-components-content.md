@@ -19,6 +19,7 @@ Patterns for using existing components and maintaining content quality standards
 | Card              | `src/components/ui/card.tsx`                 | shadcn/ui card primitives                                      |
 | Button            | `src/components/ui/button.tsx`               | shadcn/ui button with variants (default, outline, ghost, link) |
 | Pagination        | `src/components/Pagination/index.tsx`        | Page navigation for collection lists                           |
+| JsonLd            | `src/components/JsonLd.tsx`                  | Safe JSON-LD structured data (escapes XSS). Always use this.   |
 
 ## Nav Links
 

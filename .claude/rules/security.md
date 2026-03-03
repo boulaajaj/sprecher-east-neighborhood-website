@@ -12,7 +12,8 @@
 
 ### When writing code
 
-- Never use `eval()`, `Function()` constructor, or `dangerouslySetInnerHTML` with user input
+- Never use `eval()`, `Function()` constructor, or `dangerouslySetInnerHTML` with user/CMS input
+- **JSON-LD structured data**: Always use the `JsonLd` component (`src/components/JsonLd.tsx`) — never raw `dangerouslySetInnerHTML` with `JSON.stringify`. CMS content can contain `</script>` which breaks out of script tags (XSS). The `JsonLd` component escapes `<` as `\u003c`.
 - Never interpolate user input into SQL, shell commands, or URLs — always use parameterized/template-safe methods
 - Validate and sanitize all user input at system boundaries (API routes, form handlers)
 - Use `encodeURIComponent()` when building URLs from user input
