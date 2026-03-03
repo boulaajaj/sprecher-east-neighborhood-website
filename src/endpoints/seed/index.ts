@@ -1,4 +1,5 @@
 import type { CollectionSlug, GlobalSlug, Payload, PayloadRequest, File } from 'payload'
+import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
 
@@ -113,13 +114,18 @@ export const seed = async ({
     ),
   ])
 
+  const seedPassword = process.env.SEED_PASSWORD || crypto.randomUUID()
+  if (!process.env.SEED_PASSWORD) {
+    payload.logger.warn('— SEED_PASSWORD not set, using random password for demo user')
+  }
+
   const [demoAuthor, image1Doc, image2Doc, image3Doc, imageHomeDoc] = await Promise.all([
     payload.create({
       collection: 'users',
       data: {
         name: 'Sprecher East',
         email: 'demo-author@example.com',
-        password: 'password',
+        password: seedPassword,
       },
     }),
     payload.create({
@@ -151,21 +157,21 @@ export const seed = async ({
     collection: 'posts',
     depth: 0,
     context: { disableRevalidate: true },
-    data: post1({ heroImage: imageHomeDoc, blockImage: image1Doc, author: demoAuthor }),
+    data: post1({ heroImage: imageHomeDoc, author: demoAuthor }),
   })
 
   const post2Doc = await payload.create({
     collection: 'posts',
     depth: 0,
     context: { disableRevalidate: true },
-    data: post2({ heroImage: image2Doc, blockImage: image3Doc, author: demoAuthor }),
+    data: post2({ heroImage: image2Doc, author: demoAuthor }),
   })
 
   const post3Doc = await payload.create({
     collection: 'posts',
     depth: 0,
     context: { disableRevalidate: true },
-    data: post3({ heroImage: image1Doc, blockImage: image2Doc, author: demoAuthor }),
+    data: post3({ heroImage: image1Doc, author: demoAuthor }),
   })
 
   // Update related posts
