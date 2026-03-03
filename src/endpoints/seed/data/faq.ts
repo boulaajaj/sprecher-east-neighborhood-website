@@ -1,4 +1,4 @@
-import { root, heading, paragraph, text, linkNode, p } from '../helpers/lexical'
+import { root, paragraph, text, linkNode, p } from '../helpers/lexical'
 
 type FAQItem = {
   question: string

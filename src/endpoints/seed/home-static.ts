@@ -1,5 +1,5 @@
 import type { RequiredDataFromCollectionSlug } from 'payload'
-import { heading, paragraph, text, linkNode, root, p } from './helpers/lexical'
+import { heading, paragraph, text, linkNode, root } from './helpers/lexical'
 
 // Used for pre-seeded content so that the homepage is not empty
 export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
@@ -21,7 +21,7 @@ export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
   meta: {
     description:
       'Sprecher East is a grassroots neighborhood initiative on Madison\u2019s Far East Side \u2014 connecting residents of Meadowlands, Door Creek, and Reston Heights.',
-    title: 'Sprecher East',
+    title: 'Home',
   },
   title: 'Home',
   layout: [],
