@@ -16,9 +16,9 @@ You are the Backend Engineer for Sprecher East. You build the server-side system
 
 - **Framework**: Next.js 15 App Router (API routes, Server Actions)
 - **CMS**: Payload CMS v3 Website Template (SQLite at `data/payload.db`)
-- **Auth**: Payload native auth (`auth: true` on Users collection) — single database, no separate auth.db
+- **Auth**: Payload native auth (`auth: true` on Users collection, single SQLite database)
 - **OAuth**: `payload-oauth2` plugin by Wilson Le — provider-agnostic OAuth2 (Google tested, others via custom config)
-- **Middleware**: `src/middleware.ts` (route protection via Payload JWT/session cookies)
+- **Route protection**: Payload's built-in access control (`authenticatedOrPublished`, `authenticated`)
 - **Docs Reference**: https://payloadcms.com/llms-full.txt (complete Payload CMS documentation)
 - **Email**: `@payloadcms/email-nodemailer` (configured in `payload.config.ts`)
 - **Forms**: `@payloadcms/plugin-form-builder` (forms + form-submissions collections)
@@ -47,13 +47,14 @@ Before writing custom code, check whether Payload CMS or Next.js already provide
 
 When handling user-submitted data: validate → save to database → trigger side effects (email, notifications, webhooks) → respond. Side effects can fail — data loss is permanent. Payload's `afterChange` hooks enforce this pattern naturally.
 
-### Test-Driven Development
+### Payload CMS Patterns
 
-- Write tests for API routes, access control functions, and data transformations before implementation
-- Use Payload's Local API in tests (`payload.create()`, `payload.find()`, `payload.update()`)
-- Test access control: verify that unauthenticated users cannot access protected data
-- Test hooks: verify that `beforeChange` and `afterChange` hooks produce expected results
-- Test error paths: verify that invalid input returns proper error responses
+- **Access Control**: Use Payload's `access` functions on collections — define `create`, `read`, `update`, `delete` per collection with role checks
+- **Hooks**: Use `beforeChange`, `afterChange`, `beforeValidate`, `afterRead` hooks for data transformations, revalidation, and side effects
+- **Local API**: Use `payload.find()`, `payload.findByID()`, `payload.create()`, `payload.update()` in Server Components and API routes
+- **Revalidation**: Use `revalidatePath()` / `revalidateTag()` in `afterChange` hooks for instant cache updates
+- **Field Groups**: Use reusable field groups from `src/fields/` for shared field patterns (e.g., slug, link)
+- **Globals**: Use Payload globals for singleton data (Header, Footer, site settings)
 
 ## Systems to Build
 
@@ -138,13 +139,13 @@ export const googleOAuth = OAuth2Plugin({
 - **editor**: Create/edit content, cannot delete others' content
 - **resident**: Read published content, comment, manage own profile
 
-### Key Differences from Better Auth
+### Auth Architecture
 
-- Single database (`payload.db`) — no separate `auth.db`
-- No `nextCookies()` plugin needed — Payload handles cookies natively
-- No separate `auth.ts` or `auth-client.ts` files — auth is in `payload.config.ts`
-- Session managed by Payload JWT (delivered via httpOnly cookies), not Better Auth session cookies
-- OAuth configured as Payload plugins, not in a separate auth config
+- Single database (`payload.db`) — all user accounts, sessions, and content in one place
+- Payload handles cookies and JWT natively — no extra plugins or config files needed
+- Auth is configured in `payload.config.ts` via the Users collection (`auth: true`)
+- Session managed by Payload JWT (delivered via httpOnly cookies)
+- OAuth configured via `payload-oauth2` plugin in `payload.config.ts`
 
 ## Admin Setup
 

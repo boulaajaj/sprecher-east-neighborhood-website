@@ -1,0 +1,210 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@config '../../../tailwind.config.mjs';
+
+@custom-variant sm (@media (width >= theme(--breakpoint-sm)));
+@custom-variant md (@media (width >= theme(--breakpoint-md)));
+@custom-variant lg (@media (width >= theme(--breakpoint-lg)));
+@custom-variant xl (@media (width >= theme(--breakpoint-xl)));
+@custom-variant 2xl (@media (width >= theme(--breakpoint-2xl)));
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: unset;
+    font-size: unset;
+  }
+}
+
+@plugin '@tailwindcss/typography';
+
+@source inline('lg:col-span-4');
+@source inline('lg:col-span-6');
+@source inline('lg:col-span-8');
+@source inline('lg:col-span-12');
+@source inline('border-border');
+@source inline('bg-card');
+@source inline('border-error');
+@source inline('bg-error/30');
+@source inline('border-success');
+@source inline('bg-success/30');
+@source inline('border-warning');
+@source inline('bg-warning/30');
+
+@theme {
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+  --breakpoint-2xl: 86rem;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer utilities {
+  .container {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  @variant sm {
+    .container {
+      max-width: var(--breakpoint-sm);
+    }
+  }
+
+  @variant md {
+    .container {
+      max-width: var(--breakpoint-md);
+      padding-inline: 2rem;
+    }
+  }
+
+  @variant lg {
+    .container {
+      max-width: var(--breakpoint-lg);
+    }
+  }
+
+  @variant xl {
+    .container {
+      max-width: var(--breakpoint-xl);
+    }
+  }
+
+  @variant 2xl {
+    .container {
+      max-width: var(--breakpoint-2xl);
+    }
+  }
+}
+
+/* Sprecher East brand tokens — light theme (default) */
+:root,
+[data-theme='light'] {
+  --background: #f9f8f5;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  --primary: #3d7a5e;
+  --primary-foreground: #ffffff;
+  --secondary: #f0ede6;
+  --secondary-foreground: #1a1a1a;
+  --muted: #f0ede6;
+  --muted-foreground: #6b6b6b;
+  --accent: #e8923a;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --destructive-foreground: #dc2626;
+  --border: #e2ddd6;
+  --input: #e2ddd6;
+  --ring: #3d7a5e;
+  --chart-1: #3d7a5e;
+  --chart-2: #e8923a;
+  --chart-3: #4f9974;
+  --chart-4: #c97830;
+  --chart-5: #2e5e47;
+  --radius: 0.625rem;
+  --success: #3d7a5e;
+  --warning: #e8923a;
+  --error: #dc2626;
+  --surface: #f0ede6;
+  --primary-dark: #2e5e47;
+  --primary-light: #4f9974;
+  --accent-dark: #c97830;
+}
+
+/* Sprecher East brand tokens — dark theme */
+[data-theme='dark'] {
+  --background: #0f1117;
+  --foreground: #e8e6e3;
+  --card: #1a1d27;
+  --card-foreground: #e8e6e3;
+  --popover: #1a1d27;
+  --popover-foreground: #e8e6e3;
+  --primary: #4e9b76;
+  --primary-foreground: #ffffff;
+  --secondary: #1e2130;
+  --secondary-foreground: #e8e6e3;
+  --muted: #1e2130;
+  --muted-foreground: #9ca3af;
+  --accent: #f0a04b;
+  --accent-foreground: #1a1a1a;
+  --destructive: #ef4444;
+  --destructive-foreground: #ef4444;
+  --border: #2d3040;
+  --input: #2d3040;
+  --ring: #4e9b76;
+  --chart-1: #4e9b76;
+  --chart-2: #f0a04b;
+  --chart-3: #5fb88e;
+  --chart-4: #d48a38;
+  --chart-5: #3d7a5e;
+  --success: #4e9b76;
+  --warning: #f0a04b;
+  --error: #ef4444;
+  --surface: #1e2130;
+  --primary-dark: #3d7a5e;
+  --primary-light: #5fb88e;
+  --accent-dark: #d48a38;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-surface: var(--surface);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-light: var(--primary-light);
+  --color-accent-dark: var(--accent-dark);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply flex min-h-[100vh] flex-col bg-background text-foreground;
+  }
+}
+
+/* Ensure no flash of unstyled content while theme initializes */
+html {
+  opacity: initial;
+}

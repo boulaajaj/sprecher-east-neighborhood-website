@@ -25,9 +25,16 @@ jobs:
       - name: Type-check
         run: npx tsc --noEmit
 
+      - name: Create database tables
+        run: npx payload migrate
+        env:
+          PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET || 'ci-build-placeholder-secret-32chars!' }}
+          DATABASE_URI: file:./data/payload.db
+          NEXT_PUBLIC_SERVER_URL: http://localhost:3000
+
       - name: Build
         run: npm run build
         env:
-          # Prevents Sanity from failing the build when env vars aren't set
-          NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID || 'placeholder' }}
-          NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET || 'production' }}
+          PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET || 'ci-build-placeholder-secret-32chars!' }}
+          DATABASE_URI: file:./data/payload.db
+          NEXT_PUBLIC_SERVER_URL: http://localhost:3000

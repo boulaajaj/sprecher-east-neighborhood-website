@@ -32,10 +32,10 @@
 
 ### When handling auth and sessions
 
-- `PAYLOAD_SECRET` and `BETTER_AUTH_SECRET` must be different values (both 32+ random chars)
-- Better Auth uses `nextCookies()` plugin for secure cookie handling in Next.js 15
-- Middleware at `src/middleware.ts` protects authenticated routes — never bypass it
-- Never store tokens or secrets in localStorage — use httpOnly cookies (Better Auth handles this)
+- `PAYLOAD_SECRET` must be a strong random string (32+ chars) for JWT signing
+- Payload handles session cookies natively via httpOnly JWT cookies
+- Payload's built-in access control protects routes and data — never bypass `authenticatedOrPublished`
+- Never store tokens or secrets in localStorage — use httpOnly cookies (Payload handles this)
 - Never expose user roles or permissions in client-side JavaScript beyond what's needed for UI
 
 ### Secrets management
