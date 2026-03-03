@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 
-import { RelatedPosts } from '@/blocks/RelatedPosts/Component'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
+import { SidebarPosts } from '@/components/SidebarPosts'
+import { SidebarEvents } from '@/components/SidebarEvents'
+import { SidebarCTA } from '@/components/SidebarCTA'
+import { startOfToday } from '@/utilities/timezone'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
@@ -53,6 +56,13 @@ export default async function Post({ params: paramsPromise }: Args) {
 
   if (!post) return <PayloadRedirects url={url} />
 
+  const relatedPosts = (post.relatedPosts?.filter((p) => typeof p === 'object') ?? []) as Post[]
+  const relatedPostIds = relatedPosts.map((p) => p.id)
+  const recentPosts = await queryRecentPosts({
+    excludeIds: [post.id, ...relatedPostIds],
+  })
+  const upcomingEvents = await queryUpcomingEvents()
+
   return (
     <article className="pt-16 pb-16">
       <PageClient />
@@ -65,15 +75,23 @@ export default async function Post({ params: paramsPromise }: Args) {
 
       <PostHero post={post} />
 
-      <div className="flex flex-col items-center gap-4 pt-8">
-        <div className="container">
-          <RichText className="mx-auto max-w-[48rem]" data={post.content} enableGutter={false} />
-          {post.relatedPosts && post.relatedPosts.length > 0 && (
-            <RelatedPosts
-              className="col-span-3 col-start-1 mt-12 max-w-[52rem] grid-rows-[2fr] lg:grid lg:grid-cols-subgrid"
-              docs={post.relatedPosts.filter((post) => typeof post === 'object')}
+      <div className="pt-8">
+        <div className="container lg:grid lg:grid-cols-[1fr_18rem] lg:gap-8">
+          <div>
+            <RichText className="max-w-[48rem]" data={post.content} enableGutter={false} />
+          </div>
+
+          <aside className="mt-12 space-y-6 lg:sticky lg:top-24 lg:mt-0 lg:self-start">
+            <SidebarPosts posts={relatedPosts} title="Related Posts" />
+            <SidebarPosts posts={recentPosts} title="You May Also Like" />
+            <SidebarEvents events={upcomingEvents} title="Upcoming Events" />
+            <SidebarCTA
+              heading="Get Involved"
+              description="Join your neighbors in building a stronger Sprecher East community."
+              buttonLabel="Learn How"
+              buttonHref="/get-involved"
             />
-          )}
+          </aside>
         </div>
       </div>
     </article>
@@ -108,4 +126,49 @@ const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {
   })
 
   return result.docs?.[0] || null
+})
+
+const queryRecentPosts = cache(async ({ excludeIds }: { excludeIds: number[] }) => {
+  const payload = await getPayload({ config: configPromise })
+
+  const result = await payload.find({
+    collection: 'posts',
+    draft: false,
+    limit: 3,
+    overrideAccess: false,
+    sort: '-publishedAt',
+    where: {
+      id: { not_in: excludeIds },
+    },
+    select: {
+      title: true,
+      slug: true,
+      meta: true,
+    },
+  })
+
+  return result.docs
+})
+
+const queryUpcomingEvents = cache(async () => {
+  const payload = await getPayload({ config: configPromise })
+
+  const result = await payload.find({
+    collection: 'events',
+    draft: false,
+    limit: 3,
+    overrideAccess: false,
+    sort: 'date',
+    where: {
+      date: { greater_than_equal: startOfToday() },
+    },
+    select: {
+      title: true,
+      slug: true,
+      date: true,
+      category: true,
+    },
+  })
+
+  return result.docs
 })

@@ -124,13 +124,14 @@ npm run dev                         # → http://localhost:3000
 
 ## Env Vars (all secrets go in `.env.local`, never commit)
 
-| Var                       | Purpose                                         |
-| ------------------------- | ----------------------------------------------- |
-| `PAYLOAD_SECRET`          | Payload JWT signing (32+ random chars)          |
-| `DATABASE_URI`            | `file:./data/payload.db`                        |
-| `NEXT_PUBLIC_SERVER_URL`  | `http://localhost:3000` (dev) or production URL |
-| `PREVIEW_SECRET`          | Draft preview URL signing                       |
-| `GOOGLE_CLIENT_ID/SECRET` | Google OAuth via payload-oauth2 (optional)      |
+| Var                       | Purpose                                              |
+| ------------------------- | ---------------------------------------------------- |
+| `PAYLOAD_SECRET`          | Payload JWT signing (32+ random chars)               |
+| `DATABASE_URI`            | `file:./data/payload.db`                             |
+| `NEXT_PUBLIC_SERVER_URL`  | `http://localhost:3000` (dev) or production URL      |
+| `PREVIEW_SECRET`          | Draft preview URL signing                            |
+| `SITE_TIMEZONE`           | IANA timezone for dates (default: `America/Chicago`) |
+| `GOOGLE_CLIENT_ID/SECRET` | Google OAuth via payload-oauth2 (optional)           |
 
 System-level env vars (not in .env.local):
 | Var | Purpose |
@@ -149,6 +150,7 @@ System-level env vars (not in .env.local):
 - **`overrideAccess: true`**: Only in server-side Payload reads — never expose to client
 - **Live Preview**: Uses `window.postMessage` — component must use `useLivePreview()` hook
 - **Draft Preview**: Requires `PREVIEW_SECRET` env var for signed preview URLs
+- **Timezone**: Configured via `SITE_TIMEZONE` env var (default: `America/Chicago`). Use `startOfToday()` and `SITE_TIMEZONE` from `src/utilities/timezone.ts`. Never hardcode timezone strings or use bare `new Date().setHours(0,0,0,0)`. Day-only dates (midnight UTC) must be formatted with `timeZone: 'UTC'` to avoid off-by-one; `formatDateTime()` handles this automatically.
 
 ## Connected Tools
 
