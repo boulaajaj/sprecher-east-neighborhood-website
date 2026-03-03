@@ -68,8 +68,8 @@ Defined in `globals.css @theme`:
 | `--color-background`       | `#f9f8f5` | `#0f1117` |
 | `--color-surface`          | `#f0ede6` | `#1e2130` |
 | `--color-foreground`       | `#1a1a1a` | `#e8e6e3` |
-| `--color-muted-foreground` | `#6b6b6b` | (auto)    |
-| `--color-border`           | `#e2ddd6` | (auto)    |
+| `--color-muted-foreground` | `#6b6b6b` | `#9ca3af` |
+| `--color-border`           | `#e2ddd6` | `#2d3040` |
 
 ## Images
 
