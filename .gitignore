@@ -32,9 +32,13 @@ _legacy/
 data/payload.db
 data/payload.db-shm
 data/payload.db-wal
-data/auth.db
-data/auth.db-shm
-data/auth.db-wal
+data/payload-build.db
+data/payload-build.db-shm
+data/payload-build.db-wal
+
+# Sitemaps (generated at build time)
+public/sitemap*.xml
+public/robots.txt
 
 # Uploaded media (managed by Payload, preserved on VPS separately)
 public/media/
