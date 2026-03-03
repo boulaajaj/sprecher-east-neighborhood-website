@@ -9,5 +9,5 @@
   "endOfLine": "lf",
   "jsxSingleQuote": false,
   "plugins": ["prettier-plugin-tailwindcss"],
-  "tailwindStylesheet": "./src/app/globals.css"
+  "tailwindStylesheet": "./src/app/(frontend)/globals.css"
 }
