@@ -22,19 +22,7 @@ When evaluating whether to build vs. use:
 
 ## Payload CMS Template Architecture
 
-The codebase follows the official Payload CMS v3 Website Template structure. Code belongs where the template convention places it:
-
-- `src/blocks/` — Layout builder block components (config + React component per block)
-- `src/heros/` — Hero block components (HighImpact, MediumImpact, LowImpact, PostHero)
-- `src/collections/` — Payload CMS collection configs with access control and hooks
-- `src/globals/` — Payload global configs (Header, Footer)
-- `src/components/` — Shared React components (UI, Link, RichText, Media, etc.)
-- `src/access/` — Access control helpers (authenticatedOrPublished, etc.)
-- `src/fields/` — Reusable Payload field groups (slug, link, hero)
-- `src/hooks/` — Server-side hooks (revalidation, format slug, etc.)
-- `src/Header/` and `src/Footer/` — Global header and footer components
-- `src/utilities/` — Shared utility functions
-- `src/app/` — Next.js App Router pages and layouts
+See `skill-payload-cms.md` for detailed collection, block, hero, hook, and field patterns.
 
 ## Configuration Over Code
 
@@ -72,14 +60,7 @@ In development, failures should be visible and informative (console warnings, fa
 
 ## Respect Template Conventions
 
-The Payload CMS Website Template has established patterns for where code belongs. When adding new code:
-
-- **New block types** go in `src/blocks/` (config + React component)
-- **New collections** go in `src/collections/` (with access control and hooks)
-- **Shared components** go in `src/components/`
-- **Reusable field patterns** go in `src/fields/`
-- **Server-side hooks** go in `src/hooks/`
-- **Shared utilities** go in `src/utilities/`
+See `skill-payload-cms.md` for where new code belongs (blocks, collections, fields, hooks, etc.).
 
 ## Keep Dependencies Lean
 
