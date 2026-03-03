@@ -13,6 +13,7 @@ import type { Post } from '@/payload-types'
 import { PostHero } from '@/heros/PostHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import { articleJsonLd } from '@/utilities/structuredData'
+import { JsonLd } from '@/components/JsonLd'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
@@ -55,10 +56,7 @@ export default async function Post({ params: paramsPromise }: Args) {
   return (
     <article className="pt-16 pb-16">
       <PageClient />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd(post)) }}
-      />
+      <JsonLd data={articleJsonLd(post)} />
 
       {/* Allows redirects for valid pages too */}
       <PayloadRedirects disableNotFound url={url} />

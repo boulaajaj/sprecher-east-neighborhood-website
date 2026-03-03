@@ -9,6 +9,7 @@ import { formatDateTime } from '@/utilities/formatDateTime'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { eventJsonLd } from '@/utilities/structuredData'
+import { JsonLd } from '@/components/JsonLd'
 import Link from 'next/link'
 
 export async function generateStaticParams() {
@@ -40,10 +41,7 @@ export default async function EventPage({ params: paramsPromise }: Args) {
 
   return (
     <article className="pt-24 pb-24">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventJsonLd(event)) }}
-      />
+      <JsonLd data={eventJsonLd(event)} />
       <PayloadRedirects disableNotFound url={url} />
 
       <div className="container max-w-4xl">
@@ -136,7 +134,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const event = await queryEventBySlug({ slug: decodeURIComponent(slug) })
 
   const title = event?.title || ''
-  const description = event?.description || `Event details for ${event?.title}`
+  const description = event?.description || (event?.title ? `Event details for ${event.title}` : '')
 
   return {
     title,

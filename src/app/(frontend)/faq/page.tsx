@@ -4,6 +4,7 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
 import RichText from '@/components/RichText'
+import { JsonLd } from '@/components/JsonLd'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { lexicalToPlainText } from '@/utilities/lexicalToPlainText'
 
@@ -56,10 +57,7 @@ export default async function FAQPage() {
 
   return (
     <div className="pt-24 pb-24">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-      />
+      <JsonLd data={faqJsonLd} />
       <div className="container mb-16">
         <div className="prose max-w-none">
           <h1>Frequently Asked Questions</h1>
