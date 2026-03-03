@@ -4,7 +4,6 @@ import { heading, root, p } from './helpers/lexical'
 
 export type PostArgs = {
   heroImage: Media
-  blockImage: Media
   author: User
 }
 
