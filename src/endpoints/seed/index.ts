@@ -1,7 +1,8 @@
 import type { CollectionSlug, GlobalSlug, Payload, PayloadRequest, File } from 'payload'
 import crypto from 'crypto'
-import fs from 'fs'
+import fs from 'fs/promises'
 import path from 'path'
+import { fileURLToPath } from 'url'
 
 import { contactForm as contactFormData } from './contact-form'
 import { contact as contactPageData } from './contact-page'
@@ -401,6 +402,9 @@ export const seed = async ({
   payload.logger.info('Seeded database successfully!')
 }
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
 /**
  * Load an image from the assets/images/ directory.
  * Tries multiple possible base paths (dev vs built vs VPS deploy).
@@ -413,7 +417,7 @@ async function loadLocalImage(filename: string, mimetype: string): Promise<File>
 
   for (const filePath of possiblePaths) {
     try {
-      const data = fs.readFileSync(filePath)
+      const data = await fs.readFile(filePath)
       return {
         name: filename,
         data: Buffer.from(data),
