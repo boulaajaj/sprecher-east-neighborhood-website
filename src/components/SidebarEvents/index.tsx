@@ -5,7 +5,7 @@ import type { Event } from '@/payload-types'
 
 export type SidebarEventData = Pick<Event, 'slug' | 'title' | 'date' | 'category'>
 
-const categoryLabels: Record<string, string> = {
+const categoryLabels: Record<NonNullable<Event['category']>, string> = {
   meeting: 'Meeting',
   social: 'Social',
   volunteer: 'Volunteer',
@@ -29,8 +29,16 @@ export const SidebarEvents: React.FC<{
       <ul className="space-y-4">
         {events.map((event) => {
           const eventDate = new Date(event.date)
-          const month = eventDate.toLocaleDateString('en-US', { month: 'short' })
-          const day = eventDate.getDate()
+          const month = eventDate.toLocaleDateString('en-US', {
+            month: 'short',
+            timeZone: 'America/Chicago',
+          })
+          const day = Number(
+            eventDate.toLocaleDateString('en-US', {
+              day: 'numeric',
+              timeZone: 'America/Chicago',
+            }),
+          )
 
           return (
             <li key={event.slug}>

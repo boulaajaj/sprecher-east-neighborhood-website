@@ -4,6 +4,7 @@ import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { SidebarPosts } from '@/components/SidebarPosts'
 import { SidebarEvents } from '@/components/SidebarEvents'
 import { SidebarCTA } from '@/components/SidebarCTA'
+import { startOfTodayCentral } from '@/utilities/timezone'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
@@ -159,7 +160,7 @@ const queryUpcomingEvents = cache(async () => {
     overrideAccess: false,
     sort: 'date',
     where: {
-      date: { greater_than_equal: new Date().toISOString() },
+      date: { greater_than_equal: startOfTodayCentral() },
     },
     select: {
       title: true,

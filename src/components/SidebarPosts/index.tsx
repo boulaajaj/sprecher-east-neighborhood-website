@@ -34,8 +34,8 @@ export const SidebarPosts: React.FC<{
                       size="64px"
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
-                      No img
+                    <div className="flex h-full w-full items-center justify-center bg-surface">
+                      <span className="sr-only">No image available</span>
                     </div>
                   )}
                 </div>
