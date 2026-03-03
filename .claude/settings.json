@@ -1,47 +1,23 @@
 {
   "permissions": {
     "allow": [
-      "Bash(claude mcp add:*)",
-      "Read(//c/Users/ameen/AppData/Roaming/npm/**)",
-      "Read(//c/Users/ameen/AppData/Local/AnthropicClaude//**)",
-      "Bash(npm root:*)",
-      "Bash(npx @anthropic-ai/claude-code mcp add:*)",
-      "Bash(npx @anthropic-ai/claude-code mcp list:*)",
-      "Bash(echo:*)",
-      "Read(//c/Users/ameen/**)",
-      "Bash(ssh:*)",
-      "Bash(npm uninstall:*)",
-      "Bash(npm install:*)",
-      "Bash(npx tsc:*)",
-      "Bash(npx payload generate:importmap:*)",
-      "Bash(node --import tsx/esm -e:*)",
+      "Bash(*)",
+      "Read(*)",
+      "Edit(*)",
+      "Write(*)",
+      "WebFetch(*)",
       "mcp__playwright__browser_navigate",
       "mcp__playwright__browser_take_screenshot",
-      "Bash(npx better-auth:*)",
-      "Bash(./node_modules/.bin/better-auth migrate:*)",
-      "Bash(node scripts/migrate-auth.mjs:*)",
-      "Bash(npx payload:*)",
-      "Bash(npx tsx:*)",
-      "Bash(node --version:*)",
-      "Bash(node:*)",
-      "Bash(# Verify Node''s native JSON.parse handles ! fine node -e \"\"console.log\\(JSON.parse\\(''{\\\\\"\"email\\\\\"\":\\\\\"\"a@b.com\\\\\"\",\\\\\"\"password\\\\\"\":\\\\\"\"TestPass123!\\\\\"\",\\\\\"\"name\\\\\"\":\\\\\"\"Test\\\\\"\"}''\\)\\)\"\" # Check if Better Auth is doing something to the body before parsing grep -r \"\"Bad escaped\\\\|JSON.parse\\\\|parseBody\\\\|getBody\"\" /c/Users/ameen/OneDrive/sprecher-east-neighborhood-website/node_modules/better-auth/dist/ --include=\"\"*.mjs\"\" -l)",
       "mcp__playwright__browser_click",
       "mcp__playwright__browser_snapshot",
-      "Bash(taskkill:*)",
       "mcp__playwright__browser_fill_form",
-      "mcp__playwright__browser_wait_for",
-      "WebFetch(domain:github.com)",
-      "Bash(claude --version)",
-      "Bash(where claude)",
-      "Bash(cmd.exe /c \"where claude\")",
-      "Bash(npx @anthropic-ai/claude-code --version)",
-      "Bash(powershell.exe -Command \"irm https://code.claude.com/install.ps1 | iex\")",
-      "Bash(powershell.exe -Command \"winget install Anthropic.ClaudeCode --accept-source-agreements --accept-package-agreements\")"
+      "mcp__playwright__browser_wait_for"
     ],
     "additionalDirectories": [
       "c:\\Users\\ameen\\.claude\\projects\\c--Users-ameen-OneDrive-sprecher-east-neighborhood-website\\memory",
       "C:\\Users\\ameen\\OneDrive\\sprecher-east-neighborhood-website\\src\\app\\(payload)\\admin",
-      "C:\\Users\\ameen\\OneDrive\\sprecher-east-neighborhood-website\\src\\app\\api\\auth"
+      "C:\\Users\\ameen\\OneDrive\\sprecher-east-neighborhood-website\\src\\app\\api\\auth",
+      "c:\\Users\\ameen\\OneDrive\\sprecher-east-neighborhood-website\\.claude"
     ]
   }
 }
