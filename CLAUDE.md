@@ -149,6 +149,7 @@ System-level env vars (not in .env.local):
 - **`overrideAccess: true`**: Only in server-side Payload reads — never expose to client
 - **Live Preview**: Uses `window.postMessage` — component must use `useLivePreview()` hook
 - **Draft Preview**: Requires `PREVIEW_SECRET` env var for signed preview URLs
+- **Timezone**: Site serves Central Time (`America/Chicago`). VPS runs UTC. Always use `startOfTodayCentral()` from `src/utilities/timezone.ts` for date comparisons and `timeZone: 'America/Chicago'` in date formatting. Never use bare `new Date().setHours(0,0,0,0)` — it gives midnight in server-local time (UTC), not Central.
 
 ## Connected Tools
 

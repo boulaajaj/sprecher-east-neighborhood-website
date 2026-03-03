@@ -74,6 +74,16 @@ Defined in `globals.css @theme`:
 | `--color-muted-foreground` | `#6b6b6b` | `#9ca3af` |
 | `--color-border`           | `#e2ddd6` | `#2d3040` |
 
+## Dates and Timezone
+
+This site serves Sprecher East in Madison, WI — **Central Time** (`America/Chicago`).
+
+- **All date comparisons** (e.g., "upcoming" vs "past" events) must use Central Time, not server-local time. The VPS runs UTC — `new Date().setHours(0,0,0,0)` gives midnight UTC, not midnight Central.
+- Use `startOfTodayCentral()` from `src/utilities/timezone.ts` for "today" cutoffs in Payload queries
+- Use `timeZone: 'America/Chicago'` in all `toLocaleDateString()` / `toLocaleTimeString()` calls
+- `formatDateTime()` and `formatDateShort()` in `src/utilities/formatDateTime.ts` already include the timezone
+- Payload stores day-only dates (`pickerAppearance: 'dayOnly'`) as midnight UTC (e.g., `2026-03-03T00:00:00.000Z`). The `startOfTodayCentral()` utility converts the current Central date to midnight UTC to match this storage format.
+
 ## Images
 
 - Use `next/image` for all images — never raw `<img>` tags
