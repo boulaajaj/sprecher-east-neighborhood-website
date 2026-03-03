@@ -80,9 +80,9 @@ This site serves Sprecher East in Madison, WI — **Central Time** (`America/Chi
 
 - **All date comparisons** (e.g., "upcoming" vs "past" events) must use Central Time, not server-local time. The VPS runs UTC — `new Date().setHours(0,0,0,0)` gives midnight UTC, not midnight Central.
 - Use `startOfTodayCentral()` from `src/utilities/timezone.ts` for "today" cutoffs in Payload queries
-- Use `timeZone: 'America/Chicago'` in all `toLocaleDateString()` / `toLocaleTimeString()` calls
-- `formatDateTime()` and `formatDateShort()` in `src/utilities/formatDateTime.ts` already include the timezone
-- Payload stores day-only dates (`pickerAppearance: 'dayOnly'`) as midnight UTC (e.g., `2026-03-03T00:00:00.000Z`). The `startOfTodayCentral()` utility converts the current Central date to midnight UTC to match this storage format.
+- **Day-only dates vs datetimes**: Payload stores day-only dates (`pickerAppearance: 'dayOnly'`) as midnight UTC (e.g., `2026-03-03T00:00:00.000Z`). When **displaying** these, use `timeZone: 'UTC'` so "March 3" doesn't render as "March 2" (midnight UTC = 6pm previous day Central). When displaying actual datetimes with time components, use `timeZone: 'America/Chicago'`.
+- `formatDateTime()` and `formatDateShort()` in `src/utilities/formatDateTime.ts` handle this automatically — they detect day-only timestamps (ending in `T00:00:00.000Z`) and use UTC, otherwise use Central Time.
+- The `startOfTodayCentral()` utility converts the current Central date to midnight UTC to match Payload's day-only storage format for correct query comparisons.
 
 ## Images
 

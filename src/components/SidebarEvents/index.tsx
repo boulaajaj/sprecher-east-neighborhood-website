@@ -29,14 +29,15 @@ export const SidebarEvents: React.FC<{
       <ul className="space-y-4">
         {events.map((event) => {
           const eventDate = new Date(event.date)
+          // Event dates are day-only (midnight UTC) — use UTC to avoid off-by-one
           const month = eventDate.toLocaleDateString('en-US', {
             month: 'short',
-            timeZone: 'America/Chicago',
+            timeZone: 'UTC',
           })
           const day = Number(
             eventDate.toLocaleDateString('en-US', {
               day: 'numeric',
-              timeZone: 'America/Chicago',
+              timeZone: 'UTC',
             }),
           )
 
