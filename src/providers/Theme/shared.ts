@@ -9,8 +9,8 @@ export const getImplicitPreference = (): Theme | null => {
   if (typeof window !== 'undefined' && window.matchMedia) {
     const mql = window.matchMedia(mediaQuery)
     if (mql.matches) return 'dark'
-    // If the browser supports the query but prefers light, return 'light'
-    if (mql.media === mediaQuery) return 'light'
+    // If the browser does not prefer dark, treat it as preferring light
+    return 'light'
   }
   return null
 }

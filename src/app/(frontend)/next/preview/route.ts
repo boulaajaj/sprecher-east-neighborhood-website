@@ -43,7 +43,7 @@ export async function GET(req: NextRequest): Promise<Response> {
 
   const draft = await draftMode()
 
-  if (!user) {
+  if (!user?.user) {
     draft.disable()
     return new Response('You are not allowed to preview this page', { status: 403 })
   }
