@@ -6,7 +6,7 @@ const SITE_URL =
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
   siteUrl: SITE_URL,
-  generateRobotsTxt: true,
+  generateRobotsTxt: false,
   exclude: [
     '/posts-sitemap.xml',
     '/pages-sitemap.xml',
