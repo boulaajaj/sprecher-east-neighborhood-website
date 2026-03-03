@@ -10,6 +10,7 @@ import { Header } from '@/Header/Component'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { Providers } from '@/providers'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+import { organizationJsonLd } from '@/utilities/structuredData'
 import { draftMode } from 'next/headers'
 
 import './globals.css'
@@ -32,6 +33,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <InitTheme />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
+        />
       </head>
       <body>
         <Providers>

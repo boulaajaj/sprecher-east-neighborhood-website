@@ -8,6 +8,7 @@ import RichText from '@/components/RichText'
 import { formatDateTime } from '@/utilities/formatDateTime'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+import { eventJsonLd } from '@/utilities/structuredData'
 import Link from 'next/link'
 
 export async function generateStaticParams() {
@@ -39,6 +40,10 @@ export default async function EventPage({ params: paramsPromise }: Args) {
 
   return (
     <article className="pt-24 pb-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventJsonLd(event)) }}
+      />
       <PayloadRedirects disableNotFound url={url} />
 
       <div className="container max-w-4xl">
