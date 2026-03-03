@@ -146,7 +146,7 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
       description:
         'Sprecher East is a grassroots neighborhood initiative on Madison\u2019s Far East Side \u2014 connecting residents of Meadowlands, Door Creek, and Reston Heights.',
       image: metaImage.id,
-      title: 'Sprecher East',
+      title: 'Home',
     },
     title: 'Home',
   }
