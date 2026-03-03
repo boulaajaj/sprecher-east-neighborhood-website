@@ -1,5 +1,6 @@
 import type { Form } from '@/payload-types'
 import type { RequiredDataFromCollectionSlug } from 'payload'
+import { heading, paragraph, text, linkNode, root, p } from './helpers/lexical'
 
 type ContactArgs = {
   contactForm: Form
@@ -12,45 +13,46 @@ export const contact: (args: ContactArgs) => RequiredDataFromCollectionSlug<'pag
     slug: 'contact',
     _status: 'published',
     hero: {
-      type: 'none',
+      type: 'lowImpact',
+      richText: root([heading('h1', 'Contact Us')]),
     },
     layout: [
       {
         blockType: 'formBlock',
         enableIntro: true,
         form: contactForm,
-        introContent: {
-          root: {
-            type: 'root',
-            children: [
-              {
-                type: 'heading',
-                children: [
-                  {
-                    type: 'text',
-                    detail: 0,
-                    format: 0,
-                    mode: 'normal',
-                    style: '',
-                    text: 'Example contact form:',
-                    version: 1,
-                  },
-                ],
-                direction: 'ltr',
-                format: '',
-                indent: 0,
-                tag: 'h3',
-                version: 1,
-              },
-            ],
-            direction: 'ltr',
-            format: '',
-            indent: 0,
-            version: 1,
+        introContent: root([
+          heading('h3', 'Send Us a Message'),
+          p(
+            'Have a question, idea, or concern? Fill out the form below and we\u2019ll get back to you.',
+          ),
+        ]),
+      },
+      {
+        blockName: 'Quick Links',
+        blockType: 'content',
+        columns: [
+          {
+            richText: root([
+              heading('h3', 'Other Ways to Connect'),
+              paragraph(
+                text('Check out our '),
+                linkNode('FAQ', '/faq'),
+                text(' for answers to common questions, or visit our '),
+                linkNode('Resources', '/resources'),
+                text(' page for local contacts and services.'),
+              ),
+            ]),
+            size: 'full',
           },
-        },
+        ],
       },
     ],
+    meta: {
+      description:
+        'Contact Sprecher East \u2014 send us a message with questions, ideas, or concerns about the neighborhood.',
+      title: 'Contact',
+    },
     title: 'Contact',
   }
 }
