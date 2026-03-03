@@ -1,73 +1,22 @@
 import type { RequiredDataFromCollectionSlug } from 'payload'
+import { heading, root, p } from './helpers/lexical'
 
 export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
-  confirmationMessage: {
-    root: {
-      type: 'root',
-      children: [
-        {
-          type: 'heading',
-          children: [
-            {
-              type: 'text',
-              detail: 0,
-              format: 0,
-              mode: 'normal',
-              style: '',
-              text: 'The contact form has been submitted successfully.',
-              version: 1,
-            },
-          ],
-          direction: 'ltr',
-          format: '',
-          indent: 0,
-          tag: 'h2',
-          version: 1,
-        },
-      ],
-      direction: 'ltr',
-      format: '',
-      indent: 0,
-      version: 1,
-    },
-  },
+  confirmationMessage: root([
+    heading('h2', 'Thank you for reaching out!'),
+    p('Your message has been received. We\u2019ll get back to you as soon as possible.'),
+  ]),
   confirmationType: 'message',
-  createdAt: '2023-01-12T21:47:41.374Z',
   emails: [
     {
-      emailFrom: '"Payload" \u003Cdemo@payloadcms.com\u003E',
+      emailFrom: '"Sprecher East" \u003Cno-reply@example.com\u003E',
       emailTo: '{{email}}',
-      message: {
-        root: {
-          type: 'root',
-          children: [
-            {
-              type: 'paragraph',
-              children: [
-                {
-                  type: 'text',
-                  detail: 0,
-                  format: 0,
-                  mode: 'normal',
-                  style: '',
-                  text: 'Your contact form submission was successfully received.',
-                  version: 1,
-                },
-              ],
-              direction: 'ltr',
-              format: '',
-              indent: 0,
-              textFormat: 0,
-              version: 1,
-            },
-          ],
-          direction: 'ltr',
-          format: '',
-          indent: 0,
-          version: 1,
-        },
-      },
-      subject: "You've received a new message.",
+      message: root([
+        p(
+          'Thank you for contacting Sprecher East. We received your message and will respond as soon as we can.',
+        ),
+      ]),
+      subject: 'We received your message \u2014 Sprecher East',
     },
   ],
   fields: [
@@ -88,12 +37,22 @@ export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
       width: 100,
     },
     {
-      name: 'phone',
-      blockName: 'phone',
-      blockType: 'number',
-      label: 'Phone',
-      required: false,
+      name: 'subject',
+      blockName: 'subject',
+      blockType: 'select',
+      label: 'Subject',
+      required: true,
       width: 100,
+      options: [
+        { label: 'Membership', value: 'membership' },
+        { label: 'Events', value: 'events' },
+        { label: 'Neighborhood Issue', value: 'issue' },
+        { label: 'Board / Association', value: 'board' },
+        { label: 'Resources', value: 'resources' },
+        { label: 'Volunteering', value: 'volunteer' },
+        { label: 'General Question', value: 'general' },
+        { label: 'Other', value: 'other' },
+      ],
     },
     {
       name: 'message',
@@ -105,7 +64,6 @@ export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
     },
   ],
   redirect: undefined,
-  submitButtonLabel: 'Submit',
+  submitButtonLabel: 'Send Message',
   title: 'Contact Form',
-  updatedAt: '2023-01-12T21:47:41.374Z',
 }

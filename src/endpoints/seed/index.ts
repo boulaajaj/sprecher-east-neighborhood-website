@@ -1,28 +1,39 @@
 import type { CollectionSlug, GlobalSlug, Payload, PayloadRequest, File } from 'payload'
+import fs from 'fs'
+import path from 'path'
 
 import { contactForm as contactFormData } from './contact-form'
 import { contact as contactPageData } from './contact-page'
 import { home } from './home'
+import { aboutPage } from './about-page'
+import { getInvolvedPage } from './get-involved-page'
+import { associationPage } from './association-page'
 import { image1 } from './image-1'
 import { image2 } from './image-2'
+import { image3 } from './image-3'
 import { imageHero1 } from './image-hero-1'
 import { post1 } from './post-1'
 import { post2 } from './post-2'
 import { post3 } from './post-3'
+import { faqItems } from './data/faq'
+import { resourceItems } from './data/resources'
+import { eventItems } from './data/events'
 
 const collections: CollectionSlug[] = [
   'categories',
   'media',
   'pages',
   'posts',
+  'events',
+  'faq',
+  'resources',
+  'team-members',
   'forms',
   'form-submissions',
   'search',
 ]
 
 const globals: GlobalSlug[] = ['header', 'footer']
-
-const categories = ['Technology', 'News', 'Finance', 'Design', 'Software', 'Engineering']
 
 // Next.js revalidation errors are normal when seeding the database without a server running
 // i.e. running `yarn seed` locally instead of using the admin UI within an active app
@@ -37,13 +48,8 @@ export const seed = async ({
 }): Promise<void> => {
   payload.logger.info('Seeding database...')
 
-  // we need to clear the media directory before seeding
-  // as well as the collections and globals
-  // this is because while `yarn seed` drops the database
-  // the custom `/api/seed` endpoint does not
   payload.logger.info(`— Clearing collections and globals...`)
 
-  // clear the database
   await Promise.all(
     globals.map((global) =>
       payload.updateGlobal({
@@ -69,7 +75,7 @@ export const seed = async ({
       .map((collection) => payload.db.deleteVersions({ collection, req, where: {} })),
   )
 
-  payload.logger.info(`— Seeding demo author and user...`)
+  payload.logger.info(`— Seeding author...`)
 
   await payload.delete({
     collection: 'users',
@@ -83,18 +89,27 @@ export const seed = async ({
 
   payload.logger.info(`— Seeding media...`)
 
+  // Try to load local images from assets/images/, fall back to remote Payload template images
   const [image1Buffer, image2Buffer, image3Buffer, hero1Buffer] = await Promise.all([
-    fetchFileByURL(
-      'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-post1.webp',
+    loadLocalImage('image-asset.jpeg', 'image/jpeg').catch(() =>
+      fetchFileByURL(
+        'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-post1.webp',
+      ),
     ),
-    fetchFileByURL(
-      'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-post2.webp',
+    loadLocalImage('image.jpeg', 'image/jpeg').catch(() =>
+      fetchFileByURL(
+        'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-post2.webp',
+      ),
     ),
-    fetchFileByURL(
-      'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-post3.webp',
+    loadLocalImage('East_Madison_NAs.png', 'image/png').catch(() =>
+      fetchFileByURL(
+        'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-post3.webp',
+      ),
     ),
-    fetchFileByURL(
-      'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-hero1.webp',
+    loadLocalImage('photo.jpeg', 'image/jpeg').catch(() =>
+      fetchFileByURL(
+        'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-hero1.webp',
+      ),
     ),
   ])
 
@@ -102,7 +117,7 @@ export const seed = async ({
     payload.create({
       collection: 'users',
       data: {
-        name: 'Demo Author',
+        name: 'Sprecher East',
         email: 'demo-author@example.com',
         password: 'password',
       },
@@ -119,7 +134,7 @@ export const seed = async ({
     }),
     payload.create({
       collection: 'media',
-      data: image2,
+      data: image3,
       file: image3Buffer,
     }),
     payload.create({
@@ -127,70 +142,116 @@ export const seed = async ({
       data: imageHero1,
       file: hero1Buffer,
     }),
-    categories.map((category) =>
-      payload.create({
-        collection: 'categories',
-        data: {
-          title: category,
-          slug: category,
-        },
-      }),
-    ),
   ])
 
   payload.logger.info(`— Seeding posts...`)
 
-  // Do not create posts with `Promise.all` because we want the posts to be created in order
-  // This way we can sort them by `createdAt` or `publishedAt` and they will be in the expected order
+  // Create posts sequentially to preserve order by createdAt
   const post1Doc = await payload.create({
     collection: 'posts',
     depth: 0,
-    context: {
-      disableRevalidate: true,
-    },
-    data: post1({ heroImage: image1Doc, blockImage: image2Doc, author: demoAuthor }),
+    context: { disableRevalidate: true },
+    data: post1({ heroImage: imageHomeDoc, blockImage: image1Doc, author: demoAuthor }),
   })
 
   const post2Doc = await payload.create({
     collection: 'posts',
     depth: 0,
-    context: {
-      disableRevalidate: true,
-    },
+    context: { disableRevalidate: true },
     data: post2({ heroImage: image2Doc, blockImage: image3Doc, author: demoAuthor }),
   })
 
   const post3Doc = await payload.create({
     collection: 'posts',
     depth: 0,
-    context: {
-      disableRevalidate: true,
-    },
-    data: post3({ heroImage: image3Doc, blockImage: image1Doc, author: demoAuthor }),
+    context: { disableRevalidate: true },
+    data: post3({ heroImage: image1Doc, blockImage: image2Doc, author: demoAuthor }),
   })
 
-  // update each post with related posts
-  await payload.update({
-    id: post1Doc.id,
-    collection: 'posts',
-    data: {
-      relatedPosts: [post2Doc.id, post3Doc.id],
-    },
-  })
-  await payload.update({
-    id: post2Doc.id,
-    collection: 'posts',
-    data: {
-      relatedPosts: [post1Doc.id, post3Doc.id],
-    },
-  })
-  await payload.update({
-    id: post3Doc.id,
-    collection: 'posts',
-    data: {
-      relatedPosts: [post1Doc.id, post2Doc.id],
-    },
-  })
+  // Update related posts
+  await Promise.all([
+    payload.update({
+      id: post1Doc.id,
+      collection: 'posts',
+      data: { relatedPosts: [post2Doc.id, post3Doc.id] },
+    }),
+    payload.update({
+      id: post2Doc.id,
+      collection: 'posts',
+      data: { relatedPosts: [post1Doc.id, post3Doc.id] },
+    }),
+    payload.update({
+      id: post3Doc.id,
+      collection: 'posts',
+      data: { relatedPosts: [post1Doc.id, post2Doc.id] },
+    }),
+  ])
+
+  payload.logger.info(`— Seeding FAQ...`)
+
+  for (const faq of faqItems) {
+    await payload.create({
+      collection: 'faq',
+      depth: 0,
+      context: { disableRevalidate: true },
+      data: {
+        ...faq,
+        _status: 'published',
+      },
+    })
+  }
+
+  payload.logger.info(`— Seeding resources...`)
+
+  for (const resource of resourceItems) {
+    await payload.create({
+      collection: 'resources',
+      depth: 0,
+      context: { disableRevalidate: true },
+      data: {
+        ...resource,
+        _status: 'published',
+      },
+    })
+  }
+
+  payload.logger.info(`— Seeding events...`)
+
+  for (const event of eventItems) {
+    await payload.create({
+      collection: 'events',
+      depth: 0,
+      context: { disableRevalidate: true },
+      data: {
+        ...event,
+        _status: 'published',
+      },
+    })
+  }
+
+  payload.logger.info(`— Seeding team members...`)
+
+  const boardPositions = [
+    { name: 'Board President', role: 'President', order: 1 },
+    { name: 'Vice President', role: 'Vice President', order: 2 },
+    { name: 'Secretary', role: 'Secretary', order: 3 },
+    { name: 'Treasurer', role: 'Treasurer', order: 4 },
+  ]
+
+  for (const member of boardPositions) {
+    await payload.create({
+      collection: 'team-members',
+      depth: 0,
+      data: {
+        memberType: 'board-member',
+        name: member.name,
+        role: member.role,
+        bio: `${member.role} of the Sprecher East Neighborhood Association.`,
+        status: 'active',
+        order: member.order,
+      },
+    })
+  }
 
   payload.logger.info(`— Seeding contact form...`)
 
@@ -202,18 +263,35 @@ export const seed = async ({
 
   payload.logger.info(`— Seeding pages...`)
 
-  const [_, contactPage] = await Promise.all([
-    payload.create({
-      collection: 'pages',
-      depth: 0,
-      data: home({ heroImage: imageHomeDoc, metaImage: image2Doc }),
-    }),
-    payload.create({
-      collection: 'pages',
-      depth: 0,
-      data: contactPageData({ contactForm: contactForm }),
-    }),
-  ])
+  const [_homePage, contactPage, aboutPageDoc, getInvolvedDoc, _associationDoc] = await Promise.all(
+    [
+      payload.create({
+        collection: 'pages',
+        depth: 0,
+        data: home({ heroImage: imageHomeDoc, metaImage: image1Doc }),
+      }),
+      payload.create({
+        collection: 'pages',
+        depth: 0,
+        data: contactPageData({ contactForm }),
+      }),
+      payload.create({
+        collection: 'pages',
+        depth: 0,
+        data: aboutPage({ mapImage: image3Doc }),
+      }),
+      payload.create({
+        collection: 'pages',
+        depth: 0,
+        data: getInvolvedPage(),
+      }),
+      payload.create({
+        collection: 'pages',
+        depth: 0,
+        data: associationPage(),
+      }),
+    ],
+  )
 
   payload.logger.info(`— Seeding globals...`)
 
@@ -224,9 +302,43 @@ export const seed = async ({
         navItems: [
           {
             link: {
+              type: 'reference',
+              label: 'About',
+              reference: {
+                relationTo: 'pages',
+                value: aboutPageDoc.id,
+              },
+            },
+          },
+          {
+            link: {
               type: 'custom',
-              label: 'Posts',
+              label: 'Events',
+              url: '/events',
+            },
+          },
+          {
+            link: {
+              type: 'custom',
+              label: 'News',
               url: '/posts',
+            },
+          },
+          {
+            link: {
+              type: 'custom',
+              label: 'Resources',
+              url: '/resources',
+            },
+          },
+          {
+            link: {
+              type: 'reference',
+              label: 'Get Involved',
+              reference: {
+                relationTo: 'pages',
+                value: getInvolvedDoc.id,
+              },
             },
           },
           {
@@ -249,6 +361,20 @@ export const seed = async ({
           {
             link: {
               type: 'custom',
+              label: 'Association',
+              url: '/association',
+            },
+          },
+          {
+            link: {
+              type: 'custom',
+              label: 'FAQ',
+              url: '/faq',
+            },
+          },
+          {
+            link: {
+              type: 'custom',
               label: 'Admin',
               url: '/admin',
             },
@@ -258,15 +384,7 @@ export const seed = async ({
               type: 'custom',
               label: 'Source Code',
               newTab: true,
-              url: 'https://github.com/payloadcms/payload/tree/main/templates/website',
-            },
-          },
-          {
-            link: {
-              type: 'custom',
-              label: 'Payload',
-              newTab: true,
-              url: 'https://payloadcms.com/',
+              url: 'https://github.com/boulaajaj/sprecher-east-neighborhood-website',
             },
           },
         ],
@@ -275,6 +393,33 @@ export const seed = async ({
   ])
 
   payload.logger.info('Seeded database successfully!')
+}
+
+/**
+ * Load an image from the assets/images/ directory.
+ * Tries multiple possible base paths (dev vs built vs VPS deploy).
+ */
+async function loadLocalImage(filename: string, mimetype: string): Promise<File> {
+  const possiblePaths = [
+    path.resolve(process.cwd(), 'assets/images', filename),
+    path.resolve(__dirname, '../../../../assets/images', filename),
+  ]
+
+  for (const filePath of possiblePaths) {
+    try {
+      const data = fs.readFileSync(filePath)
+      return {
+        name: filename,
+        data: Buffer.from(data),
+        mimetype,
+        size: data.byteLength,
+      }
+    } catch {
+      // Try next path
+    }
+  }
+
+  throw new Error(`Local image not found: ${filename}`)
 }
 
 async function fetchFileByURL(url: string): Promise<File> {

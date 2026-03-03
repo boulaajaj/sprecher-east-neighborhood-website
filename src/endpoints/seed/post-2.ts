@@ -1,232 +1,43 @@
 import type { RequiredDataFromCollectionSlug } from 'payload'
 import type { PostArgs } from './post-1'
+import { heading, root, p } from './helpers/lexical'
 
+// "WisDOT Holds Public Hearings on I-39/90/94 Corridor Study"
 export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> = ({
   heroImage,
-  blockImage,
   author,
 }) => {
   return {
-    slug: 'global-gaze',
+    slug: 'wisdot-i39-corridor-hearings-2024',
     _status: 'published',
     authors: [author],
-    content: {
-      root: {
-        type: 'root',
-        children: [
-          {
-            type: 'heading',
-            children: [
-              {
-                type: 'text',
-                detail: 0,
-                format: 0,
-                mode: 'normal',
-                style: '',
-                text: 'Explore the untold and overlooked. A magnified view into the corners of the world, where every story deserves its spotlight.',
-                version: 1,
-              },
-            ],
-            direction: 'ltr',
-            format: '',
-            indent: 0,
-            tag: 'h2',
-            version: 1,
-          },
-          {
-            type: 'block',
-            fields: {
-              blockName: 'Disclaimer',
-              blockType: 'banner',
-              content: {
-                root: {
-                  type: 'root',
-                  children: [
-                    {
-                      type: 'paragraph',
-                      children: [
-                        {
-                          type: 'text',
-                          detail: 0,
-                          format: 1,
-                          mode: 'normal',
-                          style: '',
-                          text: 'Disclaimer:',
-                          version: 1,
-                        },
-                        {
-                          type: 'text',
-                          detail: 0,
-                          format: 0,
-                          mode: 'normal',
-                          style: '',
-                          text: ' This content is fabricated and for demonstration purposes only. To edit this post, ',
-                          version: 1,
-                        },
-                        {
-                          type: 'link',
-                          children: [
-                            {
-                              type: 'text',
-                              detail: 0,
-                              format: 0,
-                              mode: 'normal',
-                              style: '',
-                              text: 'navigate to the admin dashboard.',
-                              version: 1,
-                            },
-                          ],
-                          direction: 'ltr',
-                          fields: {
-                            linkType: 'custom',
-                            newTab: true,
-                            url: '/admin',
-                          },
-                          format: '',
-                          indent: 0,
-                          version: 3,
-                        },
-                      ],
-                      direction: 'ltr',
-                      format: '',
-                      indent: 0,
-                      textFormat: 1,
-                      version: 1,
-                    },
-                  ],
-                  direction: 'ltr',
-                  format: '',
-                  indent: 0,
-                  version: 1,
-                },
-              },
-              style: 'info',
-            },
-            format: '',
-            version: 2,
-          },
-          {
-            type: 'heading',
-            children: [
-              {
-                type: 'text',
-                detail: 0,
-                format: 0,
-                mode: 'normal',
-                style: '',
-                text: 'The Power of Resilience: Stories of Recovery and Hope',
-                version: 1,
-              },
-            ],
-            direction: 'ltr',
-            format: '',
-            indent: 0,
-            tag: 'h2',
-            version: 1,
-          },
-          {
-            type: 'paragraph',
-            children: [
-              {
-                type: 'text',
-                detail: 0,
-                format: 0,
-                mode: 'normal',
-                style: '',
-                text: "Throughout history, regions across the globe have faced the devastating impact of natural disasters, the turbulence of political unrest, and the challenging ripples of economic downturns. In these moments of profound crisis, an often-underestimated force emerges: the indomitable resilience of the human spirit. These aren't just tales of mere survival, but stories of communities forging bonds, uniting with a collective purpose, and demonstrating an innate ability to overcome.",
-                version: 1,
-              },
-            ],
-            direction: 'ltr',
-            format: '',
-            indent: 0,
-            textFormat: 0,
-            version: 1,
-          },
-          {
-            type: 'block',
-            fields: {
-              blockName: '',
-              blockType: 'mediaBlock',
-              media: blockImage.id,
-            },
-            format: '',
-            version: 2,
-          },
-          {
-            type: 'paragraph',
-            children: [
-              {
-                type: 'text',
-                detail: 0,
-                format: 0,
-                mode: 'normal',
-                style: '',
-                text: 'From neighbors forming makeshift rescue teams during floods to entire cities rallying to rebuild after economic collapse, the essence of humanity is most evident in these acts of solidarity. As we delve into these narratives, we witness the transformative power of community spirit, where adversity becomes a catalyst for growth, unity, and a brighter, rebuilt future.',
-                version: 1,
-              },
-            ],
-            direction: 'ltr',
-            format: '',
-            indent: 0,
-            textFormat: 0,
-            version: 1,
-          },
-          {
-            type: 'block',
-            fields: {
-              blockName: 'Dynamic components',
-              blockType: 'banner',
-              content: {
-                root: {
-                  type: 'root',
-                  children: [
-                    {
-                      type: 'paragraph',
-                      children: [
-                        {
-                          type: 'text',
-                          detail: 0,
-                          format: 0,
-                          mode: 'normal',
-                          style: '',
-                          text: "This content above is completely dynamic using custom layout building blocks configured in the CMS. This can be anything you'd like from rich text and images, to highly designed, complex components.",
-                          version: 1,
-                        },
-                      ],
-                      direction: 'ltr',
-                      format: '',
-                      indent: 0,
-                      textFormat: 0,
-                      version: 1,
-                    },
-                  ],
-                  direction: 'ltr',
-                  format: '',
-                  indent: 0,
-                  version: 1,
-                },
-              },
-              style: 'info',
-            },
-            format: '',
-            version: 2,
-          },
-        ],
-        direction: 'ltr',
-        format: '',
-        indent: 0,
-        version: 1,
-      },
-    },
+    content: root([
+      heading(
+        'h2',
+        'The Wisconsin Department of Transportation held public hearings on major corridor improvements to I-39/90/94.',
+      ),
+      p(
+        'The Wisconsin Department of Transportation (WisDOT) held three public hearings to update the community on the I-39/90/94 Corridor Study\u2019s Draft Environmental Impact Statement and preferred alternatives.',
+      ),
+      p(
+        'A virtual hearing took place July 29, 2024 via YouTube Live. An in-person hearing was held July 30, 2024 at Madison College Truax Building, 1701 Wright Street, Madison, WI 53704.',
+      ),
+      p(
+        'The I-39/90/94 corridor is a critical transportation route that directly affects residents on Madison\u2019s far east side. Changes to this corridor will impact traffic patterns, noise levels, and development potential in the Sprecher East area for decades to come.',
+      ),
+      p(
+        'Residents are encouraged to stay informed about this project as it progresses. The WisDOT project page has the latest information, maps, and environmental impact documents.',
+      ),
+    ]),
     heroImage: heroImage.id,
     meta: {
       description:
-        'Explore the untold and overlooked. A magnified view into the corners of the world, where every story deserves its spotlight.',
+        'WisDOT held public hearings on the I-39/90/94 Corridor Study. The project directly affects Madison\u2019s far east side residents.',
       image: heroImage.id,
-      title: 'Global Gaze: Beyond the Headlines',
+      title: 'WisDOT Holds Public Hearings on I-39/90/94 Corridor Study',
     },
-    relatedPosts: [], // this is populated by the seed script
-    title: 'Global Gaze: Beyond the Headlines',
+    publishedAt: '2024-07-25T12:00:00.000Z',
+    relatedPosts: [],
+    title: 'WisDOT Holds Public Hearings on I-39/90/94 Corridor Study',
   }
 }
