@@ -5,6 +5,7 @@ import { getPayload } from 'payload'
 import React from 'react'
 import RichText from '@/components/RichText'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+import { lexicalToPlainText } from '@/utilities/lexicalToPlainText'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
@@ -40,8 +41,25 @@ export default async function FAQPage() {
 
   const categoryOrder = Object.keys(categoryLabels)
 
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.docs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: lexicalToPlainText(faq.answer),
+      },
+    })),
+  }
+
   return (
     <div className="pt-24 pb-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <div className="container mb-16">
         <div className="prose max-w-none">
           <h1>Frequently Asked Questions</h1>
