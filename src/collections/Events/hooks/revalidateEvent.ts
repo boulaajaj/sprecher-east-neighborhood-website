@@ -12,6 +12,7 @@ export const revalidateEvent: CollectionAfterChangeHook = ({
       revalidatePath(`/events/${doc.slug}`)
       revalidatePath('/events')
       revalidateTag('events')
+      revalidateTag('events-sitemap')
     }
 
     if (previousDoc?._status === 'published' && doc._status !== 'published') {
@@ -19,6 +20,7 @@ export const revalidateEvent: CollectionAfterChangeHook = ({
       revalidatePath(`/events/${previousDoc.slug}`)
       revalidatePath('/events')
       revalidateTag('events')
+      revalidateTag('events-sitemap')
     }
   }
 
@@ -30,6 +32,7 @@ export const revalidateDelete: CollectionAfterDeleteHook = ({ doc, req: { contex
     revalidatePath(`/events/${doc.slug}`)
     revalidatePath('/events')
     revalidateTag('events')
+    revalidateTag('events-sitemap')
   }
 
   return doc

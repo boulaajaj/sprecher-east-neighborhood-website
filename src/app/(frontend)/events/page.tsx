@@ -5,6 +5,7 @@ import { getPayload } from 'payload'
 import React from 'react'
 import Link from 'next/link'
 import { formatDateTime } from '@/utilities/formatDateTime'
+import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
@@ -108,9 +109,13 @@ export default async function EventsPage() {
 }
 
 export function generateMetadata(): Metadata {
+  const title = 'Community Events'
+  const description =
+    'Upcoming events in the Sprecher East neighborhood — meetings, socials, volunteer opportunities, and more.'
+
   return {
-    title: 'Community Events',
-    description:
-      'Upcoming events in the Sprecher East neighborhood — meetings, socials, volunteer opportunities, and more.',
+    title,
+    description,
+    openGraph: mergeOpenGraph({ title, description }),
   }
 }

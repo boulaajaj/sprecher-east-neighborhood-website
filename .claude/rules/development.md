@@ -48,9 +48,27 @@ The pattern: validate → persist → notify → respond. Payload's `afterChange
 
 All external input (API requests, form submissions, webhook payloads, URL parameters) must be validated at the point of entry. Use schema validation when the framework provides it (Payload collections have built-in field validation). Never rely on client-side validation alone.
 
-## Single Source of Truth
+## DRY — Don't Repeat Yourself
 
-Constants, configuration, enum values, and type definitions used in multiple places must be defined once and imported everywhere else. Duplication across files leads to silent inconsistency.
+**Before writing any logic inline, search for an existing shared abstraction.** This codebase has utilities, components, and wrappers for common patterns. Using them is mandatory — duplicating their logic inline is a bug, not a shortcut.
+
+The search order:
+
+1. **Shared utilities** (`src/utilities/`) — URL handling, metadata, formatting, data transforms
+2. **Shared components** (`src/components/`) — UI rendering, links, media, rich text, structured data
+3. **Reusable field configs** (`src/fields/`) — slug, link, hero field groups
+4. **Access control helpers** (`src/access/`) — auth and permission checks
+
+If no abstraction exists for a pattern you need more than once, **create one first** as a shared utility or component, then use it everywhere. Never copy-paste logic between files.
+
+Examples of violations this rule prevents:
+
+- Reading `process.env.NEXT_PUBLIC_SERVER_URL` directly → use `getServerSideURL()` from `src/utilities/getURL.ts`
+- Writing `dangerouslySetInnerHTML={{ __html: JSON.stringify(...) }}` → use `JsonLd` from `src/components/JsonLd.tsx`
+- Duplicating Payload access control logic → use helpers from `src/access/`
+- Repeating OpenGraph defaults → use `mergeOpenGraph()` from `src/utilities/mergeOpenGraph.ts`
+
+Constants, configuration, enum values, and type definitions used in multiple places must also be defined once and imported everywhere. Duplication across files leads to silent inconsistency.
 
 ## Fail Explicitly
 

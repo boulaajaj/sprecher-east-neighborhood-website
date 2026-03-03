@@ -4,6 +4,9 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
 import RichText from '@/components/RichText'
+import { JsonLd } from '@/components/JsonLd'
+import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+import { lexicalToPlainText } from '@/utilities/lexicalToPlainText'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
@@ -39,8 +42,22 @@ export default async function FAQPage() {
 
   const categoryOrder = Object.keys(categoryLabels)
 
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.docs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: lexicalToPlainText(faq.answer),
+      },
+    })),
+  }
+
   return (
     <div className="pt-24 pb-24">
+      <JsonLd data={faqJsonLd} />
       <div className="container mb-16">
         <div className="prose max-w-none">
           <h1>Frequently Asked Questions</h1>
@@ -90,9 +107,13 @@ export default async function FAQPage() {
 }
 
 export function generateMetadata(): Metadata {
+  const title = 'FAQ'
+  const description =
+    'Frequently asked questions about the Sprecher East Neighborhood Association in Madison, WI.'
+
   return {
-    title: 'FAQ',
-    description:
-      'Frequently asked questions about the Sprecher East Neighborhood Association in Madison, WI.',
+    title,
+    description,
+    openGraph: mergeOpenGraph({ title, description }),
   }
 }

@@ -3,6 +3,7 @@ import type { Metadata } from 'next/types'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
+import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
@@ -103,9 +104,13 @@ export default async function ResourcesPage() {
 }
 
 export function generateMetadata(): Metadata {
+  const title = 'Neighborhood Resources'
+  const description =
+    'Contacts, services, and organizations serving the Sprecher East neighborhood in Madison, WI.'
+
   return {
-    title: 'Neighborhood Resources',
-    description:
-      'Contacts, services, and organizations serving the Sprecher East neighborhood in Madison, WI.',
+    title,
+    description,
+    openGraph: mergeOpenGraph({ title, description }),
   }
 }

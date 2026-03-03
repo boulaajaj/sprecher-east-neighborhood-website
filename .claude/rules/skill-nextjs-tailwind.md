@@ -32,6 +32,8 @@ Fetch data directly with `payload.find()` (not Route Handlers). Use `select` to 
 - The layout template handles branding — setting `title: 'About'` produces `'About — Sprecher East'`
 - Use `generateMeta()` from `src/utilities/generateMeta.ts` for CMS pages
 - For custom routes, return `{ title: 'Page Name', description: '...' }` directly
+- When writing fallback strings with template literals, always guard against null/undefined: `event?.title ? \`Details for ${event.title}\` : ''`— never`\`Details for ${event?.title}\``which produces`"Details for undefined"`
+- The SEO plugin `generateTitle` (`src/plugins/index.ts`) returns the page name only — never append brand name there either. Fallback should be `'Sprecher East'` (not empty string) so the admin UI pre-fill is useful
 
 ## Server vs Client Components
 
@@ -45,6 +47,7 @@ Fetch data directly with `payload.find()` (not Route Handlers). Use `select` to 
 - Use React `cache()` to deduplicate server-side fetches within a request
 - Use `revalidatePath()` or `revalidateTag()` in afterChange hooks for on-demand revalidation
 - Never call Route Handlers from Server Components — use the Payload Local API directly
+- For site URL, use the shared `getServerSideURL()` from `src/utilities/getURL.ts` (see DRY principle in `development.md`)
 - Static pages use `revalidate = 600` (10 minutes) as default ISR interval
 
 ## Styling Rules

@@ -12,7 +12,7 @@
 
 ### When writing code
 
-- Never use `eval()`, `Function()` constructor, or `dangerouslySetInnerHTML` with user input
+- Never use `eval()`, `Function()` constructor, or `dangerouslySetInnerHTML` directly — use safe shared wrappers instead (e.g., `JsonLd` component for structured data). Input that seems trusted today can become untrusted as the codebase evolves.
 - Never interpolate user input into SQL, shell commands, or URLs — always use parameterized/template-safe methods
 - Validate and sanitize all user input at system boundaries (API routes, form handlers)
 - Use `encodeURIComponent()` when building URLs from user input
