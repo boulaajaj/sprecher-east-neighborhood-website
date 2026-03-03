@@ -3,8 +3,7 @@ import { getServerSideURL } from './getURL'
 
 const defaultOpenGraph: Metadata['openGraph'] = {
   type: 'website',
-  description:
-    'Sprecher East is a grassroots neighborhood association on Madison\'s Far East Side.',
+  description: "Sprecher East is a grassroots neighborhood association on Madison's Far East Side.",
   images: [
     {
       url: `${getServerSideURL()}/images/photo.jpeg`,

@@ -9,7 +9,7 @@ export const populateAuthors: CollectionAfterReadHook = async ({ doc, req: { pay
   if (doc?.authors && doc?.authors?.length > 0) {
     const authorDocs = (
       await Promise.all(
-        doc.authors.map(async (author) => {
+        doc.authors.map(async (author: User | User['id']) => {
           try {
             return await payload.findByID({
               id: typeof author === 'object' ? author?.id : author,
