@@ -3,6 +3,13 @@ name: Deploy to VPS
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '*.md'
+      - '.claude/**'
+      - '.github/workflows/**'
+      - '.env.local.example'
+      - 'docs/**'
+      - 'LICENSE'
   workflow_dispatch:
 
 # Only allow one deployment at a time
