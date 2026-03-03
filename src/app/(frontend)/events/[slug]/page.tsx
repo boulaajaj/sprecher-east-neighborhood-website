@@ -9,7 +9,7 @@ import { formatDateTime } from '@/utilities/formatDateTime'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { SidebarEvents } from '@/components/SidebarEvents'
 import { SidebarCTA } from '@/components/SidebarCTA'
-import { startOfTodayCentral } from '@/utilities/timezone'
+import { startOfToday } from '@/utilities/timezone'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { eventJsonLd } from '@/utilities/structuredData'
 import { JsonLd } from '@/components/JsonLd'
@@ -187,10 +187,7 @@ const queryUpcomingEvents = cache(async ({ excludeId }: { excludeId: number }) =
     overrideAccess: false,
     sort: 'date',
     where: {
-      and: [
-        { date: { greater_than_equal: startOfTodayCentral() } },
-        { id: { not_equals: excludeId } },
-      ],
+      and: [{ date: { greater_than_equal: startOfToday() } }, { id: { not_equals: excludeId } }],
     },
     select: {
       title: true,

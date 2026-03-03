@@ -1,14 +1,15 @@
-const TIMEZONE = 'America/Chicago'
+import { SITE_TIMEZONE } from './timezone'
+
 const DAY_ONLY_SUFFIX = 'T00:00:00.000Z'
 
 /**
  * Picks the correct timezone for formatting.
  * Day-only dates (stored as midnight UTC by Payload's dayOnly picker) must
  * be formatted in UTC so "2026-03-03T00:00:00.000Z" displays as Mar 3,
- * not Mar 2 (which is what America/Chicago would show for midnight UTC).
+ * not Mar 2 (which is what the site timezone would show for midnight UTC).
  */
 function resolveTimezone(timestamp: string): string {
-  return timestamp.endsWith(DAY_ONLY_SUFFIX) ? 'UTC' : TIMEZONE
+  return timestamp.endsWith(DAY_ONLY_SUFFIX) ? 'UTC' : SITE_TIMEZONE
 }
 
 export const formatDateTime = (timestamp: string): string => {

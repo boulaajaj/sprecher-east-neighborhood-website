@@ -76,13 +76,14 @@ Defined in `globals.css @theme`:
 
 ## Dates and Timezone
 
-This site serves Sprecher East in Madison, WI — **Central Time** (`America/Chicago`).
+The site timezone is configured via `SITE_TIMEZONE` env var (default: `America/Chicago`). All timezone logic lives in `src/utilities/timezone.ts` — never hardcode timezone strings elsewhere.
 
-- **All date comparisons** (e.g., "upcoming" vs "past" events) must use Central Time, not server-local time. The VPS runs UTC — `new Date().setHours(0,0,0,0)` gives midnight UTC, not midnight Central.
-- Use `startOfTodayCentral()` from `src/utilities/timezone.ts` for "today" cutoffs in Payload queries
-- **Day-only dates vs datetimes**: Payload stores day-only dates (`pickerAppearance: 'dayOnly'`) as midnight UTC (e.g., `2026-03-03T00:00:00.000Z`). When **displaying** these, use `timeZone: 'UTC'` so "March 3" doesn't render as "March 2" (midnight UTC = 6pm previous day Central). When displaying actual datetimes with time components, use `timeZone: 'America/Chicago'`.
-- `formatDateTime()` and `formatDateShort()` in `src/utilities/formatDateTime.ts` handle this automatically — they detect day-only timestamps (ending in `T00:00:00.000Z`) and use UTC, otherwise use Central Time.
-- The `startOfTodayCentral()` utility converts the current Central date to midnight UTC to match Payload's day-only storage format for correct query comparisons.
+- **All date comparisons** (e.g., "upcoming" vs "past" events) must use the site timezone, not server-local time. The VPS runs UTC — `new Date().setHours(0,0,0,0)` gives midnight UTC, not midnight site time.
+- Use `startOfToday()` from `src/utilities/timezone.ts` for "today" cutoffs in Payload queries
+- Use `SITE_TIMEZONE` from `src/utilities/timezone.ts` when you need the raw timezone string (e.g., for `toLocaleDateString`)
+- **Day-only dates vs datetimes**: Payload stores day-only dates (`pickerAppearance: 'dayOnly'`) as midnight UTC (e.g., `2026-03-03T00:00:00.000Z`). When **displaying** these, use `timeZone: 'UTC'` so "March 3" doesn't render as "March 2". When displaying actual datetimes with time components, use `SITE_TIMEZONE`.
+- `formatDateTime()` and `formatDateShort()` in `src/utilities/formatDateTime.ts` handle this automatically — they detect day-only timestamps (ending in `T00:00:00.000Z`) and use UTC, otherwise use the site timezone.
+- `startOfToday()` converts the current site-local date to midnight UTC to match Payload's day-only storage format for correct query comparisons.
 
 ## Images
 

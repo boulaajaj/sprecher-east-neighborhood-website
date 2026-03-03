@@ -6,7 +6,7 @@ import React from 'react'
 import Link from 'next/link'
 import { formatDateTime } from '@/utilities/formatDateTime'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
-import { startOfTodayCentral } from '@/utilities/timezone'
+import { startOfToday } from '@/utilities/timezone'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
@@ -22,7 +22,7 @@ export default async function EventsPage() {
     overrideAccess: false,
   })
 
-  const todayCutoff = new Date(startOfTodayCentral())
+  const todayCutoff = new Date(startOfToday())
 
   const upcoming = events.docs.filter((e) => new Date(e.date) >= todayCutoff)
   const past = events.docs.filter((e) => new Date(e.date) < todayCutoff).reverse()
