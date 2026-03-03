@@ -4,6 +4,7 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
 import RichText from '@/components/RichText'
+import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
@@ -90,9 +91,13 @@ export default async function FAQPage() {
 }
 
 export function generateMetadata(): Metadata {
+  const title = 'FAQ'
+  const description =
+    'Frequently asked questions about the Sprecher East Neighborhood Association in Madison, WI.'
+
   return {
-    title: 'FAQ',
-    description:
-      'Frequently asked questions about the Sprecher East Neighborhood Association in Madison, WI.',
+    title,
+    description,
+    openGraph: mergeOpenGraph({ title, description }),
   }
 }

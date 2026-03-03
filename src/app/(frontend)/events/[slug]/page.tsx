@@ -7,6 +7,7 @@ import React, { cache } from 'react'
 import RichText from '@/components/RichText'
 import { formatDateTime } from '@/utilities/formatDateTime'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
+import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import Link from 'next/link'
 
 export async function generateStaticParams() {
@@ -129,9 +130,13 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const { slug = '' } = await paramsPromise
   const event = await queryEventBySlug({ slug: decodeURIComponent(slug) })
 
+  const title = event?.title || ''
+  const description = event?.description || `Event details for ${event?.title}`
+
   return {
-    title: event?.title,
-    description: event?.description || `Event details for ${event?.title}`,
+    title,
+    description,
+    openGraph: mergeOpenGraph({ title, description }),
   }
 }
 
