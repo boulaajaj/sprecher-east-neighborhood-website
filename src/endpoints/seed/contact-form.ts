@@ -1,6 +1,9 @@
 import type { RequiredDataFromCollectionSlug } from 'payload'
 import { heading, root, p } from './helpers/lexical'
 
+const CONTACT_EMAIL_FROM =
+  process.env.CONTACT_EMAIL_FROM ?? '"Sprecher East" <no-reply@sprecher-east.org>'
+
 export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
   confirmationMessage: root([
     heading('h2', 'Thank you for reaching out!'),
@@ -9,7 +12,7 @@ export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
   confirmationType: 'message',
   emails: [
     {
-      emailFrom: '"Sprecher East" \u003Cno-reply@example.com\u003E',
+      emailFrom: CONTACT_EMAIL_FROM,
       emailTo: '{{email}}',
       message: root([
         p(
