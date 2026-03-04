@@ -59,12 +59,20 @@ export function ChangePasswordForm({ userId }: { userId: number }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
+        >
           {error}
         </div>
       )}
       {success && (
-        <div className="rounded-md border border-primary/30 bg-primary/10 p-3 text-sm text-primary">
+        <div
+          role="status"
+          aria-live="polite"
+          className="rounded-md border border-primary/30 bg-primary/10 p-3 text-sm text-primary"
+        >
           Password updated successfully.
         </div>
       )}
