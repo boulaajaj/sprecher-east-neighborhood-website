@@ -44,6 +44,37 @@ When creating navigation links (header, footer, CTAs):
 - **Use `context: { disableRevalidate: true }`**: Prevents revalidation errors during seeding
 - **Meta titles are page names only**: e.g., `'Home'`, `'About'`, `'Contact'` — never include brand name (layout template adds it)
 
+## Form Components
+
+All forms must use the shadcn/ui primitives — never raw HTML `<input>`, `<label>`, or `<button>` elements:
+
+- **Input**: `src/components/ui/input.tsx` — handles focus ring, dark mode, `aria-invalid` styling
+- **Label**: `src/components/ui/label.tsx` — Radix Label primitive with `peer-disabled` support
+- **Button**: `src/components/ui/button.tsx` — CVA variants (`default`, `ghost`, `outline`, `destructive`, etc.)
+
+For feedback messages (errors, success), use design tokens — never hardcoded Tailwind color classes. Always include ARIA live regions so screen readers announce state changes:
+
+```tsx
+// Error — role="alert" + aria-live="assertive" for immediate announcement
+<div role="alert" aria-live="assertive" className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+
+// Success — role="status" + aria-live="polite" for non-urgent announcement
+<div role="status" aria-live="polite" className="rounded-md border border-primary/30 bg-primary/10 p-3 text-sm text-primary">
+```
+
+## Icons
+
+Use `lucide-react` for all icons. Never write inline SVG. The package is already installed and used throughout the codebase.
+
+```tsx
+import { Menu, X, Search } from 'lucide-react'
+```
+
+## Form UX
+
+- **Clear stale feedback on input change**: After a form submission shows an error or success message, dismiss it as soon as the user edits any field. Stale messages mislead users into thinking their new input is invalid.
+- **Client-side hooks in persistent layouts must re-sync on navigation**: If a client hook (like auth state) is used in a layout component that persists across route changes, it must re-fetch when the route changes — not just on initial mount. Use `pathname` as a dependency.
+
 ## Code Hygiene
 
 - Remove unused parameters from types and function signatures — don't leave dead code

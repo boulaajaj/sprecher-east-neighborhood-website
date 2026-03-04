@@ -6,8 +6,11 @@ import React, { useEffect, useState } from 'react'
 
 import type { Header } from '@/payload-types'
 
+import { Button } from '@/components/ui/button'
+import { Menu, X } from 'lucide-react'
 import { Logo } from '@/components/Logo/Logo'
 import { HeaderNav } from './Nav'
+import { useAuth } from '@/hooks/useAuth'
 
 interface HeaderClientProps {
   data: Header
@@ -20,6 +23,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
   const [mobileOpen, setMobileOpen] = useState(false)
   const { headerTheme, setHeaderTheme } = useHeaderTheme()
   const pathname = usePathname()
+  const { user, loading: authLoading, logout } = useAuth()
 
   useEffect(() => {
     setHeaderTheme(null)
@@ -67,6 +71,28 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
         {/* Desktop nav */}
         <div className="hidden items-center gap-1 md:flex">
           <HeaderNav data={data} />
+          {authLoading ? (
+            <div className="h-9 w-16 animate-pulse rounded-md bg-border" />
+          ) : user ? (
+            <>
+              <Link
+                href="/account"
+                className="rounded-md px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-primary"
+              >
+                {user.name || 'Account'}
+              </Link>
+              <Button variant="ghost" size="sm" onClick={logout}>
+                Sign Out
+              </Button>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className="rounded-md px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-primary"
+            >
+              Log In
+            </Link>
+          )}
           <Link
             href="/contact"
             className="ml-3 inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-dark"
@@ -83,31 +109,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={mobileOpen}
         >
-          {mobileOpen ? (
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          ) : (
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-              />
-            </svg>
-          )}
+          {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
@@ -116,6 +118,40 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
         <div className="border-t border-border bg-background md:hidden">
           <div className="container flex flex-col gap-2 py-4">
             <HeaderNav data={data} mobile onNavigate={() => setMobileOpen(false)} />
+            {!authLoading && (
+              <>
+                {user ? (
+                  <>
+                    <Link
+                      href="/account"
+                      onClick={() => setMobileOpen(false)}
+                      className="block w-full rounded-md px-3 py-2.5 text-base font-medium text-foreground transition-colors hover:bg-secondary hover:text-primary"
+                    >
+                      {user.name || 'Account'}
+                    </Link>
+                    <Button
+                      variant="ghost"
+                      size="clear"
+                      onClick={() => {
+                        setMobileOpen(false)
+                        logout()
+                      }}
+                      className="w-full justify-start rounded-md px-3 py-2.5 text-base font-medium text-muted-foreground"
+                    >
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <Link
+                    href="/login"
+                    onClick={() => setMobileOpen(false)}
+                    className="block w-full rounded-md px-3 py-2.5 text-base font-medium text-foreground transition-colors hover:bg-secondary hover:text-primary"
+                  >
+                    Log In
+                  </Link>
+                )}
+              </>
+            )}
             <Link
               href="/contact"
               onClick={() => setMobileOpen(false)}
