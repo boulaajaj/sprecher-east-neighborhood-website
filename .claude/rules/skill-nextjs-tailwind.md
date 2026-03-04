@@ -30,13 +30,7 @@ Fetch data directly with `payload.find()` (not Route Handlers). Use `select` to 
 - **Never append brand name** in `generateMeta()`, page metadata, or seed data `meta.title`
 - Set `meta.title` to the page name only: `'Home'`, `'About'`, `'Contact'`
 - The layout template handles branding — setting `title: 'About'` produces `'About — Sprecher East'`
-- Use `generateMeta()` from `src/utilities/generateMeta.ts` for CMS pages
-- **OG URL override for collection detail pages**: `generateMeta()` produces generic `/${slug}` URLs. Collection detail pages (`/posts/[slug]`, `/events/[slug]`) MUST override `openGraph.url` with the full route prefix:
-  ```typescript
-  const meta = await generateMeta({ doc })
-  return { ...meta, openGraph: { ...(meta.openGraph ?? {}), url: `/posts/${doc.slug}` } }
-  ```
-  Top-level CMS pages (`/[slug]`) are fine with the default `/${slug}`.
+- Use `generateMeta()` from `src/utilities/generateMeta.ts` for CMS pages. Collection detail pages (`/posts/[slug]`, `/events/[slug]`) must override `openGraph.url` with the correct route prefix — `generateMeta` only produces generic `/${slug}`.
 - For custom routes, return `{ title: 'Page Name', description: '...' }` directly
 - When writing fallback strings with template literals, always guard against null/undefined: `event?.title ? \`Details for ${event.title}\` : ''`— never`\`Details for ${event?.title}\``which produces`"Details for undefined"`
 - The SEO plugin `generateTitle` (`src/plugins/index.ts`) returns the page name only — never append brand name there either. Fallback should be `'Sprecher East'` (not empty string) so the admin UI pre-fill is useful
