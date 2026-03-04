@@ -35,9 +35,12 @@ Keep comments concise. One comment per work session, not per commit.
 
 ## Task-PR Traceability
 
-- Asana task comments contain the PR URL
-- PR descriptions contain the Asana task URL (format: `Asana: https://app.asana.com/...`)
-- This two-way linking makes it easy to navigate between project management and code
+Every PR that relates to an Asana task must have two-way linking:
+
+- **PR → Asana**: PR description contains `Asana: https://app.asana.com/0/0/<task_gid>/f` on its own line
+- **Asana → PR**: Asana task comment contains the PR URL (added when PR is created and when merged)
+
+This enables `/wrapped` to auto-complete tasks and makes it easy to navigate between project management and code.
 
 ## Asana API Access
 
@@ -83,7 +86,7 @@ Key GIDs (set as user env vars — see onboarding docs in strategy repo):
 When the user says "all PRs are merged", "/wrapped", or similar — run this checklist automatically without being asked:
 
 1. **Identify**: Use the PR numbers from the current session. Verify each with `gh pr view <number> --json state` — confirm actually merged, don't assume.
-2. **Asana**: For each verified merged PR, find its related Asana task (check PR body for Asana URL, or match by task name). Add a completion comment with the PR link and mark the task complete.
+2. **Asana**: For each verified merged PR, extract the Asana task GID from the PR body (`Asana: https://app.asana.com/0/0/<task_gid>/f`). Add a completion comment with the PR link and mark the task complete. If no Asana link in the PR body, skip — not every PR maps to a task.
 3. **Memory**: Update the auto-memory `MEMORY.md` (persistent across sessions) with merged PR entries.
 4. **Sync**: `git checkout main && git pull origin main`
 5. **Report**: Brief summary of what was closed.
