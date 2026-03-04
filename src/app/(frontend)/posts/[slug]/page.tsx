@@ -104,7 +104,16 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const decodedSlug = decodeURIComponent(slug)
   const post = await queryPostBySlug({ slug: decodedSlug })
 
-  return generateMeta({ doc: post })
+  const meta = await generateMeta({ doc: post })
+  if (!post) return meta
+
+  return {
+    ...meta,
+    openGraph: {
+      ...(meta.openGraph ?? {}),
+      url: `/posts/${post.slug}`,
+    },
+  }
 }
 
 const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {
