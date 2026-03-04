@@ -2,6 +2,8 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-sqlite'
 
 export async function up({ db }: MigrateUpArgs): Promise<void> {
   await db.run(sql`PRAGMA foreign_keys=OFF;`)
+  // Backfill NULL alt values before copying into NOT NULL column
+  await db.run(sql`UPDATE \`media\` SET \`alt\` = '' WHERE \`alt\` IS NULL;`)
   await db.run(sql`CREATE TABLE \`__new_media\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
   	\`alt\` text NOT NULL,
