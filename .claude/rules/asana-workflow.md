@@ -82,13 +82,13 @@ Key GIDs (set as user env vars — see onboarding docs in strategy repo):
 
 When the user says "all PRs are merged", "/wrapped", or similar — run this checklist automatically without being asked:
 
-1. **Verify**: `gh pr list --state merged` — confirm PRs are actually merged, don't assume
-2. **Asana**: For each merged PR, find the related Asana task, add a completion comment with the PR link, and mark it complete
-3. **Memory**: Update `MEMORY.md` — move PRs to merged list, remove from open
+1. **Identify**: Use the PR numbers from the current session. Verify each with `gh pr view <number> --json state` — confirm actually merged, don't assume.
+2. **Asana**: For each verified merged PR, find its related Asana task (check PR body for Asana URL, or match by task name). Add a completion comment with the PR link and mark the task complete.
+3. **Memory**: Update the auto-memory `MEMORY.md` (persistent across sessions) with merged PR entries.
 4. **Sync**: `git checkout main && git pull origin main`
-5. **Report**: Brief summary of what was closed
+5. **Report**: Brief summary of what was closed.
 
-Never skip steps or assume state — always check first.
+Never skip steps or assume state — always verify first.
 
 ## Integration Notes
 
