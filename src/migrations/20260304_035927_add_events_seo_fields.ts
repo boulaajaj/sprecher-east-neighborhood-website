@@ -144,7 +144,6 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   )
   await db.run(sql`DROP TABLE \`events\`;`)
   await db.run(sql`ALTER TABLE \`__new_events\` RENAME TO \`events\`;`)
-  await db.run(sql`PRAGMA foreign_keys=ON;`)
   await db.run(sql`CREATE INDEX \`events_hero_image_idx\` ON \`events\` (\`hero_image_id\`);`)
   await db.run(sql`CREATE UNIQUE INDEX \`events_slug_idx\` ON \`events\` (\`slug\`);`)
   await db.run(sql`CREATE INDEX \`events_updated_at_idx\` ON \`events\` (\`updated_at\`);`)
@@ -297,4 +296,7 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   await db.run(
     sql`CREATE INDEX \`media_sizes_og_sizes_og_filename_idx\` ON \`media\` (\`sizes_og_filename\`);`,
   )
+  // Re-enable FK constraints after all table recreations to prevent
+  // cascading SET NULL when dropping referenced tables (e.g., media)
+  await db.run(sql`PRAGMA foreign_keys=ON;`)
 }
