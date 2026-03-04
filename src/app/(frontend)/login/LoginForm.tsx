@@ -32,8 +32,7 @@ export function LoginForm() {
           router.push('/account')
           router.refresh()
         } else {
-          const data = await res.json().catch(() => null)
-          setError(data?.errors?.[0]?.message || 'Invalid email or password. Please try again.')
+          setError('Invalid email or password. Please try again.')
         }
       } catch {
         setError('Something went wrong. Please try again.')
