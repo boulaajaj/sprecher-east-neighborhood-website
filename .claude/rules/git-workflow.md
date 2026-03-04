@@ -51,6 +51,7 @@ Role tags match the consolidated skill profiles:
 3. PR description must include:
    - **Summary**: What changed and why (2-3 bullet points)
    - **Role**: Which agent profile made the changes (e.g., `[C-Builder]`)
+   - **Asana link**: `Asana: https://app.asana.com/0/0/<task_gid>/f` — on its own line, required if the work relates to an Asana task. This is parsed by `/wrapped` to auto-complete tasks.
    - **Test plan**: How to verify the changes work
 4. Wait for CI checks (type-check, build, CodeQL) to pass
 5. Review the diff — if you can't explain the code, it doesn't ship
