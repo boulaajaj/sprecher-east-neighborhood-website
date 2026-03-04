@@ -52,13 +52,14 @@ All forms must use the shadcn/ui primitives — never raw HTML `<input>`, `<labe
 - **Label**: `src/components/ui/label.tsx` — Radix Label primitive with `peer-disabled` support
 - **Button**: `src/components/ui/button.tsx` — CVA variants (`default`, `ghost`, `outline`, `destructive`, etc.)
 
-For feedback messages (errors, success), use design tokens — never hardcoded Tailwind color classes:
-```tsx
-// Error
-<div className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+For feedback messages (errors, success), use design tokens — never hardcoded Tailwind color classes. Always include ARIA live regions so screen readers announce state changes:
 
-// Success
-<div className="rounded-md border border-primary/30 bg-primary/10 p-3 text-sm text-primary">
+```tsx
+// Error — role="alert" + aria-live="assertive" for immediate announcement
+<div role="alert" aria-live="assertive" className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+
+// Success — role="status" + aria-live="polite" for non-urgent announcement
+<div role="status" aria-live="polite" className="rounded-md border border-primary/30 bg-primary/10 p-3 text-sm text-primary">
 ```
 
 ## Icons
