@@ -36,7 +36,7 @@
 
 - `PAYLOAD_SECRET` must be a strong random string (32+ chars) for JWT signing
 - Payload handles session cookies natively via httpOnly JWT cookies
-- Payload's built-in access control protects routes and data — never bypass `authenticatedOrPublished`
+- Payload's built-in access control protects routes and data. Use the correct read access per collection type: `authenticatedOrPublished` for draft-enabled content (shows drafts to admins/editors, published to everyone else), `anyone` for public utility collections (Categories, Media, TeamMembers) that have no draft workflow.
 - Never store tokens or secrets in localStorage — use httpOnly cookies (Payload handles this)
 - Never expose user roles or permissions in client-side JavaScript beyond what's needed for UI
 - **Never surface raw backend errors on auth endpoints** — login, password reset, and registration must show fixed generic messages to prevent account enumeration and information leakage. Log raw errors server-side for debugging, never render them in the UI.
