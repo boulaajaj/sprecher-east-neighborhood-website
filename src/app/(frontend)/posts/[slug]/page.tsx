@@ -13,6 +13,7 @@ import RichText from '@/components/RichText'
 
 import type { Post } from '@/payload-types'
 
+import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { PostHero } from '@/heros/PostHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import { articleJsonLd } from '@/utilities/structuredData'
@@ -76,6 +77,15 @@ export default async function Post({ params: paramsPromise }: Args) {
       <PostHero post={post} />
 
       <div className="pt-8">
+        <div className="container">
+          <Breadcrumbs
+            items={[
+              { label: 'Home', href: '/' },
+              { label: 'News & Updates', href: '/posts' },
+              { label: post.title },
+            ]}
+          />
+        </div>
         <div className="container lg:grid lg:grid-cols-[1fr_18rem] lg:gap-8">
           <div>
             <RichText className="max-w-[48rem]" data={post.content} enableGutter={false} />

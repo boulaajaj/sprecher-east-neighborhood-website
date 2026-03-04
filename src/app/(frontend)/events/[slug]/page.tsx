@@ -12,9 +12,9 @@ import { startOfToday } from '@/utilities/timezone'
 import { eventJsonLd } from '@/utilities/structuredData'
 import { generateMeta } from '@/utilities/generateMeta'
 import { JsonLd } from '@/components/JsonLd'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { EventHero } from '@/heros/EventHero'
 import PageClient from './page.client'
-import Link from 'next/link'
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -55,15 +55,17 @@ export default async function EventPage({ params: paramsPromise }: Args) {
       <EventHero event={event} />
 
       <div className={hasHeroImage ? 'pt-8' : 'pt-4'}>
+        <div className="container">
+          <Breadcrumbs
+            items={[
+              { label: 'Home', href: '/' },
+              { label: 'Community Events', href: '/events' },
+              { label: event.title },
+            ]}
+          />
+        </div>
         <div className="container lg:grid lg:grid-cols-[1fr_18rem] lg:gap-8">
           <div>
-            <Link
-              href="/events"
-              className="mb-8 inline-flex items-center text-sm text-muted-foreground hover:text-primary"
-            >
-              ← Back to Events
-            </Link>
-
             {(event.locationName || event.locationAddress) && (
               <div className="mb-8 rounded-lg border border-border bg-surface p-4">
                 <h3 className="mb-2 font-semibold">Location</h3>
