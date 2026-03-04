@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 import type { User } from '@/payload-types'
 
@@ -15,6 +15,7 @@ export function useAuth(): AuthState {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -23,6 +24,8 @@ export function useAuth(): AuthState {
         if (res.ok) {
           const data = await res.json()
           setUser(data.user || null)
+        } else {
+          setUser(null)
         }
       } catch {
         // Network error — treat as not authenticated
@@ -32,7 +35,7 @@ export function useAuth(): AuthState {
     }
 
     fetchUser()
-  }, [])
+  }, [pathname])
 
   const logout = useCallback(async () => {
     try {
