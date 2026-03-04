@@ -44,6 +44,31 @@ When creating navigation links (header, footer, CTAs):
 - **Use `context: { disableRevalidate: true }`**: Prevents revalidation errors during seeding
 - **Meta titles are page names only**: e.g., `'Home'`, `'About'`, `'Contact'` — never include brand name (layout template adds it)
 
+## Form Components
+
+All forms must use the shadcn/ui primitives — never raw HTML `<input>`, `<label>`, or `<button>` elements:
+
+- **Input**: `src/components/ui/input.tsx` — handles focus ring, dark mode, `aria-invalid` styling
+- **Label**: `src/components/ui/label.tsx` — Radix Label primitive with `peer-disabled` support
+- **Button**: `src/components/ui/button.tsx` — CVA variants (`default`, `ghost`, `outline`, `destructive`, etc.)
+
+For feedback messages (errors, success), use design tokens — never hardcoded Tailwind color classes:
+```tsx
+// Error
+<div className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+
+// Success
+<div className="rounded-md border border-primary/30 bg-primary/10 p-3 text-sm text-primary">
+```
+
+## Icons
+
+Use `lucide-react` for all icons. Never write inline SVG. The package is already installed and used throughout the codebase.
+
+```tsx
+import { Menu, X, Search } from 'lucide-react'
+```
+
 ## Code Hygiene
 
 - Remove unused parameters from types and function signatures — don't leave dead code

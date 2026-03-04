@@ -80,6 +80,27 @@ In development, failures should be visible and informative (console warnings, fa
 
 See `skill-payload-cms.md` for where new code belongs (blocks, collections, fields, hooks, etc.).
 
+## Fix Everything You Touch
+
+When modifying a file, fix all issues in it — not just the ones related to the current task. Pre-existing problems (wrong abstractions, inline SVGs, raw HTML where components exist, hardcoded colors) are bugs. Leaving them means they ship to production. The rule: **if you read a file and see something wrong, fix it in the same PR**.
+
+This also applies during code review. Every review finding must either be fixed or encoded as a rule so it doesn't recur.
+
+## Prefer Props Over Re-Fetching
+
+When a server component already has data that a child client component needs, pass it as a prop. Never have a client component re-fetch data that the server parent already resolved. This avoids duplicate API calls and keeps the data flow unidirectional.
+
+```tsx
+// GOOD — server passes data down
+const { user } = await getMeUser(...)
+<ChildForm userId={user.id} />
+
+// BAD — client re-fetches what server already has
+function ChildForm() {
+  const { user } = useAuth() // fires another /api/users/me request
+}
+```
+
 ## Keep Dependencies Lean
 
 Before adding a new package:
