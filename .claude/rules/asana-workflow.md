@@ -78,6 +78,18 @@ Key GIDs (set as user env vars — see onboarding docs in strategy repo):
 
 **Windows note**: Always pass JSON payloads via temp files (`-d @/tmp/file.json`) — inline JSON with single quotes breaks in Git Bash on Windows.
 
+## Post-Merge Checklist (`/wrapped`)
+
+When the user says "all PRs are merged", "/wrapped", or similar — run this checklist automatically without being asked:
+
+1. **Verify**: `gh pr list --state merged` — confirm PRs are actually merged, don't assume
+2. **Asana**: For each merged PR, find the related Asana task, add a completion comment with the PR link, and mark it complete
+3. **Memory**: Update `MEMORY.md` — move PRs to merged list, remove from open
+4. **Sync**: `git checkout main && git pull origin main`
+5. **Report**: Brief summary of what was closed
+
+Never skip steps or assume state — always check first.
+
 ## Integration Notes
 
 - Asana is on the **free plan** — no official GitHub app integration available
