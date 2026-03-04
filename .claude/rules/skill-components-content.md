@@ -70,6 +70,11 @@ Use `lucide-react` for all icons. Never write inline SVG. The package is already
 import { Menu, X, Search } from 'lucide-react'
 ```
 
+## Form UX
+
+- **Clear stale feedback on input change**: After a form submission shows an error or success message, dismiss it as soon as the user edits any field. Stale messages mislead users into thinking their new input is invalid.
+- **Client-side hooks in persistent layouts must re-sync on navigation**: If a client hook (like auth state) is used in a layout component that persists across route changes, it must re-fetch when the route changes — not just on initial mount. Use `pathname` as a dependency.
+
 ## Code Hygiene
 
 - Remove unused parameters from types and function signatures — don't leave dead code

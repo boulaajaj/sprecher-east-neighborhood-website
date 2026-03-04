@@ -39,6 +39,7 @@
 - Payload's built-in access control protects routes and data — never bypass `authenticatedOrPublished`
 - Never store tokens or secrets in localStorage — use httpOnly cookies (Payload handles this)
 - Never expose user roles or permissions in client-side JavaScript beyond what's needed for UI
+- **Never surface raw backend errors on auth endpoints** — login, password reset, and registration must show fixed generic messages to prevent account enumeration and information leakage. Log raw errors server-side for debugging, never render them in the UI.
 - **Ownership-scoped access control**: Any collection where users can modify their own records must enforce ownership checks in `access.update` — never use a blanket `authenticated` for update access on user-facing collections. Use `authenticatedSelf` from `src/access/authenticatedSelf.ts` or a custom function that compares `req.user.id` to the record `id`. A broad `authenticated` on update means any logged-in user can modify any record.
 
 ### Secrets management
