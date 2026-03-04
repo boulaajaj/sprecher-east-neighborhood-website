@@ -8,8 +8,8 @@ export const Users: CollectionConfig = {
   access: {
     admin: authenticated,
     create: authenticated,
-    delete: authenticated,
-    read: authenticated,
+    delete: authenticatedSelf,
+    read: authenticatedSelf,
     update: authenticatedSelf,
   },
   admin: {
