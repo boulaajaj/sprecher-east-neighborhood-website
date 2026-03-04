@@ -1,6 +1,6 @@
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-sqlite'
 
-export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
+export async function up({ db }: MigrateUpArgs): Promise<void> {
   await db.run(sql`PRAGMA foreign_keys=OFF;`)
   await db.run(sql`CREATE TABLE \`__new_media\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
@@ -95,12 +95,14 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
     sql`CREATE INDEX \`media_sizes_og_sizes_og_filename_idx\` ON \`media\` (\`sizes_og_filename\`);`,
   )
   await db.run(sql`ALTER TABLE \`events\` ADD \`meta_title\` text;`)
-  await db.run(sql`ALTER TABLE \`events\` ADD \`meta_image_id\` integer REFERENCES media(id);`)
+  await db.run(
+    sql`ALTER TABLE \`events\` ADD \`meta_image_id\` integer REFERENCES media(id) ON DELETE SET NULL ON UPDATE NO ACTION;`,
+  )
   await db.run(sql`ALTER TABLE \`events\` ADD \`meta_description\` text;`)
   await db.run(sql`CREATE INDEX \`events_meta_meta_image_idx\` ON \`events\` (\`meta_image_id\`);`)
   await db.run(sql`ALTER TABLE \`_events_v\` ADD \`version_meta_title\` text;`)
   await db.run(
-    sql`ALTER TABLE \`_events_v\` ADD \`version_meta_image_id\` integer REFERENCES media(id);`,
+    sql`ALTER TABLE \`_events_v\` ADD \`version_meta_image_id\` integer REFERENCES media(id) ON DELETE SET NULL ON UPDATE NO ACTION;`,
   )
   await db.run(sql`ALTER TABLE \`_events_v\` ADD \`version_meta_description\` text;`)
   await db.run(
@@ -108,7 +110,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   )
 }
 
-export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
+export async function down({ db }: MigrateDownArgs): Promise<void> {
   await db.run(sql`PRAGMA foreign_keys=OFF;`)
   await db.run(sql`CREATE TABLE \`__new_events\` (
   	\`id\` integer PRIMARY KEY NOT NULL,

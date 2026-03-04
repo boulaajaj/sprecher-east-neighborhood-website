@@ -11,9 +11,7 @@ const PageClient: React.FC<Props> = ({ hasHeroImage }) => {
   const { setHeaderTheme } = useHeaderTheme()
 
   useEffect(() => {
-    if (hasHeroImage) {
-      setHeaderTheme('dark')
-    }
+    setHeaderTheme(hasHeroImage ? 'dark' : null)
   }, [hasHeroImage, setHeaderTheme])
 
   return <React.Fragment />

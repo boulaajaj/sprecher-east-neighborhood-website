@@ -125,7 +125,16 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const { slug = '' } = await paramsPromise
   const event = await queryEventBySlug({ slug: decodeURIComponent(slug) })
 
-  return generateMeta({ doc: event })
+  const meta = await generateMeta({ doc: event })
+  if (!event) return meta
+
+  return {
+    ...meta,
+    openGraph: {
+      ...(meta.openGraph ?? {}),
+      url: `/events/${event.slug}`,
+    },
+  }
 }
 
 const queryEventBySlug = cache(async ({ slug }: { slug: string }) => {

@@ -57,11 +57,6 @@ export function eventJsonLd(event: PayloadEvent): WithContext<Record<string, unk
     },
   }
 
-  // End date from timeEnd — append to the date for a full ISO-like datetime
-  if (event.timeEnd) {
-    jsonLd.endDate = event.date
-  }
-
   // Hero image for rich results
   if (event.heroImage && typeof event.heroImage === 'object' && 'url' in event.heroImage) {
     const img = event.heroImage
