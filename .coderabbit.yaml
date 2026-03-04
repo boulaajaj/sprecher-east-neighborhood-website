@@ -5,6 +5,10 @@ reviews:
   high_level_summary: true
   poem: false
   review_status: true
+  path_filters:
+    - '!src/migrations/**'
+    - '!src/payload-types.ts'
+    - '!src/app/(payload)/admin/importMap.js'
   path_instructions:
     - path: 'src/components/ui/**'
       instructions: |
