@@ -13,8 +13,15 @@ import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { revalidateDelete, revalidateEvent } from './hooks/revalidateEvent'
+import {
+  MetaDescriptionField,
+  MetaImageField,
+  MetaTitleField,
+  OverviewField,
+  PreviewField,
+} from '@payloadcms/plugin-seo/fields'
 
-export const Events: CollectionConfig = {
+export const Events: CollectionConfig<'events'> = {
   slug: 'events',
   access: {
     create: authenticated,
@@ -27,6 +34,10 @@ export const Events: CollectionConfig = {
     slug: true,
     date: true,
     category: true,
+    meta: {
+      title: true,
+      description: true,
+    },
   },
   admin: {
     defaultColumns: ['title', 'date', 'category', '_status', 'updatedAt'],
@@ -158,6 +169,29 @@ export const Events: CollectionConfig = {
               }),
               label: 'Full Event Description',
             },
+          ],
+        },
+        {
+          name: 'meta',
+          label: 'SEO',
+          fields: [
+            OverviewField({
+              titlePath: 'meta.title',
+              descriptionPath: 'meta.description',
+              imagePath: 'meta.image',
+            }),
+            MetaTitleField({
+              hasGenerateFn: true,
+            }),
+            MetaImageField({
+              relationTo: 'media',
+            }),
+            MetaDescriptionField({}),
+            PreviewField({
+              hasGenerateFn: true,
+              titlePath: 'meta.title',
+              descriptionPath: 'meta.description',
+            }),
           ],
         },
       ],

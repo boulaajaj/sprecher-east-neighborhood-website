@@ -2,18 +2,9 @@ import Link from 'next/link'
 import React from 'react'
 
 import type { Event } from '@/payload-types'
+import { getCategoryLabel } from '@/utilities/eventCategories'
 
 export type SidebarEventData = Pick<Event, 'slug' | 'title' | 'date' | 'category'>
-
-const categoryLabels: Record<NonNullable<Event['category']>, string> = {
-  meeting: 'Meeting',
-  social: 'Social',
-  volunteer: 'Volunteer',
-  workshop: 'Workshop',
-  sports: 'Sports & Recreation',
-  community: 'Community',
-  other: 'Other',
-}
 
 export const SidebarEvents: React.FC<{
   events: SidebarEventData[]
@@ -54,7 +45,7 @@ export const SidebarEvents: React.FC<{
                   </span>
                   {event.category && (
                     <span className="text-xs text-muted-foreground">
-                      {categoryLabels[event.category] || event.category}
+                      {getCategoryLabel(event.category)}
                     </span>
                   )}
                 </div>
