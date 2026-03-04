@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { authenticated } from '../../access/authenticated'
+import { isAdmin, isAdminOrEditor } from '../../access/roles'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { revalidateDelete, revalidateResource } from './hooks/revalidateResource'
@@ -9,10 +9,10 @@ export const Resources: CollectionConfig = {
   slug: 'resources',
   defaultSort: 'order',
   access: {
-    create: authenticated,
-    delete: authenticated,
+    create: isAdminOrEditor,
+    delete: isAdmin,
     read: authenticatedOrPublished,
-    update: authenticated,
+    update: isAdminOrEditor,
   },
   admin: {
     defaultColumns: ['title', 'category', 'order', '_status', 'updatedAt'],
