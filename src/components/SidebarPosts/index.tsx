@@ -20,7 +20,10 @@ export const SidebarPosts: React.FC<{
       </h3>
       <ul className="space-y-4">
         {posts.map((post) => {
-          const metaImage = post.meta?.image
+          // meta.image is added by the SEO plugin but missing from Payload's generated types
+          const metaImage = (post.meta as Record<string, unknown> | undefined)?.image as
+            | Post['heroImage']
+            | undefined
 
           return (
             <li key={post.slug}>

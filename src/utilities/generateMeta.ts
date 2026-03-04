@@ -26,7 +26,8 @@ export const generateMeta = async (args: { doc: DocWithMeta | null }): Promise<M
 
   const meta = doc?.meta
 
-  const ogImage = getImageURL(meta?.image)
+  // meta.image is added by the SEO plugin but missing from Payload's generated types
+  const ogImage = getImageURL((meta as Record<string, unknown> | undefined)?.image as Media | null)
 
   const title = meta?.title || 'Sprecher East'
 
