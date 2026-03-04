@@ -24,6 +24,20 @@ Sprint dates: March 1 - March 14, 2026
 - **Impact**: 30 Sprint 2.x tasks superseded, all 12 agent profiles updated with new CMS knowledge, new 20-task sprint created
 - **Recommendation**: When a pivot this large happens, update all agent profiles and memory files in the same session to prevent stale context
 
+### 2026-03-03 — Frontend Engineer
+
+- **Observation**: Adding SEO plugin fields to a collection (Events) does not automatically update `payload-types.ts`. The `defaultPopulate` type check fails because `EventsSelect` has no `meta` key yet. We used `as any` with a comment explaining the workaround until `payload generate:types` is re-run.
+- **Impact**: Minor — requires a follow-up types regeneration step before the `defaultPopulate` optimization for `meta` fields can be fully typed. Runtime behavior is correct.
+- **Recommendation**: After merging any PR that adds SEO plugin fields to a new collection, run `npx payload generate:types` and commit the updated `payload-types.ts` in a separate housekeeping PR.
+
+- **Observation**: The SEO plugin's `GenerateURL` callback receives `collectionConfig` (a full `CollectionConfig` object), not a `collectionSlug` string. Using `collectionConfig.slug` is the correct way to branch on collection type.
+- **Impact**: None — caught during implementation before committing.
+- **Recommendation**: Document this pattern in `skill-payload-cms.md` to avoid the same confusion next time a collection is added to the SEO plugin.
+
+- **Observation**: The `EventHero` dual-mode pattern (full-bleed image vs. clean header fallback) works cleanly and matches `PostHero` conventions. Using a single component with conditional rendering keeps the detail page lean.
+- **Impact**: Positive — event pages with and without hero images both render correctly with correct header theme management.
+- **Recommendation**: Adopt this same dual-mode pattern for any future content-type heroes.
+
 ---
 
 ## Weekly Review Notes
