@@ -10,17 +10,27 @@ import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/
 import { searchFields } from '@/search/fieldOverrides'
 import { beforeSyncWithSearch } from '@/search/beforeSync'
 
-import type { Page, Post } from '@/payload-types'
+import type { Page, Post, Event } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
 
-const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
+const generateTitle: GenerateTitle<Post | Page | Event> = ({ doc }) => {
   return doc?.title || 'Sprecher East'
 }
 
-const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
+const generateURL: GenerateURL<Post | Page | Event> = ({ doc, collectionConfig }) => {
   const url = getServerSideURL()
 
-  return doc?.slug ? `${url}/${doc.slug}` : url
+  if (!doc?.slug) return url
+
+  if (collectionConfig?.slug === 'events') {
+    return `${url}/events/${doc.slug}`
+  }
+
+  if (collectionConfig?.slug === 'posts') {
+    return `${url}/posts/${doc.slug}`
+  }
+
+  return `${url}/${doc.slug}`
 }
 
 export const plugins: Plugin[] = [
@@ -51,6 +61,7 @@ export const plugins: Plugin[] = [
     generateURL: (docs) => docs.reduce((url, doc) => `${url}/${doc.slug}`, ''),
   }),
   seoPlugin({
+    collections: ['pages', 'posts', 'events'],
     generateTitle,
     generateURL,
   }),

@@ -27,7 +27,9 @@ import {
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from 'payload'
 
-export const Posts: CollectionConfig<'posts'> = {
+// SEO plugin adds meta fields at runtime that aren't in Payload's generated Select types,
+// so we use ungeneric CollectionConfig to avoid false type errors on defaultPopulate.meta.image.
+export const Posts: CollectionConfig = {
   slug: 'posts',
   access: {
     create: authenticated,
@@ -35,9 +37,6 @@ export const Posts: CollectionConfig<'posts'> = {
     read: authenticatedOrPublished,
     update: authenticated,
   },
-  // This config controls what's populated by default when a post is referenced
-  // https://payloadcms.com/docs/queries/select#defaultpopulate-collection-config-property
-  // Type safe if the collection slug generic is passed to `CollectionConfig` - `CollectionConfig<'posts'>
   defaultPopulate: {
     title: true,
     slug: true,

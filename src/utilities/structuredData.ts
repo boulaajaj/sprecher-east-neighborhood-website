@@ -49,6 +49,21 @@ export function eventJsonLd(event: PayloadEvent): WithContext<Record<string, unk
     url: `${siteUrl}/events/${event.slug}`,
     startDate: event.date,
     description: event.description || '',
+    eventStatus: 'https://schema.org/EventScheduled',
+    organizer: {
+      '@type': 'Organization',
+      name: 'Sprecher East',
+      url: siteUrl,
+    },
+  }
+
+  // Hero image for rich results
+  if (event.heroImage && typeof event.heroImage === 'object' && 'url' in event.heroImage) {
+    const img = event.heroImage
+    const imageUrl = img.url ? siteUrl + img.url : null
+    if (imageUrl) {
+      jsonLd.image = imageUrl
+    }
   }
 
   if (event.locationName || event.locationAddress) {

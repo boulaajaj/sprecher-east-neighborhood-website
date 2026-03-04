@@ -225,10 +225,6 @@ export interface Page {
   )[]
   meta?: {
     title?: string | null
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media
     description?: string | null
   }
   publishedAt?: string | null
@@ -268,10 +264,6 @@ export interface Post {
   categories?: (number | Category)[] | null
   meta?: {
     title?: string | null
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media
     description?: string | null
   }
   publishedAt?: string | null
@@ -834,6 +826,10 @@ export interface Event {
     }
     [k: string]: unknown
   } | null
+  meta?: {
+    title?: string | null
+    description?: string | null
+  }
   publishedAt?: string | null
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
@@ -1260,7 +1256,6 @@ export interface PagesSelect<T extends boolean = true> {
     | T
     | {
         title?: T
-        image?: T
         description?: T
       }
   publishedAt?: T
@@ -1368,7 +1363,6 @@ export interface PostsSelect<T extends boolean = true> {
     | T
     | {
         title?: T
-        image?: T
         description?: T
       }
   publishedAt?: T
@@ -1404,6 +1398,12 @@ export interface EventsSelect<T extends boolean = true> {
   heroImage?: T
   description?: T
   content?: T
+  meta?:
+    | T
+    | {
+        title?: T
+        description?: T
+      }
   publishedAt?: T
   generateSlug?: T
   slug?: T
