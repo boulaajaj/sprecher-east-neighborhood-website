@@ -85,7 +85,11 @@ export function ChangePasswordForm({ userId }: { userId: number }) {
           required
           autoComplete="new-password"
           value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
+          onChange={(e) => {
+            setNewPassword(e.target.value)
+            if (error) setError('')
+            if (success) setSuccess(false)
+          }}
           placeholder="Minimum 8 characters"
         />
       </div>
@@ -98,7 +102,11 @@ export function ChangePasswordForm({ userId }: { userId: number }) {
           required
           autoComplete="new-password"
           value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+          onChange={(e) => {
+            setConfirmPassword(e.target.value)
+            if (error) setError('')
+            if (success) setSuccess(false)
+          }}
         />
       </div>
 
