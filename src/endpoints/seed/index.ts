@@ -4,6 +4,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
+import { ROLES } from '../../access/roles'
 import { contactForm as contactFormData } from './contact-form'
 import { contact as contactPageData } from './contact-page'
 import { home } from './home'
@@ -127,6 +128,7 @@ export const seed = async ({
         name: 'Sprecher East',
         email: 'demo-author@example.com',
         password: seedPassword,
+        role: ROLES.admin,
       },
     }),
     payload.create({
