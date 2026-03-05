@@ -44,6 +44,15 @@ Role tags match the consolidated skill profiles:
 - Keep commits focused — one logical change per commit
 - Never commit secrets, keys, or credentials
 
+### Pre-PR Checklist
+
+Before creating a pull request, run these checks in order:
+
+1. **`/simplify`** — runs 3 parallel review agents (code reuse, code quality, efficiency) on the diff. Fix all findings before proceeding. This catches duplicated patterns, magic strings, missed abstractions, and performance issues.
+2. **Type-check**: `npx tsc --noEmit` — must pass with zero errors
+3. **Lint & format**: `npx lint-staged --no-stash` — or run `npx eslint . && npx prettier --check .` manually
+4. **Visual QA** (if UI changed): screenshot affected pages at all 6 viewports using Playwright MCP (see `skill-nextjs-tailwind.md`)
+
 ### Creating a Pull Request
 
 1. Push the branch: `git push -u origin <branch-name>`
