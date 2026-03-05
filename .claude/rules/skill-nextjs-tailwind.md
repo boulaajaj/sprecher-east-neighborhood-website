@@ -91,3 +91,43 @@ The site timezone is configured via `SITE_TIMEZONE` env var (default: `America/C
 - Set `priority` on hero/above-fold images
 - Below-fold images use default lazy loading
 - Payload Media component (`src/components/Media/`) handles both image and video
+
+## Responsive Design — 6-Viewport Testing
+
+Every UI/UX change **must** be visually verified at 6 viewports before committing. Use the Playwright MCP server to screenshot affected pages.
+
+**Test viewports (min + max of each breakpoint range):**
+
+| # | Name | Width | Represents |
+|---|------|-------|------------|
+| 1 | Mobile S | 320px | iPhone SE, smallest phones |
+| 2 | Mobile L | 430px | iPhone 15 Pro Max, large phones |
+| 3 | Tablet S | 768px | iPad Mini, small tablets |
+| 4 | Tablet L | 1024px | iPad Pro 11", large tablets |
+| 5 | Desktop S | 1280px | Laptops, small monitors |
+| 6 | Desktop L | 1920px | Full HD monitors |
+
+**Tailwind breakpoints (for reference):**
+- `sm: 640px` — mobile → tablet transition
+- `md: 768px` — tablet starts
+- `lg: 1024px` — desktop starts
+- `xl: 1280px` — wide desktop
+- `2xl: 1536px` — ultrawide
+
+**Responsive CSS rules:**
+- Mobile-first: base styles are for 320px, then layer `sm:`, `md:`, `lg:`, `xl:` overrides
+- Never hardcode pixel widths on content elements — use `max-w-*`, `w-full`, percentages, or grid/flex
+- Test text wrapping at 320px — long titles and descriptions must not overflow
+- Images must be `w-full` or responsive within their container — never fixed dimensions that break on small screens
+- Touch targets (buttons, links) must be at least 44x44px on mobile (WCAG 2.5.8)
+- Horizontal scrolling on any page at any viewport is a bug — fix immediately
+- Use `container` class for consistent max-width with auto margins across breakpoints
+
+**Workflow:**
+1. Make the UI/UX change
+2. Start dev server if not running (`npm run dev`)
+3. Use Playwright MCP to screenshot affected pages at all 6 viewports
+4. Inspect each screenshot — check alignment, spacing, text wrapping, image sizing, touch targets
+5. Fix any issues found
+6. Re-screenshot to verify fixes
+7. Only commit when all 6 viewports look correct

@@ -43,7 +43,7 @@ export const generateMeta = async (args: { doc: DocWithMeta | null }): Promise<M
           ]
         : undefined,
       title,
-      url: typeof doc?.slug === 'string' ? `/${doc.slug}` : '/',
+      url: typeof doc?.slug === 'string' ? (doc.slug === 'home' ? '/' : `/${doc.slug}`) : '/',
     }),
     title,
   }

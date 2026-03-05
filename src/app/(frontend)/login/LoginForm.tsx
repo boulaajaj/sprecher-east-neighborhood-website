@@ -63,7 +63,10 @@ export function LoginForm() {
           required
           autoComplete="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value)
+            if (error) setError('')
+          }}
           placeholder="you@example.com"
         />
       </div>
@@ -76,7 +79,10 @@ export function LoginForm() {
           required
           autoComplete="current-password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => {
+            setPassword(e.target.value)
+            if (error) setError('')
+          }}
         />
       </div>
 

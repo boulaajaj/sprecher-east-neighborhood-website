@@ -1,0 +1,173 @@
+# World-Class UI/UX Design Standards
+
+Design principles for creating a pixel-perfect, modern, intuitive neighborhood website. Every agent building UI must follow these standards — they are not aspirational, they are requirements.
+
+## Design Philosophy
+
+This website represents a real community. Residents will judge it in 3 seconds. If it looks amateur, they leave. If it looks polished, they trust it. Design quality is not a nice-to-have — it's the difference between a community platform people use and one they ignore.
+
+**The standard**: Every page must look like it was designed by a top-tier product design team. Clean, modern, warm, and intentional. No element should look accidental or unfinished.
+
+## Visual Hierarchy
+
+Every page must have a clear visual hierarchy that guides the eye:
+
+1. **Primary element** (hero heading, page title) — largest, boldest, most prominent
+2. **Supporting content** (subheadings, key info) — clearly secondary but still prominent
+3. **Body content** (paragraphs, lists) — comfortable reading size
+4. **Tertiary elements** (metadata, captions, labels) — smaller, muted, but still legible
+
+**Rules:**
+- Headings must have enough size contrast with body text (at least 1.5x for h2, 2x for h1)
+- Never use more than 3 font sizes on a single screen view
+- Use font weight (not just size) to create hierarchy — `font-bold` for headings, `font-normal` for body, `font-light` sparingly
+- Eyebrow text (category labels, section identifiers) uses `text-xs font-bold tracking-widest uppercase text-primary`
+
+## Spacing System
+
+Consistent spacing creates visual rhythm. Use Tailwind's spacing scale exclusively:
+
+- **Section spacing**: `py-16 md:py-20 lg:py-24` between major page sections
+- **Content gaps**: `gap-6 md:gap-8` for grid/flex layouts
+- **Element spacing**: `space-y-4` or `space-y-6` for stacked elements within a section
+- **Container padding**: `px-4 sm:px-6 lg:px-8` for horizontal page padding
+- **Card padding**: `p-6 md:p-8` for card interiors
+
+**Rules:**
+- Never use arbitrary spacing values — stick to the Tailwind scale (4, 6, 8, 10, 12, 16, 20, 24)
+- Spacing between sections should be generous — white space is not wasted space, it's breathing room
+- Related elements have tighter spacing; unrelated elements have more separation
+- The gap between a heading and its content should be smaller than the gap between two sections
+
+## Color and Contrast
+
+**WCAG AA minimum contrast ratios are mandatory:**
+- Normal text (< 18px): **4.5:1** contrast ratio against background
+- Large text (>= 18px bold or >= 24px): **3:1** contrast ratio
+- UI components and icons: **3:1** against adjacent colors
+
+**Rules:**
+- `text-foreground` on `bg-background` — primary readable combination
+- `text-muted-foreground` on `bg-background` — secondary text (verify contrast!)
+- `text-foreground` on `bg-surface` — cards and elevated surfaces
+- Never place `text-muted-foreground` on `bg-surface` without verifying the combination meets 4.5:1
+- White text on `bg-primary` must meet 4.5:1 — test both light and dark mode values
+- **Dark mode is not optional** — every color combination must be tested in both themes
+- If text is invisible or hard to read in ANY theme, it's a critical bug — fix immediately
+
+**Testing contrast:**
+- Use the Playwright MCP to screenshot in both light (`data-theme="light"`) and dark (`data-theme="dark"`) modes
+- Visually inspect every text element against its background
+- When in doubt, increase contrast — readability always wins over subtlety
+
+## Typography
+
+- **Font family**: Poppins (already loaded via `next/font/google`)
+- **Body text**: `text-base` (16px) minimum — never smaller for readable content
+- **Line height**: `leading-relaxed` (1.625) for body paragraphs, `leading-tight` (1.25) for headings
+- **Max line width**: `max-w-prose` (65ch) for long-form text — lines longer than 75 characters are hard to read
+- **Letter spacing**: Default for body, `tracking-tight` for large headings, `tracking-widest` for eyebrow labels
+
+## Card Design
+
+Cards are the primary content container pattern:
+
+- **Background**: `bg-background` (not `bg-surface` — cards should feel elevated)
+- **Border**: `border border-border` or `shadow-sm` — never both
+- **Border radius**: `rounded-2xl` for cards, `rounded-xl` for smaller elements, `rounded-lg` for buttons
+- **Hover state**: `hover:shadow-md transition-shadow duration-200` for interactive cards
+- **Padding**: `p-6` minimum, `p-8` for spacious cards
+- **Image in card**: Full-bleed at top with `rounded-t-2xl`, or inset with `rounded-xl`
+
+## Button Design
+
+Three tiers of visual importance:
+
+1. **Primary CTA**: `bg-primary text-white rounded-lg px-6 py-3 font-semibold hover:bg-primary/90 transition-colors`
+2. **Secondary CTA**: `border border-primary text-primary rounded-lg px-6 py-3 font-semibold hover:bg-primary/10 transition-colors`
+3. **Tertiary/Ghost**: `text-primary font-semibold hover:underline`
+
+**Rules:**
+- Only one primary CTA per visible screen area
+- Buttons must have minimum touch target of 44x44px (WCAG 2.5.8)
+- Always include hover and focus states
+- Icon + text buttons: icon on the left, `gap-2` between icon and label
+
+## Image Treatment
+
+- **Hero images**: Full-bleed with gradient overlay for text readability. Pattern: `relative overflow-hidden` container + `absolute inset-0 object-cover` image + gradient overlay div
+- **Section images**: `rounded-2xl overflow-hidden shadow-lg` for standalone images
+- **Card thumbnails**: Consistent aspect ratio (`aspect-video` or `aspect-[4/3]`) with `object-cover`
+- **All images**: Must have meaningful `alt` text. Use `next/image` with proper `width`/`height` or `fill`
+- **Missing images**: Show a styled placeholder — never a broken image icon or empty space
+
+## Section Patterns
+
+### Hero Sections
+- Full-viewport or near-full (`min-h-[60vh]` to `min-h-[80vh]`)
+- Background image with dark gradient overlay (`from-foreground/70 via-foreground/50 to-transparent`)
+- White text on overlay for maximum contrast
+- Clear CTA buttons at the bottom of the hero content
+
+### Feature/Stats Strips
+- Full-width colored background (`bg-primary` with white text)
+- 3-4 items in a horizontal row (responsive: stack on mobile)
+- Short, punchy text — numbers or 2-3 word labels
+
+### Content Sections
+- Alternating backgrounds (`bg-background` and `bg-surface`) to create visual separation
+- Two-column layouts on desktop, single column on mobile
+- Each section has: eyebrow label, heading, body text, optional CTA
+
+### CTA Banners
+- Full-width with `bg-primary` or gradient background
+- Centered text with 1-2 CTA buttons
+- Used between major sections to drive engagement
+
+## Animation and Transitions
+
+- **Hover transitions**: `transition-all duration-200` or `transition-colors duration-200` — never longer than 300ms
+- **No jarring animations**: Subtle transforms only (`hover:scale-[1.02]`, `hover:-translate-y-1`)
+- **Reduced motion**: Respect `prefers-reduced-motion` — use `motion-safe:` prefix for animations
+- **Page transitions**: Not needed — Next.js App Router handles navigation smoothly
+- **Loading states**: Use skeleton screens (pulsing gray boxes) not spinners for content loading
+
+## Navigation
+
+- **Header**: Fixed/sticky, clean, minimal. Logo left, nav center or right, CTA button far right
+- **Mobile nav**: Full-screen overlay or slide-in drawer — never a cramped dropdown
+- **Active state**: Current page link has `text-primary font-semibold` or underline indicator
+- **Footer**: Organized in 3-4 columns, includes all important links, contact info, and legal text
+- **Breadcrumbs**: On all inner pages, small and unobtrusive, using `text-muted-foreground`
+
+## Accessibility (Non-Negotiable)
+
+- **Focus indicators**: Visible focus ring on all interactive elements (`focus-visible:ring-2 ring-primary ring-offset-2`)
+- **Skip to content**: Link at top of page for keyboard users
+- **Semantic HTML**: Use `<main>`, `<nav>`, `<article>`, `<section>`, `<aside>`, `<header>`, `<footer>`
+- **ARIA labels**: On icon-only buttons, decorative elements, and complex widgets
+- **Form labels**: Every input must have an associated `<label>` — never placeholder-only
+- **Error messages**: Use `role="alert"` with `aria-live="assertive"`
+- **Color alone**: Never convey information through color alone — always pair with text or icons
+
+## Performance
+
+- **Core Web Vitals targets**: LCP < 2.5s, FID < 100ms, CLS < 0.1
+- **Images**: Always use `next/image` with proper sizing. Hero images get `priority`. Below-fold images lazy-load.
+- **Fonts**: Poppins is loaded via `next/font` with `display: swap` — no FOIT
+- **CSS**: Tailwind purges unused styles. Never add custom CSS when Tailwind utilities work.
+- **JavaScript**: Minimize client-side JS. Default to Server Components. Only use `'use client'` for interactivity.
+
+## Common Anti-Patterns (Never Do These)
+
+- Empty sections with no content — hide them entirely, don't show empty boxes
+- Text that disappears in dark/light mode — always test both themes
+- Huge whitespace gaps between header and content
+- Tiny, hard-to-tap buttons on mobile
+- Text overflowing its container at any viewport width
+- Images with wrong aspect ratio (stretched or squished)
+- Inconsistent border radius (mixing rounded-lg, rounded-xl, rounded-2xl randomly)
+- Multiple font families on the same page
+- Raw unstyled HTML elements (links without hover states, inputs without focus styles)
+- Content that requires horizontal scrolling
+- Orphaned single words on their own line in headings (use `text-balance` or `text-pretty`)

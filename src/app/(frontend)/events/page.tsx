@@ -7,6 +7,8 @@ import Link from 'next/link'
 import { formatDateTime } from '@/utilities/formatDateTime'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { startOfToday } from '@/utilities/timezone'
+import { MapPin } from 'lucide-react'
+import { getCategoryLabel } from '@/utilities/eventCategories'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
@@ -64,11 +66,14 @@ export default async function EventsPage() {
                   <p className="line-clamp-2 text-sm text-muted-foreground">{event.description}</p>
                 )}
                 {event.locationName && (
-                  <div className="mt-3 text-sm text-muted-foreground">📍 {event.locationName}</div>
+                  <div className="mt-3 flex items-center gap-1 text-sm text-muted-foreground">
+                    <MapPin className="h-3.5 w-3.5 shrink-0" />
+                    {event.locationName}
+                  </div>
                 )}
                 {event.category && (
                   <span className="mt-3 inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                    {event.category}
+                    {getCategoryLabel(event.category)}
                   </span>
                 )}
               </Link>
@@ -93,7 +98,7 @@ export default async function EventsPage() {
               <Link
                 key={event.id}
                 href={`/events/${event.slug}`}
-                className="group rounded-lg border border-border bg-card/50 p-4 opacity-75 transition-opacity hover:opacity-100"
+                className="group rounded-lg border border-border bg-card/50 p-4 transition-shadow hover:shadow-md"
               >
                 <div className="mb-1 text-sm text-muted-foreground">
                   {formatDateTime(event.date)}
