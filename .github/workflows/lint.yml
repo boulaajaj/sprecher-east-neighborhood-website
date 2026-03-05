@@ -11,8 +11,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
-    name: ESLint & Prettier
+  # Prettier always runs — it checks markdown, YAML, and JSON formatting too
+  prettier:
+    name: Prettier
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -29,12 +30,45 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run ESLint
-        run: npx eslint . --max-warnings=10
-
       - name: Check Prettier formatting
         run: npx prettier --check .
 
+  # ESLint skipped for docs-only changes (no JS/TS to lint)
+  eslint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Detect code changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            code:
+              - 'src/**'
+              - '*.config.*'
+              - 'tsconfig.json'
+
+      - name: Setup Node.js
+        if: steps.filter.outputs.code == 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.filter.outputs.code == 'true'
+        run: npm ci
+
+      - name: Run ESLint
+        if: steps.filter.outputs.code == 'true'
+        run: npx eslint . --max-warnings=10
+
+  # Dependency audit skipped unless package files change
   security:
     name: Dependency Audit
     runs-on: ubuntu-latest
@@ -44,14 +78,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Detect dependency changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            deps:
+              - 'package.json'
+              - 'package-lock.json'
+
       - name: Setup Node.js
+        if: steps.filter.outputs.deps == 'true'
         uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: npm
 
       - name: Install dependencies
+        if: steps.filter.outputs.deps == 'true'
         run: npm ci
 
       - name: Audit for critical/high vulnerabilities
+        if: steps.filter.outputs.deps == 'true'
         run: npm audit --audit-level=high --omit=dev

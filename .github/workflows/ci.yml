@@ -3,8 +3,22 @@ name: CI
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - '.claude/**'
+      - 'docs/**'
+      - '.github/workflows/**'
+      - '.env.local.example'
+      - 'LICENSE'
   pull_request:
     branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - '.claude/**'
+      - 'docs/**'
+      - '.github/workflows/**'
+      - '.env.local.example'
+      - 'LICENSE'
 
 jobs:
   build:
