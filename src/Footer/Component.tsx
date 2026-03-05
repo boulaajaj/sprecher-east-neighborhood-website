@@ -1,6 +1,7 @@
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import Link from 'next/link'
 import React from 'react'
+import { MapPin, Mail, ArrowUpRight } from 'lucide-react'
 
 import type { Footer } from '@/payload-types'
 
@@ -38,7 +39,7 @@ export async function Footer() {
                   <CMSLink
                     key={i}
                     {...link}
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    className="group/link flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary"
                   />
                 )
               })}
@@ -50,15 +51,17 @@ export async function Footer() {
             <h3 className="mb-5 text-xs font-bold tracking-widest text-muted-foreground uppercase">
               Get in Touch
             </h3>
-            <div className="space-y-2 text-sm text-muted-foreground">
-              <p>Sprecher East Neighborhood</p>
-              <p>Madison, WI</p>
-              <Link
-                href="/contact"
-                className="inline-block font-medium text-primary transition-colors hover:text-foreground"
-              >
-                Contact us
-              </Link>
+            <div className="space-y-3 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 shrink-0 text-primary" />
+                <span>Madison, WI</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4 shrink-0 text-primary" />
+                <Link href="/contact" className="font-medium transition-colors hover:text-primary">
+                  Contact us
+                </Link>
+              </div>
             </div>
           </div>
         </div>
