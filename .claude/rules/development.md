@@ -103,9 +103,9 @@ function ChildForm() {
 
 ## Visual QA Is Mandatory for UI/UX Changes
 
-Any change that affects what users see — layout, styling, components, spacing, typography, images, responsive behavior — **must** be visually verified before committing. Use the Playwright MCP server to screenshot affected pages at all 6 test viewports (see `skill-nextjs-tailwind.md` for the full viewport table and workflow).
+Changes that touch CSS, Tailwind classes, HTML structure, or component markup that affects rendering **must** be visually verified before committing. Use the Playwright MCP server to screenshot affected pages at all 6 test viewports (see `skill-nextjs-tailwind.md` for the full viewport table and workflow). Skip for backend-only, config-only, or docs-only changes.
 
-This is not optional. Code that "builds without errors" but looks broken on mobile is a bug. The visual QA loop is: change → screenshot → inspect → fix → re-screenshot → commit.
+Code that "builds without errors" but looks broken on mobile is a bug. The visual QA loop is: change → screenshot → inspect → fix → re-screenshot → commit.
 
 ## Keep Dependencies Lean
 

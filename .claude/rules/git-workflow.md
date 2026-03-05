@@ -48,10 +48,10 @@ Role tags match the consolidated skill profiles:
 
 Before creating a pull request, run these checks in order:
 
-1. **`/simplify`** — runs 3 parallel review agents (code reuse, code quality, efficiency) on the diff. Fix all findings before proceeding. This catches duplicated patterns, magic strings, missed abstractions, and performance issues.
+1. **`/simplify` (Claude Code skill)** — runs 3 parallel review agents (code reuse, code quality, efficiency) on the diff. Fix all findings before proceeding. This catches duplicated patterns, magic strings, missed abstractions, and performance issues.
 2. **Type-check**: `npx tsc --noEmit` — must pass with zero errors
 3. **Lint & format**: `npx lint-staged --no-stash` — or run `npx eslint . && npx prettier --check .` manually
-4. **Visual QA** (if UI changed): screenshot affected pages at all 6 viewports using Playwright MCP (see `skill-nextjs-tailwind.md`)
+4. **Visual QA** (only when the diff touches CSS, Tailwind classes, HTML structure, or component markup that affects rendering): screenshot affected pages at all 6 viewports using Playwright MCP (see `skill-nextjs-tailwind.md`). Skip for backend-only, config-only, or docs-only changes.
 
 ### Creating a Pull Request
 
