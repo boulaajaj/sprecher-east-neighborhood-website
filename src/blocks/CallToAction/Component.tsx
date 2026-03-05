@@ -7,7 +7,10 @@ import { CMSLink } from '@/components/Link'
 
 export const CallToActionBlock: React.FC<CTABlockProps> = ({ links, richText }) => {
   return (
-    <div className="bg-primary py-16 md:py-20" data-theme="dark">
+    <div
+      className="bg-gradient-to-br from-primary to-primary-dark py-16 md:py-20"
+      data-theme="dark"
+    >
       <div className="container">
         <div className="flex flex-col items-center gap-8 text-center md:flex-row md:gap-12 md:text-left">
           <div className="max-w-[48rem] flex-1">
