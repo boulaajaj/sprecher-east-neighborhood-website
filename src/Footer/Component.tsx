@@ -14,7 +14,7 @@ export async function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="mt-auto bg-background text-foreground" data-theme="dark">
+    <footer className="mt-auto border-t border-border bg-surface" data-theme="dark">
       <div className="container py-14 md:py-16">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-12">
           {/* Brand column */}
@@ -66,8 +66,8 @@ export async function Footer() {
         {/* Disclaimer + copyright */}
         <div className="mt-12 border-t border-border pt-8">
           <p className="mb-2 text-xs leading-relaxed text-muted-foreground">
-            Sprecher East is an unofficial grassroots neighborhood initiative. This website was
-            built with AI assistance.
+            Sprecher East is an unofficial grassroots neighborhood initiative. This website was built
+            with AI assistance.
           </p>
           <p className="text-xs text-muted-foreground/70">&copy; {currentYear} Sprecher East</p>
         </div>
