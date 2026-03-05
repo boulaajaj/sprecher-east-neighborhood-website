@@ -2,7 +2,7 @@
 
 Mandatory design review for all UI/UX changes. This review runs as part of `/simplify` and catches visual quality issues before they reach the user.
 
-**Inspired by**: [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) (37K stars) prioritized rule system, [awesome-design-systems](https://github.com/alexpate/awesome-design-systems) (19K stars) QA patterns, and Vercel v0's design-token-first approach.
+**Inspired by**: community UI/UX review patterns, [awesome-design-systems](https://github.com/alexpate/awesome-design-systems) QA patterns, and Vercel v0's design-token-first approach.
 
 ## When This Applies
 
