@@ -21,12 +21,26 @@ export type EventCardData = Pick<
   | 'heroImage'
 >
 
+const DateBadge: React.FC<{
+  month: string
+  day: string
+  size?: 'sm' | 'lg'
+  className?: string
+}> = ({ month, day, size = 'sm', className = '' }) => (
+  <div className={`flex shrink-0 flex-col items-center justify-center ${size === 'lg' ? 'h-16 w-16 rounded-xl' : 'h-14 w-14 rounded-lg'} ${className}`}>
+    <span className="text-xs font-bold uppercase leading-none text-primary">{month}</span>
+    <span className={`font-bold leading-tight text-foreground ${size === 'lg' ? 'text-2xl' : 'text-lg'}`}>{day}</span>
+  </div>
+)
+
 export const EventCard: React.FC<{
   event: EventCardData
   compact?: boolean
 }> = ({ event, compact }) => {
   const { slug, title, date, timeStart, timeEnd, category, description, locationName, heroImage } =
     event
+
+  if (!slug) return null
 
   const { month, day } = formatDateBadge(date)
 
@@ -36,10 +50,7 @@ export const EventCard: React.FC<{
         href={`/events/${slug}`}
         className="group flex items-center gap-4 rounded-xl border border-border bg-card p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
       >
-        <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-lg bg-surface text-center">
-          <span className="text-xs font-bold uppercase leading-none text-primary">{month}</span>
-          <span className="text-lg font-bold leading-tight text-foreground">{day}</span>
-        </div>
+        <DateBadge month={month} day={day} className="bg-surface text-center" />
         <div className="min-w-0">
           <p className="text-xs text-muted-foreground">{formatDateShort(date)}</p>
           <h3 className="truncate font-semibold text-foreground group-hover:text-primary">
@@ -69,10 +80,7 @@ export const EventCard: React.FC<{
           </div>
         )}
         {/* Date badge overlay */}
-        <div className="absolute top-3 left-3 flex h-16 w-16 flex-col items-center justify-center rounded-xl bg-card/95 shadow-lg backdrop-blur-sm">
-          <span className="text-xs font-bold uppercase leading-none text-primary">{month}</span>
-          <span className="text-2xl font-bold leading-tight text-foreground">{day}</span>
-        </div>
+        <DateBadge month={month} day={day} size="lg" className="absolute top-3 left-3 bg-card/95 shadow-lg backdrop-blur-sm" />
       </div>
 
       {/* Content area */}
