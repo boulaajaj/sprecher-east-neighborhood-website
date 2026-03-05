@@ -29,6 +29,7 @@ export function Alert({
     <div
       role={config.role}
       aria-live={config['aria-live']}
+      aria-atomic="true"
       className={cn('rounded-md border p-3 text-sm', config.className, className)}
     >
       {children}
