@@ -19,13 +19,7 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
           )}
         </div>
         {/* Centered radial vignette — darkens behind text area, keeps edges bright */}
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 60%, transparent 100%)',
-          }}
-        />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,rgba(0,0,0,0.45)_0%,rgba(0,0,0,0.15)_60%,transparent_100%)]" />
         <div className="relative z-10 container mb-8 flex items-center justify-center">
           <div className="max-w-[40rem] md:text-center">
             {richText && (
@@ -57,7 +51,7 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
         </div>
       </div>
       {/* Subtle bottom feather — short, soft edge into page background */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-16 bg-gradient-to-b from-transparent to-background/80" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-16 bg-gradient-to-b from-transparent via-background/80 to-background" />
     </div>
   )
 }
