@@ -34,7 +34,8 @@ export default async function ResourcesPage() {
   // Group resources by category
   const grouped = resources.docs.reduce(
     (acc, resource) => {
-      const cat = resource.category || 'other'
+      const rawCat = resource.category || 'other'
+      const cat = rawCat in categoryLabels ? rawCat : 'other'
       if (!acc[cat]) acc[cat] = []
       acc[cat].push(resource)
       return acc
