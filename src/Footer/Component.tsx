@@ -66,8 +66,8 @@ export async function Footer() {
         {/* Disclaimer + copyright */}
         <div className="mt-12 border-t border-border pt-8">
           <p className="mb-2 text-xs leading-relaxed text-muted-foreground">
-            Sprecher East is an unofficial grassroots neighborhood initiative. This website was built
-            with AI assistance.
+            Sprecher East is an unofficial grassroots neighborhood initiative. This website was
+            built with AI assistance.
           </p>
           <p className="text-xs text-muted-foreground/70">&copy; {currentYear} Sprecher East</p>
         </div>

@@ -27,9 +27,15 @@ const DateBadge: React.FC<{
   size?: 'sm' | 'lg'
   className?: string
 }> = ({ month, day, size = 'sm', className = '' }) => (
-  <div className={`flex shrink-0 flex-col items-center justify-center ${size === 'lg' ? 'h-16 w-16 rounded-xl' : 'h-14 w-14 rounded-lg'} ${className}`}>
-    <span className="text-xs font-bold uppercase leading-none text-primary">{month}</span>
-    <span className={`font-bold leading-tight text-foreground ${size === 'lg' ? 'text-2xl' : 'text-lg'}`}>{day}</span>
+  <div
+    className={`flex shrink-0 flex-col items-center justify-center ${size === 'lg' ? 'h-16 w-16 rounded-xl' : 'h-14 w-14 rounded-lg'} ${className}`}
+  >
+    <span className="text-xs leading-none font-bold text-primary uppercase">{month}</span>
+    <span
+      className={`leading-tight font-bold text-foreground ${size === 'lg' ? 'text-2xl' : 'text-lg'}`}
+    >
+      {day}
+    </span>
   </div>
 )
 
@@ -80,7 +86,12 @@ export const EventCard: React.FC<{
           </div>
         )}
         {/* Date badge overlay */}
-        <DateBadge month={month} day={day} size="lg" className="absolute top-3 left-3 bg-card/95 shadow-lg backdrop-blur-sm" />
+        <DateBadge
+          month={month}
+          day={day}
+          size="lg"
+          className="absolute top-3 left-3 bg-card/95 shadow-lg backdrop-blur-sm"
+        />
       </div>
 
       {/* Content area */}

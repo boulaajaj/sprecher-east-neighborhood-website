@@ -34,9 +34,7 @@ export const formatDateShort = (timestamp: string): string => {
   })
 }
 
-export const formatDateBadge = (
-  timestamp: string,
-): { month: string; day: string } => {
+export const formatDateBadge = (timestamp: string): { month: string; day: string } => {
   const date = new Date(timestamp)
   const tz = resolveTimezone(timestamp)
 

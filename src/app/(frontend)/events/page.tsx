@@ -27,7 +27,7 @@ export default async function EventsPage() {
   const past = events.docs.filter((e) => new Date(e.date) < todayCutoff).reverse()
 
   return (
-    <div className="pb-24 pt-24">
+    <div className="pt-24 pb-24">
       {/* Page header */}
       <div className="container mb-16">
         <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">
