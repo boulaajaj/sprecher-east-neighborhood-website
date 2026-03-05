@@ -86,9 +86,11 @@ After any push to a PR branch, poll for CI completion and review comments. **Do 
 
 **Phase 2 — Act on results:**
 
-- **CI passed, reviews ready**: address review comments, commit and push fixes, then restart Phase 1
+- **CI passed, new review comments exist**: address review comments in code, commit and push fixes, then restart Phase 1
 - **CI failed**: diagnose the failure, fix it, push, then restart Phase 1
-- **CI passed, no review comments**: PR is ready for merge
+- **CI passed, no new review comments**:
+  - If you previously addressed review comments in code → proceed to "After Review Comments" section to reply to each resolved comment before handoff
+  - If no review comments were ever submitted → PR is ready for handoff to owner for merge
 
 **Rules:**
 
