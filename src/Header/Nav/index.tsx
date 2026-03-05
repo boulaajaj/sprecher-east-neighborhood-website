@@ -18,8 +18,16 @@ function resolveHref(link: NonNullable<HeaderType['navItems']>[number]['link']):
   return ''
 }
 
+function normalizePath(value: string): string {
+  const [pathOnly] = value.split(/[?#]/)
+  if (pathOnly === '/') return '/'
+  return pathOnly.replace(/\/+$/, '')
+}
+
 function isActivePath(pathname: string, href: string): boolean {
-  return pathname === href || pathname.startsWith(href + '/')
+  const current = normalizePath(pathname)
+  const target = normalizePath(href)
+  return current === target || (target !== '/' && current.startsWith(target + '/'))
 }
 
 interface HeaderNavProps {
