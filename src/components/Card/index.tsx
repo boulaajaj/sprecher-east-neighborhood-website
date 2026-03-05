@@ -2,7 +2,7 @@
 import { cn } from '@/utilities/ui'
 import useClickableCard from '@/utilities/useClickableCard'
 import Link from 'next/link'
-import React, { Fragment } from 'react'
+import React from 'react'
 import { ImageIcon } from 'lucide-react'
 
 import type { Post } from '@/payload-types'
@@ -60,20 +60,19 @@ export const Card: React.FC<{
       </div>
       <div className="p-5 md:p-6">
         {showCategories && hasCategories && (
-          <div className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">
+          <div className="mb-3 flex flex-wrap gap-2">
             {categories?.map((category, index) => {
               if (typeof category === 'object') {
                 const { title: titleFromCategory } = category
-
                 const categoryTitle = titleFromCategory || 'Untitled category'
 
-                const isLast = index === categories.length - 1
-
                 return (
-                  <Fragment key={index}>
+                  <span
+                    key={index}
+                    className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
+                  >
                     {categoryTitle}
-                    {!isLast && <Fragment>, &nbsp;</Fragment>}
-                  </Fragment>
+                  </span>
                 )
               }
 
