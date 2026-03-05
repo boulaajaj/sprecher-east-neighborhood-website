@@ -16,7 +16,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
     twoThirds: '8',
   }
 
-  const isMultiColumn = columns && columns.length > 1 && columns[0]?.size !== 'full'
+  const isMultiColumn = (columns?.length ?? 0) > 1 && columns?.some((col) => col?.size !== 'full')
 
   return (
     <div className="container py-16 md:py-20">

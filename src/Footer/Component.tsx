@@ -14,7 +14,7 @@ export async function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="mt-auto bg-foreground text-white" data-theme="dark">
+    <footer className="mt-auto bg-background text-foreground" data-theme="dark">
       <div className="container py-14 md:py-16">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-12">
           {/* Brand column */}
@@ -22,14 +22,14 @@ export async function Footer() {
             <Link href="/" className="inline-block">
               <Logo className="text-2xl" />
             </Link>
-            <p className="max-w-xs text-sm leading-relaxed text-white/70">
+            <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
               Connecting neighbors on Madison&apos;s Far East Side.
             </p>
           </div>
 
           {/* Quick links column */}
           <div>
-            <h3 className="mb-5 text-xs font-bold tracking-widest text-white/50 uppercase">
+            <h3 className="mb-5 text-xs font-bold tracking-widest text-muted-foreground uppercase">
               Quick Links
             </h3>
             <nav className="flex flex-col gap-3">
@@ -38,7 +38,7 @@ export async function Footer() {
                   <CMSLink
                     key={i}
                     {...link}
-                    className="text-sm text-white/70 transition-colors hover:text-white"
+                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                   />
                 )
               })}
@@ -47,15 +47,15 @@ export async function Footer() {
 
           {/* Contact column */}
           <div>
-            <h3 className="mb-5 text-xs font-bold tracking-widest text-white/50 uppercase">
+            <h3 className="mb-5 text-xs font-bold tracking-widest text-muted-foreground uppercase">
               Get in Touch
             </h3>
-            <div className="space-y-2 text-sm text-white/70">
+            <div className="space-y-2 text-sm text-muted-foreground">
               <p>Sprecher East Neighborhood</p>
               <p>Madison, WI</p>
               <Link
                 href="/contact"
-                className="inline-block font-medium text-primary-light transition-colors hover:text-white"
+                className="inline-block font-medium text-primary transition-colors hover:text-foreground"
               >
                 Contact us
               </Link>
@@ -64,12 +64,12 @@ export async function Footer() {
         </div>
 
         {/* Disclaimer + copyright */}
-        <div className="mt-12 border-t border-white/10 pt-8">
-          <p className="mb-2 text-xs leading-relaxed text-white/50">
+        <div className="mt-12 border-t border-border pt-8">
+          <p className="mb-2 text-xs leading-relaxed text-muted-foreground">
             Sprecher East is an unofficial grassroots neighborhood initiative. This website was
             built with AI assistance.
           </p>
-          <p className="text-xs text-white/40">&copy; {currentYear} Sprecher East</p>
+          <p className="text-xs text-muted-foreground/70">&copy; {currentYear} Sprecher East</p>
         </div>
       </div>
     </footer>
