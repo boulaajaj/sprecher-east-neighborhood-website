@@ -33,3 +33,15 @@ export const formatDateShort = (timestamp: string): string => {
     timeZone: resolveTimezone(timestamp),
   })
 }
+
+export const formatDateBadge = (
+  timestamp: string,
+): { month: string; day: string } => {
+  const date = new Date(timestamp)
+  const tz = resolveTimezone(timestamp)
+
+  return {
+    month: date.toLocaleDateString('en-US', { month: 'short', timeZone: tz }),
+    day: date.toLocaleDateString('en-US', { day: 'numeric', timeZone: tz }),
+  }
+}
