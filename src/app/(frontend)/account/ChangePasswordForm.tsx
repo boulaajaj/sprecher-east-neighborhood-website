@@ -2,6 +2,7 @@
 
 import React, { useCallback, useState } from 'react'
 
+import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -58,24 +59,8 @@ export function ChangePasswordForm({ userId }: { userId: number }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
-        <div
-          role="alert"
-          aria-live="assertive"
-          className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
-        >
-          {error}
-        </div>
-      )}
-      {success && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="rounded-md border border-primary/30 bg-primary/10 p-3 text-sm text-primary"
-        >
-          Password updated successfully.
-        </div>
-      )}
+      {error && <Alert variant="error">{error}</Alert>}
+      {success && <Alert variant="success">Password updated successfully.</Alert>}
 
       <div className="space-y-1">
         <Label htmlFor="new-password">New Password</Label>

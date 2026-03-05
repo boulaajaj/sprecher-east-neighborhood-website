@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import React, { useCallback, useState } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import RichText from '@/components/RichText'
+import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 
@@ -127,13 +128,9 @@ export const FormBlock: React.FC<
             <p className="animate-pulse text-sm text-muted-foreground">Loading, please wait...</p>
           )}
           {error && (
-            <div
-              role="alert"
-              aria-live="assertive"
-              className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
-            >
+            <Alert variant="error">
               {error.message || 'Something went wrong. Please try again.'}
-            </div>
+            </Alert>
           )}
           {!hasSubmitted && (
             <form id={formID} onSubmit={handleSubmit(onSubmit)}>
