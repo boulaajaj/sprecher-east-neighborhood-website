@@ -98,16 +98,17 @@ Every UI/UX change **must** be visually verified at 6 viewports before committin
 
 **Test viewports (min + max of each breakpoint range):**
 
-| # | Name | Width | Represents |
-|---|------|-------|------------|
-| 1 | Mobile S | 320px | iPhone SE, smallest phones |
-| 2 | Mobile L | 430px | iPhone 15 Pro Max, large phones |
-| 3 | Tablet S | 768px | iPad Mini, small tablets |
-| 4 | Tablet L | 1024px | iPad Pro 11", large tablets |
-| 5 | Desktop S | 1280px | Laptops, small monitors |
-| 6 | Desktop L | 1920px | Full HD monitors |
+| #   | Name      | Width  | Represents                      |
+| --- | --------- | ------ | ------------------------------- |
+| 1   | Mobile S  | 320px  | iPhone SE, smallest phones      |
+| 2   | Mobile L  | 430px  | iPhone 15 Pro Max, large phones |
+| 3   | Tablet S  | 768px  | iPad Mini, small tablets        |
+| 4   | Tablet L  | 1024px | iPad Pro 11", large tablets     |
+| 5   | Desktop S | 1280px | Laptops, small monitors         |
+| 6   | Desktop L | 1920px | Full HD monitors                |
 
 **Tailwind breakpoints (for reference):**
+
 - `sm: 640px` — mobile → tablet transition
 - `md: 768px` — tablet starts
 - `lg: 1024px` — desktop starts
@@ -115,6 +116,7 @@ Every UI/UX change **must** be visually verified at 6 viewports before committin
 - `2xl: 1536px` — ultrawide
 
 **Responsive CSS rules:**
+
 - Mobile-first: base styles are for 320px, then layer `sm:`, `md:`, `lg:`, `xl:` overrides
 - Never hardcode pixel widths on content elements — use `max-w-*`, `w-full`, percentages, or grid/flex
 - Test text wrapping at 320px — long titles and descriptions must not overflow
@@ -124,6 +126,7 @@ Every UI/UX change **must** be visually verified at 6 viewports before committin
 - Use `container` class for consistent max-width with auto margins across breakpoints
 
 **Workflow:**
+
 1. Make the UI/UX change
 2. Start dev server if not running (`npm run dev`)
 3. Use Playwright MCP to screenshot affected pages at all 6 viewports

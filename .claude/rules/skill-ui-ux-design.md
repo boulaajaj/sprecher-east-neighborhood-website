@@ -18,6 +18,7 @@ Every page must have a clear visual hierarchy that guides the eye:
 4. **Tertiary elements** (metadata, captions, labels) — smaller, muted, but still legible
 
 **Rules:**
+
 - Headings must have enough size contrast with body text (at least 1.5x for h2, 2x for h1)
 - Never use more than 3 font sizes on a single screen view
 - Use font weight (not just size) to create hierarchy — `font-bold` for headings, `font-normal` for body, `font-light` sparingly
@@ -34,6 +35,7 @@ Consistent spacing creates visual rhythm. Use Tailwind's spacing scale exclusive
 - **Card padding**: `p-6 md:p-8` for card interiors
 
 **Rules:**
+
 - Never use arbitrary spacing values — stick to the Tailwind scale (4, 6, 8, 10, 12, 16, 20, 24)
 - Spacing between sections should be generous — white space is not wasted space, it's breathing room
 - Related elements have tighter spacing; unrelated elements have more separation
@@ -42,11 +44,13 @@ Consistent spacing creates visual rhythm. Use Tailwind's spacing scale exclusive
 ## Color and Contrast
 
 **WCAG AA minimum contrast ratios are mandatory:**
+
 - Normal text (< 18px): **4.5:1** contrast ratio against background
 - Large text (>= 18px bold or >= 24px): **3:1** contrast ratio
 - UI components and icons: **3:1** against adjacent colors
 
 **Rules:**
+
 - `text-foreground` on `bg-background` — primary readable combination
 - `text-muted-foreground` on `bg-background` — secondary text (verify contrast!)
 - `text-foreground` on `bg-surface` — cards and elevated surfaces
@@ -56,6 +60,7 @@ Consistent spacing creates visual rhythm. Use Tailwind's spacing scale exclusive
 - If text is invisible or hard to read in ANY theme, it's a critical bug — fix immediately
 
 **Testing contrast:**
+
 - Use the Playwright MCP to screenshot in both light (`data-theme="light"`) and dark (`data-theme="dark"`) modes
 - Visually inspect every text element against its background
 - When in doubt, increase contrast — readability always wins over subtlety
@@ -88,6 +93,7 @@ Three tiers of visual importance:
 3. **Tertiary/Ghost**: `text-primary font-semibold hover:underline`
 
 **Rules:**
+
 - Only one primary CTA per visible screen area
 - Buttons must have minimum touch target of 44x44px (WCAG 2.5.8)
 - Always include hover and focus states
@@ -104,22 +110,26 @@ Three tiers of visual importance:
 ## Section Patterns
 
 ### Hero Sections
+
 - Full-viewport or near-full (`min-h-[60vh]` to `min-h-[80vh]`)
 - Background image with dark gradient overlay (`from-foreground/70 via-foreground/50 to-transparent`)
 - White text on overlay for maximum contrast
 - Clear CTA buttons at the bottom of the hero content
 
 ### Feature/Stats Strips
+
 - Full-width colored background (`bg-primary` with white text)
 - 3-4 items in a horizontal row (responsive: stack on mobile)
 - Short, punchy text — numbers or 2-3 word labels
 
 ### Content Sections
+
 - Alternating backgrounds (`bg-background` and `bg-surface`) to create visual separation
 - Two-column layouts on desktop, single column on mobile
 - Each section has: eyebrow label, heading, body text, optional CTA
 
 ### CTA Banners
+
 - Full-width with `bg-primary` or gradient background
 - Centered text with 1-2 CTA buttons
 - Used between major sections to drive engagement
