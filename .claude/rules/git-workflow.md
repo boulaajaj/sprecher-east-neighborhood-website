@@ -68,13 +68,15 @@ Before creating a pull request, run these checks in order:
 
 ### Post-PR Review Polling
 
-After creating a PR, automatically poll for CI completion and review comments using gradual backoff:
+After any push to a PR branch (initial creation or review fixes), automatically poll for CI completion and review comments:
 
-1. **Start a background check** (`run_in_background`) that sleeps 10 minutes, then runs `gh pr checks <number>` and `gh api repos/.../pulls/<number>/reviews`
+1. **After every push**: start a background check (`run_in_background`) that sleeps **10 minutes**, then runs `gh pr checks <number>` and `gh api repos/.../pulls/<number>/reviews`
 2. **If CI + reviews are ready**: immediately start addressing review comments
-3. **If not ready**: start a 5-minute follow-up check
-4. **If still not ready**: start a final 2-minute check
+3. **If not ready and no new push happened**: start a **5-minute** follow-up check
+4. **If still not ready**: start a final **2-minute** check
 5. **If still not ready after 3 checks**: stop polling and wait for the user
+
+**Key rule: a push resets the clock.** CI restarts from scratch on every push, so the backoff (10→5→2) only applies within a single CI run. If review fixes are pushed between checks, restart from step 1 with a fresh 10-minute wait. Never use a shorter interval right after a push.
 
 This keeps the session context alive (diff, files, PR number) so review comments can be fixed immediately without re-reading. No external scheduling tools needed — use the built-in `run_in_background` bash parameter.
 
