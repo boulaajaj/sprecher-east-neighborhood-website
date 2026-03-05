@@ -1,6 +1,5 @@
 'use client'
-import { useHeaderTheme } from '@/providers/HeaderTheme'
-import React, { useEffect } from 'react'
+import React from 'react'
 
 import type { Page } from '@/payload-types'
 
@@ -9,12 +8,6 @@ import { Media } from '@/components/Media'
 import RichText from '@/components/RichText'
 
 export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText }) => {
-  const { setHeaderTheme } = useHeaderTheme()
-
-  useEffect(() => {
-    setHeaderTheme('dark')
-  }, [setHeaderTheme])
-
   return (
     <div
       className="relative -mt-[10.4rem] flex min-h-[85vh] items-center justify-center text-white"
@@ -44,7 +37,7 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
                       {...link}
                       className={
                         i === 0
-                          ? 'rounded-lg bg-primary px-8 py-3.5 text-base font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-primary-dark hover:shadow-xl'
+                          ? 'rounded-lg bg-primary px-8 py-3.5 text-base font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-xl'
                           : 'rounded-lg border-2 border-white/80 px-8 py-3.5 text-base font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:border-white hover:bg-white/10'
                       }
                     />
