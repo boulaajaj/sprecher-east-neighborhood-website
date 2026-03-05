@@ -66,6 +66,18 @@ Before creating a pull request, run these checks in order:
 5. Review the diff — if you can't explain the code, it doesn't ship
 6. Merge via PR (squash merge preferred for clean history)
 
+### Post-PR Review Polling
+
+After creating a PR, automatically poll for CI completion and review comments using gradual backoff:
+
+1. **Start a background check** (`run_in_background`) that sleeps 10 minutes, then runs `gh pr checks <number>` and `gh api repos/.../pulls/<number>/reviews`
+2. **If CI + reviews are ready**: immediately start addressing review comments
+3. **If not ready**: start a 5-minute follow-up check
+4. **If still not ready**: start a final 2-minute check
+5. **If still not ready after 3 checks**: stop polling and wait for the user
+
+This keeps the session context alive (diff, files, PR number) so review comments can be fixed immediately without re-reading. No external scheduling tools needed — use the built-in `run_in_background` bash parameter.
+
 ### Deploying to Production
 
 - Merging to `main` triggers the deploy workflow automatically
