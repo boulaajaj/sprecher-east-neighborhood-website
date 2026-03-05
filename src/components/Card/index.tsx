@@ -1,5 +1,5 @@
 'use client'
-import { cn } from '@/utilities/ui'
+import { cn, categoryPillClassName } from '@/utilities/ui'
 import useClickableCard from '@/utilities/useClickableCard'
 import Link from 'next/link'
 import React from 'react'
@@ -67,10 +67,7 @@ export const Card: React.FC<{
                 const categoryTitle = titleFromCategory || 'Untitled category'
 
                 return (
-                  <span
-                    key={index}
-                    className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
-                  >
+                  <span key={index} className={categoryPillClassName}>
                     {categoryTitle}
                   </span>
                 )

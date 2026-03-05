@@ -70,7 +70,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-1 md:flex">
-          <HeaderNav data={data} />
+          <HeaderNav data={data} pathname={pathname} />
           {authLoading ? (
             <div className="h-9 w-16 animate-pulse rounded-md bg-border" />
           ) : user ? (
@@ -117,7 +117,12 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
       {mobileOpen && (
         <div className="border-t border-border bg-background md:hidden">
           <div className="container flex flex-col gap-2 py-4">
-            <HeaderNav data={data} mobile onNavigate={() => setMobileOpen(false)} />
+            <HeaderNav
+              data={data}
+              pathname={pathname}
+              mobile
+              onNavigate={() => setMobileOpen(false)}
+            />
             {!authLoading && (
               <>
                 {user ? (
