@@ -10,16 +10,16 @@ Any diff that touches CSS, Tailwind classes, HTML structure, component markup, o
 
 ## Review Priority (Highest to Lowest)
 
-| Priority | Category | Impact | What to check |
-|----------|----------|--------|---------------|
-| 1 | **Contrast & Readability** | CRITICAL | Text legible on all backgrounds? Both themes? WCAG 4.5:1 minimum? |
-| 2 | **Image Treatment** | CRITICAL | Overlays subtle? Image stays vivid? Text readable via shadow/vignette, not heavy gradients? |
-| 3 | **Section Transitions** | HIGH | Sections flow naturally? No harsh color boundaries? Short, soft feathers only? |
-| 4 | **Spacing & Rhythm** | HIGH | Consistent spacing scale? Generous whitespace? Related items grouped, sections separated? |
-| 5 | **Typography Hierarchy** | HIGH | Clear size/weight contrast? Max 3 font sizes per view? Line length under 75ch? |
-| 6 | **Color Harmony** | MEDIUM | Using design tokens, not hardcoded colors? Palette feels cohesive? |
-| 7 | **Component Polish** | MEDIUM | Consistent border-radius? Hover/focus states? Shadow depth makes sense? |
-| 8 | **Animation & Motion** | LOW | Transitions 150-300ms? No janky layout shifts? Respects prefers-reduced-motion? |
+| Priority | Category                   | Impact   | What to check                                                                               |
+| -------- | -------------------------- | -------- | ------------------------------------------------------------------------------------------- |
+| 1        | **Contrast & Readability** | CRITICAL | Text legible on all backgrounds? Both themes? WCAG 4.5:1 minimum?                           |
+| 2        | **Image Treatment**        | CRITICAL | Overlays subtle? Image stays vivid? Text readable via shadow/vignette, not heavy gradients? |
+| 3        | **Section Transitions**    | HIGH     | Sections flow naturally? No harsh color boundaries? Short, soft feathers only?              |
+| 4        | **Spacing & Rhythm**       | HIGH     | Consistent spacing scale? Generous whitespace? Related items grouped, sections separated?   |
+| 5        | **Typography Hierarchy**   | HIGH     | Clear size/weight contrast? Max 3 font sizes per view? Line length under 75ch?              |
+| 6        | **Color Harmony**          | MEDIUM   | Using design tokens, not hardcoded colors? Palette feels cohesive?                          |
+| 7        | **Component Polish**       | MEDIUM   | Consistent border-radius? Hover/focus states? Shadow depth makes sense?                     |
+| 8        | **Animation & Motion**     | LOW      | Transitions 150-300ms? No janky layout shifts? Respects prefers-reduced-motion?             |
 
 ## Image & Hero Treatment Rules
 
@@ -69,13 +69,13 @@ These are the most common source of "looks cheap" feedback. Follow strictly:
 
 **ALWAYS use design tokens.** Never hardcode colors, even in inline styles.
 
-| Instead of | Use |
-|------------|-----|
+| Instead of                    | Use                                                    |
+| ----------------------------- | ------------------------------------------------------ |
 | `rgba(0,0,0,0.5)` in overlays | Acceptable only for image scrims (no token equivalent) |
-| `#3d7a5e` | `bg-primary` / `text-primary` |
-| `#f9f8f5` | `bg-background` |
-| `gray-500` | `text-muted-foreground` |
-| `border-gray-200` | `border-border` |
+| `#3d7a5e`                     | `bg-primary` / `text-primary`                          |
+| `#f9f8f5`                     | `bg-background`                                        |
+| `gray-500`                    | `text-muted-foreground`                                |
+| `border-gray-200`             | `border-border`                                        |
 
 ## The "First Impression" Test
 
@@ -91,14 +91,14 @@ For every UI change, ask these questions. If any answer is "no", fix it before p
 
 Screenshot every affected page at all 6 viewports. This is non-negotiable for UI changes.
 
-| # | Name | Width | Check for |
-|---|------|-------|-----------|
-| 1 | Mobile S | 320px | Text wrapping, touch targets 44px+, no horizontal scroll |
-| 2 | Mobile L | 430px | Image aspect ratios, card layouts, button spacing |
-| 3 | Tablet S | 768px | Grid transitions (1-col to 2-col), nav breakpoint |
-| 4 | Tablet L | 1024px | Content width, sidebar layouts, image sizing |
-| 5 | Desktop S | 1280px | Full nav visible, max-width constraints, spacing balance |
-| 6 | Desktop L | 1920px | Content not stretched, comfortable reading width, alignment |
+| #   | Name      | Width  | Check for                                                   |
+| --- | --------- | ------ | ----------------------------------------------------------- |
+| 1   | Mobile S  | 320px  | Text wrapping, touch targets 44px+, no horizontal scroll    |
+| 2   | Mobile L  | 430px  | Image aspect ratios, card layouts, button spacing           |
+| 3   | Tablet S  | 768px  | Grid transitions (1-col to 2-col), nav breakpoint           |
+| 4   | Tablet L  | 1024px | Content width, sidebar layouts, image sizing                |
+| 5   | Desktop S | 1280px | Full nav visible, max-width constraints, spacing balance    |
+| 6   | Desktop L | 1920px | Content not stretched, comfortable reading width, alignment |
 
 ## Anti-Patterns Checklist
 
