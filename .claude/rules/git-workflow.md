@@ -66,7 +66,7 @@ Before creating a pull request, run these checks in order:
 
 ### After Review Comments
 
-Once CI passes and reviewers submit comments (see Post-PR Review Polling below):
+Once all review comments have been addressed, fixes pushed, and CI passes again:
 
 1. **Resolve all review comments on GitHub**: For each reviewer comment, reply on the PR thread explaining what was fixed and why the suggestion was adopted (or why it was declined). This gives the project owner visibility and signals to automated reviewers that the comment was addressed. Never leave comments unresolved.
 2. Review the diff — if you can't explain the code, it doesn't ship
