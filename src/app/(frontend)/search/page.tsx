@@ -72,10 +72,12 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
         </div>
       </div>
 
-      {posts.totalDocs > 0 ? (
+      {posts.docs && posts.docs.length > 0 ? (
         <CollectionArchive posts={posts.docs as CardPostData[]} />
       ) : (
-        <div className="container">No results found.</div>
+        <div className="container py-12 text-center">
+          <p className="text-muted-foreground">No results found.</p>
+        </div>
       )}
     </div>
   )
@@ -84,5 +86,6 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
 export function generateMetadata(): Metadata {
   return {
     title: 'Search',
+    description: 'Search the Sprecher East website for news, events, and resources.',
   }
 }

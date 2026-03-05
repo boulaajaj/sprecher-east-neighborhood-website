@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import React, { useCallback, useState } from 'react'
 
+import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -45,15 +46,7 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
-        <div
-          role="alert"
-          aria-live="assertive"
-          className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
-        >
-          {error}
-        </div>
-      )}
+      {error && <Alert variant="error">{error}</Alert>}
 
       <div className="space-y-1">
         <Label htmlFor="email">Email</Label>
@@ -63,7 +56,10 @@ export function LoginForm() {
           required
           autoComplete="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value)
+            if (error) setError('')
+          }}
           placeholder="you@example.com"
         />
       </div>
@@ -76,7 +72,10 @@ export function LoginForm() {
           required
           autoComplete="current-password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => {
+            setPassword(e.target.value)
+            if (error) setError('')
+          }}
         />
       </div>
 

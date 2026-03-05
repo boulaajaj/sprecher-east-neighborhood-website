@@ -7,6 +7,7 @@ import RichText from '@/components/RichText'
 import { JsonLd } from '@/components/JsonLd'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { lexicalToPlainText } from '@/utilities/lexicalToPlainText'
+import { ChevronDown } from 'lucide-react'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
@@ -82,9 +83,7 @@ export default async function FAQPage() {
                     <summary className="cursor-pointer list-none font-medium">
                       <span className="flex items-center justify-between">
                         {faq.question}
-                        <span className="ml-2 text-muted-foreground transition-transform group-open:rotate-180">
-                          ▾
-                        </span>
+                        <ChevronDown className="ml-2 h-4 w-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
                       </span>
                     </summary>
                     <div className="mt-4 border-t border-border pt-4">
