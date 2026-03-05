@@ -37,26 +37,30 @@ export const Card: React.FC<{
   return (
     <article
       className={cn(
-        'overflow-hidden rounded-lg border border-border bg-card transition-shadow hover:cursor-pointer hover:shadow-md',
+        'group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:cursor-pointer hover:shadow-lg',
         className,
       )}
       ref={card.ref}
     >
-      <div className="relative w-full">
+      <div className="relative w-full overflow-hidden">
         {!metaImage && (
-          <div className="flex aspect-video w-full items-center justify-center bg-surface">
-            <ImageIcon className="h-8 w-8 text-muted-foreground/50" />
+          <div className="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-surface to-primary/5">
+            <ImageIcon className="h-10 w-10 text-muted-foreground/30" />
           </div>
         )}
         {metaImage && typeof metaImage !== 'string' && (
           <div className="aspect-video overflow-hidden">
-            <Media resource={metaImage} size="33vw" imgClassName="h-full w-full object-cover" />
+            <Media
+              resource={metaImage}
+              size="33vw"
+              imgClassName="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
           </div>
         )}
       </div>
-      <div className="p-4">
+      <div className="p-5 md:p-6">
         {showCategories && hasCategories && (
-          <div className="mb-3 text-xs font-semibold tracking-wider text-primary uppercase">
+          <div className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">
             {categories?.map((category, index) => {
               if (typeof category === 'object') {
                 const { title: titleFromCategory } = category
@@ -78,14 +82,16 @@ export const Card: React.FC<{
           </div>
         )}
         {titleToUse && (
-          <h3 className="text-lg font-semibold text-foreground">
-            <Link className="hover:text-primary" href={href} ref={link.ref}>
+          <h3 className="text-lg leading-snug font-semibold text-foreground">
+            <Link className="transition-colors hover:text-primary" href={href} ref={link.ref}>
               {titleToUse}
             </Link>
           </h3>
         )}
         {description && (
-          <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{sanitizedDescription}</p>
+          <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+            {sanitizedDescription}
+          </p>
         )}
       </div>
     </article>
