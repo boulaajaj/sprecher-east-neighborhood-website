@@ -3,6 +3,7 @@ import React from 'react'
 import type { Event } from '@/payload-types'
 
 import { Media } from '@/components/Media'
+import { categoryPillClassName } from '@/utilities/ui'
 import { formatDateTime } from '@/utilities/formatDateTime'
 import { getCategoryLabel } from '@/utilities/eventCategories'
 
@@ -73,9 +74,7 @@ export const EventHero: React.FC<{
     <div className="container pt-32 pb-10">
       <div className="max-w-3xl">
         {category && (
-          <span className="mb-4 inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-            {getCategoryLabel(category)}
-          </span>
+          <span className={`mb-4 ${categoryPillClassName}`}>{getCategoryLabel(category)}</span>
         )}
 
         <h1 className="mb-6 text-4xl font-bold md:text-5xl">{title}</h1>

@@ -70,7 +70,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-1 md:flex">
-          <HeaderNav data={data} />
+          <HeaderNav data={data} pathname={pathname} />
           {authLoading ? (
             <div className="h-9 w-16 animate-pulse rounded-md bg-border" />
           ) : user ? (
@@ -95,7 +95,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
           )}
           <Link
             href="/contact"
-            className="ml-3 inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-dark"
+            className="ml-3 inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
           >
             Contact
           </Link>
@@ -117,7 +117,12 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
       {mobileOpen && (
         <div className="border-t border-border bg-background md:hidden">
           <div className="container flex flex-col gap-2 py-4">
-            <HeaderNav data={data} mobile onNavigate={() => setMobileOpen(false)} />
+            <HeaderNav
+              data={data}
+              pathname={pathname}
+              mobile
+              onNavigate={() => setMobileOpen(false)}
+            />
             {!authLoading && (
               <>
                 {user ? (
@@ -155,7 +160,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
             <Link
               href="/contact"
               onClick={() => setMobileOpen(false)}
-              className="mt-2 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-dark"
+              className="mt-2 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
             >
               Contact
             </Link>

@@ -5,6 +5,7 @@ import { MapPin, Clock, Calendar } from 'lucide-react'
 import type { Event } from '@/payload-types'
 
 import { Media } from '@/components/Media'
+import { categoryPillClassName } from '@/utilities/ui'
 import { formatDateShort, formatDateBadge } from '@/utilities/formatDateTime'
 import { getCategoryLabel } from '@/utilities/eventCategories'
 
@@ -127,11 +128,7 @@ export const EventCard: React.FC<{
         )}
 
         {/* Category pill */}
-        {category && (
-          <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-            {getCategoryLabel(category)}
-          </span>
-        )}
+        {category && <span className={categoryPillClassName}>{getCategoryLabel(category)}</span>}
       </div>
     </Link>
   )

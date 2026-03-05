@@ -10,3 +10,6 @@ import { twMerge } from 'tailwind-merge'
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
+
+export const categoryPillClassName =
+  'inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary'
