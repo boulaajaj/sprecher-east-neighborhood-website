@@ -94,7 +94,7 @@ The site timezone is configured via `SITE_TIMEZONE` env var (default: `America/C
 
 ## Responsive Design — 6-Viewport Testing
 
-Every UI/UX change **must** be visually verified at 6 viewports before committing. Use the Playwright MCP server to screenshot affected pages.
+Changes that affect rendering (CSS, Tailwind classes, HTML structure, component markup) **must** be visually verified at 6 viewports before committing. Use the Playwright MCP server to screenshot affected pages. Skip for backend-only, config-only, or docs-only changes.
 
 **Test viewports (min + max of each breakpoint range):**
 
