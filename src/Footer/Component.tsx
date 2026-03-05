@@ -14,7 +14,7 @@ export async function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="mt-auto bg-background text-foreground" data-theme="dark">
+    <footer className="mt-auto border-t border-border bg-surface" data-theme="dark">
       <div className="container py-14 md:py-16">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-12">
           {/* Brand column */}

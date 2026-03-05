@@ -33,7 +33,12 @@ export const Events: CollectionConfig<'events'> = {
     title: true,
     slug: true,
     date: true,
+    timeStart: true,
+    timeEnd: true,
     category: true,
+    description: true,
+    locationName: true,
+    heroImage: true,
     meta: {
       title: true,
       description: true,

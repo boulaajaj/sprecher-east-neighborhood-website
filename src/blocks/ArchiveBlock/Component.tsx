@@ -53,11 +53,11 @@ export const ArchiveBlock: React.FC<
   }
 
   return (
-    <div className="bg-surface py-16 md:py-20" id={`block-${id}`}>
+    <div className="border-y border-border bg-surface py-16 md:py-20" id={`block-${id}`}>
       {introContent && (
         <div className="container mb-12">
           <RichText
-            className="ms-0 max-w-[48rem] [&_h3]:text-2xl [&_h3]:font-bold [&_h3]:text-foreground md:[&_h3]:text-3xl"
+            className="ms-0 max-w-[48rem] [&_h3]:text-2xl [&_h3]:font-bold [&_h3]:text-foreground md:[&_h3]:text-3xl [&_p]:text-muted-foreground"
             data={introContent}
             enableGutter={false}
           />
