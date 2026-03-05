@@ -20,6 +20,7 @@ function resolveHref(link: NonNullable<HeaderType['navItems']>[number]['link']):
 
 function normalizePath(value: string): string {
   const [pathOnly] = value.split(/[?#]/)
+  if (!pathOnly) return ''
   if (pathOnly === '/') return '/'
   return pathOnly.replace(/\/+$/, '')
 }
@@ -27,6 +28,7 @@ function normalizePath(value: string): string {
 function isActivePath(pathname: string, href: string): boolean {
   const current = normalizePath(pathname)
   const target = normalizePath(href)
+  if (!target || !target.startsWith('/')) return false
   return current === target || (target !== '/' && current.startsWith(target + '/'))
 }
 
