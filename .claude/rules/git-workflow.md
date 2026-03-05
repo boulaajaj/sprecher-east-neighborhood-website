@@ -63,8 +63,9 @@ Before creating a pull request, run these checks in order:
    - **Asana link**: `Asana: https://app.asana.com/0/0/<task_gid>/f` — on its own line, required if the work relates to an Asana task. This is parsed by `/wrapped` to auto-complete tasks.
    - **Test plan**: How to verify the changes work
 4. Wait for CI checks (type-check, build, CodeQL) to pass
-5. Review the diff — if you can't explain the code, it doesn't ship
-6. Merge via PR (squash merge preferred for clean history)
+5. **Resolve all review comments on GitHub**: For each reviewer comment, reply on the PR thread explaining what was fixed and why the suggestion was adopted (or why it was declined). This gives the project owner visibility and signals to automated reviewers that the comment was addressed. Never leave comments unresolved.
+6. Review the diff — if you can't explain the code, it doesn't ship
+7. **Hand off to Amine for merge** — the agent does not merge PRs. The project owner reviews and merges to maintain visibility into what goes to production. (Squash merge preferred for clean history.)
 
 ### Post-PR Review Polling
 
