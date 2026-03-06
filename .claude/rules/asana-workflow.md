@@ -70,6 +70,13 @@ curl -s -X PUT -H "Authorization: Bearer $ASANA_PAT" \
 # List tasks in a project
 curl -s -H "Authorization: Bearer $ASANA_PAT" \
   "https://app.asana.com/api/1.0/projects/{project_gid}/tasks?opt_fields=name,completed,assignee.name,due_on"
+
+# Create a new task in a project
+echo '{"data":{"name":"[C-Builder] Bug: Your task name","projects":["'"$ASANA_PROJECT_GID"'"],"notes":"Task description"}}' > /tmp/asana_create.json
+curl -s -X POST -H "Authorization: Bearer $ASANA_PAT" \
+  -H "Content-Type: application/json" \
+  -d @/tmp/asana_create.json \
+  "https://app.asana.com/api/1.0/tasks"
 ```
 
 Key GIDs (set as user env vars — see onboarding docs in strategy repo):
@@ -103,13 +110,13 @@ The agent judges the category based on context — no need to ask the user which
 
 **Create a task if** the work:
 
-- Will produce a commit (code, config, skill, or docs change)
+- Will produce a non-trivial commit (code, config, skill, or docs change)
 - Changes how agents work (skills, rules, workflows)
 - Fixes something a user would notice
 
-**Skip task creation for:**
+**Skip task creation for** (these take precedence over the rules above):
 
-- Typo fixes and formatting-only changes
+- Typo fixes and formatting-only changes (even though they produce commits)
 - Changes already covered by an existing open task (add a comment to that task instead)
 - Trivial one-line fixes within the scope of a larger in-progress task
 
@@ -128,10 +135,11 @@ If a session produces multiple fixes, create multiple tasks and multiple PRs.
 1. Work comes in (user request, bug report, review finding)
 2. Judge the category based on context
 3. Create Asana task in the current sprint section
-4. Create a branch and start working
+4. Create a branch
 5. Comment on the task with branch name
-6. Link PR when created
-7. Complete the task when the PR merges to main
+6. Start working
+7. Link PR when created
+8. Complete the task when the PR merges to main (for Spike tasks that don't produce a PR, complete when the investigation is done — link any output such as a decision comment or research summary instead)
 
 ## Post-Merge Checklist (`/wrapped`)
 
