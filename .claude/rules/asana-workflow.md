@@ -71,8 +71,8 @@ curl -s -X PUT -H "Authorization: Bearer $ASANA_PAT" \
 curl -s -H "Authorization: Bearer $ASANA_PAT" \
   "https://app.asana.com/api/1.0/projects/{project_gid}/tasks?opt_fields=name,completed,assignee.name,due_on"
 
-# Create a new task in a project
-echo '{"data":{"name":"[C-Builder] Bug: Your task name","projects":["'"$ASANA_PROJECT_GID"'"],"notes":"Task description"}}' > /tmp/asana_create.json
+# Create a new task in a project (use memberships to place in a sprint section)
+echo '{"data":{"name":"[C-Builder] Bug: Your task name","memberships":[{"project":"'"$ASANA_PROJECT_GID"'","section":"<sprint_section_gid>"}],"notes":"Task description"}}' > /tmp/asana_create.json
 curl -s -X POST -H "Authorization: Bearer $ASANA_PAT" \
   -H "Content-Type: application/json" \
   -d @/tmp/asana_create.json \
@@ -122,13 +122,13 @@ The agent judges the category based on context — no need to ask the user which
 
 ### One Task = One PR
 
-Every task maps to exactly one PR. Don't bundle unrelated changes into one PR even if they feel related. This ensures:
+Every task that produces code changes maps to exactly one PR. Don't bundle unrelated changes into one PR even if they feel related. This ensures:
 
 - Clean Asana ↔ PR traceability
 - Easier code review (smaller, focused diffs)
 - Simpler rollback if something breaks
 
-If a session produces multiple fixes, create multiple tasks and multiple PRs.
+If a session produces multiple fixes, create multiple tasks and multiple PRs. Spike tasks are the exception — they may complete without a PR when the output is research notes or a decision record.
 
 ### Workflow
 
