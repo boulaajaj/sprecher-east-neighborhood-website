@@ -79,7 +79,7 @@ Consistent spacing creates visual rhythm. Use Tailwind's spacing scale exclusive
 
 **When centering works** (short, punchy, symmetrical):
 
-- Hero headlines (1-2 lines max)
+- Hero headlines (single sentence, under ~10 words)
 - CTA banners with a single sentence + buttons
 - Stat numbers and their labels
 - Footer taglines
