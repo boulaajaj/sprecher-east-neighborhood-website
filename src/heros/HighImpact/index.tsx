@@ -50,8 +50,8 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
           </div>
         </div>
       </div>
-      {/* Subtle bottom feather — short, soft edge into page background */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-16 bg-gradient-to-b from-transparent via-background/80 to-background" />
+      {/* Gradual bottom fade — tall multi-layer gradient for seamless transition into page */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-48 bg-gradient-to-b from-transparent via-background/20 to-background" />
     </div>
   )
 }

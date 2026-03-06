@@ -35,8 +35,8 @@ These are the most common source of "looks cheap" feedback. Follow strictly:
 ### DON'T (Amateur Tells)
 
 - **Full-screen linear gradient** overlays (e.g., `from-black/80 via-black/50 to-black/30`) — kills the image, looks like a dark filter was dragged across it
-- **100% blend into background** — the image should END with a crisp-ish edge, not dissolve completely into the page color
-- **Tall gradient washes** (h-40, h-64) — makes the bottom of the hero look like a faded printout
+- **Abrupt short feathers** (h-12, h-16) — creates a visible hard line where the gradient stops, drawing attention to the transition instead of hiding it
+- **High-opacity via stops** (via-background/80) — makes the gradient curve too steep, looking like a band rather than a fade
 - **Heavy uniform darkening** — if the whole image is dimmed equally, you've lost the photography
 
 ### The Correct Pattern
@@ -55,13 +55,13 @@ These are the most common source of "looks cheap" feedback. Follow strictly:
 <h1 className="drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">...</h1>
 <p className="drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)]">...</p>
 
-{/* Subtle bottom feather — short, partial opacity */}
-<div className="h-16 bg-gradient-to-b from-transparent to-background/80" />
+{/* Gradual bottom fade — tall with low-opacity midpoint for exponential curve */}
+<div className="h-48 bg-gradient-to-b from-transparent via-background/20 to-background" />
 ```
 
 ## Section Transition Rules
 
-- **Between hero and content**: Short feather (h-12 to h-16), partial opacity (60-80%). Never full opacity.
+- **Between hero and content**: Tall gradual feather (h-48) with a low-opacity via stop (via-background/20) for an exponential fade curve. The transition should be invisible — if you can point to where it starts, it's too abrupt.
 - **Between content sections**: Use alternating `bg-background` and `bg-surface` for visual separation. No gradients between sections.
 - **Before footer**: A simple `border-t border-border` is usually enough. No gradient needed.
 
@@ -106,7 +106,7 @@ Flag any of these as bugs requiring immediate fix:
 
 - [ ] Text invisible or hard to read in either theme
 - [ ] Gradient overlay that dims the entire hero image uniformly
-- [ ] Bottom gradient taller than 4rem or at 100% opacity
+- [ ] Visible hard line where a gradient starts or stops (feather too short or via-stop too opaque)
 - [ ] Hardcoded hex colors instead of design tokens
 - [ ] Horizontal scrollbar at any viewport
 - [ ] Touch target smaller than 44x44px on mobile
