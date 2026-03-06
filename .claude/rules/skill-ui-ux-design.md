@@ -73,6 +73,36 @@ Consistent spacing creates visual rhythm. Use Tailwind's spacing scale exclusive
 - **Max line width**: `max-w-prose` (65ch) for long-form text — lines longer than 75 characters are hard to read
 - **Letter spacing**: Default for body, `tracking-tight` for large headings, `tracking-widest` for eyebrow labels
 
+## Text Alignment and Layout Balance
+
+**Default to left-aligned text for content sections.** Centering paragraph text is the hallmark of amateur design — it signals "I didn't know what else to do." Professional layouts create visual interest through asymmetry and intentional weight distribution.
+
+**When centering works** (short, punchy, symmetrical):
+
+- Hero headlines (single sentence, under ~10 words)
+- CTA banners with a single sentence + buttons
+- Stat numbers and their labels
+- Footer taglines
+- Empty states and loading messages
+
+**When centering looks cheap** (never do this):
+
+- Multi-paragraph content sections (About, descriptions, body copy)
+- Card grids or lists
+- Navigation menus
+- Form layouts
+- Long-form body copy (multi-sentence or multi-paragraph text blocks)
+
+**What to do instead of centering content sections:**
+
+- Left-align the text with `max-w-prose` for comfortable reading width
+- Add visual weight to the right side: an image, illustration, or CTA card
+- Use the natural left-to-right reading flow — the eye starts left, so put content there
+- Let whitespace on the right breathe rather than forcing symmetry
+- For two-element layouts: text left (60-65% width), visual element right (35-40% width)
+
+The goal is **visual balance**, not visual symmetry. A left-aligned text block with a photo on the right is more engaging than the same text centered with nothing around it.
+
 ## Card Design
 
 Cards are the primary content container pattern:
@@ -181,3 +211,4 @@ Three tiers of visual importance:
 - Raw unstyled HTML elements (links without hover states, inputs without focus styles)
 - Content that requires horizontal scrolling
 - Orphaned single words on their own line in headings (use `text-balance` or `text-pretty`)
+- Centered multi-paragraph text blocks — left-align body content, center only short headlines and CTAs
