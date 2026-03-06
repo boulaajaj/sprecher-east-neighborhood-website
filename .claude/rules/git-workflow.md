@@ -48,7 +48,7 @@ Role tags match the consolidated skill profiles:
 
 Before creating a pull request, run these checks in order:
 
-1. **`/simplify` (Claude Code skill)** — runs 4 parallel review agents (code reuse, code quality, efficiency, **visual design**) on the diff. The visual design agent screenshots affected pages at all 6 viewports and reviews against `.claude/rules/skill-visual-design-review.md`. Fix all findings before proceeding.
+1. **`/simplify` (Claude Code skill)** — runs 4 parallel review agents (code reuse, code quality, efficiency, **visual design**) on the diff. For diffs touching CSS, Tailwind, HTML structure, component markup, or images, the visual design agent invokes the `/visual-design-review` skill — screenshots affected pages at multiple viewports and themes, produces critique + fix strategies + implementation tasks anchored to the project's brand. Fix all Critical and High findings before proceeding.
 2. **Type-check**: `npx tsc --noEmit` — must pass with zero errors
 3. **Lint & format**: `npx lint-staged --no-stash` — or run `npx eslint . && npx prettier --check .` manually
 
@@ -61,7 +61,7 @@ Before creating a pull request, run these checks in order:
    - **Role**: Which agent profile made the changes (e.g., `[C-Builder]`)
    - **Asana link**: `Asana: https://app.asana.com/0/0/<task_gid>/f` — on its own line, required if the work relates to an Asana task. This is parsed by `/wrapped` to auto-complete tasks.
    - **Test plan**: How to verify the changes work
-4. Wait for CI checks (type-check, build, CodeQL) to pass
+4. **Immediately start Post-PR Review Polling** (see section below) — do not wait for the user to remind you. This is mandatory after every push to a PR branch.
 
 ### After Review Comments
 
@@ -77,11 +77,11 @@ After any push to a PR branch, poll for CI completion and review comments. **Do 
 
 **Phase 1 — Wait for CI (read-only, no pushes):**
 
-1. Start a background check (`run_in_background`) that sleeps **10 minutes**, then runs `gh pr checks <number>` and `gh api repos/.../pulls/<number>/reviews`
+1. Start a background check (`run_in_background`) that sleeps **1 minute**, then runs `gh pr checks <number>` and `gh api repos/.../pulls/<number>/reviews`
 2. If CI + reviews are ready → go to Phase 2
-3. If not ready → sleep **5 minutes**, check again
-4. Repeat 5-minute checks up to **30 minutes total** (10 + 5 + 5 + 5 + 5 = 30 min, 5 checks max)
-5. If CI is still not done after 30 minutes → **stop polling and alert the user** — something is critically wrong with the build
+3. If not ready → sleep **1 minute**, check again
+4. Repeat 1-minute checks up to **15 minutes total** (15 checks max)
+5. If CI is still not done after 15 minutes → **stop polling and alert the user** — something is critically wrong with the build
 
 **Phase 2 — Act on results:**
 
@@ -94,8 +94,8 @@ After any push to a PR branch, poll for CI completion and review comments. **Do 
 **Rules:**
 
 - **Never push during Phase 1** — wait for CI to finish before making changes
-- **A push always restarts Phase 1** from the beginning (fresh 30-minute window)
-- **30-minute hard cap** per CI run — if exceeded, escalate to user
+- **A push always restarts Phase 1** from the beginning (fresh 15-minute window)
+- **15-minute hard cap** per CI run — if exceeded, escalate to user
 - Use `run_in_background` bash parameter — no external scheduling needed
 - This keeps session context alive (diff, files, PR number) so review comments can be fixed immediately
 

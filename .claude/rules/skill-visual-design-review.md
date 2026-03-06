@@ -1,118 +1,44 @@
 # Visual Design Review
 
-Mandatory design review for all UI/UX changes. This review runs as part of `/simplify` and catches visual quality issues before they reach the user.
-
-**Inspired by**: community UI/UX review patterns, [awesome-design-systems](https://github.com/alexpate/awesome-design-systems) QA patterns, and Vercel v0's design-token-first approach.
+Mandatory design review for all UI/UX changes. This rule ensures the `/visual-design-review` skill is invoked before any frontend PR.
 
 ## When This Applies
 
 Any diff that touches CSS, Tailwind classes, HTML structure, component markup, or image treatment. Skip for backend-only, config-only, or docs-only changes.
 
+## How It Works
+
+The visual design review skill at `~/.claude/skills/visual-design-review/SKILL.md` acts as a design director. It:
+
+1. Screenshots affected pages at 5 viewports (320, 768, 1024, 1280, 1920) in both light and dark themes
+2. Evaluates visual quality using principle-based taste (Apple/Linear/Stripe caliber)
+3. Produces findings with severity, design specs, and **fix strategies anchored to the project's brand**
+4. Outputs a grouped **Implementation Plan** with tasks, affected files, design tokens, effort estimates
+5. Recommends patterns to codify in the design system
+
+## What It Does NOT Do
+
+- Read source code (.tsx, .jsx files) — it reviews visuals only
+- Prescribe specific CSS classes or Tailwind values — it speaks in design language
+- Redesign the site — it evolves the existing design within brand rails
+
 ## Review Priority (Highest to Lowest)
 
-| Priority | Category                   | Impact   | What to check                                                                               |
-| -------- | -------------------------- | -------- | ------------------------------------------------------------------------------------------- |
-| 1        | **Contrast & Readability** | CRITICAL | Text legible on all backgrounds? Both themes? WCAG 4.5:1 minimum?                           |
-| 2        | **Image Treatment**        | CRITICAL | Overlays subtle? Image stays vivid? Text readable via shadow/vignette, not heavy gradients? |
-| 3        | **Section Transitions**    | HIGH     | Sections flow naturally? No harsh color boundaries? Short, soft feathers only?              |
-| 4        | **Spacing & Rhythm**       | HIGH     | Consistent spacing scale? Generous whitespace? Related items grouped, sections separated?   |
-| 5        | **Typography Hierarchy**   | HIGH     | Clear size/weight contrast? Max 3 font sizes per view? Line length under 75ch?              |
-| 6        | **Color Harmony**          | MEDIUM   | Using design tokens, not hardcoded colors? Palette feels cohesive?                          |
-| 7        | **Component Polish**       | MEDIUM   | Consistent border-radius? Hover/focus states? Shadow depth makes sense?                     |
-| 8        | **Animation & Motion**     | LOW      | Transitions 150-300ms? No janky layout shifts? Respects prefers-reduced-motion?             |
-
-## Image & Hero Treatment Rules
-
-These are the most common source of "looks cheap" feedback. Follow strictly:
-
-### DO (Professional Techniques)
-
-- **Radial vignette** behind text — darkens only the area where text lives, keeps the rest of the image vivid and bright
-- **Per-character text shadows** (`drop-shadow`) — creates a "fog" halo around each letter, readable on any background
-- **Short bottom feather** (max 4rem, max 80% opacity) — a subtle softening at the section edge, not a full blend
-- **Let the image breathe** — the photo is the hero; overlays should be invisible until you look for them
-
-### DON'T (Amateur Tells)
-
-- **Full-screen linear gradient** overlays (e.g., `from-black/80 via-black/50 to-black/30`) — kills the image, looks like a dark filter was dragged across it
-- **Abrupt short feathers** (h-12, h-16) — creates a visible hard line where the gradient stops, drawing attention to the transition instead of hiding it
-- **High-opacity via stops** (via-background/80) — makes the gradient curve too steep, looking like a band rather than a fade
-- **Heavy uniform darkening** — if the whole image is dimmed equally, you've lost the photography
-
-### The Correct Pattern
-
-```tsx
-{/* Centered radial vignette — darkens behind text area only */}
-<div
-  className="pointer-events-none absolute inset-0"
-  style={{
-    background:
-      'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 60%, transparent 100%)',
-  }}
-/>
-
-{/* Text with per-character shadow for universal readability */}
-<h1 className="drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">...</h1>
-<p className="drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)]">...</p>
-
-{/* Gradual bottom fade — tall with low-opacity midpoint for exponential curve */}
-<div className="h-48 bg-gradient-to-b from-transparent via-background/20 to-background" />
-```
-
-## Section Transition Rules
-
-- **Between hero and content**: Tall gradual feather (h-48) with a low-opacity via stop (via-background/20) for an exponential fade curve. The transition should be invisible — if you can point to where it starts, it's too abrupt.
-- **Between content sections**: Use alternating `bg-background` and `bg-surface` for visual separation. No gradients between sections.
-- **Before footer**: A simple `border-t border-border` is usually enough. No gradient needed.
+| Priority | Category               | Impact   |
+| -------- | ---------------------- | -------- |
+| 1        | Contrast & Readability | CRITICAL |
+| 2        | Image Treatment        | CRITICAL |
+| 3        | Section Transitions    | HIGH     |
+| 4        | Spacing & Rhythm       | HIGH     |
+| 5        | Typography Hierarchy   | HIGH     |
+| 6        | Color Harmony          | MEDIUM   |
+| 7        | Component Polish       | MEDIUM   |
+| 8        | Animation & Motion     | LOW      |
 
 ## Design Token Discipline
 
-**ALWAYS use design tokens.** Never hardcode colors, even in inline styles.
+Always use design tokens from `globals.css @theme {}`. Never hardcode colors. The skill enforces this in its recommendations — every fix strategy references project tokens by name.
 
-| Instead of                    | Use                                                    |
-| ----------------------------- | ------------------------------------------------------ |
-| `rgba(0,0,0,0.5)` in overlays | Acceptable only for image scrims (no token equivalent) |
-| `#3d7a5e`                     | `bg-primary` / `text-primary`                          |
-| `#f9f8f5`                     | `bg-background`                                        |
-| `gray-500`                    | `text-muted-foreground`                                |
-| `border-gray-200`             | `border-border`                                        |
+## Integration
 
-## The "First Impression" Test
-
-For every UI change, ask these questions. If any answer is "no", fix it before pushing:
-
-1. **3-second test**: Does the page look professional within 3 seconds? Would a resident trust this site?
-2. **Squint test**: Squint at the screenshot — is there a clear visual hierarchy? Can you identify the primary, secondary, and tertiary elements?
-3. **Comparison test**: Does this look as good as a modern city government site or a well-funded nonprofit? Not a student project?
-4. **Theme test**: Does it look correct in BOTH light and dark mode? Any text disappearing?
-5. **Edge test**: Are all edges clean? No harsh lines, no visible overlay boundaries, no unintended color bands?
-
-## Visual QA Viewport Matrix
-
-Screenshot every affected page at all 6 viewports. This is non-negotiable for UI changes.
-
-| #   | Name      | Width  | Check for                                                   |
-| --- | --------- | ------ | ----------------------------------------------------------- |
-| 1   | Mobile S  | 320px  | Text wrapping, touch targets 44px+, no horizontal scroll    |
-| 2   | Mobile L  | 430px  | Image aspect ratios, card layouts, button spacing           |
-| 3   | Tablet S  | 768px  | Grid transitions (1-col to 2-col), nav breakpoint           |
-| 4   | Tablet L  | 1024px | Content width, sidebar layouts, image sizing                |
-| 5   | Desktop S | 1280px | Full nav visible, max-width constraints, spacing balance    |
-| 6   | Desktop L | 1920px | Content not stretched, comfortable reading width, alignment |
-
-## Anti-Patterns Checklist
-
-Flag any of these as bugs requiring immediate fix:
-
-- [ ] Text invisible or hard to read in either theme
-- [ ] Gradient overlay that dims the entire hero image uniformly
-- [ ] Visible hard line where a gradient starts or stops (feather too short or via-stop too opaque)
-- [ ] Hardcoded hex colors instead of design tokens
-- [ ] Horizontal scrollbar at any viewport
-- [ ] Touch target smaller than 44x44px on mobile
-- [ ] Inconsistent border-radius within the same section
-- [ ] Missing hover/focus states on interactive elements
-- [ ] Content width exceeding 75ch for body text
-- [ ] Empty space where content should be (empty sections, broken images)
-- [ ] Orphaned single words on their own line in headings
-- [ ] Raw unstyled HTML elements (inputs without focus rings, links without hover)
+This review runs automatically as part of `/simplify` (the visual design agent). It can also be invoked standalone via `/visual-design-review` for focused design audits. Fix all Critical and High findings before creating a PR.
