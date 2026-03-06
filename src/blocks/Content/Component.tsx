@@ -9,7 +9,9 @@ import { CMSLink } from '../../components/Link'
 export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
   const { columns } = props
 
-  const colSpanClasses: Record<string, string> = {
+  type ColumnSize = 'full' | 'half' | 'oneThird' | 'twoThirds'
+
+  const colSpanClasses: Record<ColumnSize, string> = {
     full: 'col-span-4 lg:col-span-12',
     half: 'col-span-4 lg:col-span-6',
     oneThird: 'col-span-4 lg:col-span-4',
@@ -17,7 +19,8 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
   }
 
   const isMultiColumn = (columns?.length ?? 0) > 1 && columns?.some((col) => col?.size !== 'full')
-  const isFourColumns = (columns?.length ?? 0) === 4
+  const isFourColumns =
+    (columns?.length ?? 0) === 4 && columns?.every((col) => col?.size !== 'full')
 
   return (
     <div className={cn('py-16 md:py-20', isMultiColumn && 'bg-surface')}>
@@ -39,7 +42,8 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                 <div
                   className={cn({
                     'col-span-1': isFourColumns,
-                    [colSpanClasses[size ?? 'full'] ?? colSpanClasses.full]: !isFourColumns,
+                    [colSpanClasses[(size as ColumnSize) ?? 'full'] ?? colSpanClasses.full]:
+                      !isFourColumns,
                     'md:col-span-2': isMultiColumn && !isFourColumns && size !== 'full',
                     'rounded-2xl border border-border bg-card p-6 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg md:p-8':
                       isMultiColumn,

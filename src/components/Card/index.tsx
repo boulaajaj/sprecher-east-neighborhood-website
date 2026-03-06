@@ -43,7 +43,7 @@ export const Card: React.FC<{
       <div className="relative w-full overflow-hidden">
         {!metaImage && (
           <div className="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-primary-dark via-primary to-primary-light">
-            <div className="flex flex-col items-center gap-1 opacity-20">
+            <div className="flex flex-col items-center gap-1 opacity-20" aria-hidden="true">
               <span className="text-lg font-bold tracking-tight text-white italic">Sprecher</span>
               <span className="text-sm font-medium tracking-widest text-white/80 uppercase">
                 East
