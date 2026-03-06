@@ -39,7 +39,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                 <div
                   className={cn({
                     'col-span-1': isFourColumns,
-                    [colSpanClasses[size ?? 'full']]: !isFourColumns,
+                    [colSpanClasses[size ?? 'full'] ?? colSpanClasses.full]: !isFourColumns,
                     'md:col-span-2': isMultiColumn && !isFourColumns && size !== 'full',
                     'rounded-2xl border border-border bg-card p-6 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg md:p-8':
                       isMultiColumn,
