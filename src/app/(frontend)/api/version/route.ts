@@ -10,6 +10,10 @@ function getBuildId(): string {
   try {
     cachedBuildId = readFileSync(join(process.cwd(), '.next', 'BUILD_ID'), 'utf-8').trim()
   } catch {
+    if (process.env.NODE_ENV === 'production') {
+      // Don't cache failure in production — retry on next request
+      return 'unknown'
+    }
     // In dev mode, use a stable fallback — dev doesn't need version polling
     cachedBuildId = 'development'
   }

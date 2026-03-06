@@ -10,6 +10,7 @@ export function VersionCheck() {
   const [updateAvailable, setUpdateAvailable] = useState(false)
   const [visible, setVisible] = useState(false)
   const buildIdRef = useRef<string | null>(null)
+  const newBuildIdRef = useRef<string | null>(null)
   const lastActivityRef = useRef<number>(Date.now())
   const dismissedBuildRef = useRef<string | null>(null)
 
@@ -31,6 +32,7 @@ export function VersionCheck() {
 
       // Build changed and user hasn't dismissed this specific version
       if (buildId !== buildIdRef.current && buildId !== dismissedBuildRef.current) {
+        newBuildIdRef.current = buildId
         setUpdateAvailable(true)
         // Small delay so the toast animates in after render
         requestAnimationFrame(() => setVisible(true))
@@ -70,8 +72,10 @@ export function VersionCheck() {
     }
     document.addEventListener('visibilitychange', onVisibilityChange)
 
-    // Initial check
-    checkVersion()
+    // Initial check — only if tab is visible
+    if (!document.hidden) {
+      checkVersion()
+    }
 
     return () => {
       activityEvents.forEach((event) => document.removeEventListener(event, markActive))
@@ -89,7 +93,7 @@ export function VersionCheck() {
     // After animation out, hide the element and remember dismissed version
     setTimeout(() => {
       setUpdateAvailable(false)
-      dismissedBuildRef.current = buildIdRef.current
+      dismissedBuildRef.current = newBuildIdRef.current
     }, 300)
   }
 
