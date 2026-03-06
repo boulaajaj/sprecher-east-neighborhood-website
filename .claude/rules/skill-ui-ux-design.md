@@ -91,7 +91,7 @@ Consistent spacing creates visual rhythm. Use Tailwind's spacing scale exclusive
 - Card grids or lists
 - Navigation menus
 - Form layouts
-- Any text block longer than 2 lines
+- Long-form body copy (multi-sentence or multi-paragraph text blocks)
 
 **What to do instead of centering content sections:**
 
