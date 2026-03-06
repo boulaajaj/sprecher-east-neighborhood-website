@@ -3,8 +3,6 @@ import { cn, categoryPillClassName } from '@/utilities/ui'
 import useClickableCard from '@/utilities/useClickableCard'
 import Link from 'next/link'
 import React from 'react'
-import { ImageIcon } from 'lucide-react'
-
 import type { Post } from '@/payload-types'
 
 import { Media } from '@/components/Media'
@@ -44,8 +42,13 @@ export const Card: React.FC<{
     >
       <div className="relative w-full overflow-hidden">
         {!metaImage && (
-          <div className="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-surface to-primary/5">
-            <ImageIcon className="h-10 w-10 text-muted-foreground/30" />
+          <div className="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-primary-dark via-primary to-primary-light">
+            <div className="flex flex-col items-center gap-1 opacity-20">
+              <span className="text-lg font-bold tracking-tight text-white italic">Sprecher</span>
+              <span className="text-sm font-medium tracking-widest text-white/80 uppercase">
+                East
+              </span>
+            </div>
           </div>
         )}
         {metaImage && typeof metaImage !== 'string' && (
