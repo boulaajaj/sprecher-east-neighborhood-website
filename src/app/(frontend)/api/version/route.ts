@@ -9,10 +9,10 @@ function getBuildId(): string {
 
   try {
     cachedBuildId = readFileSync(join(process.cwd(), '.next', 'BUILD_ID'), 'utf-8').trim()
-  } catch {
+  } catch (error) {
     if (process.env.NODE_ENV === 'production') {
-      // Don't cache failure in production — retry on next request
-      return 'unknown'
+      // Surface the failure so the GET handler can return 500
+      throw error
     }
     // In dev mode, use a stable fallback — dev doesn't need version polling
     cachedBuildId = 'development'
@@ -22,12 +22,24 @@ function getBuildId(): string {
 }
 
 export async function GET() {
-  return NextResponse.json(
-    { buildId: getBuildId() },
-    {
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
+  try {
+    return NextResponse.json(
+      { buildId: getBuildId() },
+      {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+        },
       },
-    },
-  )
+    )
+  } catch {
+    return NextResponse.json(
+      { error: 'Build ID unavailable' },
+      {
+        status: 500,
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+        },
+      },
+    )
+  }
 }

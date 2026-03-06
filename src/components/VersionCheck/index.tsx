@@ -49,9 +49,9 @@ export function VersionCheck() {
     }
 
     const activityEvents = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart']
-    activityEvents.forEach((event) =>
-      document.addEventListener(event, markActive, { passive: true }),
-    )
+    activityEvents.forEach((event) => {
+      document.addEventListener(event, markActive, { passive: true })
+    })
 
     // Poll on interval, but only when user is active and tab is visible
     const interval = setInterval(() => {
@@ -78,7 +78,9 @@ export function VersionCheck() {
     }
 
     return () => {
-      activityEvents.forEach((event) => document.removeEventListener(event, markActive))
+      activityEvents.forEach((event) => {
+        document.removeEventListener(event, markActive)
+      })
       document.removeEventListener('visibilitychange', onVisibilityChange)
       clearInterval(interval)
     }
