@@ -8,9 +8,9 @@ Any diff that touches CSS, Tailwind classes, HTML structure, component markup, o
 
 ## How It Works
 
-The visual design review skill at `~/.claude/skills/visual-design-review/SKILL.md` acts as a design director. It:
+The `/visual-design-review` skill acts as a design director. It:
 
-1. Screenshots affected pages at 5 viewports (320, 768, 1024, 1280, 1920) in both light and dark themes
+1. Screenshots affected pages at 6 viewports (320, 430, 768, 1024, 1280, 1920) in both light and dark themes
 2. Evaluates visual quality using principle-based taste (Apple/Linear/Stripe caliber)
 3. Produces findings with severity, design specs, and **fix strategies anchored to the project's brand**
 4. Outputs a grouped **Implementation Plan** with tasks, affected files, design tokens, effort estimates
@@ -37,7 +37,7 @@ The visual design review skill at `~/.claude/skills/visual-design-review/SKILL.m
 
 ## Design Token Discipline
 
-Always use design tokens from `globals.css @theme {}`. Never hardcode colors. The skill enforces this in its recommendations — every fix strategy references project tokens by name.
+Always use design tokens from `globals.css @theme {}`. Never hardcode colors (exception: `rgba(0,0,0,...)` for image scrims/shadows where no token equivalent exists). The skill guides this in its recommendations — every fix strategy references project tokens by name.
 
 ## Integration
 

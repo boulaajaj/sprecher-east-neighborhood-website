@@ -48,7 +48,7 @@ Role tags match the consolidated skill profiles:
 
 Before creating a pull request, run these checks in order:
 
-1. **`/simplify` (Claude Code skill)** — runs 4 parallel review agents (code reuse, code quality, efficiency, **visual design**) on the diff. For diffs touching CSS, Tailwind, HTML structure, component markup, or images, the visual design agent invokes the `/visual-design-review` skill — screenshots affected pages at multiple viewports and themes, produces critique + fix strategies + implementation tasks anchored to the project's brand. Fix all Critical and High findings before proceeding.
+1. **`/simplify` (Claude Code skill)** — runs 4 parallel review agents (code reuse, code quality, efficiency, **visual design**) on the diff. For diffs touching CSS, Tailwind, HTML structure, component markup, or images, the visual design agent invokes the `/visual-design-review` skill — screenshots affected pages at all 6 viewports (320/430/768/1024/1280/1920) and both themes, produces critique + fix strategies + implementation tasks anchored to the project's brand. Fix all Critical and High findings before proceeding.
 2. **Type-check**: `npx tsc --noEmit` — must pass with zero errors
 3. **Lint & format**: `npx lint-staged --no-stash` — or run `npx eslint . && npx prettier --check .` manually
 
@@ -77,7 +77,7 @@ After any push to a PR branch, poll for CI completion and review comments. **Do 
 
 **Phase 1 — Wait for CI (read-only, no pushes):**
 
-1. Start a background check (`run_in_background`) that sleeps **1 minute**, then runs `gh pr checks <number>` and `gh api repos/.../pulls/<number>/reviews`
+1. Start a background check (`run_in_background`) that sleeps **1 minute**, then runs `gh pr checks <number>` and `gh api repos/{owner}/{repo}/pulls/{number}/reviews`
 2. If CI + reviews are ready → go to Phase 2
 3. If not ready → sleep **1 minute**, check again
 4. Repeat 1-minute checks up to **15 minutes total** (15 checks max)
