@@ -81,6 +81,58 @@ Key GIDs (set as user env vars — see onboarding docs in strategy repo):
 
 **Windows note**: Always pass JSON payloads via temp files (`-d @/tmp/file.json`) — inline JSON with single quotes breaks in Git Bash on Windows.
 
+## Ad-Hoc Work Tracking
+
+All significant work must be tracked in Asana — not just planned sprint items. When work arises mid-session (bug report, design feedback, missing feature discovery), create an Asana task **before** starting the fix.
+
+### Task Categories
+
+Use the category as a prefix in the task name: `[role-tag] Category: description`
+
+| Category        | When to use                                      | Example                                                  |
+| --------------- | ------------------------------------------------ | -------------------------------------------------------- |
+| **Bug**         | Something is broken or producing wrong output    | `[C-Builder] Bug: Contact form doesn't appear`           |
+| **Feature**     | New capability that doesn't exist yet            | `[C-Builder] Feature: Calendar export for events`        |
+| **Improvement** | Enhancing something that already works           | `[C-Builder] Improvement: Left-align content sections`   |
+| **Task**        | Maintenance, docs, skills, CI, workflow changes  | `[E-Ops] Task: Add text alignment design principle`      |
+| **Spike**       | Research or investigation (may not produce code) | `[B-Research] Spike: Evaluate commenting system options` |
+
+The agent judges the category based on context — no need to ask the user which type it is.
+
+### Significance Threshold
+
+**Create a task if** the work:
+
+- Will produce a commit (code, config, skill, or docs change)
+- Changes how agents work (skills, rules, workflows)
+- Fixes something a user would notice
+
+**Skip task creation for:**
+
+- Typo fixes and formatting-only changes
+- Changes already covered by an existing open task (add a comment to that task instead)
+- Trivial one-line fixes within the scope of a larger in-progress task
+
+### One Task = One PR
+
+Every task maps to exactly one PR. Don't bundle unrelated changes into one PR even if they feel related. This ensures:
+
+- Clean Asana ↔ PR traceability
+- Easier code review (smaller, focused diffs)
+- Simpler rollback if something breaks
+
+If a session produces multiple fixes, create multiple tasks and multiple PRs.
+
+### Workflow
+
+1. Work comes in (user request, bug report, review finding)
+2. Judge the category based on context
+3. Create Asana task in the current sprint section
+4. Create a branch and start working
+5. Comment on the task with branch name
+6. Link PR when created
+7. Complete the task when the PR merges to main
+
 ## Post-Merge Checklist (`/wrapped`)
 
 When the user says "all PRs are merged", "/wrapped", or similar — run this checklist automatically without being asked:
