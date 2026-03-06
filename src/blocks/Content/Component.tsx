@@ -23,7 +23,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
     (columns?.length ?? 0) === 4 && columns?.every((col) => col?.size !== 'full')
 
   return (
-    <div className={cn('py-16 md:py-20', isMultiColumn && 'bg-surface')}>
+    <div className={cn('py-10 md:py-14', isMultiColumn && 'bg-surface')}>
       <div className="container">
         <div
           className={cn({
@@ -47,7 +47,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                     'md:col-span-2': isMultiColumn && !isFourColumns && size !== 'full',
                     'rounded-2xl border border-border bg-card p-6 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg md:p-8':
                       isMultiColumn,
-                    'max-w-prose [&_h2]:mb-6 [&_h2]:text-3xl [&_h2]:font-bold [&_h2]:tracking-tight [&_h2]:text-foreground md:[&_h2]:text-4xl lg:[&_h2]:text-5xl [&_p]:text-base [&_p]:leading-relaxed [&_p]:text-muted-foreground md:[&_p]:text-lg':
+                    'max-w-3xl [&_h2]:mb-4 [&_h2]:text-3xl [&_h2]:font-bold [&_h2]:tracking-tight [&_h2]:text-foreground md:[&_h2]:text-4xl [&_p]:text-base [&_p]:leading-relaxed [&_p]:text-muted-foreground md:[&_p]:text-lg':
                       !isMultiColumn,
                   })}
                   key={index}
