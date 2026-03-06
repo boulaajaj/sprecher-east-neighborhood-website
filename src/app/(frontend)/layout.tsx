@@ -12,6 +12,7 @@ import { InitTheme } from '@/providers/Theme/InitTheme'
 import { Providers } from '@/providers'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { organizationJsonLd } from '@/utilities/structuredData'
+import { VersionCheck } from '@/components/VersionCheck'
 import { draftMode } from 'next/headers'
 
 import './globals.css'
@@ -53,6 +54,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Header />
           <main id="main-content">{children}</main>
           <Footer />
+          <VersionCheck />
         </Providers>
       </body>
     </html>
