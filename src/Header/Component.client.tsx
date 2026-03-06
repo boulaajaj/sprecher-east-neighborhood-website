@@ -56,10 +56,8 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-[background-color,border-color,box-shadow] duration-200 ${
-        scrolled
-          ? 'border-b border-border bg-background/95 shadow-md backdrop-blur-md'
-          : 'border-b border-border bg-background/95 shadow-sm backdrop-blur-md'
+      className={`sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-md transition-[background-color,border-color,box-shadow] duration-200 ${
+        scrolled ? 'shadow-md' : 'shadow-sm'
       }`}
       {...(theme ? { 'data-theme': theme } : {})}
     >

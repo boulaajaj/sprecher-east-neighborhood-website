@@ -19,12 +19,12 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
           )}
         </div>
         {/* Centered radial vignette — darkens behind text area, keeps edges bright */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,rgba(0,0,0,0.45)_0%,rgba(0,0,0,0.15)_60%,transparent_100%)]" />
+        <div className="hero-vignette pointer-events-none absolute inset-0" />
         <div className="relative z-10 container mb-8 flex items-center justify-center">
           <div className="max-w-[40rem] md:text-center">
             {richText && (
               <RichText
-                className="mb-8 [&_h1]:text-4xl [&_h1]:leading-tight [&_h1]:font-bold [&_h1]:tracking-tight [&_h1]:text-white [&_h1]:drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] md:[&_h1]:text-5xl lg:[&_h1]:text-6xl [&_p]:text-lg [&_p]:text-white/90 [&_p]:drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)] md:[&_p]:text-xl"
+                className="[&_h1]:hero-text-shadow [&_p]:hero-text-shadow-sm mb-8 [&_h1]:text-4xl [&_h1]:leading-tight [&_h1]:font-bold [&_h1]:tracking-tight [&_h1]:text-white md:[&_h1]:text-5xl lg:[&_h1]:text-6xl [&_p]:text-lg [&_p]:text-white/90 md:[&_p]:text-xl"
                 data={richText}
                 enableGutter={false}
               />
