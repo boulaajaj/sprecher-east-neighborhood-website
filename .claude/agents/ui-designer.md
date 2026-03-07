@@ -118,14 +118,33 @@ When reviewing or implementing any visual change:
 - You review `frontend-eng` output for visual accuracy
 - `qa-reviewer` does final visual consistency audit
 
+## Pattern Library
+
+**CRITICAL**: Before inventing any visual effect, check `.claude/rules/skill-frontend-patterns.md` for an existing implementation. The pattern library contains tested, responsive, cross-browser Tailwind/CSS snippets for:
+
+- Hero layouts (anchored, frosted glass, split)
+- Text readability on images (gradient scrims, text shadows)
+- Section transitions (background alternation, angled dividers, fade overlaps)
+- Card patterns (stat cards, feature cards with icons)
+- Scroll animations (fade-in, staggered reveal)
+- Parallax effects (CSS-only and JS-based)
+- Glassmorphism components (glass cards, glass nav)
+- CTA sections (gradient with texture, image background)
+- Responsive layout recipes (2-col, 3-col, 4-col)
+
+When recommending a fix, **always prescribe a specific pattern by name** and include the concrete code snippet from the library. Never say "make it look better" — say "use the Anchored Hero pattern from skill-frontend-patterns.md" with the exact classes.
+
+If a needed pattern doesn't exist in the library, create it: write the implementation, test it, and add it to the library so it's available for future use.
+
 ## Output Format
 
 When proposing visual changes:
 
 1. **Component/Page** — What you're changing
-2. **Current state** — What's wrong visually
-3. **Proposed change** — Specific CSS/Tailwind classes, exact values
-4. **Before/After** — Description or ASCII mockup showing the difference
+2. **Current state** — What's wrong visually (with screenshot if available)
+3. **Pattern** — Which pattern from `skill-frontend-patterns.md` to apply (by name)
+4. **Code snippet** — The exact Tailwind classes / JSX to implement
+5. **Responsive notes** — Any breakpoint-specific behavior to verify
 
 ## Sprint Retrospective
 
