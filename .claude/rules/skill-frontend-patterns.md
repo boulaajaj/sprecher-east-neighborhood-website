@@ -9,6 +9,7 @@ This is a living library. When a new pattern is proven in production, add it her
 **This library is a floor, not a ceiling.** These patterns are proven starting points — use them, combine them, remix them, but never treat them as the only options. The best designs come from creative composition: a frosted glass panel with a subtle parallax background, an anchored hero with staggered text reveal, a split layout with a floating stat strip overlapping the fold.
 
 **What we value:**
+
 - **Minimalism with maximum impact** — every element earns its place; if it doesn't serve the user, remove it
 - **Purposeful asymmetry** — visual weight should feel intentional, not accidental; perfect symmetry is boring, thoughtful imbalance is compelling
 - **Smooth contextual flow** — each section should lead naturally to the next; the user should never wonder "why is this here?"
@@ -16,6 +17,7 @@ This is a living library. When a new pattern is proven in production, add it her
 - **Elegance over flashiness** — subtle shadows beat loud gradients; a 200ms ease-out beat a 500ms bounce; restraint is the mark of quality
 
 **Creative freedom within constraints:**
+
 - Stay within Tailwind CSS + Next.js — no external animation libraries unless justified
 - Use design tokens from `globals.css @theme {}` for all colors
 - Respect accessibility (contrast ratios, reduced motion, focus indicators)
@@ -23,6 +25,7 @@ This is a living library. When a new pattern is proven in production, add it her
 - Beyond these constraints: **experiment freely.** Combine patterns. Invent new ones. Add subtle shadows, micro-animations, unexpected but effective layout choices. If the result is clean, intuitive, and beautiful — ship it.
 
 **When inventing something new:**
+
 - Build it, screenshot it at all viewports, verify it works
 - If it's good, add it to this library with a name, code snippet, and explanation of why it works
 - The library grows through creative work, not through rules committees
@@ -56,7 +59,7 @@ Instead of centering everything in a tall void, anchor content to the bottom-lef
   {/* Content anchored to bottom-left */}
   <div className="relative z-10 container flex min-h-[80vh] items-end pb-16 md:pb-20">
     <div className="max-w-2xl">
-      <h1 className="text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">
+      <h1 className="text-4xl leading-tight font-bold tracking-tight text-white md:text-5xl lg:text-6xl">
         Your Neighborhood, Your Community
       </h1>
       <p className="mt-4 max-w-lg text-lg leading-relaxed text-white/85 md:text-xl">
@@ -98,7 +101,7 @@ Place hero text on a frosted glass card that sits on top of the image. Text is a
   {/* Content in frosted glass panel */}
   <div className="relative z-10 container flex min-h-[80vh] items-end pb-16 md:items-center md:pb-0">
     <div className="w-full max-w-xl rounded-2xl border border-white/20 bg-white/10 p-8 shadow-2xl backdrop-blur-md md:p-12">
-      <h1 className="text-3xl font-bold leading-tight tracking-tight text-white md:text-4xl lg:text-5xl">
+      <h1 className="text-3xl leading-tight font-bold tracking-tight text-white md:text-4xl lg:text-5xl">
         Your Neighborhood, Your Community
       </h1>
       <p className="mt-4 text-base leading-relaxed text-white/90 md:text-lg">
@@ -119,7 +122,7 @@ Place hero text on a frosted glass card that sits on top of the image. Text is a
 
 **Key CSS:** `backdrop-blur-md` (12px blur) + `bg-white/10` (10% white) + `border border-white/20`. The blur makes the panel feel physical without hiding the image.
 
-**Browser support:** `backdrop-filter` is supported in all modern browsers. Safari requires no prefix since v15.4+.
+**Browser support:** `backdrop-filter` is supported in all modern browsers. Safari 9–17 requires the `-webkit-backdrop-filter` prefix; Safari 18+ supports the unprefixed property. For maximum compatibility, include both in `globals.css` if targeting older Safari versions.
 
 **Responsive:** Panel is full-width on mobile (anchored to bottom with `items-end`), centered on desktop (`md:items-center`).
 
@@ -134,15 +137,15 @@ For heroes without a full-bleed background image. Text occupies 50-60% of the wi
   <div className="grid items-center gap-8 md:grid-cols-2 md:gap-12 lg:gap-16">
     {/* Text side — always left */}
     <div>
-      <span className="text-xs font-bold uppercase tracking-widest text-primary">
+      <span className="text-xs font-bold tracking-widest text-primary uppercase">
         Sprecher East
       </span>
-      <h1 className="mt-3 text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl">
+      <h1 className="mt-3 text-4xl leading-tight font-bold tracking-tight text-foreground md:text-5xl">
         Your Neighborhood, Your Community
       </h1>
       <p className="mt-4 max-w-lg text-lg leading-relaxed text-muted-foreground">
-        A grassroots neighborhood initiative connecting residents of
-        Meadowlands, Door Creek, and Reston Heights since 2006.
+        A grassroots neighborhood initiative connecting residents of Meadowlands, Door Creek, and
+        Reston Heights since 2006.
       </p>
       <div className="mt-8 flex flex-wrap gap-4">
         <a className="rounded-lg bg-primary px-6 py-3 font-semibold text-white transition hover:bg-primary/90">
@@ -177,12 +180,18 @@ When text sits at the bottom of an image. Darkens only the bottom portion.
 ```css
 /* Bottom-anchored text */
 .scrim-bottom {
-  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 40%, transparent 70%);
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0.3) 40%,
+    transparent 70%
+  );
 }
 ```
 
 Tailwind equivalent:
-```
+
+```css
 bg-gradient-to-t from-black/70 via-black/30 to-transparent
 ```
 
@@ -190,7 +199,7 @@ bg-gradient-to-t from-black/70 via-black/30 to-transparent
 
 When text sits on the left with image visible on the right.
 
-```
+```css
 bg-gradient-to-r from-black/70 via-black/40 to-transparent
 ```
 
@@ -201,21 +210,26 @@ For text directly on images without a scrim. Use multiple shadows for a soft hal
 ```css
 .hero-text-readable {
   text-shadow:
-    0 1px 3px rgba(0,0,0,0.6),
-    0 4px 12px rgba(0,0,0,0.4),
-    0 8px 24px rgba(0,0,0,0.2);
+    0 1px 3px rgba(0, 0, 0, 0.6),
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    0 8px 24px rgba(0, 0, 0, 0.2);
 }
 ```
 
-In Tailwind (using `drop-shadow` filter for multi-layer effect):
-```
+In Tailwind (using arbitrary `text-shadow` value):
+
+```css
 [text-shadow:0_1px_3px_rgba(0,0,0,0.6),0_4px_12px_rgba(0,0,0,0.4)]
 ```
 
 Or add to `globals.css`:
+
 ```css
 .hero-text-readable {
-  text-shadow: 0 1px 3px rgba(0,0,0,0.6), 0 4px 12px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.2);
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.6),
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    0 8px 24px rgba(0, 0, 0, 0.2);
 }
 ```
 
@@ -227,7 +241,7 @@ Or add to `globals.css`:
 
 Sections must alternate between `bg-background` and `bg-surface` to create visual rhythm. Never use the same background on consecutive sections.
 
-```
+```text
 Section 1 (Hero):     dark / full-bleed image
 Section 2 (Content):  bg-background
 Section 3 (Cards):    bg-surface
@@ -244,9 +258,7 @@ A subtle angle between sections creates visual flow without hard horizontal line
 <section className="relative bg-surface py-16 md:py-24">
   {/* Angled top edge */}
   <div className="absolute inset-x-0 -top-8 h-16 -skew-y-1 bg-surface" />
-  <div className="container relative">
-    {/* Section content */}
-  </div>
+  <div className="relative container">{/* Section content */}</div>
 </section>
 ```
 
@@ -257,8 +269,10 @@ A subtle angle between sections creates visual flow without hard horizontal line
 A gradient at the bottom of one section that fades into the next. Already used on the hero — extend this to other section boundaries.
 
 ```tsx
-{/* At the bottom of any section */}
-<div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-background" />
+{
+  /* At the bottom of any section */
+}
+;<div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-background" />
 ```
 
 ---
@@ -315,7 +329,9 @@ Using CSS-only `@starting-style` (modern browsers) or Intersection Observer for 
 .animate-on-scroll {
   opacity: 0;
   transform: translateY(1.5rem);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
 }
 
 .animate-on-scroll.is-visible {
@@ -345,7 +361,7 @@ export function useScrollReveal() {
           observer.unobserve(el)
         }
       },
-      { threshold: 0.15 }
+      { threshold: 0.15 },
     )
     observer.observe(el)
     return () => observer.disconnect()
@@ -369,6 +385,7 @@ function Section() {
 ```
 
 **Reduced motion:** Always respect user preferences:
+
 ```css
 @media (prefers-reduced-motion: reduce) {
   .animate-on-scroll {
@@ -381,25 +398,30 @@ function Section() {
 
 ### Pattern: Staggered Card Reveal
 
-Cards in a grid appear one after another with a slight delay.
+Cards in a grid appear one after another with a slight delay. Each card is wrapped in a dedicated component to respect React's Rules of Hooks.
 
 ```tsx
-{cards.map((card, i) => {
+function RevealCard({ card, index }: { card: CardProps; index: number }) {
   const { ref, isVisible } = useScrollReveal()
+  const delayClass = ['delay-0', 'delay-100', 'delay-200', 'delay-300', 'delay-[400ms]'][
+    Math.min(index, 4)
+  ]
   return (
-    <div
-      key={card.id}
-      ref={ref}
-      className={`animate-on-scroll ${isVisible ? 'is-visible' : ''}`}
-      style={{ transitionDelay: `${i * 100}ms` }}
-    >
+    <div ref={ref} className={`animate-on-scroll ${delayClass} ${isVisible ? 'is-visible' : ''}`}>
       <Card {...card} />
     </div>
   )
-})}
+}
+
+{
+  /* Usage */
+}
+{
+  cards.map((card, i) => <RevealCard key={card.id} card={card} index={i} />)
+}
 ```
 
-**Rule:** Max delay of 400ms (4 cards). Beyond that, everything after the 4th card should appear at the same time.
+**Rule:** Max delay of 400ms (4 cards). Beyond that, everything after the 4th card should appear at the same time. Uses Tailwind delay utilities instead of inline styles.
 
 ---
 
@@ -407,40 +429,48 @@ Cards in a grid appear one after another with a slight delay.
 
 ### Pattern: Subtle Background Parallax
 
-The background image moves slower than the scroll, creating depth. CSS-only, no JS needed.
+The background image moves slower than the scroll, creating depth. Uses the project's `<Media />` component with a CSS parallax class defined in `globals.css`.
 
-```tsx
-<section className="relative overflow-hidden py-24">
-  {/* Parallax background — moves at 50% scroll speed */}
-  <div
-    className="absolute inset-0 -top-[20%] -bottom-[20%] bg-cover bg-center bg-fixed"
-    style={{ backgroundImage: `url(${imageUrl})` }}
-  />
-  <div className="absolute inset-0 bg-black/40" />
-  <div className="container relative z-10 text-white">
-    {/* Content */}
-  </div>
-</section>
-```
+Add to `globals.css`:
 
-**Key CSS:** `bg-fixed` creates the parallax effect. The `-top-[20%] -bottom-[20%]` oversizes the image so it doesn't show gaps during scroll.
-
-**Mobile note:** `background-attachment: fixed` doesn't work on iOS Safari. Use a fallback:
 ```css
-@supports not (-webkit-touch-callout: none) {
-  .parallax-bg { background-attachment: fixed; }
+.parallax-bg {
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+}
+
+/* iOS Safari doesn't support background-attachment: fixed — fall back to static */
+@media (hover: none) and (pointer: coarse) {
+  .parallax-bg {
+    background-attachment: scroll;
+  }
 }
 ```
 
-Or detect mobile and skip parallax — static images are fine on small screens.
+```tsx
+<section className="relative overflow-hidden py-24">
+  {/* Parallax background */}
+  <div className="absolute inset-0 -top-[20%] -bottom-[20%]">
+    <Media fill imgClassName="object-cover" resource={media} />
+  </div>
+  <div className="absolute inset-0 bg-black/40" />
+  <div className="relative z-10 container text-white">{/* Content */}</div>
+</section>
+```
+
+**Key CSS:** The oversized container (`-top-[20%] -bottom-[20%]`) prevents gaps during scroll. For true CSS parallax with background images, use the `.parallax-bg` class on a div with `background-image` set via a CSS custom property.
+
+**Mobile note:** `background-attachment: fixed` doesn't work on iOS Safari. The `@media (hover: none) and (pointer: coarse)` query targets touch devices more reliably than `-webkit-touch-callout` feature detection. On mobile, the image is static — which is fine for small screens.
 
 ### Pattern: JS-Based Smooth Parallax
 
-For more control over parallax speed and direction. Client component.
+For more control over parallax speed and direction. Client component. Uses `requestAnimationFrame` to avoid scroll jank.
 
 ```tsx
 'use client'
 import { useEffect, useRef } from 'react'
+import Image from 'next/image'
 
 export function ParallaxImage({ src, speed = 0.3 }: { src: string; speed?: number }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -449,10 +479,21 @@ export function ParallaxImage({ src, speed = 0.3 }: { src: string; speed?: numbe
     const el = ref.current
     if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-    function handleScroll() {
-      const rect = el!.getBoundingClientRect()
+    let ticking = false
+
+    function update() {
+      if (!el) return
+      const rect = el.getBoundingClientRect()
       const offset = rect.top * speed
-      el!.style.transform = `translateY(${offset}px)`
+      el.style.transform = `translateY(${offset}px)`
+      ticking = false
+    }
+
+    function handleScroll() {
+      if (!ticking) {
+        requestAnimationFrame(update)
+        ticking = true
+      }
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
@@ -462,7 +503,7 @@ export function ParallaxImage({ src, speed = 0.3 }: { src: string; speed?: numbe
   return (
     <div className="absolute inset-0 -top-[15%] -bottom-[15%] overflow-hidden">
       <div ref={ref} className="h-full w-full">
-        <img src={src} alt="" className="h-full w-full object-cover" />
+        <Image src={src} alt="" fill className="object-cover" />
       </div>
     </div>
   )
@@ -486,6 +527,7 @@ A frosted glass card for overlays, modals, or floating content.
 ```
 
 **Dark variant (on dark backgrounds):**
+
 ```tsx
 <div className="rounded-2xl border border-white/10 bg-black/20 p-6 shadow-xl backdrop-blur-md">
   {/* Card content */}
@@ -493,6 +535,7 @@ A frosted glass card for overlays, modals, or floating content.
 ```
 
 **Colored variant (brand tint):**
+
 ```tsx
 <div className="rounded-2xl border border-primary/20 bg-primary/10 p-6 shadow-xl backdrop-blur-md">
   {/* Card content */}
@@ -505,9 +548,7 @@ Frosted glass header that shows content scrolling beneath.
 
 ```tsx
 <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-background/80 backdrop-blur-lg">
-  <nav className="container flex h-16 items-center justify-between">
-    {/* Nav content */}
-  </nav>
+  <nav className="container flex h-16 items-center justify-between">{/* Nav content */}</nav>
 </header>
 ```
 
@@ -522,14 +563,14 @@ Frosted glass header that shows content scrolling beneath.
 More visually interesting than a flat gradient.
 
 ```tsx
-<section className="relative overflow-hidden bg-gradient-to-br from-primary to-primary-dark py-16 md:py-24" data-theme="dark">
-  {/* Subtle texture overlay */}
-  <div className="absolute inset-0 opacity-10" style={{
-    backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
-    backgroundSize: '24px 24px'
-  }} />
+<section
+  className="relative overflow-hidden bg-gradient-to-br from-primary to-primary/70 py-16 md:py-24"
+  data-theme="dark"
+>
+  {/* Subtle texture overlay — uses Tailwind arbitrary values, no inline styles */}
+  <div className="absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:24px_24px] opacity-10" />
 
-  <div className="container relative">
+  <div className="relative container">
     <div className="mx-auto max-w-2xl text-center">
       <h2 className="text-3xl font-bold text-white md:text-4xl">Join Your Neighbors</h2>
       <p className="mt-4 text-lg text-white/85">
@@ -557,12 +598,10 @@ For CTAs that want more visual impact than a solid color.
 ```tsx
 <section className="relative overflow-hidden py-16 md:py-24">
   <div className="absolute inset-0">
-    <img src={bgUrl} alt="" className="h-full w-full object-cover" />
+    <Image src={bgUrl} alt="" fill className="object-cover" />
   </div>
   <div className="absolute inset-0 bg-primary/85" />
-  <div className="container relative text-center text-white">
-    {/* CTA content */}
-  </div>
+  <div className="relative container text-center text-white">{/* CTA content */}</div>
 </section>
 ```
 
@@ -577,14 +616,18 @@ For CTAs that want more visual impact than a solid color.
 The most common section layout. Text left, visual right. Reverses on alternate sections.
 
 ```tsx
-{/* Normal order */}
-<div className="grid items-center gap-8 md:grid-cols-2 lg:gap-16">
+{
+  /* Normal order */
+}
+;<div className="grid items-center gap-8 md:grid-cols-2 lg:gap-16">
   <div>{/* Text content */}</div>
   <div>{/* Image/visual */}</div>
 </div>
 
-{/* Reversed (image left, text right) — for alternating sections */}
-<div className="grid items-center gap-8 md:grid-cols-2 lg:gap-16">
+{
+  /* Reversed (image left, text right) — for alternating sections */
+}
+;<div className="grid items-center gap-8 md:grid-cols-2 lg:gap-16">
   <div className="order-2 md:order-1">{/* Image/visual */}</div>
   <div className="order-1 md:order-2">{/* Text content */}</div>
 </div>
@@ -596,7 +639,9 @@ The most common section layout. Text left, visual right. Reverses on alternate s
 
 ```tsx
 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-  {items.map(item => <Card key={item.id} {...item} />)}
+  {items.map((item) => (
+    <Card key={item.id} {...item} />
+  ))}
 </div>
 ```
 
@@ -606,7 +651,9 @@ The most common section layout. Text left, visual right. Reverses on alternate s
 
 ```tsx
 <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-  {stats.map(stat => <StatCard key={stat.label} {...stat} />)}
+  {stats.map((stat) => (
+    <StatCard key={stat.label} {...stat} />
+  ))}
 </div>
 ```
 
@@ -624,18 +671,12 @@ A section background photo at very low opacity — adds warmth and context witho
 <section className="relative overflow-hidden bg-surface py-16 md:py-24">
   {/* Backdrop photo — extremely subtle */}
   <div className="pointer-events-none absolute inset-0">
-    <img
-      src={backdropUrl}
-      alt=""
-      className="h-full w-full object-cover opacity-[0.06]"
-    />
+    <img src={backdropUrl} alt="" className="h-full w-full object-cover opacity-[0.06]" />
   </div>
   {/* Optional: tinted overlay to blend photo into section bg color */}
   <div className="pointer-events-none absolute inset-0 bg-surface/60" />
 
-  <div className="container relative z-10">
-    {/* Section content */}
-  </div>
+  <div className="relative z-10 container">{/* Section content */}</div>
 </section>
 ```
 
@@ -656,13 +697,12 @@ A full-bleed section where a photo is visible but tinted with the brand color. M
   </div>
   {/* Brand tint — photo visible but color-matched to the site */}
   <div className="absolute inset-0 bg-primary/80" />
-  <div className="container relative z-10 text-white">
-    {/* Content */}
-  </div>
+  <div className="relative z-10 container text-white">{/* Content */}</div>
 </section>
 ```
 
 **Variants:**
+
 - `bg-primary/80` — strong brand tint, text is white
 - `bg-background/85` — soft wash, text stays dark (foreground)
 - `bg-gradient-to-r from-primary/90 to-primary/70` — gradient tint reveals more image on one side
@@ -673,25 +713,27 @@ A full-bleed section where a photo is visible but tinted with the brand color. M
 
 Placeholder photos to use per section until real neighborhood photos are available. Source from Unsplash (free, no attribution required for web use). Store in `public/images/backdrops/`.
 
-| Section | Photo Subject | Mood | File Name |
-|---------|--------------|------|-----------|
-| Hero | Aerial suburban neighborhood, green trees | Warm, welcoming, expansive | `hero-neighborhood.jpg` |
-| About | Tree-lined residential street | Calm, established, inviting | `about-street.jpg` |
-| Parks & Recreation | Green park with walking path or playground | Active, natural, family-friendly | `parks-greenspace.jpg` |
-| Community | Diverse group of neighbors at outdoor gathering | Connected, joyful, inclusive | `community-gathering.jpg` |
-| Housing | Suburban homes with yards, warm light | Stable, comfortable, aspirational | `housing-homes.jpg` |
-| News/Updates | Coffee table with newspaper, morning light | Informed, local, current | `news-morning.jpg` |
-| Get Involved / CTA | Hands together or group volunteering | Active, united, purposeful | `cta-volunteers.jpg` |
-| Events | Outdoor festival or farmers market | Lively, seasonal, fun | `events-market.jpg` |
-| Resources | Library, books, or community center interior | Helpful, organized, accessible | `resources-library.jpg` |
+| Section            | Photo Subject                                   | Mood                              | File Name                 |
+| ------------------ | ----------------------------------------------- | --------------------------------- | ------------------------- |
+| Hero               | Aerial suburban neighborhood, green trees       | Warm, welcoming, expansive        | `hero-neighborhood.jpg`   |
+| About              | Tree-lined residential street                   | Calm, established, inviting       | `about-street.jpg`        |
+| Parks & Recreation | Green park with walking path or playground      | Active, natural, family-friendly  | `parks-greenspace.jpg`    |
+| Community          | Diverse group of neighbors at outdoor gathering | Connected, joyful, inclusive      | `community-gathering.jpg` |
+| Housing            | Suburban homes with yards, warm light           | Stable, comfortable, aspirational | `housing-homes.jpg`       |
+| News/Updates       | Coffee table with newspaper, morning light      | Informed, local, current          | `news-morning.jpg`        |
+| Get Involved / CTA | Hands together or group volunteering            | Active, united, purposeful        | `cta-volunteers.jpg`      |
+| Events             | Outdoor festival or farmers market              | Lively, seasonal, fun             | `events-market.jpg`       |
+| Resources          | Library, books, or community center interior    | Helpful, organized, accessible    | `resources-library.jpg`   |
 
 **Downloading:** Use Unsplash Source URLs for development. For production, download and self-host to avoid external dependencies:
+
 ```bash
 # Example: download a neighborhood photo from Unsplash
 curl -L "https://unsplash.com/photos/{photo-id}/download?w=1920" -o public/images/backdrops/hero-neighborhood.jpg
 ```
 
 **Photo treatment rules:**
+
 - Always download at 1920px width (matches largest viewport)
 - Compress with quality 80 — backdrops don't need sharpness since they're displayed at low opacity
 - Use `object-cover` so photos fill their container without distortion
@@ -720,13 +762,13 @@ curl -L "https://unsplash.com/photos/{photo-id}/download?w=1920" -o public/image
 
 ### Viewport Testing Quick Reference
 
-| Viewport | Width | What to check |
-|----------|-------|---------------|
-| Mobile S | 320px | Text wrapping, touch targets (44px min), no horizontal overflow |
-| Mobile L | 430px | Same as above, verify nothing breaks at slightly wider mobile |
-| Tablet | 768px | Grid columns transition, image aspect ratios, nav layout |
-| Tablet L | 1024px | Desktop layout kicks in, spacing feels balanced |
-| Desktop | 1280px | Full layout, nothing feels too wide or too narrow |
+| Viewport  | Width  | What to check                                                          |
+| --------- | ------ | ---------------------------------------------------------------------- |
+| Mobile S  | 320px  | Text wrapping, touch targets (44px min), no horizontal overflow        |
+| Mobile L  | 430px  | Same as above, verify nothing breaks at slightly wider mobile          |
+| Tablet    | 768px  | Grid columns transition, image aspect ratios, nav layout               |
+| Tablet L  | 1024px | Desktop layout kicks in, spacing feels balanced                        |
+| Desktop   | 1280px | Full layout, nothing feels too wide or too narrow                      |
 | Desktop L | 1920px | Content centered, no ultra-wide stretching, max-width constraints work |
 
 ---
@@ -735,13 +777,13 @@ curl -L "https://unsplash.com/photos/{photo-id}/download?w=1920" -o public/image
 
 These are specific implementation mistakes the designer should catch and prescribe fixes for:
 
-| Anti-Pattern | What You See | Fix |
-|---|---|---|
-| Centered void | Text floating in the middle of a tall empty space | Anchor to bottom or side, reduce height, or add visual elements |
-| Centered paragraph | Multi-sentence text with `text-center` | Remove `text-center`, add `max-w-prose`, left-align |
-| Uniform cards | All cards identical with no visual differentiation | Add icons, images, or color accents per card |
-| Consecutive same-bg | Two sections with same background color | Alternate `bg-background`/`bg-surface`, or insert a colored divider |
-| Giant min-height | `min-h-[80vh]` with 3 lines of content | Reduce to `min-h-[60vh]` or use `py-24` instead |
-| Missing scrim | White text on bright image with no gradient | Add `bg-gradient-to-t from-black/60` below text area |
-| Template buttons | Generic "Learn More" or "Get Started" | Use specific action words: "See Upcoming Events", "Join the Discussion" |
-| Orphan section | A section with heading + one sentence + nothing else | Merge with adjacent section or add supporting content |
+| Anti-Pattern        | What You See                                         | Fix                                                                     |
+| ------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------- |
+| Centered void       | Text floating in the middle of a tall empty space    | Anchor to bottom or side, reduce height, or add visual elements         |
+| Centered paragraph  | Multi-sentence text with `text-center`               | Remove `text-center`, add `max-w-prose`, left-align                     |
+| Uniform cards       | All cards identical with no visual differentiation   | Add icons, images, or color accents per card                            |
+| Consecutive same-bg | Two sections with same background color              | Alternate `bg-background`/`bg-surface`, or insert a colored divider     |
+| Giant min-height    | `min-h-[80vh]` with 3 lines of content               | Reduce to `min-h-[60vh]` or use `py-24` instead                         |
+| Missing scrim       | White text on bright image with no gradient          | Add `bg-gradient-to-t from-black/60` below text area                    |
+| Template buttons    | Generic "Learn More" or "Get Started"                | Use specific action words: "See Upcoming Events", "Join the Discussion" |
+| Orphan section      | A section with heading + one sentence + nothing else | Merge with adjacent section or add supporting content                   |

@@ -19,7 +19,7 @@ The `/visual-design-review` skill acts as a design director. It:
 ## What It Does
 
 - Reviews visuals from screenshots at multiple viewports and themes
-- **Prescribes specific fixes from the pattern library** (`skill-frontend-patterns.md`) — every finding includes the pattern name and code snippet to implement the fix
+- **Prescribes specific fixes from the pattern library** (`.claude/rules/skill-frontend-patterns.md`) — every finding includes the pattern name and code snippet to implement the fix
 - Reads source code when needed to understand what classes/markup are producing the visual issue
 - Evolves the existing design within brand rails
 
