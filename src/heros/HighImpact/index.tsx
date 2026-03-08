@@ -10,7 +10,7 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
   return (
     <div className="relative -mt-[10.4rem]">
       {/* Background image — stays vivid at the top, darkens at the bottom where text lives */}
-      <div className="absolute inset-0 select-none">
+      <div aria-hidden="true" className="absolute inset-0 select-none">
         {media && typeof media === 'object' && (
           <Media fill imgClassName="object-cover" priority resource={media} />
         )}
@@ -54,7 +54,7 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
       </div>
 
       {/* Bottom fade — seamless transition into page content */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent via-background/30 to-background" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-24 bg-gradient-to-b from-transparent to-background" />
     </div>
   )
 }
