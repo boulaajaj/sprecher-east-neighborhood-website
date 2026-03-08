@@ -4,13 +4,36 @@ Concrete Tailwind CSS and React patterns for building polished, modern UI. Every
 
 This is a living library. When a new pattern is proven in production, add it here.
 
+## Design Philosophy
+
+**This library is a floor, not a ceiling.** These patterns are proven starting points — use them, combine them, remix them, but never treat them as the only options. The best designs come from creative composition: a frosted glass panel with a subtle parallax background, an anchored hero with staggered text reveal, a split layout with a floating stat strip overlapping the fold.
+
+**What we value:**
+- **Minimalism with maximum impact** — every element earns its place; if it doesn't serve the user, remove it
+- **Purposeful asymmetry** — visual weight should feel intentional, not accidental; perfect symmetry is boring, thoughtful imbalance is compelling
+- **Smooth contextual flow** — each section should lead naturally to the next; the user should never wonder "why is this here?"
+- **Intuitiveness for the layman** — a resident who has never built a website should find navigation, CTAs, and content hierarchy immediately obvious
+- **Elegance over flashiness** — subtle shadows beat loud gradients; a 200ms ease-out beat a 500ms bounce; restraint is the mark of quality
+
+**Creative freedom within constraints:**
+- Stay within Tailwind CSS + Next.js — no external animation libraries unless justified
+- Use design tokens from `globals.css @theme {}` for all colors
+- Respect accessibility (contrast ratios, reduced motion, focus indicators)
+- Test at 6 viewports (320, 430, 768, 1024, 1280, 1920px)
+- Beyond these constraints: **experiment freely.** Combine patterns. Invent new ones. Add subtle shadows, micro-animations, unexpected but effective layout choices. If the result is clean, intuitive, and beautiful — ship it.
+
+**When inventing something new:**
+- Build it, screenshot it at all viewports, verify it works
+- If it's good, add it to this library with a name, code snippet, and explanation of why it works
+- The library grows through creative work, not through rules committees
+
 ## How to Use This File
 
 1. **Designer identifies a problem** (e.g., "hero text is hard to read on the image")
 2. **Designer prescribes a pattern from this library** (e.g., "use the Frosted Glass Text Panel")
 3. **Builder copies the snippet, adapts it to the component, and ships it**
 
-The designer SHOULD reference patterns by name and include the specific snippet. The builder SHOULD NOT invent visual effects from scratch when a pattern exists here.
+The designer SHOULD reference patterns by name and include the specific snippet. The builder SHOULD NOT invent visual effects from scratch when a pattern exists here — but IS encouraged to combine, adapt, and extend patterns creatively.
 
 ---
 
