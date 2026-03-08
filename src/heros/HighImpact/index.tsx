@@ -8,7 +8,7 @@ import RichText from '@/components/RichText'
 
 export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText }) => {
   return (
-    <div className="relative -mt-[10.4rem]" data-theme="dark">
+    <div className="relative -mt-[10.4rem]">
       {/* Background image — stays vivid at the top, darkens at the bottom where text lives */}
       <div className="absolute inset-0 select-none">
         {media && typeof media === 'object' && (
@@ -16,15 +16,18 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
         )}
       </div>
 
-      {/* Directional gradient scrim — darkens bottom-left where text is anchored */}
+      {/* Gradient scrim — darkens the bottom where text is anchored */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
       {/* Content anchored to bottom-left */}
-      <div className="relative z-10 container flex min-h-[80vh] items-end pb-16 md:pb-20">
+      <div
+        className="relative z-10 container flex min-h-[80vh] items-end pb-16 md:pb-20"
+        data-theme="dark"
+      >
         <div className="max-w-2xl">
           {richText && (
             <RichText
-              className="hero-text-shadow [&_p]:hero-text-shadow-sm mb-8 [&_h1]:text-4xl [&_h1]:leading-tight [&_h1]:font-bold [&_h1]:tracking-tight [&_h1]:text-white md:[&_h1]:text-5xl lg:[&_h1]:text-6xl [&_p]:max-w-lg [&_p]:text-lg [&_p]:leading-relaxed [&_p]:text-white/85 md:[&_p]:text-xl"
+              className="[&_h1]:hero-text-shadow [&_p]:hero-text-shadow-sm mb-8 [&_h1]:text-4xl [&_h1]:leading-tight [&_h1]:font-bold [&_h1]:tracking-tight [&_h1]:text-white md:[&_h1]:text-5xl lg:[&_h1]:text-6xl [&_p]:max-w-lg [&_p]:text-lg [&_p]:leading-relaxed [&_p]:text-white/85 md:[&_p]:text-xl"
               data={richText}
               enableGutter={false}
             />
