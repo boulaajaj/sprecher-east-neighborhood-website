@@ -54,7 +54,7 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
       </div>
 
       {/* Bottom fade — seamless transition into page content */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-32 bg-gradient-to-b from-transparent via-background/30 to-background" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent via-background/30 to-background" />
     </div>
   )
 }
