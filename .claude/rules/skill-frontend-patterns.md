@@ -429,9 +429,9 @@ function RevealCard({ card, index }: { card: CardProps; index: number }) {
 
 ### Pattern: Subtle Background Parallax
 
-The background image moves slower than the scroll, creating depth. Uses the project's `<Media />` component with a CSS parallax class defined in `globals.css`.
+The background image moves slower than the scroll, creating depth. Two approaches: CSS `background-attachment: fixed` for simple parallax, or an oversized `<Media />` container for next/image compatibility.
 
-Add to `globals.css`:
+**Approach A: CSS parallax with `background-image`** — add to `globals.css`:
 
 ```css
 .parallax-bg {
@@ -450,7 +450,18 @@ Add to `globals.css`:
 
 ```tsx
 <section className="relative overflow-hidden py-24">
-  {/* Parallax background */}
+  {/* CSS parallax — uses background-image via inline style (acceptable here since the URL is dynamic) */}
+  <div className="parallax-bg absolute inset-0" style={{ backgroundImage: `url(${imageUrl})` }} />
+  <div className="absolute inset-0 bg-black/40" />
+  <div className="relative z-10 container text-white">{/* Content */}</div>
+</section>
+```
+
+**Approach B: Oversized container with `<Media />`** — works with next/image optimization:
+
+```tsx
+<section className="relative overflow-hidden py-24">
+  {/* Oversized container creates parallax-like depth on scroll */}
   <div className="absolute inset-0 -top-[20%] -bottom-[20%]">
     <Media fill imgClassName="object-cover" resource={media} />
   </div>
@@ -459,9 +470,9 @@ Add to `globals.css`:
 </section>
 ```
 
-**Key CSS:** The oversized container (`-top-[20%] -bottom-[20%]`) prevents gaps during scroll. For true CSS parallax with background images, use the `.parallax-bg` class on a div with `background-image` set via a CSS custom property.
+**When to use which:** Approach A gives true parallax but bypasses next/image optimization. Approach B uses optimized images but relies on the oversized container (`-top-[20%] -bottom-[20%]`) to prevent gaps — it's not true parallax but creates a similar depth feel. For full parallax with optimized images, use the JS-Based Smooth Parallax pattern below.
 
-**Mobile note:** `background-attachment: fixed` doesn't work on iOS Safari. The `@media (hover: none) and (pointer: coarse)` query targets touch devices more reliably than `-webkit-touch-callout` feature detection. On mobile, the image is static — which is fine for small screens.
+**Mobile note:** `background-attachment: fixed` doesn't work on iOS Safari. The `@media (hover: none) and (pointer: coarse)` query targets touch devices and falls back to static — which is fine for small screens.
 
 ### Pattern: JS-Based Smooth Parallax
 
