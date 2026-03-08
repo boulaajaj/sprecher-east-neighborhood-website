@@ -87,6 +87,23 @@ Every image must have alt text that:
 
 ## Photo Sourcing
 
+### Section Backdrop Photos
+
+Placeholder stock photos live in `public/images/backdrops/` — used as subtle faded backgrounds behind content sections (see "Section Backdrop Patterns" in `skill-frontend-patterns.md`). These are temporary until real neighborhood photos are available.
+
+| File                      | Section   | Subject                     | Source   |
+| ------------------------- | --------- | --------------------------- | -------- |
+| `hero-neighborhood.jpg`   | Hero      | Suburban homes, warm tone   | Unsplash |
+| `about-street.jpg`        | About     | Residential house, inviting | Unsplash |
+| `parks-greenspace.jpg`    | Parks     | Green park, walking path    | Unsplash |
+| `community-gathering.jpg` | Community | Friends gathering outdoors  | Unsplash |
+| `housing-homes.jpg`       | Housing   | Modern home, warm light     | Unsplash |
+| `events-market.jpg`       | Events    | Farmers market, produce     | Unsplash |
+| `cta-volunteers.jpg`      | CTA       | Group volunteering          | Unsplash |
+| `resources-library.jpg`   | Resources | Library interior, books     | Unsplash |
+
+**Replacement strategy:** When real neighborhood photos are taken (drone shots, event photos, park photos), replace the placeholder files using the same file names. No code changes needed — the section backdrops will automatically show real content.
+
 ### Self-Hosted Content (Priority)
 
 1. Owner's photo collection (DJI drone, phone photos)

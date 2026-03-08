@@ -86,6 +86,10 @@ When modifying a file, fix all issues in it — not just the ones related to the
 
 This also applies during code review. Every review finding must either be fixed or encoded as a rule so it doesn't recur.
 
+## Documentation Is Code
+
+Code examples in rules files (`.claude/rules/`), pattern libraries, and agent configs are templates that developers adapt — they must follow the same standards as production code. Every rule that applies to source files also applies to code snippets in documentation: use project components, use design tokens, follow React patterns, respect linting and formatting. If a snippet would fail a code review in a PR, it doesn't belong in the docs either.
+
 ## Prefer Props Over Re-Fetching
 
 When a server component already has data that a child client component needs, pass it as a prop. Never have a client component re-fetch data that the server parent already resolved. This avoids duplicate API calls and keeps the data flow unidirectional.
