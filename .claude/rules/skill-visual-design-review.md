@@ -50,11 +50,11 @@ Every finding must include:
 
 1. **Severity** — CRITICAL / HIGH / MEDIUM / LOW
 2. **What's wrong** — Visual description of the problem
-3. **Pattern to apply** — Name of the pattern from `skill-frontend-patterns.md` (e.g., "Anchored Hero", "Frosted Glass Text Panel", "Background Alternation")
+3. **Pattern to apply** — Name of the pattern from `.claude/rules/skill-frontend-patterns.md` (e.g., "Anchored Hero", "Frosted Glass Text Panel", "Background Alternation")
 4. **Code snippet** — The exact Tailwind/CSS/JSX from the pattern library, adapted to the specific component
 5. **Files to change** — Which source files need the edit
 
-If no existing pattern fits the problem, the reviewer must **write a new pattern** with a tested implementation and add it to `skill-frontend-patterns.md` before prescribing it.
+If no existing pattern fits the problem, the reviewer must **write a new pattern** with a tested implementation and add it to `.claude/rules/skill-frontend-patterns.md` before prescribing it.
 
 ## Integration
 
