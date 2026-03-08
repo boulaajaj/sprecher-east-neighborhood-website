@@ -268,11 +268,10 @@ A subtle angle between sections creates visual flow without hard horizontal line
 
 A gradient at the bottom of one section that fades into the next. Already used on the hero — extend this to other section boundaries.
 
+<!-- prettier-ignore -->
 ```tsx
-{
-  /* At the bottom of any section */
-}
-;<div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-background" />
+{/* At the bottom of any section */}
+<div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-background" />
 ```
 
 ---
@@ -400,6 +399,7 @@ function Section() {
 
 Cards in a grid appear one after another with a slight delay. Each card is wrapped in a dedicated component to respect React's Rules of Hooks.
 
+<!-- prettier-ignore -->
 ```tsx
 function RevealCard({ card, index }: { card: CardProps; index: number }) {
   const { ref, isVisible } = useScrollReveal()
@@ -413,12 +413,10 @@ function RevealCard({ card, index }: { card: CardProps; index: number }) {
   )
 }
 
-{
-  /* Usage */
-}
-{
-  cards.map((card, i) => <RevealCard key={card.id} card={card} index={i} />)
-}
+{/* Usage */}
+{cards.map((card, i) => (
+  <RevealCard key={card.id} card={card} index={i} />
+))}
 ```
 
 **Rule:** Max delay of 400ms (4 cards). Beyond that, everything after the 4th card should appear at the same time. Uses Tailwind delay utilities instead of inline styles.
@@ -626,19 +624,16 @@ For CTAs that want more visual impact than a solid color.
 
 The most common section layout. Text left, visual right. Reverses on alternate sections.
 
+<!-- prettier-ignore -->
 ```tsx
-{
-  /* Normal order */
-}
-;<div className="grid items-center gap-8 md:grid-cols-2 lg:gap-16">
+{/* Normal order */}
+<div className="grid items-center gap-8 md:grid-cols-2 lg:gap-16">
   <div>{/* Text content */}</div>
   <div>{/* Image/visual */}</div>
 </div>
 
-{
-  /* Reversed (image left, text right) — for alternating sections */
-}
-;<div className="grid items-center gap-8 md:grid-cols-2 lg:gap-16">
+{/* Reversed (image left, text right) — for alternating sections */}
+<div className="grid items-center gap-8 md:grid-cols-2 lg:gap-16">
   <div className="order-2 md:order-1">{/* Image/visual */}</div>
   <div className="order-1 md:order-2">{/* Text content */}</div>
 </div>
