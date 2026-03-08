@@ -38,6 +38,8 @@ This is a living library. When a new pattern is proven in production, add it her
 
 The designer SHOULD reference patterns by name and include the specific snippet. The builder SHOULD NOT invent visual effects from scratch when a pattern exists here — but IS encouraged to combine, adapt, and extend patterns creatively.
 
+**These snippets are templates, not copy-paste code.** Adapt them to the specific component, props, and context. All snippets follow the same standards as production code (see "Documentation Is Code" in `development.md`).
+
 ---
 
 ## Hero Patterns
