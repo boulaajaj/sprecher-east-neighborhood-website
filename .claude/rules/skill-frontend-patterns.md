@@ -219,7 +219,7 @@ For text directly on images without a scrim. Use multiple shadows for a soft hal
 In Tailwind (using arbitrary `text-shadow` value):
 
 ```css
-[text-shadow:0_1px_3px_rgba(0,0,0,0.6),0_4px_12px_rgba(0,0,0,0.4)]
+[text-shadow:0_1px_3px_rgba(0,0,0,0.6),0_4px_12px_rgba(0,0,0,0.4),0_8px_24px_rgba(0,0,0,0.2)]
 ```
 
 Or add to `globals.css`:
@@ -670,8 +670,8 @@ A section background photo at very low opacity — adds warmth and context witho
 ```tsx
 <section className="relative overflow-hidden bg-surface py-16 md:py-24">
   {/* Backdrop photo — extremely subtle */}
-  <div className="pointer-events-none absolute inset-0">
-    <img src={backdropUrl} alt="" className="h-full w-full object-cover opacity-[0.06]" />
+  <div className="pointer-events-none absolute inset-0 opacity-[0.06]">
+    <Image src={backdropUrl} alt="" fill className="object-cover" />
   </div>
   {/* Optional: tinted overlay to blend photo into section bg color */}
   <div className="pointer-events-none absolute inset-0 bg-surface/60" />
@@ -693,7 +693,7 @@ A full-bleed section where a photo is visible but tinted with the brand color. M
 ```tsx
 <section className="relative overflow-hidden py-16 md:py-24">
   <div className="absolute inset-0">
-    <img src={photoUrl} alt="" className="h-full w-full object-cover" />
+    <Image src={photoUrl} alt="" fill className="object-cover" />
   </div>
   {/* Brand tint — photo visible but color-matched to the site */}
   <div className="absolute inset-0 bg-primary/80" />
