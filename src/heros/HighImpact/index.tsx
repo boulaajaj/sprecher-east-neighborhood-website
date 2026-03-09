@@ -10,7 +10,7 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
   return (
     <div className="relative -mt-[10.4rem]">
       <div
-        className="relative flex min-h-[75vh] items-center justify-center text-white"
+        className="relative flex min-h-[70vh] items-center justify-center text-white"
         data-theme="dark"
       >
         <div className="absolute inset-0 select-none">
@@ -50,8 +50,8 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
           </div>
         </div>
       </div>
-      {/* Gradual bottom fade — tall multi-layer gradient for seamless transition into page */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-32 bg-gradient-to-b from-transparent via-background/30 to-background" />
+      {/* Gradual bottom fade — multi-layer gradient for seamless transition into page */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-24 bg-gradient-to-b from-transparent via-background/40 to-background" />
     </div>
   )
 }

@@ -57,43 +57,15 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
                 'We\u2019re a free, voluntary neighborhood association \u2014 not an HOA. No dues, no fees, no mandatory rules. Just neighbors working together to make our corner of Madison a better place to live.',
               ),
             ]),
-            size: 'full',
-          },
-        ],
-      },
-      {
-        blockName: 'Quick Facts',
-        blockType: 'content',
-        columns: [
-          {
-            enableLink: false,
-            richText: root([
-              heading('h3', 'Established 2006'),
-              p('Serving our neighborhood for nearly 20 years.'),
-            ]),
-            size: 'oneThird',
+            size: 'twoThirds',
           },
           {
-            enableLink: false,
             richText: root([
-              heading('h3', 'Far East Side'),
-              p('Madison\u2019s District 16, represented at City Hall.'),
-            ]),
-            size: 'oneThird',
-          },
-          {
-            enableLink: false,
-            richText: root([
-              heading('h3', 'Three Subdivisions'),
-              p('Meadowlands, Door Creek, and Reston Heights.'),
-            ]),
-            size: 'oneThird',
-          },
-          {
-            enableLink: false,
-            richText: root([
-              heading('h3', 'Free Membership'),
-              p('Open to all residents. No dues or fees.'),
+              heading('h3', 'Quick Facts'),
+              p('\u2713 Established 2006 \u2014 nearly 20 years serving our community'),
+              p('\u2713 Far East Side \u2014 Madison\u2019s District 16'),
+              p('\u2713 Three subdivisions \u2014 Meadowlands, Door Creek, Reston Heights'),
+              p('\u2713 Free membership \u2014 open to all residents, no dues or fees'),
             ]),
             size: 'oneThird',
           },

@@ -6,8 +6,9 @@ import React from 'react'
 import type { Post } from '@/payload-types'
 
 import { Media } from '@/components/Media'
+import { formatDateShort } from '@/utilities/formatDateTime'
 
-export type CardPostData = Pick<Post, 'slug' | 'categories' | 'meta' | 'title'>
+export type CardPostData = Pick<Post, 'slug' | 'categories' | 'meta' | 'title' | 'publishedAt'>
 
 export const Card: React.FC<{
   alignItems?: 'center'
@@ -20,7 +21,7 @@ export const Card: React.FC<{
   const { card, link } = useClickableCard({})
   const { className, doc, relationTo, showCategories, title: titleFromProps } = props
 
-  const { slug, categories, meta, title } = doc || {}
+  const { slug, categories, meta, publishedAt, title } = doc || {}
   const { description } = meta || {}
   // meta.image is added by the SEO plugin but missing from Payload's generated types
   const metaImage = (meta as Record<string, unknown> | undefined)?.image as
@@ -62,9 +63,20 @@ export const Card: React.FC<{
         )}
       </div>
       <div className="p-5 md:p-6">
-        {showCategories && hasCategories && (
-          <div className="mb-3 flex flex-wrap gap-2">
-            {categories?.map((category, index) => {
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          {publishedAt && (
+            <time className="text-xs font-medium text-muted-foreground" dateTime={publishedAt}>
+              {formatDateShort(publishedAt)}
+            </time>
+          )}
+          {showCategories && hasCategories && publishedAt && (
+            <span className="text-muted-foreground/40" aria-hidden="true">
+              &middot;
+            </span>
+          )}
+          {showCategories &&
+            hasCategories &&
+            categories?.map((category, index) => {
               if (typeof category === 'object') {
                 const { title: titleFromCategory } = category
                 const categoryTitle = titleFromCategory || 'Untitled category'
@@ -78,8 +90,7 @@ export const Card: React.FC<{
 
               return null
             })}
-          </div>
-        )}
+        </div>
         {titleToUse && (
           <h3 className="text-lg leading-snug font-semibold text-foreground">
             <Link className="transition-colors hover:text-primary" href={href} ref={link.ref}>
