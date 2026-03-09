@@ -8,7 +8,7 @@ import RichText from '@/components/RichText'
 
 export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText }) => {
   return (
-    <div className="relative -mt-[10.4rem]">
+    <div className="relative -mt-[var(--header-height)]">
       {/* Background image — stays vivid at the top, darkens at the bottom where text lives */}
       <div aria-hidden="true" className="absolute inset-0 select-none">
         {media && typeof media === 'object' && (
@@ -21,7 +21,7 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
 
       {/* Content anchored to bottom-left */}
       <div
-        className="relative z-10 container flex min-h-[80vh] items-end pb-16 md:pb-20"
+        className="relative z-10 container flex min-h-[80vh] items-end pt-[var(--header-height)] pb-16 md:pb-20"
         data-theme="dark"
       >
         <div className="max-w-2xl">

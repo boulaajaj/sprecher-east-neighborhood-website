@@ -24,8 +24,8 @@ export const EventHero: React.FC<{
   if (heroImage && typeof heroImage === 'object') {
     // Full-bleed hero with image, dark overlay, white text
     return (
-      <div className="relative -mt-[10.4rem] flex items-end">
-        <div className="relative z-10 container pb-8 text-white lg:grid lg:grid-cols-[1fr_48rem_1fr]">
+      <div className="relative -mt-[var(--header-height)] flex items-end">
+        <div className="relative z-10 container pt-[var(--header-height)] pb-8 text-white lg:grid lg:grid-cols-[1fr_48rem_1fr]">
           <div className="col-span-1 col-start-1 md:col-span-2 md:col-start-2">
             {category && (
               <div className="mb-4 text-sm tracking-widest uppercase opacity-90">

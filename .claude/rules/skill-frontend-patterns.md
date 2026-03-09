@@ -49,7 +49,7 @@ The designer SHOULD reference patterns by name and include the specific snippet.
 Instead of centering everything in a tall void, anchor content to the bottom-left. Creates visual weight and a natural reading entry point.
 
 ```tsx
-<div className="relative -mt-[10.4rem] min-h-[80vh]">
+<div className="relative -mt-[var(--header-height)] min-h-[80vh]">
   {/* Background image */}
   <div className="absolute inset-0">
     <Media fill imgClassName="object-cover" priority resource={media} />
@@ -91,7 +91,7 @@ Instead of centering everything in a tall void, anchor content to the bottom-lef
 Place hero text on a frosted glass card that sits on top of the image. Text is always legible regardless of image content.
 
 ```tsx
-<div className="relative -mt-[10.4rem] min-h-[80vh]">
+<div className="relative -mt-[var(--header-height)] min-h-[80vh]">
   {/* Background image — stays vivid */}
   <div className="absolute inset-0">
     <Media fill imgClassName="object-cover" priority resource={media} />
@@ -559,7 +559,9 @@ Frosted glass header that shows content scrolling beneath.
 
 ```tsx
 <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-background/80 backdrop-blur-lg">
-  <nav className="container flex h-16 items-center justify-between">{/* Nav content */}</nav>
+  <nav className="container flex h-[var(--header-height)] items-center justify-between">
+    {/* Nav content */}
+  </nav>
 </header>
 ```
 
