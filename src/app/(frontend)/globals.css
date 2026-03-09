@@ -28,7 +28,6 @@
 @source inline('lg:col-span-8');
 @source inline('lg:col-span-12');
 @source inline('border-border');
-@source inline('hero-vignette');
 @source inline('hero-text-shadow');
 @source inline('hero-text-shadow-sm');
 @source inline('bg-card');
@@ -88,17 +87,8 @@
   }
 }
 
-/* Hero image scrim utilities — centralized so components stay clean */
+/* Hero text readability utilities — centralized so components stay clean */
 @layer utilities {
-  .hero-vignette {
-    background: radial-gradient(
-      ellipse 70% 60% at 50% 50%,
-      rgba(0, 0, 0, 0.45) 0%,
-      rgba(0, 0, 0, 0.15) 60%,
-      transparent 100%
-    );
-  }
-
   .hero-text-shadow {
     filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
   }
