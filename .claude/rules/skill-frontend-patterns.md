@@ -49,7 +49,7 @@ The designer SHOULD reference patterns by name and include the specific snippet.
 Instead of centering everything in a tall void, anchor content to the bottom-left. Creates visual weight and a natural reading entry point.
 
 ```tsx
-<div className="relative -mt-[10.4rem] min-h-[80vh]">
+<div className="relative -mt-[var(--header-height)] min-h-[80vh]">
   {/* Background image */}
   <div className="absolute inset-0">
     <Media fill imgClassName="object-cover" priority resource={media} />
@@ -91,7 +91,7 @@ Instead of centering everything in a tall void, anchor content to the bottom-lef
 Place hero text on a frosted glass card that sits on top of the image. Text is always legible regardless of image content.
 
 ```tsx
-<div className="relative -mt-[10.4rem] min-h-[80vh]">
+<div className="relative -mt-[var(--header-height)] min-h-[80vh]">
   {/* Background image — stays vivid */}
   <div className="absolute inset-0">
     <Media fill imgClassName="object-cover" priority resource={media} />

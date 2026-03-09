@@ -101,7 +101,7 @@
 /* Sprecher East brand tokens — light theme (default) */
 :root,
 [data-theme='light'] {
-  --header-height: 4.5rem; /* ~72px — matches sticky header (py-4 + logo + border) */
+  --header-height: 4.5rem; /* ~72px — reduced from legacy 10.4rem to match actual sticky header (py-4 + logo + border) */
   --background: #f9f8f5;
   --foreground: #1a1a1a;
   --card: #ffffff;
