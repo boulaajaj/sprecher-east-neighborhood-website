@@ -559,7 +559,9 @@ Frosted glass header that shows content scrolling beneath.
 
 ```tsx
 <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-background/80 backdrop-blur-lg">
-  <nav className="container flex h-16 items-center justify-between">{/* Nav content */}</nav>
+  <nav className="container flex h-[var(--header-height)] items-center justify-between">
+    {/* Nav content */}
+  </nav>
 </header>
 ```
 
