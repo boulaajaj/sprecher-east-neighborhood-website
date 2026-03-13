@@ -29,7 +29,8 @@ export async function generateStaticParams() {
     })
 
     return events.docs.map(({ slug }) => ({ slug }))
-  } catch {
+  } catch (error) {
+    console.error('[events] generateStaticParams failed; falling back to []', error)
     return []
   }
 }

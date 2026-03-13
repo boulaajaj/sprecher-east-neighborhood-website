@@ -36,7 +36,8 @@ export async function generateStaticParams() {
     })
 
     return posts.docs.map(({ slug }) => ({ slug }))
-  } catch {
+  } catch (error) {
+    console.error('[posts] generateStaticParams failed; falling back to []', error)
     return []
   }
 }

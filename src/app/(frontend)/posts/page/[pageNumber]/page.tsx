@@ -86,7 +86,8 @@ export async function generateStaticParams() {
     }
 
     return pages
-  } catch {
+  } catch (error) {
+    console.error('[posts/page] generateStaticParams failed; falling back to []', error)
     return []
   }
 }

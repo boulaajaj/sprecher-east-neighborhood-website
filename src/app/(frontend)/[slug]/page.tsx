@@ -30,7 +30,8 @@ export async function generateStaticParams() {
     return (
       pages.docs?.filter((doc) => doc.slug !== HOME_PAGE_SLUG).map(({ slug }) => ({ slug })) ?? []
     )
-  } catch {
+  } catch (error) {
+    console.error('[pages] generateStaticParams failed; falling back to []', error)
     return []
   }
 }
