@@ -31,7 +31,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
   const isCardGrid = isMultiColumn && !isFourColumns && !isContentColumns
 
   return (
-    <div className={cn('py-12 md:py-16', (isCardGrid || isFourColumns) && 'bg-surface')}>
+    <div className={cn('py-8 md:py-10', (isCardGrid || isFourColumns) && 'bg-surface')}>
       <div className="container">
         <div
           className={cn({
@@ -62,8 +62,8 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                       isContentColumns && index === 0,
                     'flex flex-col justify-center rounded-2xl border border-border bg-card p-6 shadow-sm md:p-8 [&_h3]:mb-3 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-foreground [&_p]:text-sm [&_p]:leading-relaxed [&_p]:text-muted-foreground':
                       isContentColumns && index > 0,
-                    // Single full-width column — readable width with clear hierarchy
-                    'max-w-[52rem] [&_h2]:mb-4 [&_h2]:text-3xl [&_h2]:font-bold [&_h2]:tracking-tight [&_h2]:text-foreground md:[&_h2]:text-4xl [&_p]:text-base [&_p]:leading-relaxed [&_p]:text-muted-foreground md:[&_p]:text-lg':
+                    // Single full-width column — readable width with accent border
+                    'max-w-prose border-l-4 border-primary pl-6 md:pl-8 [&_h2]:mb-3 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:tracking-tight [&_h2]:text-foreground md:[&_h2]:text-3xl [&_p]:text-base [&_p]:leading-relaxed [&_p]:text-muted-foreground':
                       !isMultiColumn,
                   })}
                   key={index}

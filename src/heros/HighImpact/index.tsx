@@ -9,49 +9,68 @@ import RichText from '@/components/RichText'
 export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText }) => {
   return (
     <div className="relative -mt-[10.4rem]">
-      <div
-        className="relative flex min-h-[70vh] items-center justify-center text-white"
-        data-theme="dark"
-      >
+      <div className="relative flex min-h-[70vh] items-end text-white" data-theme="dark">
+        {/* Background image */}
         <div className="absolute inset-0 select-none">
           {media && typeof media === 'object' && (
             <Media fill imgClassName="object-cover" priority resource={media} />
           )}
         </div>
-        {/* Centered radial vignette — darkens behind text area, keeps edges bright */}
-        <div className="hero-vignette pointer-events-none absolute inset-0" />
-        <div className="relative z-10 container mb-8 flex items-center justify-center">
-          <div className="max-w-[40rem] md:text-center">
-            {richText && (
-              <RichText
-                className="[&_h1]:hero-text-shadow [&_p]:hero-text-shadow-sm mb-8 [&_h1]:text-4xl [&_h1]:leading-tight [&_h1]:font-bold [&_h1]:tracking-tight [&_h1]:text-white md:[&_h1]:text-5xl lg:[&_h1]:text-6xl [&_p]:text-lg [&_p]:text-white/90 md:[&_p]:text-xl"
-                data={richText}
-                enableGutter={false}
-              />
-            )}
+        {/* Dark overlay for text readability */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+
+        {/* Two-column layout: text left, buttons right */}
+        <div className="relative z-10 container pt-48 pb-16 md:pt-56 md:pb-20">
+          <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+            {/* Left column — title above, description in frosted glass */}
+            <div className="max-w-2xl">
+              {richText && (
+                <>
+                  {/* Title — sits directly on the hero image with strong shadow for readability */}
+                  <RichText
+                    className="mb-0 [&_h1]:text-3xl [&_h1]:leading-tight [&_h1]:font-bold [&_h1]:tracking-tight [&_h1]:text-white [&_h1]:[text-shadow:0_2px_4px_rgba(0,0,0,0.8),0_4px_16px_rgba(0,0,0,0.5)] sm:[&_h1]:text-4xl lg:[&_h1]:text-5xl [&_p]:hidden"
+                    data={richText}
+                    enableGutter={false}
+                  />
+                  {/* Description — frosted glass card with realistic glass effect */}
+                  <div className="relative mt-1 overflow-hidden rounded-xl border border-white/20 bg-white/10 px-4 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-xl md:px-5 md:py-3.5">
+                    {/* Glass highlight sheen — top-left to bottom-right */}
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-white/5" />
+                    {/* Inner glow along top edge */}
+                    <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+                    <RichText
+                      className="relative mb-0 [&_h1]:hidden [&_p]:mt-0 [&_p]:mb-0 [&_p]:text-base [&_p]:leading-relaxed [&_p]:text-white/90 md:[&_p]:text-lg"
+                      data={richText}
+                      enableGutter={false}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Right column — CTA buttons aligned to bottom, frosted glass style */}
             {Array.isArray(links) && links.length > 0 && (
-              <ul className="flex gap-4 md:justify-center">
+              <div className="flex shrink-0 flex-col gap-3 sm:flex-row md:flex-col md:pb-2">
                 {links.map(({ link }, i) => {
                   return (
-                    <li key={i}>
-                      <CMSLink
-                        {...link}
-                        className={
-                          i === 0
-                            ? 'rounded-lg bg-primary px-8 py-3.5 text-base font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-xl'
-                            : 'rounded-lg border-2 border-white/80 px-8 py-3.5 text-base font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:border-white hover:bg-white/10'
-                        }
-                      />
-                    </li>
+                    <CMSLink
+                      key={i}
+                      {...link}
+                      className={
+                        i === 0
+                          ? 'rounded-xl border border-white/20 bg-primary/80 px-8 py-3.5 text-center text-base font-semibold text-white shadow-[0_4px_16px_rgba(0,0,0,0.3)] backdrop-blur-md transition-all hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-xl'
+                          : 'rounded-xl border border-white/20 bg-black/25 px-8 py-3.5 text-center text-base font-semibold text-white shadow-[0_4px_16px_rgba(0,0,0,0.3)] backdrop-blur-md transition-all hover:-translate-y-0.5 hover:bg-black/35 hover:shadow-xl'
+                      }
+                    />
                   )
                 })}
-              </ul>
+              </div>
             )}
           </div>
         </div>
       </div>
-      {/* Gradual bottom fade — multi-layer gradient for seamless transition into page */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-24 bg-gradient-to-b from-transparent via-background/40 to-background" />
+      {/* Bottom fade into page content — extended for smooth transition */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-40 bg-gradient-to-b from-transparent via-background/40 to-background md:h-48" />
     </div>
   )
 }

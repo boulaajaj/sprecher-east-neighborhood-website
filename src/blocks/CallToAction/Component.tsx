@@ -7,16 +7,13 @@ import { CMSLink } from '@/components/Link'
 
 export const CallToActionBlock: React.FC<CTABlockProps> = ({ links, richText }) => {
   return (
-    <div
-      className="bg-gradient-to-br from-primary to-primary-dark py-12 md:py-16"
-      data-theme="dark"
-    >
+    <div className="bg-background py-8 md:py-10" data-theme="dark">
       <div className="container">
         <div className="flex flex-col items-center gap-6 text-center md:flex-row md:gap-12 md:text-left">
           <div className="max-w-[48rem] flex-1">
             {richText && (
               <RichText
-                className="mb-0 text-white [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-white md:[&_h2]:text-3xl [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-white md:[&_h3]:text-2xl [&_p]:mt-2 [&_p]:text-base [&_p]:text-white/90 md:[&_p]:text-lg"
+                className="mb-0 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-primary md:[&_h2]:text-3xl [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-primary md:[&_h3]:text-2xl [&_p]:mt-2 [&_p]:text-base [&_p]:text-foreground md:[&_p]:text-lg"
                 data={richText}
                 enableGutter={false}
               />
@@ -31,8 +28,8 @@ export const CallToActionBlock: React.FC<CTABlockProps> = ({ links, richText }) 
                   {...link}
                   className={
                     i === 0
-                      ? 'rounded-lg bg-white px-8 py-3 text-base font-semibold text-primary shadow-lg transition-all hover:-translate-y-0.5 hover:bg-white/95 hover:shadow-xl'
-                      : 'rounded-lg border-2 border-white px-8 py-3 text-base font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-white/10'
+                      ? 'rounded-lg bg-primary px-8 py-3 text-base font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-xl'
+                      : 'rounded-lg bg-accent px-8 py-3 text-base font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-accent/90 hover:shadow-xl'
                   }
                 />
               )
