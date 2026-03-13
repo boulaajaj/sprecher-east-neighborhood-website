@@ -17,17 +17,21 @@ import { EventHero } from '@/heros/EventHero'
 import PageClient from './page.client'
 
 export async function generateStaticParams() {
-  const payload = await getPayload({ config: configPromise })
-  const events = await payload.find({
-    collection: 'events',
-    draft: false,
-    limit: 1000,
-    overrideAccess: false,
-    pagination: false,
-    select: { slug: true },
-  })
+  try {
+    const payload = await getPayload({ config: configPromise })
+    const events = await payload.find({
+      collection: 'events',
+      draft: false,
+      limit: 1000,
+      overrideAccess: false,
+      pagination: false,
+      select: { slug: true },
+    })
 
-  return events.docs.map(({ slug }) => ({ slug }))
+    return events.docs.map(({ slug }) => ({ slug }))
+  } catch {
+    return []
+  }
 }
 
 type Args = {
