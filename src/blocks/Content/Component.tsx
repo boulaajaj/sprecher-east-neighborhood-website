@@ -22,12 +22,10 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
   const isMultiColumn = colCount > 1 && columns?.some((col) => col?.size !== 'full')
   const isFourColumns = colCount === 4 && columns?.every((col) => col?.size !== 'full')
   // Two-column content layout (e.g., twoThirds + oneThird) — no card styling
+  // colCount === 2 already excludes isFourColumns (colCount === 4), so no extra guard needed
   const isContentColumns =
-    isMultiColumn &&
-    !isFourColumns &&
-    colCount === 2 &&
-    columns?.some((col) => col?.size !== 'half')
-  // Card grid: 3+ equal columns (stats, features, etc.)
+    isMultiColumn && colCount === 2 && columns?.some((col) => col?.size !== 'half')
+  // Card grid: 2+ equal columns (e.g., two half-width cols, three thirds, etc.)
   const isCardGrid = isMultiColumn && !isFourColumns && !isContentColumns
 
   return (

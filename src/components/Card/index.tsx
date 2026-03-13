@@ -63,34 +63,36 @@ export const Card: React.FC<{
         )}
       </div>
       <div className="p-5 md:p-6">
-        <div className="mb-3 flex flex-wrap items-center gap-2">
-          {publishedAt && (
-            <time className="text-xs font-medium text-muted-foreground" dateTime={publishedAt}>
-              {formatDateShort(publishedAt)}
-            </time>
-          )}
-          {showCategories && hasCategories && publishedAt && (
-            <span className="text-muted-foreground/40" aria-hidden="true">
-              &middot;
-            </span>
-          )}
-          {showCategories &&
-            hasCategories &&
-            categories?.map((category, index) => {
-              if (typeof category === 'object') {
-                const { title: titleFromCategory } = category
-                const categoryTitle = titleFromCategory || 'Untitled category'
+        {(publishedAt || (showCategories && hasCategories)) && (
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            {publishedAt && (
+              <time className="text-xs font-medium text-muted-foreground" dateTime={publishedAt}>
+                {formatDateShort(publishedAt)}
+              </time>
+            )}
+            {showCategories && hasCategories && publishedAt && (
+              <span className="text-muted-foreground/40" aria-hidden="true">
+                &middot;
+              </span>
+            )}
+            {showCategories &&
+              hasCategories &&
+              categories?.map((category, index) => {
+                if (typeof category === 'object') {
+                  const { title: titleFromCategory } = category
+                  const categoryTitle = titleFromCategory || 'Untitled category'
 
-                return (
-                  <span key={index} className={categoryPillClassName}>
-                    {categoryTitle}
-                  </span>
-                )
-              }
+                  return (
+                    <span key={index} className={categoryPillClassName}>
+                      {categoryTitle}
+                    </span>
+                  )
+                }
 
-              return null
-            })}
-        </div>
+                return null
+              })}
+          </div>
+        )}
         {titleToUse && (
           <h3 className="text-lg leading-snug font-semibold text-foreground">
             <Link className="transition-colors hover:text-primary" href={href} ref={link.ref}>
