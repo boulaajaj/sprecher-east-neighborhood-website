@@ -28,7 +28,14 @@ export const Card: React.FC<{
     | Post['heroImage']
     | undefined
 
-  const hasCategories = categories && Array.isArray(categories) && categories.length > 0
+  const renderableCategories =
+    showCategories && Array.isArray(categories)
+      ? categories.filter(
+          (category): category is Exclude<typeof category, number | string> =>
+            typeof category === 'object' && category !== null,
+        )
+      : []
+  const hasCategories = renderableCategories.length > 0
   const titleToUse = titleFromProps || title
   const sanitizedDescription = description?.replace(/\u00A0/g, ' ') // replace non-breaking space with regular space
   const href = `/${relationTo}/${slug}`
@@ -70,26 +77,19 @@ export const Card: React.FC<{
                 {formatDateShort(publishedAt)}
               </time>
             )}
-            {showCategories && hasCategories && publishedAt && (
+            {hasCategories && publishedAt && (
               <span className="text-muted-foreground/40" aria-hidden="true">
                 &middot;
               </span>
             )}
-            {showCategories &&
-              hasCategories &&
-              categories?.map((category, index) => {
-                if (typeof category === 'object') {
-                  const { title: titleFromCategory } = category
-                  const categoryTitle = titleFromCategory || 'Untitled category'
-
-                  return (
-                    <span key={index} className={categoryPillClassName}>
-                      {categoryTitle}
-                    </span>
-                  )
-                }
-
-                return null
+            {hasCategories &&
+              renderableCategories.map((category, index) => {
+                const categoryTitle = category.title || 'Untitled category'
+                return (
+                  <span key={index} className={categoryPillClassName}>
+                    {categoryTitle}
+                  </span>
+                )
               })}
           </div>
         )}
