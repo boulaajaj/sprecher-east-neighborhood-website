@@ -6,8 +6,9 @@ import React from 'react'
 import type { Post } from '@/payload-types'
 
 import { Media } from '@/components/Media'
+import { formatDateShort } from '@/utilities/formatDateTime'
 
-export type CardPostData = Pick<Post, 'slug' | 'categories' | 'meta' | 'title'>
+export type CardPostData = Pick<Post, 'slug' | 'categories' | 'meta' | 'title' | 'publishedAt'>
 
 export const Card: React.FC<{
   alignItems?: 'center'
@@ -20,14 +21,21 @@ export const Card: React.FC<{
   const { card, link } = useClickableCard({})
   const { className, doc, relationTo, showCategories, title: titleFromProps } = props
 
-  const { slug, categories, meta, title } = doc || {}
+  const { slug, categories, meta, publishedAt, title } = doc || {}
   const { description } = meta || {}
   // meta.image is added by the SEO plugin but missing from Payload's generated types
   const metaImage = (meta as Record<string, unknown> | undefined)?.image as
     | Post['heroImage']
     | undefined
 
-  const hasCategories = categories && Array.isArray(categories) && categories.length > 0
+  const renderableCategories =
+    showCategories && Array.isArray(categories)
+      ? categories.filter(
+          (category): category is Exclude<typeof category, number | string> =>
+            typeof category === 'object' && category !== null,
+        )
+      : []
+  const hasCategories = renderableCategories.length > 0
   const titleToUse = titleFromProps || title
   const sanitizedDescription = description?.replace(/\u00A0/g, ' ') // replace non-breaking space with regular space
   const href = `/${relationTo}/${slug}`
@@ -62,22 +70,27 @@ export const Card: React.FC<{
         )}
       </div>
       <div className="p-5 md:p-6">
-        {showCategories && hasCategories && (
-          <div className="mb-3 flex flex-wrap gap-2">
-            {categories?.map((category, index) => {
-              if (typeof category === 'object') {
-                const { title: titleFromCategory } = category
-                const categoryTitle = titleFromCategory || 'Untitled category'
-
+        {(publishedAt || (showCategories && hasCategories)) && (
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            {publishedAt && (
+              <time className="text-xs font-medium text-muted-foreground" dateTime={publishedAt}>
+                {formatDateShort(publishedAt)}
+              </time>
+            )}
+            {hasCategories && publishedAt && (
+              <span className="text-muted-foreground/40" aria-hidden="true">
+                &middot;
+              </span>
+            )}
+            {hasCategories &&
+              renderableCategories.map((category, index) => {
+                const categoryTitle = category.title || 'Untitled category'
                 return (
                   <span key={index} className={categoryPillClassName}>
                     {categoryTitle}
                   </span>
                 )
-              }
-
-              return null
-            })}
+              })}
           </div>
         )}
         {titleToUse && (
