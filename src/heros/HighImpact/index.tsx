@@ -58,8 +58,8 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
                       {...link}
                       className={
                         i === 0
-                          ? 'rounded-xl border border-white/20 bg-primary/80 px-8 py-3.5 text-center text-base font-semibold text-white shadow-[0_4px_16px_rgba(0,0,0,0.3)] backdrop-blur-md transition-all hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-xl'
-                          : 'rounded-xl border border-white/20 bg-black/25 px-8 py-3.5 text-center text-base font-semibold text-white shadow-[0_4px_16px_rgba(0,0,0,0.3)] backdrop-blur-md transition-all hover:-translate-y-0.5 hover:bg-black/35 hover:shadow-xl'
+                          ? 'rounded-xl bg-primary px-8 py-3.5 text-center text-base font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-xl'
+                          : 'rounded-xl bg-accent px-8 py-3.5 text-center text-base font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-accent/90 hover:shadow-xl'
                       }
                     />
                   )
