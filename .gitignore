@@ -61,3 +61,30 @@ CLAUDE.local.md
 
 # Local screenshots
 homepage-local.png
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Testing
+/coverage
+
+# Editors / IDEs
+.idea/
+
+# Environment variables (bare .env is never committed either)
+.env
+
+# Claude Code — local agent state (project settings.json is OK to commit)
+.claude/agent-memory/
+.claude/worktrees/
+
+# Other local agent tooling
+.claire/
+
+# Local scratch media (root-level screenshots, source photo dumps)
+/*.png
+/*.jpg
+Sprecher-East-Photo_Album/
