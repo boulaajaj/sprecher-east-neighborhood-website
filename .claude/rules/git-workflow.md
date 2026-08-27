@@ -32,7 +32,7 @@ Role tags match the consolidated skill profiles:
 
 ### Starting a Session
 
-1. `cd ~/OneDrive/sprecher-east-neighborhood-website`
+1. `cd` into your local clone of this repository
 2. `git checkout main && git pull origin main`
 3. Create a feature branch: `git checkout -b agent/<role>/<description>`
 4. Work on the branch — commit frequently with clear messages

@@ -23,8 +23,8 @@
 ## SSH Key
 
 - Type: ed25519
-- Private key location (local): C:\Users\ameen\.ssh\id_ed25519_sprecher
-- Public key location (local): C:\Users\ameen\.ssh\id_ed25519_sprecher.pub
+- Private key location (local): `~/.ssh/id_ed25519_sprecher`
+- Public key location (local): `~/.ssh/id_ed25519_sprecher.pub`
 - Key comment: github-actions-deploy
 - Status: Added to Hostinger hPanel ✓ — still needs GitHub secrets
 
@@ -34,7 +34,7 @@
 | ----------- | ----------------------------------------------------------------- |
 | VPS_HOST    | 187.77.27.93                                                      |
 | VPS_USER    | root                                                              |
-| VPS_SSH_KEY | contents of C:\Users\ameen\.ssh\id_ed25519_sprecher (private key) |
+| VPS_SSH_KEY | contents of `~/.ssh/id_ed25519_sprecher` (private key)            |
 | VPS_PORT    | 22                                                                |
 
 ## App on Server
