@@ -70,19 +70,24 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 }
 
 export async function generateStaticParams() {
-  const payload = await getPayload({ config: configPromise })
-  const { totalDocs } = await payload.count({
-    collection: 'posts',
-    overrideAccess: false,
-  })
+  try {
+    const payload = await getPayload({ config: configPromise })
+    const { totalDocs } = await payload.count({
+      collection: 'posts',
+      overrideAccess: false,
+    })
 
-  const totalPages = Math.ceil(totalDocs / 12)
+    const totalPages = Math.ceil(totalDocs / 12)
 
-  const pages: { pageNumber: string }[] = []
+    const pages: { pageNumber: string }[] = []
 
-  for (let i = 1; i <= totalPages; i++) {
-    pages.push({ pageNumber: String(i) })
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push({ pageNumber: String(i) })
+    }
+
+    return pages
+  } catch (error) {
+    console.error('[posts/page] generateStaticParams failed; falling back to []', error)
+    return []
   }
-
-  return pages
 }
