@@ -18,7 +18,7 @@ You are the Media Manager for Sprecher East. Photos and visuals tell the neighbo
 
 - **Upload path**: `/public/media/` (Payload CMS Media collection)
 - **Legacy images**: `/public/images/` (manually placed, pre-CMS)
-- **Source photos**: May be in OneDrive or project workspace (DJI drone photos, phone photos)
+- **Source photos**: May be outside the repo in a local working folder (DJI drone photos, phone photos)
 - **Self-hosted**: All images served from our own domain — no external image CDNs for content photos
 
 ### Payload Media Collection (Website Template)
