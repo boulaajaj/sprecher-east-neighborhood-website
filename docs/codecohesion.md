@@ -1,6 +1,6 @@
 # CodeCohesion — 3D architecture and churn view
 
-**Tracking issue:** #96 · **Upstream:** [virtualgenius/codecohesion](https://github.com/virtualgenius/codecohesion) (MIT) · **Pairs with:** [Graphify](graphify.md) (#95)
+**Tracking issue:** #96 · **Upstream:** [virtualgenius/codecohesion](https://github.com/virtualgenius/codecohesion) (MIT) · **Pairs with:** Graphify (#95, evaluated in PR #98)
 
 CodeCohesion turns the git history into an interactive 3D "solar system": directories are hubs, files are satellites, and color modes show churn, age, ownership, hotspots, and temporal-coupling clusters (files that keep changing together). A Gource-style timeline replays every commit.
 
@@ -10,14 +10,14 @@ Graphify answers _what connects to what_ (imports, calls, concepts). CodeCohesio
 
 `codecohesion-out/` is a self-contained static build of the upstream viewer with this repo's data baked in (about 4 MB):
 
-| Path                                                         | What it is                                                                    |
-| ------------------------------------------------------------ | ----------------------------------------------------------------------------- |
-| `index.html`, `assets/*.js`, `favicon-*.svg`                 | Upstream viewer, built with a relative base so it runs anywhere               |
-| `data/sprecher-east-neighborhood-website.json`               | HEAD snapshot: 335 files, 106k LOC, per-file git metadata                     |
-| `data/sprecher-east-neighborhood-website-timeline-full.json` | Timeline V2: every commit as a delta (295 commits, Feb–Sep 2026)              |
-| `data/repos.json`                                            | Repo manifest the viewer reads on load                                        |
-| `standalone.html`                                            | Single-file build (viewer + data inlined); opens by double-click, no server   |
-| `codecohesion/data/*-coupling.json`                          | Temporal-coupling graph: 763 files, 5,156 co-change edges, 8 Louvain clusters |
+| Path                                                         | What it is                                                                                     |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| `index.html`, `assets/*.js`, `favicon-*.svg`                 | Upstream viewer, built with a relative base; two small markup fixes applied by the pack script |
+| `data/sprecher-east-neighborhood-website.json`               | HEAD snapshot: 335 files, 106k LOC, per-file git metadata                                      |
+| `data/sprecher-east-neighborhood-website-timeline-full.json` | Timeline V2: every commit as a delta (295 commits, Feb–Sep 2026)                               |
+| `data/repos.json`                                            | Repo manifest the viewer reads on load                                                         |
+| `standalone.html`                                            | Single-file build (viewer + data inlined); opens by double-click, no server                    |
+| `codecohesion/data/*-coupling.json`                          | Temporal-coupling graph: 763 files, 5,156 co-change edges, 8 Louvain clusters                  |
 
 The coupling file lives under `codecohesion/data/` because the upstream viewer fetches it from the absolute path `/codecohesion/data/<repo>-coupling.json` (a leftover from its GitHub Pages deployment). It is duplicated under the timeline name so the "Coupling Clusters" color mode also works during timeline playback.
 
@@ -68,11 +68,10 @@ npx vite build --base ./
 #    dist/data/<repo>.json, <repo>-timeline-full.json     -> codecohesion-out/data/
 #    <repo>-coupling.json (+ copy as <repo>-timeline-full-coupling.json)
 #                                                          -> codecohesion-out/codecohesion/data/
-#    write codecohesion-out/data/repos.json as {"repos":["sprecher-east-neighborhood-website"]}
-#    set "repositoryPath" to the repo name in every JSON (no local paths in the public repo)
 
-# 4. single-file build
-python scripts/codecohesion-pack.py codecohesion-out codecohesion-out/standalone.html /tmp/unused-fragment.html
+# 4. post-process and pack (fixes upstream markup, strips local paths,
+#    writes data/repos.json and standalone.html)
+python scripts/codecohesion-pack.py codecohesion-out
 ```
 
 Regenerate after large refactors or roughly once per sprint. The full-delta run takes under a minute for this repo.
