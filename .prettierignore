@@ -7,3 +7,5 @@ _legacy
 *.db
 package-lock.json
 src/app/(payload)
+graphify-out
+codecohesion-out
