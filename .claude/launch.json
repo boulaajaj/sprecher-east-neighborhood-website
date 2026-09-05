@@ -6,6 +6,18 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "graphify-out",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "4173", "-d", "graphify-out"],
+      "port": 4173
+    },
+    {
+      "name": "codecohesion-out",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "4174", "-d", "codecohesion-out"],
+      "port": 4174
     }
   ]
 }

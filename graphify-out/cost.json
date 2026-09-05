@@ -1,0 +1,13 @@
+{
+  "runs": [
+    {
+      "date": "2026-09-05T08:33:44.025977+00:00",
+      "input_tokens": 29032938,
+      "output_tokens": 57127,
+      "files": 306,
+      "note": "semantic pass ran as 40 Claude Code subagents; input includes prompt-cache reads"
+    }
+  ],
+  "total_input_tokens": 29032938,
+  "total_output_tokens": 57127
+}
