@@ -30,6 +30,8 @@ export default [
       'next-env.d.ts',
       'src/app/(payload)/**',
       'scripts/**',
+      'graphify-out/**',
+      'codecohesion-out/**',
       'src/migrations/**',
       'src/endpoints/seed/**',
       '.eslintcache',
