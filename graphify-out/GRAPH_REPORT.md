@@ -5,7 +5,7 @@
 
 ## Summary
 - 1640 nodes · 3437 edges · 148 communities (91 shown, 48 thin omitted)
-- Extraction: 86% EXTRACTED · 14% INFERRED · 0% AMBIGUOUS · INFERRED: 475 edges (avg confidence: 0.84)
+- Extraction: 86% EXTRACTED · 14% INFERRED · <1% AMBIGUOUS (10 edges, listed under "Ambiguous Edges" below) · INFERRED: 475 edges (avg confidence: 0.84)
 - Token cost: 29,032,938 input · 57,127 output (semantic pass via 40 Claude Code subagents; input includes prompt-cache reads)
 
 ## Community Hubs (Navigation)

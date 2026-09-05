@@ -1,6 +1,6 @@
 # Graphify — codebase knowledge graph
 
-**Tracking issue:** #95 · **Upstream:** [safishamsi/graphify](https://github.com/safishamsi/graphify) (PyPI `graphifyy` 0.9.54, Apache-2.0/MIT) · **Pairs with:** [CodeCohesion](codecohesion.md) (#96)
+**Tracking issue:** #95 · **Upstream:** [safishamsi/graphify](https://github.com/safishamsi/graphify) (PyPI `graphifyy` 0.9.54, Apache-2.0/MIT) · **Pairs with:** CodeCohesion (#96, evaluated in PR #99)
 
 Graphify turns the repo into a queryable knowledge graph. Code is parsed structurally (tree-sitter, no LLM), and docs and images go through Claude subagents that extract named concepts, relationships, and the _why_ behind decisions. Everything is merged into one graph, clustered into communities, and exported as an interactive HTML page, a JSON file for tooling, and a plain-language audit report.
 
