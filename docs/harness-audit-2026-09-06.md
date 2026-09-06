@@ -70,6 +70,12 @@ are deferred to security PRs with runtime/build verification; no versions were
 changed in this harness cleanup. The restored dependency gate may therefore fail
 until those updates land.
 
+The first restored CI run passed ESLint and CodeQL and confirmed the dependency
+audit failure. It also found formatting drift in `docs/memory/vps.md` and
+`MIGRATION.md`; both received formatting-only corrections. The harness work is
+tracked in [draft PR #100](https://github.com/boulaajaj/sprecher-east-neighborhood-website/pull/100),
+kept draft while dependency security remediation is outstanding.
+
 Understood sufficiently to change: agent entry routing, checked-in tool commands,
 current configuration paths, obsolete review boundaries, and workflow activation.
 Inspected only: specialist role profiles, application behavior, deployment
