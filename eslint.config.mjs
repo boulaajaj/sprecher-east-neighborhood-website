@@ -22,6 +22,7 @@ export default [
       'out/**',
       'build/**',
       'node_modules/**',
+      '.npm-cache/**',
       'data/**',
       '_legacy/**',
       '*.config.js',

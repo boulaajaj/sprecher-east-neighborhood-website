@@ -4,6 +4,7 @@ out/
 
 # Dependencies
 node_modules/
+.npm-cache/
 
 # Environment variables (never commit these)
 .env.local
