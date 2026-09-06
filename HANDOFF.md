@@ -1,5 +1,8 @@
 # Sprecher East — Project Handoff
 
+> Historical Sanity-era record, superseded by `AGENTS.md` and `CLAUDE.md`.
+> Do not use the setup or deployment instructions below for the current app.
+
 **Last updated:** 2026-02-19
 **Status:** Next.js + Tailwind + Sanity app built. Needs `npm install` + image migration to run.
 

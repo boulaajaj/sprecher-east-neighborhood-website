@@ -61,3 +61,10 @@ Sprint dates: March 1 - March 14, 2026
 ### Process Changes
 
 - _Pending first retro_
+
+### 2026-09-06 — [C-Builder] Harness audit
+
+- Observation: Claude-specific guidance drifted from the Payload source tree and Lint was disabled by inactivity.
+- Impact: Codex lacked a repository entry point, and passing PR builds omitted formatting and dependency gates.
+- Action: Added AGENTS.md, corrected primary guidance, restored Lint, and recorded remaining gaps in docs/harness-audit-2026-09-06.md.
+- Recommendation: Review dependency findings and Code Cohesion's failed CodeQL check before merging related work.

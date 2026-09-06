@@ -16,7 +16,7 @@ This is an unofficial grassroots initiative. Always be transparent about AI assi
 - **Framework**: Next.js 15 (App Router, TypeScript)
 - **CSS**: Tailwind CSS v4 (design tokens in `src/app/(frontend)/globals.css @theme {}`)
 - **CMS**: Payload CMS v3 Website Template at `/admin` (self-hosted, SQLite `data/payload.db`)
-- **Auth**: Payload native auth (Users collection with `auth: true`) + `payload-oauth2` plugin for social login
+- **Auth**: Payload native auth (Users collection with `auth: true`); social OAuth is not installed
 - **Rich Text**: Lexical editor with slash menu, toolbars, inline images, and custom blocks
 - **Icons**: Lucide React
 - **Hosting**: Hostinger VPS (Ubuntu 24.04, PM2 + Caddy)
@@ -55,7 +55,7 @@ src/
   endpoints/       Custom API endpoints
   fields/          Reusable Payload field groups (slug, link, hero)
   Footer/          Footer global component
-  globals/         Payload global configs (Header, Footer)
+  # Global configs live in Header/config.ts and Footer/config.ts
   Header/          Header global component
   heros/           Hero block components (HighImpact, MediumImpact, LowImpact, PostHero)
   hooks/           Server-side hooks (revalidation, format slug, etc.)
@@ -68,27 +68,27 @@ src/
 - **Blocks**: Each block in `src/blocks/` has a Payload config and a React component — pages compose content from these
 - **Heros**: Hero components in `src/heros/` render per-page hero sections (4 types)
 - **Collections**: Payload collection configs in `src/collections/` define data models with access control and hooks
-- **Globals**: Singleton data (Header nav, Footer) in `src/globals/`
+- **Globals**: Singleton data (Header nav, Footer) in `src/Header/config.ts` and `src/Footer/config.ts`
 - **Components**: Shared UI in `src/components/` — no strict layer boundaries
 
 ## Key Files
 
-| File                             | Purpose                                           |
-| -------------------------------- | ------------------------------------------------- |
-| `payload.config.ts`              | Payload CMS config (SQLite, collections, plugins) |
-| `src/app/(frontend)/globals.css` | Tailwind v4 @theme block — all design tokens      |
-| `src/collections/Pages.ts`       | Pages collection with layout builder blocks       |
-| `src/collections/Posts.ts`       | Blog posts collection                             |
-| `src/collections/Events.ts`      | Events collection (custom)                        |
-| `src/collections/Users.ts`       | Users collection with Payload native auth         |
-| `src/collections/Media.ts`       | Media uploads with size variants                  |
-| `src/blocks/`                    | Layout builder block configs + React components   |
-| `src/heros/`                     | Hero block configs + React components             |
-| `src/access/`                    | Access control helpers                            |
-| `src/fields/`                    | Reusable field groups (slug, link, hero)          |
-| `src/Header/`                    | Header global component                           |
-| `src/Footer/`                    | Footer global component                           |
-| `ecosystem.config.js`            | PM2 config for VPS                                |
+| File                              | Purpose                                           |
+| --------------------------------- | ------------------------------------------------- |
+| `src/payload.config.ts`           | Payload CMS config (SQLite, collections, plugins) |
+| `src/app/(frontend)/globals.css`  | Tailwind v4 @theme block — all design tokens      |
+| `src/collections/Pages/index.ts`  | Pages collection with layout builder blocks       |
+| `src/collections/Posts/index.ts`  | Blog posts collection                             |
+| `src/collections/Events/index.ts` | Events collection (custom)                        |
+| `src/collections/Users/index.ts`  | Users collection with Payload native auth         |
+| `src/collections/Media.ts`        | Media uploads with size variants                  |
+| `src/blocks/`                     | Layout builder block configs + React components   |
+| `src/heros/`                      | Hero block configs + React components             |
+| `src/access/`                     | Access control helpers                            |
+| `src/fields/`                     | Reusable field groups (slug, link, hero)          |
+| `src/Header/`                     | Header global component                           |
+| `src/Footer/`                     | Footer global component                           |
+| `ecosystem.config.js`             | PM2 config for VPS                                |
 
 ## Design Tokens
 
@@ -111,12 +111,11 @@ src/
 | Search       | `@payloadcms/plugin-search`       | Indexed search collection for fast queries        |
 | Redirects    | `@payloadcms/plugin-redirects`    | URL redirect management for SEO                   |
 | Nested Docs  | `@payloadcms/plugin-nested-docs`  | Parent/child hierarchy with breadcrumbs           |
-| OAuth        | `payload-oauth2`                  | Provider-agnostic OAuth2 social login             |
 
 ## Local Dev Setup
 
 ```bash
-npm install
+npm ci
 cp .env.local.example .env.local   # fill in secrets (see Env Vars below)
 npm run dev                         # → http://localhost:3000
 # Visit /admin for first-time Payload admin setup (create first admin user)
@@ -124,14 +123,13 @@ npm run dev                         # → http://localhost:3000
 
 ## Env Vars (all secrets go in `.env.local`, never commit)
 
-| Var                       | Purpose                                              |
-| ------------------------- | ---------------------------------------------------- |
-| `PAYLOAD_SECRET`          | Payload JWT signing (32+ random chars)               |
-| `DATABASE_URI`            | `file:./data/payload.db`                             |
-| `NEXT_PUBLIC_SERVER_URL`  | `http://localhost:3000` (dev) or production URL      |
-| `PREVIEW_SECRET`          | Draft preview URL signing                            |
-| `SITE_TIMEZONE`           | IANA timezone for dates (default: `America/Chicago`) |
-| `GOOGLE_CLIENT_ID/SECRET` | Google OAuth via payload-oauth2 (optional)           |
+| Var                      | Purpose                                              |
+| ------------------------ | ---------------------------------------------------- |
+| `PAYLOAD_SECRET`         | Payload JWT signing (32+ random chars)               |
+| `DATABASE_URI`           | `file:./data/payload.db`                             |
+| `NEXT_PUBLIC_SERVER_URL` | `http://localhost:3000` (dev) or production URL      |
+| `PREVIEW_SECRET`         | Draft preview URL signing                            |
+| `SITE_TIMEZONE`          | IANA timezone for dates (default: `America/Chicago`) |
 
 System-level env vars (not in .env.local):
 | Var | Purpose |
@@ -141,7 +139,7 @@ System-level env vars (not in .env.local):
 
 ## Known Gotchas
 
-- **npm installs**: Always use `--legacy-peer-deps` for Payload packages
+- **npm installs**: `.npmrc` supplies `legacy-peer-deps=true` for Payload packages
 - **Payload REST route**: `REST_GET(config)` — curried, NOT `REST_GET(req, config)`
 - **Payload importMap**: Auto-generated on dev server start at `src/app/(payload)/admin/importMap.js`
 - **`defaultSort`**: Must be on collection root, NOT inside `admin: {}`

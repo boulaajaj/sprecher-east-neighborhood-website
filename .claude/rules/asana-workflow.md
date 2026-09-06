@@ -1,5 +1,10 @@
 # Asana-GitHub Workflow
 
+> Migration override: `MIGRATION.md` designates GitHub Issues and Projects as the
+> source of truth for new work. The instructions below apply only to legacy Asana
+> tasks that still need reconciliation; do not create duplicate Asana tasks for
+> new GitHub work. Migration completion is not yet verified.
+
 ## Task Completion Rules
 
 A development or content task is only marked **complete** in Asana when its PR is **merged to `main`**. Until then, the task stays open with progress comments.

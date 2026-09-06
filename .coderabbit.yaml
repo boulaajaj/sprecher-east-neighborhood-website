@@ -12,24 +12,22 @@ reviews:
   path_instructions:
     - path: 'src/components/ui/**'
       instructions: |
-        These are Level 1 atomic, domain-agnostic UI primitives.
-        They must NOT import from features/, sections/, or layout/.
-        They should be pure presentational with no domain knowledge.
-    - path: 'src/components/features/**'
+        Shared UI primitives. Check accessibility and reusable interfaces.
+        Do not impose nonexistent features/sections/layout layer boundaries.
+    - path: 'src/blocks/**'
       instructions: |
-        These are Level 2 domain-specific components.
-        They can import from ui/ but NOT from sections/ or layout/.
-    - path: 'src/components/sections/**'
+        Payload layout blocks pair collection field configuration with rendering.
+        Check that rendered fields match the block schema and generated types.
+    - path: 'src/collections/**'
       instructions: |
-        These are Level 3 page sections.
-        They can import from ui/ and features/ but NOT from layout/.
-    - path: 'src/components/layout/**'
+        Check Payload access control, draft/published behavior, and hooks.
+        Flag schema changes for owner approval.
+    - path: 'src/access/**'
       instructions: |
-        App shell components (Nav, Footer, UserMenu).
-        They can import from ui/ only.
-    - path: 'src/lib/**'
+        Review authorization boundaries and role checks for least privilege.
+    - path: 'src/utilities/**'
       instructions: |
-        Utility and data layer. Must not import from components/.
+        Shared utilities. Check server/client boundaries and timezone handling.
     - path: '.github/**'
       instructions: |
         CI/CD and GitHub configuration. Review for security implications.
