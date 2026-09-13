@@ -185,3 +185,7 @@ VPS first-deploy extra steps: create `data/` dir, set env vars, run seed script,
 5. Migrate content and deploy
 
 See `docs/memory/progress.md` for full history and `docs/memory/retro/sprint-2.md` for retrospective log.
+
+## Standing Instructions From Amine (2026-09-13)
+
+- **Merging is delegated.** Amine (2026-09-13): "whenever the PRs are ready and green, merge and move to the next items on the list, don't need to wait for me to merge manually." A PR is ready when CI is green on its head, the Copilot review has no open findings, every review thread is resolved, and there is no merge conflict. Merge it (squash preferred), verify linked issues close, then continue with the next tracked item. Applies to `boulaajaj/amibou-os` and this repo. Owner login, consent, or judgment calls are still reported and left to Amine.
