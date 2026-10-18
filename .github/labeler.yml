@@ -23,7 +23,7 @@ auth:
 
 documentation:
   - changed-files:
-      - any-glob-to-any-file: ['docs/**', '*.md', 'CLAUDE.md', '.claude/**']
+      - any-glob-to-any-file: ['docs/**', '*.md', 'CLAUDE.md', '.claude/**', '.agents/**']
 
 ci:
   - changed-files:
@@ -42,3 +42,17 @@ config:
   - changed-files:
       - any-glob-to-any-file:
           ['*.config.*', '.prettierrc', '.eslintrc*', 'eslint.config.*', 'tsconfig.json']
+
+process:
+  - changed-files:
+      - any-glob-to-any-file:
+          [
+            'AGENTS.md',
+            'CONTRIBUTING.md',
+            '.agents/**',
+            '.github/ISSUE_TEMPLATE/**',
+            '.github/pull_request_template.md',
+            '.github/workflows/pr-policy.yml',
+            '.github/workflows/issue-labels.yml',
+            '.github/workflows/issue-fix-summary.yml',
+          ]
