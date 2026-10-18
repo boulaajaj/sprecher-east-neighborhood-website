@@ -1,121 +1,40 @@
 # Git Workflow and Development Lifecycle
 
-## Branch Protection
+**The change workflow is defined in [`AGENTS.md`](../../AGENTS.md), and the step-by-step
+procedure is in [`.agents/skills/change-workflow/SKILL.md`](../../.agents/skills/change-workflow/SKILL.md).**
+Both are tool-agnostic and are the source of truth. This file only adds Claude Code specifics.
+If anything here conflicts with them, `AGENTS.md` wins.
 
-- `main` is protected on both repos (website + strategy)
-- No direct pushes to main — all changes go through pull requests
-- Force pushes and branch deletion on main are blocked
+Summary: issue → branch → PR (template filled, `Closes #N`) → independent review → all
+checks green → owner approves and merges → GitHub Actions deploys. Agents never merge,
+never push to `main`, and never change code on the server.
 
-## Branch Naming Convention
+## Branch protection
 
-```
-agent/<role-tag>/<short-description>
-```
+See "How GitHub enforces this" in `AGENTS.md`. Agents use the owner's admin account, so
+nothing technical stops a bypass. Never use `gh pr merge` (with or without `--admin`), and
+never push to `main`.
 
-Examples:
+## Claude Code specifics
 
-- `agent/C-Builder/fix-auth-bug`
-- `agent/A-Content/update-about-page`
-- `agent/B-Research/audit-accessibility`
-- `agent/E-Ops/update-ci-pipeline`
+- **Before opening a PR**, run `/simplify` on the diff and fix all Critical and High findings.
+  For visual changes, it runs `/visual-design-review` across viewports and themes.
+- **Independent review:** use the `pr-review` skill in a separate session or subagent
+  (e.g. the `qa-reviewer` agent). Never review your own PR in the same context that wrote it.
+- **Polling after a push:** wait for checks in the background (`run_in_background`) using
+  `gh pr checks <number>`, about once a minute and for at most 15 minutes. Don't push while
+  waiting. If the checks still haven't finished after 15 minutes, alert the user.
+- **Asana:** if the work relates to an Asana task, add
+  `Asana: https://app.asana.com/0/0/<task_gid>/f` on its own line in the PR description.
 
-Role tags match the consolidated skill profiles:
+## Security rules
 
-- `A-Content` — Content and Voice
-- `B-Research` — Research and Quality
-- `C-Builder` — Code, design, infra, analytics
-- `D-Community` — Community and Events
-- `E-Ops` — Operations
-- `F-RD` — R&D (on-demand)
+- Never commit `.env.local` or any file with secrets, and never commit SSH private keys.
+- Secret scanning and push protection block pushes that contain secrets.
+- Fix CodeQL findings before merging. Review Dependabot PRs promptly.
 
-## Session Workflow
+## Memory backup
 
-### Starting a Session
-
-1. `cd` into your local clone of this repository
-2. `git checkout main && git pull origin main`
-3. Create a feature branch: `git checkout -b agent/<role>/<description>`
-4. Work on the branch — commit frequently with clear messages
-
-### Commit Conventions
-
-- Use imperative mood: "Add feature" not "Added feature"
-- Include Co-Authored-By line for AI-generated code
-- Keep commits focused — one logical change per commit
-- Never commit secrets, keys, or credentials
-
-### Pre-PR Checklist
-
-Before creating a pull request, run these checks in order:
-
-1. **`/simplify` (Claude Code skill)** — runs 4 parallel review agents (code reuse, code quality, efficiency, **visual design**) on the diff. For diffs touching CSS, Tailwind, HTML structure, component markup, or images, the visual design agent invokes the `/visual-design-review` skill — screenshots affected pages at all 6 viewports (320/430/768/1024/1280/1920) and both themes, produces critique + fix strategies + implementation tasks anchored to the project's brand. Fix all Critical and High findings before proceeding.
-2. **Type-check**: `npx tsc --noEmit` — must pass with zero errors
-3. **Lint & format**: `npx lint-staged --no-stash` — or run `npx eslint . && npx prettier --check .` manually
-
-### Creating a Pull Request
-
-1. Push the branch: `git push -u origin <branch-name>`
-2. Create a **Draft PR** if work is incomplete
-3. PR description must include:
-   - **Summary**: What changed and why (2-3 bullet points)
-   - **Role**: Which agent profile made the changes (e.g., `[C-Builder]`)
-   - **Asana link**: `Asana: https://app.asana.com/0/0/<task_gid>/f` — on its own line, required if the work relates to an Asana task. This is parsed by `/wrapped` to auto-complete tasks.
-   - **Test plan**: How to verify the changes work
-4. **Immediately start Post-PR Review Polling** (see section below) — do not wait for the user to remind you. This is mandatory after every push to a PR branch.
-
-### After Review Comments
-
-Once all review comments have been addressed, fixes pushed, and CI passes again:
-
-1. **Resolve all review comments on GitHub**: For each reviewer comment, reply on the PR thread explaining what was fixed and why the suggestion was adopted (or why it was declined). This gives the project owner visibility and signals to automated reviewers that the comment was addressed. Never leave comments unresolved.
-2. Review the diff — if you can't explain the code, it doesn't ship
-3. **Hand off to Amine for merge** — the agent does not merge PRs. The project owner reviews and merges to maintain visibility into what goes to production. (Squash merge preferred for clean history.)
-
-### Post-PR Review Polling
-
-After any push to a PR branch, poll for CI completion and review comments. **Do not push any commits while polling** — CI restarts on every push, so pushing mid-wait resets the clock and wastes time.
-
-**Phase 1 — Wait for CI (read-only, no pushes):**
-
-1. Start a background check (`run_in_background`) that sleeps **1 minute**, then runs `gh pr checks <number>` and `gh api repos/{owner}/{repo}/pulls/{number}/reviews`
-2. If CI + reviews are ready → go to Phase 2
-3. If not ready → sleep **1 minute**, check again
-4. Repeat 1-minute checks up to **15 minutes total** (15 checks max)
-5. If CI is still not done after 15 minutes → **stop polling and alert the user** — something is critically wrong with the build
-
-**Phase 2 — Act on results:**
-
-- **CI passed, new review comments exist**: address review comments in code, commit and push fixes, then restart Phase 1
-- **CI failed**: diagnose the failure, fix it, push, then restart Phase 1
-- **CI passed, no new review comments**:
-  - If you previously addressed review comments in code → proceed to "After Review Comments" section to reply to each resolved comment before handoff
-  - If no review comments were ever submitted → PR is ready for handoff to owner for merge
-
-**Rules:**
-
-- **Never push during Phase 1** — wait for CI to finish before making changes
-- **A push always restarts Phase 1** from the beginning (fresh 15-minute window)
-- **15-minute hard cap** per CI run — if exceeded, escalate to user
-- Use `run_in_background` bash parameter — no external scheduling needed
-- This keeps session context alive (diff, files, PR number) so review comments can be fixed immediately
-
-### Deploying to Production
-
-- Merging to `main` triggers the deploy workflow automatically
-- Deploy goes to VPS via SSH (PM2 + Caddy)
-- Only one deploy runs at a time (concurrency group)
-- Monitor the GitHub Actions tab for deploy status
-
-## Security Rules
-
-- Never commit `.env.local` or any file with secrets
-- Never commit SSH private keys
-- Secret scanning + push protection is enabled (will block pushes containing secrets)
-- CodeQL runs on every PR — fix any security findings before merging
-- Dependabot will open PRs for vulnerable dependencies — review and merge promptly
-
-## Memory Backup
-
-- Session memory snapshots are committed to `docs/memory/` via PR
-- This provides version-controlled backup of project context
-- Memory PRs follow the same branch/PR workflow as code changes
+Project context belongs in the repository (`AGENTS.md`, `CLAUDE.md`, `.claude/rules/`,
+`docs/memory/`), not in any tool's private memory. Updates go through the same issue → PR
+workflow as code.

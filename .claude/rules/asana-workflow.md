@@ -1,5 +1,10 @@
 # Asana-GitHub Workflow
 
+> **Legacy.** Asana is being retired in favor of GitHub Issues (`MIGRATION.md`, #94).
+> [`AGENTS.md`](../../AGENTS.md) defines the workflow, and wherever this file conflicts with
+> it, `AGENTS.md` wins: **every change starts with a GitHub issue**, however small. Mirroring
+> work in Asana is optional until the migration is complete.
+
 ## Task Completion Rules
 
 A development or content task is only marked **complete** in Asana when its PR is **merged to `main`**. Until then, the task stays open with progress comments.
@@ -90,7 +95,7 @@ Key GIDs (set as user env vars — see onboarding docs in strategy repo):
 
 ## Ad-Hoc Work Tracking
 
-All significant work must be tracked in Asana — not just planned sprint items. When work arises mid-session (bug report, design feedback, missing feature discovery), create an Asana task **before** starting the fix.
+All work is tracked as a GitHub issue before it starts (see `AGENTS.md`). Until the Asana migration is complete, significant work may also be mirrored as an Asana task.
 
 ### Task Categories
 
@@ -106,7 +111,7 @@ Use the category as a prefix in the task name: `[role-tag] Category: description
 
 The agent judges the category based on context — no need to ask the user which type it is.
 
-### Significance Threshold
+### Significance Threshold (Asana mirroring only — every change still needs a GitHub issue)
 
 **Create a task if** the work:
 
@@ -147,7 +152,7 @@ When the user says "all PRs are merged", "/wrapped", or similar — run this che
 
 1. **Identify**: Use the PR numbers from the current session. Verify each with `gh pr view <number> --json state` — confirm actually merged, don't assume.
 2. **Asana**: For each verified merged PR, extract the Asana task GID from the PR body (`Asana: https://app.asana.com/0/0/<task_gid>/f`). Add a completion comment with the PR link and mark the task complete. If no Asana link in the PR body, skip — not every PR maps to a task.
-3. **Memory**: Update the auto-memory `MEMORY.md` (persistent across sessions) with merged PR entries.
+3. **Memory**: Durable project context belongs in the repository (`AGENTS.md`, `docs/memory/`), updated through a PR, not in any tool's private memory.
 4. **Sync**: `git checkout main && git pull origin main`
 5. **Report**: Brief summary of what was closed.
 
