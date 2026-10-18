@@ -30,12 +30,12 @@
 
 ## GitHub Secrets needed
 
-| Secret name | Value                                                             |
-| ----------- | ----------------------------------------------------------------- |
-| VPS_HOST    | 187.77.27.93                                                      |
-| VPS_USER    | root                                                              |
-| VPS_SSH_KEY | contents of `~/.ssh/id_ed25519_sprecher` (private key)            |
-| VPS_PORT    | 22                                                                |
+| Secret name | Value                                                  |
+| ----------- | ------------------------------------------------------ |
+| VPS_HOST    | 187.77.27.93                                           |
+| VPS_USER    | root                                                   |
+| VPS_SSH_KEY | contents of `~/.ssh/id_ed25519_sprecher` (private key) |
+| VPS_PORT    | 22                                                     |
 
 ## App on Server
 

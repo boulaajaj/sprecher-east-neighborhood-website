@@ -1,0 +1,57 @@
+name: Feature or improvement
+description: New functionality or an improvement to something that works.
+title: 'feat: '
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What need or problem does this address, and for whom?
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: Proposed fix
+      description: The proposed solution (the PR has the final version).
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which parts of the project does this touch? Each choice becomes a label.
+      multiple: true
+      options:
+        - frontend
+        - cms
+        - auth
+        - styling
+        - ux
+        - ci
+        - infra
+        - config
+        - dependencies
+        - tooling
+        - migration
+        - graphify
+        - visualization
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - high
+        - medium
+        - low
+    validations:
+      required: true

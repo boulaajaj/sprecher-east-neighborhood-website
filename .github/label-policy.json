@@ -1,0 +1,20 @@
+{
+  "$comment": "Single source of truth for issue labels required by AGENTS.md. Read by issue-labels.yml and pr-policy.yml. Keep the issue forms' dropdown options in .github/ISSUE_TEMPLATE in sync.",
+  "types": ["bug", "enhancement", "documentation", "tech-debt", "process"],
+  "areas": [
+    "frontend",
+    "cms",
+    "auth",
+    "styling",
+    "ux",
+    "ci",
+    "infra",
+    "config",
+    "dependencies",
+    "tooling",
+    "migration",
+    "graphify",
+    "visualization"
+  ],
+  "priorities": { "high": "b60205", "medium": "fbca04", "low": "0e8a16" }
+}

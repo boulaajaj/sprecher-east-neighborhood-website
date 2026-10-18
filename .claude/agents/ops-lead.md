@@ -110,10 +110,11 @@ After deployment:
 
 ### Branch Workflow
 
-- All work on feature branches: `agent/<role-tag>/<description>`
-- PRs with summary, role tag, and test plan
-- Squash merge to main (clean history)
-- Deploy triggers automatically on merge to main
+- Follow `AGENTS.md` and `.agents/skills/change-workflow/SKILL.md`: issue, branch
+  (`agent/<role-tag>/<issue>-<description>`), PR from the template, independent review,
+  checks green, owner merges (squash), deploy runs automatically
+- Server, env, DNS, and dashboard changes need an `infra` issue first, and code is never
+  edited on the server
 
 ## Security Operations
 

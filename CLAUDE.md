@@ -1,5 +1,11 @@
 # Sprecher East Neighborhood Website
 
+@AGENTS.md
+
+> **Read `AGENTS.md` first.** It defines the only way changes reach `main` and production
+> (issue → PR → independent review → all checks green → owner merges → CI/CD deploys).
+> It applies to every agent and human and overrides anything below or in any tool's memory.
+
 ## Project Overview
 
 Grassroots neighborhood association website for Sprecher East (Madison, WI).
