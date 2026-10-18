@@ -1,0 +1,82 @@
+name: Issue Labels
+
+# Turns the Type / Area / Priority answers of an issue form into labels, so every
+# issue carries the labels AGENTS.md requires. Allowed values: .github/label-policy.json
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: issue-labels-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  label:
+    name: Apply labels from issue form
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          sparse-checkout: .github/label-policy.json
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const policy = JSON.parse(fs.readFileSync('.github/label-policy.json', 'utf8'));
+            const issue = context.payload.issue;
+            const current = issue.labels.map((l) => l.name);
+
+            // Issue forms render answers as "### <Label>\n\n<value>". Only accept sections
+            // whose values are all valid options, so a heading typed inside a free-text
+            // answer can't spoof a dropdown.
+            const occurrences = {};
+            for (const part of (issue.body || '').split(/^###\s+/m).slice(1)) {
+              const nl = part.indexOf('\n');
+              const title = (nl === -1 ? part : part.slice(0, nl)).trim().toLowerCase();
+              const value = nl === -1 ? '' : part.slice(nl + 1).trim();
+              const values = value === '_No response_' ? [] : value.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
+              (occurrences[title] ||= []).push(values);
+            }
+            const valid = (title, allowed) =>
+              (occurrences[title] || []).filter((vals) => vals.length && vals.every((v) => allowed.includes(v)));
+            const type = valid('type', policy.types)[0]?.[0]; // Type is the first field of its forms
+            const areas = valid('area', policy.areas).at(-1) || []; // Area/Priority are the last fields
+            const priority = valid('priority', Object.keys(policy.priorities)).at(-1)?.[0];
+
+            const add = new Set(areas);
+            const remove = [];
+            if (type) {
+              add.add(type);
+              remove.push(...current.filter((l) => policy.types.includes(l) && l !== type));
+            }
+            if (priority) {
+              const name = `priority: ${priority}`;
+              try {
+                await github.rest.issues.createLabel({ ...context.repo, name, color: policy.priorities[priority] });
+              } catch (e) {
+                if (e.status !== 422) throw e; // 422 = label already exists
+              }
+              add.add(name);
+              remove.push(...current.filter((l) => l.startsWith('priority: ') && l !== name));
+            }
+
+            for (const name of remove) {
+              try {
+                await github.rest.issues.removeLabel({ ...context.repo, issue_number: issue.number, name });
+              } catch (e) {
+                if (e.status !== 404) throw e;
+              }
+            }
+            if (add.size === 0) {
+              core.info('No issue-form answers found; nothing to label.');
+              return;
+            }
+            await github.rest.issues.addLabels({ ...context.repo, issue_number: issue.number, labels: [...add] });
+            core.info(`Labels applied: ${[...add].join(', ')}${remove.length ? `; removed: ${remove.join(', ')}` : ''}`);

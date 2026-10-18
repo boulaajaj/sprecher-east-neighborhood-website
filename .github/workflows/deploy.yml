@@ -6,7 +6,8 @@ on:
     paths-ignore:
       - '**/*.md'
       - '.claude/**'
-      - '.github/workflows/**'
+      - '.agents/**'
+      - '.github/**'
       - '.env.local.example'
       - 'docs/**'
       - 'LICENSE'

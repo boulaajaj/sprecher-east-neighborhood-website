@@ -2,45 +2,55 @@ name: CI
 
 permissions:
   contents: read
+  pull-requests: read # dorny/paths-filter lists PR files via the API
 
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - '**/*.md'
-      - '.claude/**'
-      - 'docs/**'
-      - '.env.local.example'
-      - 'LICENSE'
   pull_request:
     branches: [main]
-    paths-ignore:
-      - '**/*.md'
-      - '.claude/**'
-      - 'docs/**'
-      - '.env.local.example'
-      - 'LICENSE'
 
 jobs:
   build:
     name: Type-check & Build
     runs-on: ubuntu-latest
 
+    # The job always runs so "Type-check & Build" always reports a result
+    # (it is a required check on main). Docs-only changes skip the heavy steps.
     steps:
       - uses: actions/checkout@v6
 
+      - name: Detect code changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          predicate-quantifier: 'every'
+          filters: |
+            code:
+              - '**'
+              - '!**/*.md'
+              - '!.claude/**'
+              - '!.agents/**'
+              - '!docs/**'
+              - '!.env.local.example'
+              - '!LICENSE'
+
       - uses: actions/setup-node@v6
+        if: steps.filter.outputs.code == 'true'
         with:
           node-version: 20
           cache: npm
 
       - name: Install dependencies
+        if: steps.filter.outputs.code == 'true'
         run: npm ci
 
       - name: Type-check
+        if: steps.filter.outputs.code == 'true'
         run: npx tsc --noEmit
 
       - name: Create database tables
+        if: steps.filter.outputs.code == 'true'
         run: npx payload migrate
         env:
           PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET || 'ci-build-placeholder-secret-32chars!' }}
@@ -48,6 +58,7 @@ jobs:
           NEXT_PUBLIC_SERVER_URL: http://localhost:3000
 
       - name: Build
+        if: steps.filter.outputs.code == 'true'
         run: npm run build
         env:
           PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET || 'ci-build-placeholder-secret-32chars!' }}
