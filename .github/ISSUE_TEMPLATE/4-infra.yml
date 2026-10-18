@@ -1,0 +1,71 @@
+name: Server or infrastructure change
+description: A change to server config, env vars, DNS, or third-party dashboards (not code in this repo).
+title: 'infra: '
+labels: [infra]
+body:
+  - type: markdown
+    attributes:
+      value: Never put secret values (passwords, keys, tokens) in this issue.
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options:
+        - bug
+        - enhancement
+        - tech-debt
+        - process
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Why does something need to change?
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: Proposed fix
+      description: Exactly what will change, where (server, file, dashboard), and how to roll it back.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which parts of the project does this touch? Each choice becomes a label.
+      multiple: true
+      options:
+        - frontend
+        - cms
+        - auth
+        - styling
+        - ux
+        - ci
+        - infra
+        - config
+        - dependencies
+        - tooling
+        - migration
+        - graphify
+        - visualization
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - high
+        - medium
+        - low
+    validations:
+      required: true

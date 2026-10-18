@@ -1,0 +1,65 @@
+name: Task (docs, tech debt, process)
+description: Documentation, refactoring/tech debt, or a change to how we work.
+title: 'chore: '
+body:
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options:
+        - documentation
+        - tech-debt
+        - process
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is missing, outdated, or causing friction?
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: Proposed fix
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which parts of the project does this touch? Each choice becomes a label.
+      multiple: true
+      options:
+        - frontend
+        - cms
+        - auth
+        - styling
+        - ux
+        - ci
+        - infra
+        - config
+        - dependencies
+        - tooling
+        - migration
+        - graphify
+        - visualization
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - high
+        - medium
+        - low
+    validations:
+      required: true

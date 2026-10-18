@@ -1,0 +1,69 @@
+name: Bug
+description: Something is broken or behaves wrongly.
+title: 'bug: '
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Describe the problem. The fix itself goes in the pull request that closes this issue.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is wrong? Include what you expected and what actually happens.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to ...
+        2. Click ...
+        3. See ...
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: Proposed fix
+      description: Your current idea for the fix (optional; the PR has the final version).
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: How will we know it is fixed?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which parts of the project does this touch? Each choice becomes a label.
+      multiple: true
+      options:
+        - frontend
+        - cms
+        - auth
+        - styling
+        - ux
+        - ci
+        - infra
+        - config
+        - dependencies
+        - tooling
+        - migration
+        - graphify
+        - visualization
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - high
+        - medium
+        - low
+    validations:
+      required: true
