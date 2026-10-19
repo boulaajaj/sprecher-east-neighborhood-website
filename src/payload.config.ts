@@ -18,6 +18,7 @@ import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
+import { emailAdapterFromEnv } from './utilities/email'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -64,6 +65,12 @@ export default buildConfig({
   collections: [Pages, Posts, Events, TeamMembers, Resources, FAQ, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
+  // SMTP (Mailgun in production); unset → emails go to the server log
+  email: emailAdapterFromEnv(),
+  // Absolute links in emails (password reset). Without it Payload derives the origin from the
+  // request and, behind the Caddy proxy (http upstream vs https allowlist), falls back to a
+  // relative link that doesn't work in an email.
+  serverURL: getServerSideURL(),
   plugins,
   secret: process.env.PAYLOAD_SECRET,
   sharp,
