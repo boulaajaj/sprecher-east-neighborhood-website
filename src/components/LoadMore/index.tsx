@@ -26,15 +26,21 @@ export function useLoadMore<T extends { id: number | string }>(
   const [status, setStatus] = useState<Status>('idle')
   const [pagesLoaded, setPagesLoaded] = useState(1)
   const inFlight = useRef(false)
+  // Latest loaded page and total in refs, so a stale callback (e.g. the scroll observer
+  // firing before re-render) can never request the same page twice
+  const pageRef = useRef(initial.page)
+  const totalPagesRef = useRef(initial.totalPages)
 
   const hasMore = page < totalPages
 
   const loadMore = useCallback(async () => {
-    if (inFlight.current || !hasMore) return
+    if (inFlight.current || pageRef.current >= totalPagesRef.current) return
     inFlight.current = true
     setStatus('loading')
     try {
-      const next = await load(page + 1)
+      const next = await load(pageRef.current + 1)
+      pageRef.current = next.page
+      totalPagesRef.current = next.totalPages
       setItems((prev) => {
         // Content can shift between requests (a new post is published); skip repeats.
         const seen = new Set(prev.map((item) => item.id))
@@ -50,7 +56,7 @@ export function useLoadMore<T extends { id: number | string }>(
     } finally {
       inFlight.current = false
     }
-  }, [hasMore, load, page])
+  }, [load])
 
   return {
     items,
@@ -59,6 +65,8 @@ export function useLoadMore<T extends { id: number | string }>(
     loadMore,
     totalDocs,
     firstItemNumber: (initial.page - 1) * initial.limit + 1,
+    /** Last page loaded so far (for the no-JavaScript "next page" link). */
+    page,
     autoLoad: pagesLoaded < AUTO_LOAD_PAGES,
   }
 }
@@ -119,7 +127,7 @@ export const LoadMoreFooter: React.FC<LoadMoreFooterProps> = ({
       : `That's all ${totalDocs} ${noun}`
 
   const buttonClassName =
-    'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-primary px-6 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/10 disabled:opacity-60'
+    'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-primary px-6 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/10 aria-disabled:opacity-60'
 
   return (
     <div className={cn('mt-10 flex flex-col items-center gap-4 text-center', className)}>
@@ -154,9 +162,12 @@ export const LoadMoreFooter: React.FC<LoadMoreFooterProps> = ({
         ) : (
           <button
             type="button"
-            disabled={status === 'loading'}
+            // aria-disabled, not disabled: a disabled button drops keyboard focus to <body>
+            aria-disabled={status === 'loading'}
             className={buttonClassName}
-            onClick={onLoadMore}
+            onClick={() => {
+              if (status !== 'loading') onLoadMore()
+            }}
           >
             {status === 'loading' && (
               <Loader2 aria-hidden="true" className="h-4 w-4 motion-safe:animate-spin" />

@@ -71,7 +71,7 @@ export const EventCard: React.FC<{
 
   if (compact) {
     return (
-      <article className="group relative flex min-w-0 items-center gap-4 rounded-xl border border-border bg-card p-4 shadow-sm transition-all duration-200 focus-within:ring-2 focus-within:ring-ring hover:shadow-md motion-safe:hover:-translate-y-0.5">
+      <article className="group relative flex min-w-0 items-center gap-4 rounded-xl border border-border bg-card p-4 shadow-sm transition-all duration-200 hover:shadow-md has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring motion-safe:hover:-translate-y-0.5">
         <DateBadge date={date} className="bg-surface text-center" />
         <div className="min-w-0">
           <time className="text-xs text-muted-foreground" dateTime={toDateTimeAttr(date)}>
@@ -88,7 +88,7 @@ export const EventCard: React.FC<{
   }
 
   return (
-    <article className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-md transition-all duration-200 focus-within:ring-2 focus-within:ring-ring hover:shadow-xl motion-safe:hover:-translate-y-1">
+    <article className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-md transition-all duration-200 hover:shadow-xl has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring motion-safe:hover:-translate-y-1">
       {/* Image area with date badge overlay */}
       <div className="relative aspect-[16/9] w-full overflow-hidden">
         {heroImage && typeof heroImage === 'object' ? (

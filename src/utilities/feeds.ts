@@ -32,7 +32,13 @@ export type EventScope = 'upcoming' | 'past'
 
 /** Validates a page number coming from a URL or a client request. */
 export function parsePageNumber(value: unknown): number | null {
-  const page = Number(value)
+  // Only plain decimal digits or an integer: rejects "0x10", "2e2", true, [2], etc.
+  const page =
+    typeof value === 'number'
+      ? value
+      : typeof value === 'string' && /^\d{1,4}$/.test(value)
+        ? Number(value)
+        : NaN
   return Number.isInteger(page) && page >= 1 && page <= MAX_PAGE ? page : null
 }
 
@@ -42,7 +48,7 @@ export function isEventScope(value: unknown): value is EventScope {
 
 // Always filter on _status explicitly. `overrideAccess: false` without a user already
 // limits results to published documents, but this keeps drafts out even if a caller
-// later passes a signed-in user (any signed-in user can read drafts via the access rule).
+// later passes a signed-in admin or editor (who can read drafts via the access rule).
 const published: Where = { _status: { equals: 'published' } }
 
 export async function findPublishedPosts(page: number): Promise<FeedPage<PostFeedItem>> {

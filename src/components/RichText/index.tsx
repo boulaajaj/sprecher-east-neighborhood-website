@@ -69,9 +69,10 @@ export default function RichText(props: Props) {
         {
           container: enableGutter,
           'mx-auto prose md:prose-md dark:prose-invert': enableProse,
-          // Without a gutter the parent sets the width. `prose` brings its own 65ch
-          // max-width and `mx-auto`, which shrink and centre the text inside flex cards.
-          'w-full max-w-none!': !enableGutter,
+          // Without a gutter the parent sets the width: full width, no prose 65ch cap
+          // (otherwise `mx-auto` shrinks and centres the text inside flex cards). A max-w-*
+          // passed in className still wins, because tailwind-merge drops this max-w-none.
+          'w-full max-w-none': !enableGutter,
         },
         className,
       )}

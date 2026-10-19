@@ -37,6 +37,7 @@ export const EventsFeed: React.FC<{
         status={feed.status}
         autoLoad={feed.autoLoad}
         onLoadMore={feed.loadMore}
+        fallbackHref={`/events/list/${scope}/${feed.page + 1}`}
       />
     </>
   )

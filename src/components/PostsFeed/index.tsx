@@ -21,8 +21,6 @@ export const PostsFeed: React.FC<{ initial: FeedPage<PostFeedItem> }> = ({ initi
     )
   }
 
-  const nextPage = Math.floor((feed.firstItemNumber - 1 + feed.items.length) / initial.limit) + 1
-
   return (
     <>
       <CollectionArchive posts={feed.items} />
@@ -36,7 +34,7 @@ export const PostsFeed: React.FC<{ initial: FeedPage<PostFeedItem> }> = ({ initi
           status={feed.status}
           autoLoad={feed.autoLoad}
           onLoadMore={feed.loadMore}
-          fallbackHref={`/posts/page/${nextPage}`}
+          fallbackHref={`/posts/page/${feed.page + 1}`}
         />
       </div>
     </>

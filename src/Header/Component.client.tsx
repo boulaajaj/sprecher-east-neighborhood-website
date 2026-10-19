@@ -58,6 +58,17 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [mobileOpen, closeMobileMenu])
 
+  // Close the mobile menu if the viewport grows past the desktop breakpoint (e.g. a tablet
+  // rotated with the menu open): its close button hides there, and the scroll lock would stay
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 1024px)')
+    const onChange = (event: MediaQueryListEvent) => {
+      if (event.matches) setMobileOpen(false)
+    }
+    desktop.addEventListener('change', onChange)
+    return () => desktop.removeEventListener('change', onChange)
+  }, [])
+
   // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (mobileOpen) {
