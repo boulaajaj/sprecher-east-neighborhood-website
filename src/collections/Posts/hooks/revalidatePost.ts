@@ -4,6 +4,18 @@ import { revalidatePath, revalidateTag } from 'next/cache'
 
 import type { Post } from '../../../payload-types'
 
+/**
+ * News listings built from the published-posts feed: /posts, its numbered no-JavaScript pages,
+ * and the home page's "Recent News" block. Refresh them when a post is published, changed,
+ * unpublished or deleted, instead of waiting for the 10-minute ISR window.
+ */
+const revalidatePostLists = () => {
+  revalidatePath('/posts')
+  // A route pattern must name the route group (Next tags cached pages with their app path)
+  revalidatePath('/(frontend)/posts/page/[pageNumber]', 'page')
+  revalidatePath('/')
+}
+
 export const revalidatePost: CollectionAfterChangeHook<Post> = ({
   doc,
   previousDoc,
@@ -16,6 +28,7 @@ export const revalidatePost: CollectionAfterChangeHook<Post> = ({
       payload.logger.info(`Revalidating post at path: ${path}`)
 
       revalidatePath(path)
+      revalidatePostLists()
       revalidateTag('posts-sitemap')
     }
 
@@ -26,6 +39,7 @@ export const revalidatePost: CollectionAfterChangeHook<Post> = ({
       payload.logger.info(`Revalidating old post at path: ${oldPath}`)
 
       revalidatePath(oldPath)
+      revalidatePostLists()
       revalidateTag('posts-sitemap')
     }
   }
@@ -37,6 +51,7 @@ export const revalidateDelete: CollectionAfterDeleteHook<Post> = ({ doc, req: { 
     const path = `/posts/${doc?.slug}`
 
     revalidatePath(path)
+    revalidatePostLists()
     revalidateTag('posts-sitemap')
   }
 
