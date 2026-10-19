@@ -4,6 +4,7 @@ import type { BeforeEmail } from '@payloadcms/plugin-form-builder/types'
 import type { User } from '@/payload-types'
 import { hasAdminOrEditor } from '@/access/roles'
 import { clientIpFromHeaders } from '@/utilities/clientIp'
+import { isSingleAddress } from '@/utilities/email'
 
 /**
  * Guards for public form submissions now that the site can send real email.
@@ -16,6 +17,9 @@ import { clientIpFromHeaders } from '@/utilities/clientIp'
  *    to arbitrary addresses, including comma-separated lists. Those emails are dropped; emails
  *    to recipients the admin configured (e.g. info@) still go out. Re-enabling visitor
  *    confirmations is an owner decision (needs spam protection, see #112).
+ * 3. A Reply-To filled from the submission (e.g. "{{email}}" on the owner notification) is kept
+ *    only if it is exactly one plain address; otherwise it falls back to the From address, so a
+ *    list or junk can't send the owner's reply elsewhere. The visitor's input stays in the body.
  */
 
 const WINDOW_MS = 60 * 60 * 1000
@@ -103,7 +107,7 @@ export const dropEmailsToSubmittedAddresses: BeforeEmail = async (emails, { data
   })
   const templates = form?.emails ?? []
 
-  const allowed = emails.filter((_email, index) => {
+  const allowed = emails.flatMap((email, index) => {
     const template = templates[index]
     const fromSubmission =
       !template ||
@@ -112,8 +116,17 @@ export const dropEmailsToSubmittedAddresses: BeforeEmail = async (emails, { data
       usesSubmittedValue(template.bcc)
     if (fromSubmission) {
       req.payload.logger.warn('Form email addressed from submitted data was not sent')
+      return []
     }
-    return !fromSubmission
+    const replyTo = typeof email.replyTo === 'string' ? email.replyTo.trim() : email.replyTo
+    if (usesSubmittedValue(template.replyTo) && !(replyTo && isSingleAddress(replyTo))) {
+      req.payload.logger.warn(
+        'Form email Reply-To from submitted data was not one address; replies go to the sender address',
+      )
+      // The plugin's own default when no Reply-To is configured: the From address
+      return [{ ...email, replyTo: email.from }]
+    }
+    return [email]
   })
 
   return capEmails(allowed, req.payload.logger)

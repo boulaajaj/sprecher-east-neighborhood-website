@@ -1,6 +1,13 @@
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 
 /**
+ * One bare address (no display name, list or whitespace). Deliberately simple: it rejects
+ * lists and header tricks; the mail server does the real validation.
+ */
+export const isSingleAddress = (value: string): boolean =>
+  /^[^\s@,;<>"()]+@[^\s@,;<>"()]+\.[^\s@,;<>"()]+$/.test(value)
+
+/**
  * Payload email adapter (password resets, form-builder emails) built from SMTP_* env vars.
  * Production sends through Mailgun SMTP. With no SMTP_HOST (local dev, CI builds) this
  * returns undefined and Payload keeps its default: emails are written to the server log.
@@ -16,8 +23,16 @@ export function emailAdapterFromEnv(): ReturnType<typeof nodemailerAdapter> | un
   const user = process.env.SMTP_USER
   const pass = process.env.SMTP_PASS
 
+  const portSetting = process.env.SMTP_PORT?.trim()
+  const port = portSetting ? Number(portSetting) : 587
+  const validPort = Number.isInteger(port) && port >= 1 && port <= 65535
+
   const problems = [
     !fromAddress && 'SMTP_FROM_ADDRESS is missing',
+    fromAddress &&
+      !isSingleAddress(fromAddress) &&
+      'SMTP_FROM_ADDRESS is not a single email address',
+    !validPort && 'SMTP_PORT must be a whole number from 1 to 65535',
     Boolean(user) !== Boolean(pass) && 'SMTP_USER and SMTP_PASS must be set together',
   ].filter(Boolean)
   if (problems.length > 0 || !fromAddress) {
@@ -25,7 +40,6 @@ export function emailAdapterFromEnv(): ReturnType<typeof nodemailerAdapter> | un
     return undefined
   }
 
-  const port = Number(process.env.SMTP_PORT || 587)
   const secure = port === 465
 
   return nodemailerAdapter({
