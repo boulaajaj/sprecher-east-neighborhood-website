@@ -62,13 +62,12 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
   return (
     <div className="pt-24 pb-24">
       <PageClient />
-      <div className="container mb-16">
-        <div className="prose max-w-none text-center dark:prose-invert">
-          <h1 className="mb-8 lg:mb-16">Search</h1>
-
-          <div className="mx-auto max-w-[50rem]">
-            <Search />
-          </div>
+      <div className="container mb-12 md:mb-16">
+        <h1 className="mb-6 text-4xl font-bold tracking-tight text-foreground md:text-5xl">
+          Search
+        </h1>
+        <div className="max-w-[50rem]">
+          <Search />
         </div>
       </div>
 

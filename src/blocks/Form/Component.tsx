@@ -158,8 +158,15 @@ export const FormBlock: React.FC<
                   })}
               </div>
 
-              <Button form={formID} type="submit" variant="default">
-                {submitButtonLabel}
+              <Button
+                className="min-h-11 w-full px-6 sm:w-auto"
+                disabled={isLoading}
+                form={formID}
+                size="lg"
+                type="submit"
+                variant="default"
+              >
+                {submitButtonLabel || 'Send'}
               </Button>
             </form>
           )}

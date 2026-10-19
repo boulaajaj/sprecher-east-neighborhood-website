@@ -4,7 +4,8 @@ import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
 import type { Plugin } from 'payload'
-import { isAdmin, isAdminOrEditor } from '@/access/roles'
+import { anyone } from '@/access/anyone'
+import { isAdmin, isAdminOrEditor, isAdminOrEditorFieldAccess } from '@/access/roles'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
@@ -79,12 +80,21 @@ export const plugins: Plugin[] = [
     formOverrides: {
       access: {
         create: isAdminOrEditor,
-        read: isAdminOrEditor,
+        // Visitors must read a form's definition (fields, labels, submit button) to fill it
+        // in. With admin/editor-only read, the public contact page rendered an empty form.
+        read: anyone,
         update: isAdminOrEditor,
         delete: isAdmin,
       },
       fields: ({ defaultFields }) => {
         return defaultFields.map((field) => {
+          // Email routing (recipients, reply-to, templates) stays private.
+          if ('name' in field && field.name === 'emails' && field.type === 'array') {
+            return {
+              ...field,
+              access: { ...field.access, read: isAdminOrEditorFieldAccess },
+            }
+          }
           if ('name' in field && field.name === 'confirmationMessage') {
             return {
               ...field,
