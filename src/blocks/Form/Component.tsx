@@ -11,6 +11,8 @@ import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 
 import { fields } from './fields'
 import { getClientSideURL } from '@/utilities/getURL'
+import { TURNSTILE_SITE_KEY, TurnstileWidget } from '@/components/TurnstileWidget'
+import { TURNSTILE_TOKEN_HEADER } from '@/utilities/turnstileHeader'
 
 export type FormBlockType = {
   blockName?: string
@@ -46,12 +48,22 @@ export const FormBlock: React.FC<
   const [hasSubmitted, setHasSubmitted] = useState<boolean>()
   const [error, setError] = useState<{ message: string; status?: string } | undefined>()
   const router = useRouter()
+  // Spam check (Cloudflare Turnstile) — only when a site key is configured
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [turnstileReset, setTurnstileReset] = useState(0)
 
   const onSubmit = useCallback(
     (data: FormFieldBlock[]) => {
       let loadingTimerID: ReturnType<typeof setTimeout>
       const submitForm = async () => {
         setError(undefined)
+
+        if (TURNSTILE_SITE_KEY && !turnstileToken) {
+          setError({
+            message: 'Please wait for the spam check above to finish, or tick the box if shown.',
+          })
+          return
+        }
 
         const dataToSend = Object.entries(data).map(([name, value]) => ({
           field: name,
@@ -71,9 +83,12 @@ export const FormBlock: React.FC<
             }),
             headers: {
               'Content-Type': 'application/json',
+              ...(turnstileToken ? { [TURNSTILE_TOKEN_HEADER]: turnstileToken } : {}),
             },
             method: 'POST',
           })
+          // Tokens are single use: get a fresh one for any retry
+          if (TURNSTILE_SITE_KEY) setTurnstileReset((n) => n + 1)
 
           const res = await req.json()
 
@@ -111,7 +126,7 @@ export const FormBlock: React.FC<
 
       void submitForm()
     },
-    [router, formID, redirect, confirmationType],
+    [router, formID, redirect, confirmationType, turnstileToken],
   )
 
   return (
@@ -157,6 +172,16 @@ export const FormBlock: React.FC<
                     return null
                   })}
               </div>
+
+              {TURNSTILE_SITE_KEY && (
+                <div className="mb-6">
+                  <TurnstileWidget
+                    action="form-submission"
+                    onToken={setTurnstileToken}
+                    resetSignal={turnstileReset}
+                  />
+                </div>
+              )}
 
               <Button
                 className="min-h-11 w-full px-6 sm:w-auto"

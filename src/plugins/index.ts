@@ -7,6 +7,7 @@ import type { Plugin } from 'payload'
 import { anyone } from '@/access/anyone'
 import { isAdmin, isAdminOrEditor, isAdminOrEditorFieldAccess } from '@/access/roles'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
+import { verifyHumanSubmission } from '@/hooks/verifyHumanSubmission'
 import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { searchFields } from '@/search/fieldOverrides'
@@ -114,6 +115,9 @@ export const plugins: Plugin[] = [
       },
     },
     formSubmissionOverrides: {
+      hooks: {
+        beforeChange: [verifyHumanSubmission],
+      },
       access: {
         create: () => true,
         read: isAdmin,
