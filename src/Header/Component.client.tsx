@@ -2,7 +2,7 @@
 import { useHeaderTheme } from '@/providers/HeaderTheme'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import type { Header } from '@/payload-types'
 
@@ -24,6 +24,12 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
   const { headerTheme, setHeaderTheme } = useHeaderTheme()
   const pathname = usePathname()
   const { user, loading: authLoading, logout } = useAuth()
+  const toggleRef = useRef<HTMLButtonElement>(null)
+
+  const closeMobileMenu = useCallback((restoreFocus = false) => {
+    setMobileOpen(false)
+    if (restoreFocus) toggleRef.current?.focus()
+  }, [])
 
   useEffect(() => {
     setHeaderTheme(null)
@@ -41,6 +47,16 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  // Escape closes the mobile menu and returns focus to the toggle
+  useEffect(() => {
+    if (!mobileOpen) return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeMobileMenu(true)
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [mobileOpen, closeMobileMenu])
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -67,7 +83,8 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden items-center gap-1 md:flex">
+        {/* Desktop nav starts at lg: below 1024px the items don't fit and the page scrolls sideways */}
+        <div className="hidden items-center gap-1 lg:flex">
           <HeaderNav data={data} pathname={pathname} />
           {authLoading ? (
             <div className="h-9 w-16 animate-pulse rounded-md bg-border" />
@@ -86,14 +103,15 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
           ) : (
             <Link
               href="/login"
-              className="rounded-md px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-primary"
+              className="rounded-md px-3 py-2 text-sm font-medium whitespace-nowrap text-foreground transition-colors hover:bg-secondary hover:text-primary"
             >
               Log In
             </Link>
           )}
           <Link
             href="/contact"
-            className="ml-3 inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+            aria-current={pathname === '/contact' ? 'page' : undefined}
+            className="ml-3 inline-flex min-h-10 items-center rounded-md bg-primary px-4 py-2 text-sm font-medium whitespace-nowrap text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Contact
           </Link>
@@ -101,25 +119,34 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
 
         {/* Mobile hamburger */}
         <button
+          ref={toggleRef}
           type="button"
-          className="inline-flex items-center justify-center rounded-md p-2 text-foreground transition-colors hover:bg-secondary md:hidden"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-md text-foreground transition-colors hover:bg-secondary lg:hidden"
           onClick={() => setMobileOpen((prev) => !prev)}
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={mobileOpen}
+          aria-controls="mobile-menu"
         >
-          {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          {mobileOpen ? (
+            <X aria-hidden="true" className="h-6 w-6" />
+          ) : (
+            <Menu aria-hidden="true" className="h-6 w-6" />
+          )}
         </button>
       </div>
 
       {/* Mobile menu overlay */}
       {mobileOpen && (
-        <div className="border-t border-border bg-background md:hidden">
+        <div
+          id="mobile-menu"
+          className="max-h-[calc(100dvh-var(--header-height))] overflow-y-auto border-t border-border bg-background lg:hidden"
+        >
           <div className="container flex flex-col gap-2 py-4">
             <HeaderNav
               data={data}
               pathname={pathname}
               mobile
-              onNavigate={() => setMobileOpen(false)}
+              onNavigate={() => closeMobileMenu()}
             />
             {!authLoading && (
               <>
@@ -127,7 +154,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
                   <>
                     <Link
                       href="/account"
-                      onClick={() => setMobileOpen(false)}
+                      onClick={() => closeMobileMenu()}
                       className="block w-full rounded-md px-3 py-2.5 text-base font-medium text-foreground transition-colors hover:bg-secondary hover:text-primary"
                     >
                       {user.name || 'Account'}
@@ -136,7 +163,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
                       variant="ghost"
                       size="clear"
                       onClick={() => {
-                        setMobileOpen(false)
+                        closeMobileMenu()
                         logout()
                       }}
                       className="w-full justify-start rounded-md px-3 py-2.5 text-base font-medium text-muted-foreground"
@@ -147,7 +174,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
                 ) : (
                   <Link
                     href="/login"
-                    onClick={() => setMobileOpen(false)}
+                    onClick={() => closeMobileMenu()}
                     className="block w-full rounded-md px-3 py-2.5 text-base font-medium text-foreground transition-colors hover:bg-secondary hover:text-primary"
                   >
                     Log In
@@ -157,8 +184,9 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
             )}
             <Link
               href="/contact"
-              onClick={() => setMobileOpen(false)}
-              className="mt-2 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+              onClick={() => closeMobileMenu()}
+              aria-current={pathname === '/contact' ? 'page' : undefined}
+              className="mt-2 inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
             >
               Contact
             </Link>

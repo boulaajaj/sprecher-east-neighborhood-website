@@ -68,8 +68,10 @@ export default function RichText(props: Props) {
         'payload-richtext',
         {
           container: enableGutter,
-          'max-w-none': !enableGutter,
           'mx-auto prose md:prose-md dark:prose-invert': enableProse,
+          // Without a gutter the parent sets the width. `prose` brings its own 65ch
+          // max-width and `mx-auto`, which shrink and centre the text inside flex cards.
+          'w-full max-w-none!': !enableGutter,
         },
         className,
       )}

@@ -26,19 +26,20 @@ export const ArchiveBlock: React.FC<
       else return category
     })
 
+    // Public block: never let the Local API's default overrideAccess surface drafts,
+    // and show the newest posts first.
     const fetchedPosts = await payload.find({
       collection: 'posts',
       depth: 1,
       limit,
-      ...(flattenedCategories && flattenedCategories.length > 0
-        ? {
-            where: {
-              categories: {
-                in: flattenedCategories,
-              },
-            },
-          }
-        : {}),
+      overrideAccess: false,
+      sort: '-publishedAt',
+      where: {
+        _status: { equals: 'published' },
+        ...(flattenedCategories && flattenedCategories.length > 0
+          ? { categories: { in: flattenedCategories } }
+          : {}),
+      },
     })
 
     posts = fetchedPosts.docs

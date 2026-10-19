@@ -32,6 +32,9 @@ function isActivePath(pathname: string, href: string): boolean {
   return current === target || (target !== '/' && current.startsWith(target + '/'))
 }
 
+// The header always shows a Contact button, so a CMS "Contact" nav item would appear twice.
+const CTA_PATHS = new Set(['/contact'])
+
 interface HeaderNavProps {
   data: HeaderType
   pathname: string
@@ -40,7 +43,9 @@ interface HeaderNavProps {
 }
 
 export const HeaderNav: React.FC<HeaderNavProps> = ({ data, pathname, mobile, onNavigate }) => {
-  const navItems = data?.navItems || []
+  const navItems = (data?.navItems || []).filter(
+    ({ link }) => !CTA_PATHS.has(normalizePath(resolveHref(link))),
+  )
 
   if (mobile) {
     return (
@@ -54,8 +59,9 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ data, pathname, mobile, on
               <CMSLink
                 {...link}
                 appearance="link"
+                ariaCurrent={Boolean(active)}
                 className={cn(
-                  'block w-full rounded-md px-3 py-2.5 text-base font-medium transition-colors hover:bg-secondary hover:text-primary',
+                  'block min-h-11 w-full rounded-md px-3 py-2.5 text-base font-medium transition-colors hover:bg-secondary hover:text-primary',
                   active ? 'bg-secondary text-primary' : 'text-foreground',
                 )}
               />
@@ -65,12 +71,13 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ data, pathname, mobile, on
         <div onClick={onNavigate}>
           <Link
             href="/search"
+            aria-current={isActivePath(pathname, '/search') ? 'page' : undefined}
             className={cn(
-              'flex items-center gap-2 rounded-md px-3 py-2.5 text-base font-medium transition-colors hover:bg-secondary hover:text-primary',
+              'flex min-h-11 items-center gap-2 rounded-md px-3 py-2.5 text-base font-medium transition-colors hover:bg-secondary hover:text-primary',
               isActivePath(pathname, '/search') ? 'bg-secondary text-primary' : 'text-foreground',
             )}
           >
-            <SearchIcon className="h-5 w-5" />
+            <SearchIcon aria-hidden="true" className="h-5 w-5" />
             Search
           </Link>
         </div>
@@ -89,8 +96,9 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ data, pathname, mobile, on
             key={i}
             {...link}
             appearance="link"
+            ariaCurrent={Boolean(active)}
             className={cn(
-              'relative rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-primary',
+              'relative rounded-md px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors hover:bg-secondary hover:text-primary',
               active ? 'text-primary' : 'text-foreground',
             )}
           />
@@ -98,13 +106,14 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ data, pathname, mobile, on
       })}
       <Link
         href="/search"
+        aria-current={isActivePath(pathname, '/search') ? 'page' : undefined}
         className={cn(
           'rounded-md p-2 transition-colors hover:bg-secondary hover:text-primary',
           isActivePath(pathname, '/search') ? 'text-primary' : 'text-muted-foreground',
         )}
       >
         <span className="sr-only">Search</span>
-        <SearchIcon className="h-5 w-5" />
+        <SearchIcon aria-hidden="true" className="h-5 w-5" />
       </Link>
     </nav>
   )

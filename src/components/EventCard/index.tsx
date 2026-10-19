@@ -5,12 +5,13 @@ import { MapPin, Clock, Calendar } from 'lucide-react'
 import type { Event } from '@/payload-types'
 
 import { Media } from '@/components/Media'
-import { categoryPillClassName } from '@/utilities/ui'
-import { formatDateShort, formatDateBadge } from '@/utilities/formatDateTime'
+import { categoryPillClassName, cn } from '@/utilities/ui'
+import { formatDateShort, formatDateBadge, toDateTimeAttr } from '@/utilities/formatDateTime'
 import { getCategoryLabel } from '@/utilities/eventCategories'
 
 export type EventCardData = Pick<
   Event,
+  | 'id'
   | 'slug'
   | 'title'
   | 'date'
@@ -22,23 +23,40 @@ export type EventCardData = Pick<
   | 'heroImage'
 >
 
+/**
+ * Stretches the title link over the whole card so the card stays clickable, while the
+ * link's accessible name is just the event title (not every line of the card).
+ */
+const stretchedLinkClassName =
+  'after:absolute after:inset-0 after:rounded-[inherit] after:content-[""] focus-visible:outline-none'
+
 const DateBadge: React.FC<{
-  month: string
-  day: string
+  date: string
   size?: 'sm' | 'lg'
   className?: string
-}> = ({ month, day, size = 'sm', className = '' }) => (
-  <div
-    className={`flex shrink-0 flex-col items-center justify-center ${size === 'lg' ? 'h-16 w-16 rounded-xl' : 'h-14 w-14 rounded-lg'} ${className}`}
-  >
-    <span className="text-xs leading-none font-bold text-primary uppercase">{month}</span>
-    <span
-      className={`leading-tight font-bold text-foreground ${size === 'lg' ? 'text-2xl' : 'text-lg'}`}
+}> = ({ date, size = 'sm', className = '' }) => {
+  const { month, day } = formatDateBadge(date)
+  return (
+    <div
+      aria-hidden="true"
+      className={cn(
+        'flex shrink-0 flex-col items-center justify-center',
+        size === 'lg' ? 'h-16 w-16 rounded-xl' : 'h-14 w-14 rounded-lg',
+        className,
+      )}
     >
-      {day}
-    </span>
-  </div>
-)
+      <span className="text-xs leading-none font-bold text-primary uppercase">{month}</span>
+      <span
+        className={cn(
+          'leading-tight font-bold text-foreground',
+          size === 'lg' ? 'text-2xl' : 'text-lg',
+        )}
+      >
+        {day}
+      </span>
+    </div>
+  )
+}
 
 export const EventCard: React.FC<{
   event: EventCardData
@@ -49,87 +67,84 @@ export const EventCard: React.FC<{
 
   if (!slug) return null
 
-  const { month, day } = formatDateBadge(date)
+  const href = `/events/${slug}`
 
   if (compact) {
     return (
-      <Link
-        href={`/events/${slug}`}
-        className="group flex items-center gap-4 rounded-xl border border-border bg-card p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-      >
-        <DateBadge month={month} day={day} className="bg-surface text-center" />
+      <article className="group relative flex min-w-0 items-center gap-4 rounded-xl border border-border bg-card p-4 shadow-sm transition-all duration-200 focus-within:ring-2 focus-within:ring-ring hover:shadow-md motion-safe:hover:-translate-y-0.5">
+        <DateBadge date={date} className="bg-surface text-center" />
         <div className="min-w-0">
-          <p className="text-xs text-muted-foreground">{formatDateShort(date)}</p>
+          <time className="text-xs text-muted-foreground" dateTime={toDateTimeAttr(date)}>
+            {formatDateShort(date)}
+          </time>
           <h3 className="truncate font-semibold text-foreground group-hover:text-primary">
-            {title}
+            <Link href={href} className={stretchedLinkClassName}>
+              {title}
+            </Link>
           </h3>
         </div>
-      </Link>
+      </article>
     )
   }
 
   return (
-    <Link
-      href={`/events/${slug}`}
-      className="group overflow-hidden rounded-2xl border border-border bg-card shadow-md transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
-    >
+    <article className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-md transition-all duration-200 focus-within:ring-2 focus-within:ring-ring hover:shadow-xl motion-safe:hover:-translate-y-1">
       {/* Image area with date badge overlay */}
       <div className="relative aspect-[16/9] w-full overflow-hidden">
         {heroImage && typeof heroImage === 'object' ? (
           <Media
             resource={heroImage}
             fill
-            imgClassName="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            imgClassName="h-full w-full object-cover transition-transform duration-300 motion-safe:group-hover:scale-105"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/10 to-surface">
-            <Calendar className="h-12 w-12 text-muted-foreground/20" />
+            <Calendar aria-hidden="true" className="h-12 w-12 text-muted-foreground/20" />
           </div>
         )}
-        {/* Date badge overlay */}
         <DateBadge
-          month={month}
-          day={day}
+          date={date}
           size="lg"
           className="absolute top-3 left-3 bg-card/95 shadow-lg backdrop-blur-sm"
         />
       </div>
 
       {/* Content area */}
-      <div className="p-5 md:p-6">
+      <div className="flex flex-1 flex-col p-5 md:p-6">
         <h3 className="mb-2 text-lg leading-snug font-semibold text-foreground group-hover:text-primary">
-          {title}
+          <Link href={href} className={stretchedLinkClassName}>
+            {title}
+          </Link>
         </h3>
 
-        {/* Time */}
-        {timeStart && (
-          <div className="mb-1.5 flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Clock className="h-3.5 w-3.5 shrink-0" />
-            <span>
-              {timeStart}
-              {timeEnd ? ` – ${timeEnd}` : ''}
-            </span>
-          </div>
-        )}
+        {/* Date (the badge above is decorative) and time — never invent a time */}
+        <p className="mb-1.5 flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Clock aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
+          <span>
+            <time dateTime={toDateTimeAttr(date)}>{formatDateShort(date)}</time>
+            {timeStart ? ` · ${timeStart}${timeEnd ? ` – ${timeEnd}` : ''}` : ''}
+          </span>
+        </p>
 
-        {/* Location */}
         {locationName && (
-          <div className="mb-3 flex items-center gap-1.5 text-sm text-muted-foreground">
-            <MapPin className="h-3.5 w-3.5 shrink-0" />
+          <p className="mb-3 flex items-center gap-1.5 text-sm text-muted-foreground">
+            <MapPin aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
             <span>{locationName}</span>
-          </div>
+          </p>
         )}
 
-        {/* Description */}
         {description && (
           <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
             {description}
           </p>
         )}
 
-        {/* Category pill */}
-        {category && <span className={categoryPillClassName}>{getCategoryLabel(category)}</span>}
+        {category && (
+          <span className={cn(categoryPillClassName, 'mt-auto self-start')}>
+            {getCategoryLabel(category)}
+          </span>
+        )}
       </div>
-    </Link>
+    </article>
   )
 }

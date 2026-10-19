@@ -19,6 +19,20 @@ export const SITE_TIMEZONE = process.env.SITE_TIMEZONE || 'America/Chicago'
  * right now in the site timezone, then compare against that date at midnight UTC
  * (matching how Payload stores day-only dates).
  */
+/**
+ * Human label for the site timezone, e.g. "Central Time" for America/Chicago.
+ * Used next to event times, which are entered as plain text in site-local time.
+ */
+export function siteTimeZoneLabel(): string {
+  const part = new Intl.DateTimeFormat('en-US', {
+    timeZone: SITE_TIMEZONE,
+    timeZoneName: 'longGeneric',
+  })
+    .formatToParts(new Date())
+    .find((p) => p.type === 'timeZoneName')
+  return part?.value ?? SITE_TIMEZONE
+}
+
 export function startOfToday(): string {
   const localDate = new Intl.DateTimeFormat('en-CA', { timeZone: SITE_TIMEZONE }).format(new Date())
   return `${localDate}T00:00:00.000Z`

@@ -69,7 +69,7 @@ export default async function ResourcesPage() {
                 {grouped[cat].map((resource) => (
                   <div
                     key={resource.id}
-                    className="group rounded-2xl border border-border bg-card p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                    className="group rounded-2xl border border-border bg-card p-5 shadow-sm transition-all duration-200 hover:shadow-md motion-safe:hover:-translate-y-0.5"
                   >
                     <h3 className="mb-1.5 font-semibold text-foreground">{resource.title}</h3>
                     {resource.description && (
