@@ -36,7 +36,7 @@ export function isTurnstileEnabled(): boolean {
   const siteKey = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY)
   if (secret !== siteKey && !warnedHalfConfigured) {
     console.error(
-      '[turnstile] Spam check is OFF: set both TURNSTILE_SECRET_KEY and NEXT_PUBLIC_TURNSTILE_SITE_KEY, then rebuild',
+      '[turnstile] Spam check is OFF: only one of TURNSTILE_SECRET_KEY and NEXT_PUBLIC_TURNSTILE_SITE_KEY is set. To turn it on, set both and rebuild.',
     )
     warnedHalfConfigured = true
   }
@@ -48,7 +48,7 @@ export function isTurnstileEnabled(): boolean {
     !warnedTestSecret
   ) {
     console.warn(
-      '[turnstile] TURNSTILE_SECRET_KEY is a Cloudflare test secret, so the spam check accepts any token. Use the real keys outside local testing.',
+      '[turnstile] TURNSTILE_SECRET_KEY is a Cloudflare test secret, so the result never depends on the visitor (it always passes, or always fails). Use the real keys outside local testing.',
     )
     warnedTestSecret = true
   }
