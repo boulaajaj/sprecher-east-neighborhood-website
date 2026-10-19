@@ -2,7 +2,7 @@
 import type { FormFieldBlock, Form as FormType } from '@payloadcms/plugin-form-builder/types'
 
 import { useRouter } from 'next/navigation'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import RichText from '@/components/RichText'
 import { Alert } from '@/components/ui/alert'
@@ -11,6 +11,8 @@ import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 
 import { fields } from './fields'
 import { getClientSideURL } from '@/utilities/getURL'
+import { TURNSTILE_SITE_KEY, TurnstileWidget } from '@/components/TurnstileWidget'
+import { TURNSTILE_TOKEN_HEADER } from '@/utilities/turnstileHeader'
 
 export type FormBlockType = {
   blockName?: string
@@ -46,12 +48,42 @@ export const FormBlock: React.FC<
   const [hasSubmitted, setHasSubmitted] = useState<boolean>()
   const [error, setError] = useState<{ message: string; status?: string } | undefined>()
   const router = useRouter()
+  // Spam check (Cloudflare Turnstile) — only when a site key is configured
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [turnstileReset, setTurnstileReset] = useState(0)
+  const [turnstileBlocked, setTurnstileBlocked] = useState(false)
+  const [turnstileFailed, setTurnstileFailed] = useState(false)
+  const onTurnstileToken = useCallback((token: string | null) => {
+    setTurnstileToken(token)
+    if (token) {
+      setTurnstileFailed(false)
+      setTurnstileBlocked(false)
+    }
+  }, [])
+  const onTurnstileBlocked = useCallback(() => setTurnstileBlocked(true), [])
+  const onTurnstileError = useCallback(() => setTurnstileFailed(true), [])
+  // Blocks a double-click from sending a second request with the same single-use token
+  const submittingRef = useRef(false)
 
   const onSubmit = useCallback(
     (data: FormFieldBlock[]) => {
       let loadingTimerID: ReturnType<typeof setTimeout>
       const submitForm = async () => {
+        if (submittingRef.current) return
         setError(undefined)
+
+        if (TURNSTILE_SITE_KEY && !turnstileToken) {
+          setError({
+            message: turnstileBlocked
+              ? 'The spam check couldn’t load, so this form can’t be sent. A content blocker may be stopping it: allow challenges.cloudflare.com for this site, or try another browser.'
+              : turnstileFailed
+                ? 'The spam check ran into a problem. Please reload the page and try again.'
+                : 'One moment: the spam check is still running. If a checkbox appears above the Send button, tick it.',
+          })
+          return
+        }
+        submittingRef.current = true
+        let succeeded = false
 
         const dataToSend = Object.entries(data).map(([name, value]) => ({
           field: name,
@@ -71,6 +103,7 @@ export const FormBlock: React.FC<
             }),
             headers: {
               'Content-Type': 'application/json',
+              ...(turnstileToken ? { [TURNSTILE_TOKEN_HEADER]: turnstileToken } : {}),
             },
             method: 'POST',
           })
@@ -92,6 +125,7 @@ export const FormBlock: React.FC<
 
           setIsLoading(false)
           setHasSubmitted(true)
+          succeeded = true
 
           if (confirmationType === 'redirect' && redirect) {
             const { url } = redirect
@@ -106,12 +140,16 @@ export const FormBlock: React.FC<
           setError({
             message: 'Something went wrong.',
           })
+        } finally {
+          submittingRef.current = false
+          // Tokens are single use: after a failed attempt, get a fresh one for the retry
+          if (TURNSTILE_SITE_KEY && !succeeded) setTurnstileReset((n) => n + 1)
         }
       }
 
       void submitForm()
     },
-    [router, formID, redirect, confirmationType],
+    [router, formID, redirect, confirmationType, turnstileToken, turnstileBlocked, turnstileFailed],
   )
 
   return (
@@ -157,6 +195,17 @@ export const FormBlock: React.FC<
                     return null
                   })}
               </div>
+
+              {TURNSTILE_SITE_KEY && (
+                <div className="mb-6">
+                  <TurnstileWidget
+                    onToken={onTurnstileToken}
+                    onLoadError={onTurnstileBlocked}
+                    onWidgetError={onTurnstileError}
+                    resetSignal={turnstileReset}
+                  />
+                </div>
+              )}
 
               <Button
                 className="min-h-11 w-full px-6 sm:w-auto"
