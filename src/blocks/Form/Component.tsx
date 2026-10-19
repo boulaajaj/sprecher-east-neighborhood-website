@@ -2,7 +2,7 @@
 import type { FormFieldBlock, Form as FormType } from '@payloadcms/plugin-form-builder/types'
 
 import { useRouter } from 'next/navigation'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import RichText from '@/components/RichText'
 import { Alert } from '@/components/ui/alert'
@@ -51,19 +51,27 @@ export const FormBlock: React.FC<
   // Spam check (Cloudflare Turnstile) — only when a site key is configured
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [turnstileReset, setTurnstileReset] = useState(0)
+  const [turnstileBlocked, setTurnstileBlocked] = useState(false)
+  // Blocks a double-click from sending a second request with the same single-use token
+  const submittingRef = useRef(false)
 
   const onSubmit = useCallback(
     (data: FormFieldBlock[]) => {
       let loadingTimerID: ReturnType<typeof setTimeout>
       const submitForm = async () => {
+        if (submittingRef.current) return
         setError(undefined)
 
         if (TURNSTILE_SITE_KEY && !turnstileToken) {
           setError({
-            message: 'Please wait for the spam check above to finish, or tick the box if shown.',
+            message: turnstileBlocked
+              ? 'The spam check couldn’t load, so this form can’t be sent. A content blocker may be stopping it: allow challenges.cloudflare.com for this site, or use another way to reach us on this page.'
+              : 'One moment: the spam check is still running. If a checkbox appears above the Send button, tick it.',
           })
           return
         }
+        submittingRef.current = true
+        let succeeded = false
 
         const dataToSend = Object.entries(data).map(([name, value]) => ({
           field: name,
@@ -87,8 +95,6 @@ export const FormBlock: React.FC<
             },
             method: 'POST',
           })
-          // Tokens are single use: get a fresh one for any retry
-          if (TURNSTILE_SITE_KEY) setTurnstileReset((n) => n + 1)
 
           const res = await req.json()
 
@@ -107,6 +113,7 @@ export const FormBlock: React.FC<
 
           setIsLoading(false)
           setHasSubmitted(true)
+          succeeded = true
 
           if (confirmationType === 'redirect' && redirect) {
             const { url } = redirect
@@ -121,12 +128,16 @@ export const FormBlock: React.FC<
           setError({
             message: 'Something went wrong.',
           })
+        } finally {
+          submittingRef.current = false
+          // Tokens are single use: after a failed attempt, get a fresh one for the retry
+          if (TURNSTILE_SITE_KEY && !succeeded) setTurnstileReset((n) => n + 1)
         }
       }
 
       void submitForm()
     },
-    [router, formID, redirect, confirmationType, turnstileToken],
+    [router, formID, redirect, confirmationType, turnstileToken, turnstileBlocked],
   )
 
   return (
@@ -176,8 +187,8 @@ export const FormBlock: React.FC<
               {TURNSTILE_SITE_KEY && (
                 <div className="mb-6">
                   <TurnstileWidget
-                    action="form-submission"
                     onToken={setTurnstileToken}
+                    onLoadError={() => setTurnstileBlocked(true)}
                     resetSignal={turnstileReset}
                   />
                 </div>

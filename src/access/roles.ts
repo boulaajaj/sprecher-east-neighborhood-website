@@ -24,8 +24,8 @@ const getRole = (user: User | null): UserRole | null => {
 /** Check if user has admin role */
 const hasAdmin = (user: User | null): boolean => getRole(user) === ROLES.admin
 
-/** Check if user has admin or editor role */
-const hasAdminOrEditor = (user: User | null): boolean => {
+/** Check if user has admin or editor role (also used by hooks that exempt staff) */
+export const hasAdminOrEditor = (user: User | null): boolean => {
   const role = getRole(user)
   return role === ROLES.admin || role === ROLES.editor
 }
