@@ -8,15 +8,27 @@ import { TURNSTILE_ACTION } from './turnstileHeader'
 
 const SITEVERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
 
+/**
+ * Cloudflare's published dummy secrets (always pass / always fail / token spent). Their
+ * responses don't carry our action, so the action check is skipped for them.
+ * https://developers.cloudflare.com/turnstile/troubleshooting/testing/
+ */
+const DUMMY_SECRETS = new Set([
+  '1x0000000000000000000000000000000AA',
+  '2x0000000000000000000000000000000AA',
+  '3x0000000000000000000000000000000AA',
+])
+
 /** Turnstile tokens are at most 2048 characters. */
 const MAX_TOKEN_LENGTH = 2048
 
 let warnedHalfConfigured = false
 
 /**
- * On only when BOTH keys are set. NEXT_PUBLIC_* values are inlined at build time, so this
- * sees the same site key the browser bundle has: adding keys to .env.local without a rebuild
- * leaves the check off instead of rejecting every visitor who has no widget to solve.
+ * On only when BOTH keys are set. The site key is pinned at build time for server and browser
+ * code alike (next.config.js `env`), so this sees the same value the browser bundle has:
+ * adding keys to .env.local without a rebuild leaves the check off instead of rejecting every
+ * visitor who has no widget to solve. (Outside Next, e.g. `payload migrate`, it's read live.)
  */
 export function isTurnstileEnabled(): boolean {
   const secret = Boolean(process.env.TURNSTILE_SECRET_KEY)
@@ -67,8 +79,8 @@ export async function verifyTurnstileToken(
     if (result.success !== true) {
       return { ok: false, reason: (result['error-codes'] ?? ['unknown']).join(',') }
     }
-    // Cloudflare advises checking the action when one is set. Dummy test keys may omit it.
-    if (result.action && result.action !== TURNSTILE_ACTION) {
+    // Cloudflare advises checking the action when one is set (not meaningful for dummy keys).
+    if (!DUMMY_SECRETS.has(secret) && result.action && result.action !== TURNSTILE_ACTION) {
       return { ok: false, reason: `unexpected-action:${result.action}` }
     }
     return { ok: true }

@@ -52,6 +52,13 @@ export const FormBlock: React.FC<
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [turnstileReset, setTurnstileReset] = useState(0)
   const [turnstileBlocked, setTurnstileBlocked] = useState(false)
+  const [turnstileFailed, setTurnstileFailed] = useState(false)
+  const onTurnstileToken = useCallback((token: string | null) => {
+    setTurnstileToken(token)
+    if (token) setTurnstileFailed(false)
+  }, [])
+  const onTurnstileBlocked = useCallback(() => setTurnstileBlocked(true), [])
+  const onTurnstileError = useCallback(() => setTurnstileFailed(true), [])
   // Blocks a double-click from sending a second request with the same single-use token
   const submittingRef = useRef(false)
 
@@ -65,8 +72,10 @@ export const FormBlock: React.FC<
         if (TURNSTILE_SITE_KEY && !turnstileToken) {
           setError({
             message: turnstileBlocked
-              ? 'The spam check couldn’t load, so this form can’t be sent. A content blocker may be stopping it: allow challenges.cloudflare.com for this site, or use another way to reach us on this page.'
-              : 'One moment: the spam check is still running. If a checkbox appears above the Send button, tick it.',
+              ? 'The spam check couldn’t load, so this form can’t be sent. A content blocker may be stopping it: allow challenges.cloudflare.com for this site, or try another browser.'
+              : turnstileFailed
+                ? 'The spam check ran into a problem. Please reload the page and try again.'
+                : 'One moment: the spam check is still running. If a checkbox appears above the Send button, tick it.',
           })
           return
         }
@@ -137,7 +146,7 @@ export const FormBlock: React.FC<
 
       void submitForm()
     },
-    [router, formID, redirect, confirmationType, turnstileToken, turnstileBlocked],
+    [router, formID, redirect, confirmationType, turnstileToken, turnstileBlocked, turnstileFailed],
   )
 
   return (
@@ -187,8 +196,9 @@ export const FormBlock: React.FC<
               {TURNSTILE_SITE_KEY && (
                 <div className="mb-6">
                   <TurnstileWidget
-                    onToken={setTurnstileToken}
-                    onLoadError={() => setTurnstileBlocked(true)}
+                    onToken={onTurnstileToken}
+                    onLoadError={onTurnstileBlocked}
+                    onWidgetError={onTurnstileError}
                     resetSignal={turnstileReset}
                   />
                 </div>

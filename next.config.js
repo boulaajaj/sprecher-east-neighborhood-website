@@ -12,6 +12,13 @@ const NEXT_PUBLIC_SERVER_URL =
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  env: {
+    // Pin the Turnstile site key at build time for server AND browser code. Next only inlines
+    // NEXT_PUBLIC_* values that exist at build; when unset, server code would read a key added
+    // later to .env.local (check on) while the browser bundle has none (no widget). `env`
+    // entries are inlined even when empty, so both sides always agree.
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? '',
+  },
   images: {
     remotePatterns: [
       ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {

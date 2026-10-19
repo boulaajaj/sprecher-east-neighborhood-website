@@ -42,16 +42,26 @@ declare global {
   }
 }
 
+/** No script after this long (e.g. blocked on a client-side revisit, where onError doesn't fire). */
+const SCRIPT_LOAD_TIMEOUT_MS = 15_000
+
 type Props = {
   /** Called with a fresh token, or null when the token expires or the check errors. */
   onToken: (token: string | null) => void
   /** Called when the Turnstile script can't load (blocked or offline). */
   onLoadError?: () => void
+  /** Called when the widget reports an error (e.g. hostname not allowed, challenge failed). */
+  onWidgetError?: () => void
   /** Change this value to reset the widget (tokens are single use). */
   resetSignal?: number
 }
 
-export const TurnstileWidget: React.FC<Props> = ({ onToken, onLoadError, resetSignal = 0 }) => {
+export const TurnstileWidget: React.FC<Props> = ({
+  onToken,
+  onLoadError,
+  onWidgetError,
+  resetSignal = 0,
+}) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const widgetIdRef = useRef<string | null>(null)
   const { theme } = useTheme()
@@ -59,9 +69,20 @@ export const TurnstileWidget: React.FC<Props> = ({ onToken, onLoadError, resetSi
     () => typeof window !== 'undefined' && Boolean(window.turnstile),
   )
   const onTokenRef = useRef(onToken)
+  const onWidgetErrorRef = useRef(onWidgetError)
   useEffect(() => {
     onTokenRef.current = onToken
-  }, [onToken])
+    onWidgetErrorRef.current = onWidgetError
+  }, [onToken, onWidgetError])
+
+  // If the script never becomes available, report it as blocked
+  useEffect(() => {
+    if (!TURNSTILE_SITE_KEY || scriptReady) return
+    const timer = setTimeout(() => {
+      if (!window.turnstile) onLoadError?.()
+    }, SCRIPT_LOAD_TIMEOUT_MS)
+    return () => clearTimeout(timer)
+  }, [scriptReady, onLoadError])
 
   const removeWidget = useCallback(() => {
     if (widgetIdRef.current && window.turnstile) window.turnstile.remove(widgetIdRef.current)
@@ -81,7 +102,10 @@ export const TurnstileWidget: React.FC<Props> = ({ onToken, onLoadError, resetSi
       size: el.clientWidth < FLEXIBLE_MIN_WIDTH ? 'compact' : 'flexible',
       callback: (token) => onTokenRef.current(token),
       'expired-callback': () => onTokenRef.current(null),
-      'error-callback': () => onTokenRef.current(null),
+      'error-callback': () => {
+        onTokenRef.current(null)
+        onWidgetErrorRef.current?.()
+      },
     })
     onTokenRef.current(null)
     return removeWidget
