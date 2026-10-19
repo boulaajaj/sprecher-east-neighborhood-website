@@ -7,6 +7,7 @@ import type { Plugin } from 'payload'
 import { anyone } from '@/access/anyone'
 import { isAdmin, isAdminOrEditor, isAdminOrEditorFieldAccess } from '@/access/roles'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
+import { dropEmailsToSubmittedAddresses, rateLimitSubmissions } from '@/hooks/formSubmissionGuards'
 import { limitSubmissionSize } from '@/hooks/limitSubmissionSize'
 import { verifyHumanSubmission } from '@/hooks/verifyHumanSubmission'
 import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
@@ -76,6 +77,7 @@ export const plugins: Plugin[] = [
     generateURL,
   }),
   formBuilderPlugin({
+    beforeEmail: dropEmailsToSubmittedAddresses,
     fields: {
       payment: false,
     },
@@ -119,7 +121,8 @@ export const plugins: Plugin[] = [
       hooks: {
         // Cheapest check first: oversized submissions never reach Turnstile or the database
         beforeValidate: [limitSubmissionSize],
-        beforeChange: [verifyHumanSubmission],
+        // Rate limit before Turnstile, so a rate-limited client never triggers a Siteverify call
+        beforeChange: [rateLimitSubmissions, verifyHumanSubmission],
       },
       access: {
         create: () => true,

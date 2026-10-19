@@ -1,8 +1,11 @@
 import type { RequiredDataFromCollectionSlug } from 'payload'
 import { heading, root, p } from './helpers/lexical'
 
-const CONTACT_EMAIL_FROM =
-  process.env.CONTACT_EMAIL_FROM ?? '"Sprecher East" <no-reply@sprecher-east.org>'
+/** Optional sender override; empty uses the SMTP default (SMTP_FROM_NAME <SMTP_FROM_ADDRESS>). */
+const CONTACT_EMAIL_FROM = process.env.CONTACT_EMAIL_FROM
+
+/** Where contact-form messages are sent (e.g. the association inbox). Unset = no email. */
+const CONTACT_NOTIFY_EMAIL = process.env.CONTACT_NOTIFY_EMAIL
 
 export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
   confirmationMessage: root([
@@ -10,18 +13,19 @@ export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
     p('Your message has been received. We\u2019ll get back to you as soon as possible.'),
   ]),
   confirmationType: 'message',
-  emails: [
-    {
-      emailFrom: CONTACT_EMAIL_FROM,
-      emailTo: '{{email}}',
-      message: root([
-        p(
-          'Thank you for contacting Sprecher East. We received your message and will respond as soon as we can.',
-        ),
-      ]),
-      subject: 'We received your message \u2014 Sprecher East',
-    },
-  ],
+  // Notify the site owner; never email the address a visitor types in (the form-builder
+  // guard drops such emails anyway). Recipient comes from the environment, not the source.
+  emails: CONTACT_NOTIFY_EMAIL
+    ? [
+        {
+          ...(CONTACT_EMAIL_FROM ? { emailFrom: CONTACT_EMAIL_FROM } : {}),
+          emailTo: CONTACT_NOTIFY_EMAIL,
+          replyTo: '{{email}}',
+          message: root([p('New message from the website contact form:'), p('{{*:table}}')]),
+          subject: 'Website message: {{subject}}',
+        },
+      ]
+    : [],
   fields: [
     {
       name: 'full-name',

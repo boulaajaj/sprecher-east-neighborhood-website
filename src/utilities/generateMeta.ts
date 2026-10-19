@@ -3,23 +3,18 @@ import type { Metadata } from 'next'
 import type { Media, Page, Post, Event, Config } from '../payload-types'
 
 import { mergeOpenGraph } from './mergeOpenGraph'
-import { getServerSideURL } from './getURL'
+import { toAbsoluteURL } from './getURL'
 
 /** The CMS slug for the homepage — used to map /home → / in URLs */
 export const HOME_PAGE_SLUG = 'home'
 
 const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
-  const serverUrl = getServerSideURL()
-
-  let url = serverUrl + '/images/photo.jpeg'
-
   if (image && typeof image === 'object' && 'url' in image) {
-    const ogUrl = image.sizes?.og?.url
-
-    url = ogUrl ? serverUrl + ogUrl : serverUrl + image.url
+    const url = image.sizes?.og?.url || image.url
+    if (url) return toAbsoluteURL(url)
   }
 
-  return url
+  return toAbsoluteURL('/images/photo.jpeg')
 }
 
 type DocWithMeta = Partial<Page> | Partial<Post> | Partial<Event>
