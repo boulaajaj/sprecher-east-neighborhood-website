@@ -82,7 +82,7 @@ type LoadMoreFooterProps = {
   autoLoad: boolean
   onLoadMore: () => void
   /** Real URL of the next page, so "Load more" also works without JavaScript. */
-  fallbackHref?: string
+  fallbackHref: string
   className?: string
 }
 
@@ -99,6 +99,26 @@ export const LoadMoreFooter: React.FC<LoadMoreFooterProps> = ({
   className,
 }) => {
   const sentinelRef = useRef<HTMLDivElement>(null)
+  const controlRef = useRef<HTMLAnchorElement>(null)
+  const statusRef = useRef<HTMLParagraphElement>(null)
+  // Whether keyboard focus was on "Load more" when the current load started
+  const hadFocusRef = useRef(false)
+
+  const startLoad = useCallback(() => {
+    hadFocusRef.current =
+      controlRef.current !== null && document.activeElement === controlRef.current
+    onLoadMore()
+  }, [onLoadMore])
+
+  // The last load removes "Load more". If it had focus, the browser drops focus to <body>
+  // and the next Tab jumps to the top of the page; keep it at the end of the list instead.
+  useEffect(() => {
+    if (status !== 'idle' || hasMore || !hadFocusRef.current) return
+    hadFocusRef.current = false
+    if (!document.activeElement || document.activeElement === document.body) {
+      statusRef.current?.focus()
+    }
+  }, [hasMore, status])
 
   // Infinite scroll: load the next page shortly before the reader reaches the end.
   useEffect(() => {
@@ -108,13 +128,13 @@ export const LoadMoreFooter: React.FC<LoadMoreFooterProps> = ({
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) onLoadMore()
+        if (entries.some((entry) => entry.isIntersecting)) startLoad()
       },
       { rootMargin: '0px 0px 600px 0px' },
     )
     observer.observe(sentinel)
     return () => observer.disconnect()
-  }, [autoLoad, hasMore, onLoadMore, status])
+  }, [autoLoad, hasMore, startLoad, status])
 
   if (totalDocs === 0) return null
 
@@ -133,7 +153,14 @@ export const LoadMoreFooter: React.FC<LoadMoreFooterProps> = ({
     <div className={cn('mt-10 flex flex-col items-center gap-4 text-center', className)}>
       <div ref={sentinelRef} aria-hidden="true" className="h-px w-full" />
 
-      <p role="status" aria-live="polite" className="text-sm text-muted-foreground">
+      <p
+        ref={statusRef}
+        role="status"
+        aria-live="polite"
+        // Focus target when the last load removes "Load more" (see above); not in the tab order
+        tabIndex={-1}
+        className="rounded-sm text-sm text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
         {status === 'loading' ? `Loading more ${noun}…` : statusText}
       </p>
 
@@ -143,47 +170,34 @@ export const LoadMoreFooter: React.FC<LoadMoreFooterProps> = ({
         </p>
       )}
 
-      {hasMore &&
-        (fallbackHref ? (
-          <a
-            href={fallbackHref}
-            aria-disabled={status === 'loading'}
-            className={buttonClassName}
-            onClick={(event) => {
-              // Let Ctrl/Cmd/Shift/middle clicks open the fallback page in a new tab or window
-              if (
-                event.button !== 0 ||
-                event.metaKey ||
-                event.ctrlKey ||
-                event.shiftKey ||
-                event.altKey
-              )
-                return
-              event.preventDefault()
-              onLoadMore()
-            }}
-          >
-            {status === 'loading' && (
-              <Loader2 aria-hidden="true" className="h-4 w-4 motion-safe:animate-spin" />
-            )}
-            {status === 'error' ? 'Try again' : `Load more ${noun}`}
-          </a>
-        ) : (
-          <button
-            type="button"
-            // aria-disabled, not disabled: a disabled button drops keyboard focus to <body>
-            aria-disabled={status === 'loading'}
-            className={buttonClassName}
-            onClick={() => {
-              if (status !== 'loading') onLoadMore()
-            }}
-          >
-            {status === 'loading' && (
-              <Loader2 aria-hidden="true" className="h-4 w-4 motion-safe:animate-spin" />
-            )}
-            {status === 'error' ? 'Try again' : `Load more ${noun}`}
-          </button>
-        ))}
+      {hasMore && (
+        // A real link, so "Load more" also works without JavaScript and can open in a new tab.
+        // aria-disabled, not removal, while loading: keyboard focus stays on it.
+        <a
+          ref={controlRef}
+          href={fallbackHref}
+          aria-disabled={status === 'loading'}
+          className={buttonClassName}
+          onClick={(event) => {
+            // Let Ctrl/Cmd/Shift/middle clicks open the fallback page in a new tab or window
+            if (
+              event.button !== 0 ||
+              event.metaKey ||
+              event.ctrlKey ||
+              event.shiftKey ||
+              event.altKey
+            )
+              return
+            event.preventDefault()
+            if (status !== 'loading') startLoad()
+          }}
+        >
+          {status === 'loading' && (
+            <Loader2 aria-hidden="true" className="h-4 w-4 motion-safe:animate-spin" />
+          )}
+          {status === 'error' ? 'Try again' : `Load more ${noun}`}
+        </a>
+      )}
     </div>
   )
 }
