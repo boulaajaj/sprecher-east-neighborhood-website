@@ -9,6 +9,11 @@ import { findPublishedEvents, isEventScope, parsePageNumber } from '@/utilities/
 
 export const revalidate = 600
 
+/** No pages at build time; each one is rendered on first visit and then cached like ISR. */
+export function generateStaticParams() {
+  return []
+}
+
 type Args = {
   params: Promise<{ scope: string; page: string }>
 }

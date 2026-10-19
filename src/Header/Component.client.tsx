@@ -61,7 +61,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
   // Close the mobile menu if the viewport grows past the desktop breakpoint (e.g. a tablet
   // rotated with the menu open): its close button hides there, and the scroll lock would stay
   useEffect(() => {
-    const desktop = window.matchMedia('(min-width: 1024px)')
+    const desktop = window.matchMedia('(min-width: 64rem)') // Tailwind's lg, in rem so it tracks font size
     const onChange = (event: MediaQueryListEvent) => {
       if (event.matches) setMobileOpen(false)
     }

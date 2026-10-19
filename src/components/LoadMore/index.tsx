@@ -150,6 +150,15 @@ export const LoadMoreFooter: React.FC<LoadMoreFooterProps> = ({
             aria-disabled={status === 'loading'}
             className={buttonClassName}
             onClick={(event) => {
+              // Let Ctrl/Cmd/Shift/middle clicks open the fallback page in a new tab or window
+              if (
+                event.button !== 0 ||
+                event.metaKey ||
+                event.ctrlKey ||
+                event.shiftKey ||
+                event.altKey
+              )
+                return
               event.preventDefault()
               onLoadMore()
             }}
