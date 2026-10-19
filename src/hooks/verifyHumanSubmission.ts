@@ -2,7 +2,6 @@ import { APIError, type CollectionBeforeChangeHook } from 'payload'
 
 import type { User } from '@/payload-types'
 import { hasAdminOrEditor } from '@/access/roles'
-import { clientIpFromHeaders } from '@/utilities/clientIp'
 import { TURNSTILE_TOKEN_HEADER } from '@/utilities/turnstileHeader'
 import { isTurnstileEnabled, verifyTurnstileToken } from '@/utilities/turnstile'
 
@@ -21,10 +20,7 @@ export const verifyHumanSubmission: CollectionBeforeChangeHook = async ({
   if (hasAdminOrEditor(req.user as User | null)) return data
   if (!isTurnstileEnabled()) return data
 
-  const result = await verifyTurnstileToken(
-    req.headers?.get(TURNSTILE_TOKEN_HEADER),
-    clientIpFromHeaders(req.headers),
-  )
+  const result = await verifyTurnstileToken(req.headers?.get(TURNSTILE_TOKEN_HEADER))
 
   if (!result.ok) {
     // Why it failed goes to the log (a wrong secret looks like a bot otherwise);

@@ -7,6 +7,7 @@ import type { Plugin } from 'payload'
 import { anyone } from '@/access/anyone'
 import { isAdmin, isAdminOrEditor, isAdminOrEditorFieldAccess } from '@/access/roles'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
+import { limitSubmissionSize } from '@/hooks/limitSubmissionSize'
 import { verifyHumanSubmission } from '@/hooks/verifyHumanSubmission'
 import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
@@ -116,6 +117,8 @@ export const plugins: Plugin[] = [
     },
     formSubmissionOverrides: {
       hooks: {
+        // Cheapest check first: oversized submissions never reach Turnstile or the database
+        beforeValidate: [limitSubmissionSize],
         beforeChange: [verifyHumanSubmission],
       },
       access: {

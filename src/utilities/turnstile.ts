@@ -4,14 +4,15 @@
  * Docs: https://developers.cloudflare.com/turnstile/get-started/server-side-validation/
  */
 
+import { getServerSideURL } from './getURL'
 import { TURNSTILE_ACTION } from './turnstileHeader'
 
 const SITEVERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
 
 /**
  * Cloudflare's published dummy secrets (always pass / always fail / token spent). Their
- * responses don't carry our action, so the action check is skipped for them.
- * https://developers.cloudflare.com/turnstile/troubleshooting/testing/
+ * responses don't carry our action or hostname, so those checks are skipped for them; every
+ * other secret gets both checks. https://developers.cloudflare.com/turnstile/troubleshooting/testing/
  */
 const DUMMY_SECRETS = new Set([
   '1x0000000000000000000000000000000AA',
@@ -55,6 +56,25 @@ export function isTurnstileEnabled(): boolean {
   return enabled
 }
 
+/**
+ * Hostnames a token may come from: the site's own (NEXT_PUBLIC_SERVER_URL) plus any listed in
+ * TURNSTILE_ALLOWED_HOSTNAMES (comma-separated). A token solved on another hostname that uses
+ * the same widget (e.g. a dev host) is rejected.
+ */
+export function turnstileAllowedHostnames(): Set<string> {
+  const hosts = new Set<string>()
+  try {
+    hosts.add(new URL(getServerSideURL()).hostname.toLowerCase())
+  } catch {
+    // An invalid server URL leaves only the explicit list; with an empty list, every token fails.
+  }
+  for (const host of (process.env.TURNSTILE_ALLOWED_HOSTNAMES ?? '').split(',')) {
+    const trimmed = host.trim().toLowerCase()
+    if (trimmed) hosts.add(trimmed)
+  }
+  return hosts
+}
+
 type SiteverifyResponse = {
   success: boolean
   'error-codes'?: string[]
@@ -67,11 +87,14 @@ export type TurnstileResult = { ok: true } | { ok: false; reason: string }
 /**
  * Verifies a Turnstile token. Any failure — including a network error reaching Cloudflare —
  * returns ok: false, so a public form fails closed rather than accepting unverified posts.
- * `reason` is for server logs only (never the token or the secret).
+ * `reason` is for server logs only (never the token or the secret). Tokens are single use and
+ * expire after 5 minutes; Cloudflare enforces both (`timeout-or-duplicate`).
+ *
+ * No `remoteip` is sent: it's optional, and the only source here would be X-Forwarded-For,
+ * which a client can set itself if it ever reaches the app without going through Caddy (#118).
  */
 export async function verifyTurnstileToken(
   token: string | null | undefined,
-  remoteIp?: string | null,
 ): Promise<TurnstileResult> {
   const secret = process.env.TURNSTILE_SECRET_KEY
   if (!secret) return { ok: false, reason: 'no-secret' }
@@ -79,7 +102,6 @@ export async function verifyTurnstileToken(
   if (token.length > MAX_TOKEN_LENGTH) return { ok: false, reason: 'token-too-long' }
 
   const body = new URLSearchParams({ secret, response: token })
-  if (remoteIp) body.set('remoteip', remoteIp)
 
   try {
     const res = await fetch(SITEVERIFY_URL, {
@@ -92,9 +114,16 @@ export async function verifyTurnstileToken(
     if (result.success !== true) {
       return { ok: false, reason: (result['error-codes'] ?? ['unknown']).join(',') }
     }
-    // Cloudflare advises checking the action when one is set (not meaningful for dummy keys).
-    if (!DUMMY_SECRETS.has(secret) && result.action && result.action !== TURNSTILE_ACTION) {
-      return { ok: false, reason: `unexpected-action:${result.action}` }
+    // Cloudflare: "Validate the action and hostname when specified". Our widget always sets the
+    // action, so a missing or different one fails too. Dummy secrets don't return either.
+    if (!DUMMY_SECRETS.has(secret)) {
+      if (result.action !== TURNSTILE_ACTION) {
+        return { ok: false, reason: `unexpected-action:${result.action ?? 'none'}` }
+      }
+      const hostname = result.hostname?.toLowerCase()
+      if (!hostname || !turnstileAllowedHostnames().has(hostname)) {
+        return { ok: false, reason: `unexpected-hostname:${hostname ?? 'none'}` }
+      }
     }
     return { ok: true }
   } catch (err) {
