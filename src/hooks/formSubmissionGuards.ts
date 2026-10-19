@@ -2,14 +2,15 @@ import { APIError, type CollectionBeforeChangeHook } from 'payload'
 import type { BeforeEmail } from '@payloadcms/plugin-form-builder/types'
 
 import type { User } from '@/payload-types'
-import { ROLES } from '@/access/roles'
+import { hasAdminOrEditor } from '@/access/roles'
 import { clientIpFromHeaders } from '@/utilities/clientIp'
 
 /**
  * Guards for public form submissions now that the site can send real email.
  *
- * 1. Rate limit: anonymous visitors get a few submissions per hour per IP. Protects the
- *    inbox and the Mailgun quota from floods. In-memory: the site runs as one PM2 process.
+ * 1. Rate limit: anonymous visitors get a few submissions per hour per IP, under a site-wide
+ *    hourly ceiling. Protects the inbox and the Mailgun quota from floods. In-memory: the
+ *    site runs as one PM2 process.
  * 2. No mail to addresses the visitor typed in: a form email whose recipients come from the
  *    submission (e.g. a confirmation to "{{email}}") would let anyone make the site send mail
  *    to arbitrary addresses, including comma-separated lists. Those emails are dropped; emails
@@ -18,38 +19,49 @@ import { clientIpFromHeaders } from '@/utilities/clientIp'
  */
 
 const WINDOW_MS = 60 * 60 * 1000
-const MAX_SUBMISSIONS_PER_WINDOW = 5
+const MAX_PER_IP_PER_WINDOW = 5
+/**
+ * Site-wide ceiling on anonymous submissions per hour. The per-IP key comes from
+ * X-Forwarded-For, which can only be trusted when requests arrive through Caddy; this cap
+ * still bounds email volume (Mailgun quota) if that header is ever spoofed.
+ */
+const MAX_TOTAL_PER_WINDOW = 30
+/** Bounded memory: the oldest tracked IP is evicted first (Map keeps insertion order). */
+const MAX_TRACKED_IPS = 2000
+
 const recentByIp = new Map<string, number[]>()
+let recentTotal: number[] = []
+
+const withinWindow = (times: number[], now: number) => times.filter((t) => now - t < WINDOW_MS)
 
 export const rateLimitSubmissions: CollectionBeforeChangeHook = ({ data, operation, req }) => {
   if (operation !== 'create') return data
-
-  const role = (req.user as User | null)?.role
-  if (role === ROLES.admin || role === ROLES.editor) return data
-
-  const ip = clientIpFromHeaders(req.headers)
-  if (!ip) return data
+  if (hasAdminOrEditor(req.user as User | null)) return data
 
   const now = Date.now()
-  const recent = (recentByIp.get(ip) ?? []).filter((t) => now - t < WINDOW_MS)
-  if (recent.length >= MAX_SUBMISSIONS_PER_WINDOW) {
-    throw new APIError(
-      'Too many messages from your connection. Please try again later.',
-      429,
-      null,
-      true,
-    )
-  }
-  recent.push(now)
-  recentByIp.set(ip, recent)
+  const tooMany = () =>
+    new APIError('Too many messages right now. Please try again later.', 429, null, true)
 
-  // Keep the map small: drop IPs with no submissions in the window
-  if (recentByIp.size > 1000) {
-    for (const [key, times] of recentByIp) {
-      if (times.every((t) => now - t >= WINDOW_MS)) recentByIp.delete(key)
+  recentTotal = withinWindow(recentTotal, now)
+  if (recentTotal.length >= MAX_TOTAL_PER_WINDOW) {
+    req.payload.logger.warn('Form submissions hit the site-wide hourly limit')
+    throw tooMany()
+  }
+
+  const ip = clientIpFromHeaders(req.headers)
+  if (ip) {
+    const recent = withinWindow(recentByIp.get(ip) ?? [], now)
+    if (recent.length >= MAX_PER_IP_PER_WINDOW) throw tooMany()
+    recent.push(now)
+    recentByIp.delete(ip) // re-insert so this IP becomes the newest entry
+    recentByIp.set(ip, recent)
+    if (recentByIp.size > MAX_TRACKED_IPS) {
+      const oldest = recentByIp.keys().next().value
+      if (oldest !== undefined) recentByIp.delete(oldest)
     }
   }
 
+  recentTotal.push(now)
   return data
 }
 
