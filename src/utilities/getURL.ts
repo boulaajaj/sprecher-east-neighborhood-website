@@ -9,6 +9,13 @@ export const getServerSideURL = () => {
   )
 }
 
+/**
+ * Absolute URL on this site for a path or URL. Upload URLs are absolute once Payload's
+ * `serverURL` is set, so never prefix them by string concatenation (that doubles the host).
+ */
+export const toAbsoluteURL = (pathOrUrl: string): string =>
+  new URL(pathOrUrl, getServerSideURL()).toString()
+
 export const getClientSideURL = () => {
   if (canUseDOM) {
     const protocol = window.location.protocol

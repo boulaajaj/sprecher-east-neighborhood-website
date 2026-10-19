@@ -1,4 +1,4 @@
-import { getServerSideURL } from './getURL'
+import { getServerSideURL, toAbsoluteURL } from './getURL'
 import type { Post, Event as PayloadEvent } from '@/payload-types'
 
 type WithContext<T> = T & { '@context': string }
@@ -60,7 +60,7 @@ export function eventJsonLd(event: PayloadEvent): WithContext<Record<string, unk
   // Hero image for rich results
   if (event.heroImage && typeof event.heroImage === 'object' && 'url' in event.heroImage) {
     const img = event.heroImage
-    const imageUrl = img.url ? siteUrl + img.url : null
+    const imageUrl = img.url ? toAbsoluteURL(img.url) : null
     if (imageUrl) {
       jsonLd.image = imageUrl
     }
