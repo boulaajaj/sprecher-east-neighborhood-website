@@ -1,6 +1,7 @@
 import * as migration_20260303_010747_initial from './20260303_010747_initial'
 import * as migration_20260304_035927_add_events_seo_fields from './20260304_035927_add_events_seo_fields'
 import * as migration_20260304_205039 from './20260304_205039'
+import * as migration_20261018_044131_payload_3_91_upgrade from './20261018_044131_payload_3_91_upgrade'
 
 export const migrations = [
   {
@@ -17,5 +18,10 @@ export const migrations = [
     up: migration_20260304_205039.up,
     down: migration_20260304_205039.down,
     name: '20260304_205039',
+  },
+  {
+    up: migration_20261018_044131_payload_3_91_upgrade.up,
+    down: migration_20261018_044131_payload_3_91_upgrade.down,
+    name: '20261018_044131_payload_3_91_upgrade',
   },
 ]
