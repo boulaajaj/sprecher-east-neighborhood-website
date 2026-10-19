@@ -68,6 +68,11 @@ export default buildConfig({
   secret: process.env.PAYLOAD_SECRET,
   sharp,
   typescript: {
+    // Regenerate types only under `next dev`. Payload otherwise rewrites this file whenever
+    // NODE_ENV isn't 'production' — including `payload migrate` in the deploy — which left the
+    // server checkout dirty and can make the next deploy's `git pull` fail (#115).
+    // After schema changes, run `npm run generate:types`.
+    autoGenerate: process.env.NODE_ENV === 'development',
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
 })
