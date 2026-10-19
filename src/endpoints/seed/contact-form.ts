@@ -1,8 +1,8 @@
 import type { RequiredDataFromCollectionSlug } from 'payload'
 import { heading, root, p } from './helpers/lexical'
 
-const CONTACT_EMAIL_FROM =
-  process.env.CONTACT_EMAIL_FROM ?? '"Sprecher East" <no-reply@example.com>'
+/** Optional sender override; empty uses the SMTP default (SMTP_FROM_NAME <SMTP_FROM_ADDRESS>). */
+const CONTACT_EMAIL_FROM = process.env.CONTACT_EMAIL_FROM
 
 /** Where contact-form messages are sent (e.g. the association inbox). Unset = no email. */
 const CONTACT_NOTIFY_EMAIL = process.env.CONTACT_NOTIFY_EMAIL
@@ -18,7 +18,7 @@ export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
   emails: CONTACT_NOTIFY_EMAIL
     ? [
         {
-          emailFrom: CONTACT_EMAIL_FROM,
+          ...(CONTACT_EMAIL_FROM ? { emailFrom: CONTACT_EMAIL_FROM } : {}),
           emailTo: CONTACT_NOTIFY_EMAIL,
           replyTo: '{{email}}',
           message: root([p('New message from the website contact form:'), p('{{*:table}}')]),

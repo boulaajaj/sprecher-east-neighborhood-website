@@ -8,9 +8,9 @@ import { clientIpFromHeaders } from '@/utilities/clientIp'
 /**
  * Guards for public form submissions now that the site can send real email.
  *
- * 1. Rate limit: anonymous visitors get a few submissions per hour per IP, under a site-wide
- *    hourly ceiling. Protects the inbox and the Mailgun quota from floods. In-memory: the
- *    site runs as one PM2 process.
+ * 1. Rate limits: anonymous visitors get a few submissions per hour per IP, and the site sends
+ *    at most a fixed number of form emails per hour. Protects the inbox and the Mailgun quota
+ *    from floods. In-memory: the site runs as one PM2 process.
  * 2. No mail to addresses the visitor typed in: a form email whose recipients come from the
  *    submission (e.g. a confirmation to "{{email}}") would let anyone make the site send mail
  *    to arbitrary addresses, including comma-separated lists. Those emails are dropped; emails
@@ -21,16 +21,18 @@ import { clientIpFromHeaders } from '@/utilities/clientIp'
 const WINDOW_MS = 60 * 60 * 1000
 const MAX_PER_IP_PER_WINDOW = 5
 /**
- * Site-wide ceiling on anonymous submissions per hour. The per-IP key comes from
- * X-Forwarded-For, which can only be trusted when requests arrive through Caddy; this cap
- * still bounds email volume (Mailgun quota) if that header is ever spoofed.
+ * Site-wide ceiling on form emails sent per hour, counted in beforeEmail (emails actually
+ * going out), not on submission attempts: junk or failed submissions can't use it up and lock
+ * residents out. Bounds Mailgun volume even if X-Forwarded-For is spoofed (#118). Above the
+ * cap, emails are dropped but the submission is still stored in Admin → Form Submissions.
  */
-const MAX_TOTAL_PER_WINDOW = 30
+const MAX_EMAILS_PER_WINDOW = 30
 /** Bounded memory: the oldest tracked IP is evicted first (Map keeps insertion order). */
 const MAX_TRACKED_IPS = 2000
 
 const recentByIp = new Map<string, number[]>()
-let recentTotal: number[] = []
+let emailsSent: number[] = []
+let capLoggedAt = 0
 
 const withinWindow = (times: number[], now: number) => times.filter((t) => now - t < WINDOW_MS)
 
@@ -38,31 +40,45 @@ export const rateLimitSubmissions: CollectionBeforeChangeHook = ({ data, operati
   if (operation !== 'create') return data
   if (hasAdminOrEditor(req.user as User | null)) return data
 
-  const now = Date.now()
-  const tooMany = () =>
-    new APIError('Too many messages right now. Please try again later.', 429, null, true)
+  const ip = clientIpFromHeaders(req.headers)
+  if (!ip) return data
 
-  recentTotal = withinWindow(recentTotal, now)
-  if (recentTotal.length >= MAX_TOTAL_PER_WINDOW) {
-    req.payload.logger.warn('Form submissions hit the site-wide hourly limit')
-    throw tooMany()
+  const now = Date.now()
+  const recent = withinWindow(recentByIp.get(ip) ?? [], now)
+  if (recent.length >= MAX_PER_IP_PER_WINDOW) {
+    throw new APIError(
+      'Too many messages from your connection. Please try again later.',
+      429,
+      null,
+      true,
+    )
+  }
+  recent.push(now)
+  recentByIp.delete(ip) // re-insert so this IP becomes the newest entry
+  recentByIp.set(ip, recent)
+  if (recentByIp.size > MAX_TRACKED_IPS) {
+    const oldest = recentByIp.keys().next().value
+    if (oldest !== undefined) recentByIp.delete(oldest)
   }
 
-  const ip = clientIpFromHeaders(req.headers)
-  if (ip) {
-    const recent = withinWindow(recentByIp.get(ip) ?? [], now)
-    if (recent.length >= MAX_PER_IP_PER_WINDOW) throw tooMany()
-    recent.push(now)
-    recentByIp.delete(ip) // re-insert so this IP becomes the newest entry
-    recentByIp.set(ip, recent)
-    if (recentByIp.size > MAX_TRACKED_IPS) {
-      const oldest = recentByIp.keys().next().value
-      if (oldest !== undefined) recentByIp.delete(oldest)
+  return data
+}
+
+/** Applies the site-wide hourly email cap to the emails a submission is about to send. */
+const capEmails = <T>(emails: T[], logger: { warn: (msg: string) => void }): T[] => {
+  const now = Date.now()
+  emailsSent = withinWindow(emailsSent, now)
+  const room = Math.max(0, MAX_EMAILS_PER_WINDOW - emailsSent.length)
+  if (emails.length > room) {
+    // One log line per window, not one per request
+    if (now - capLoggedAt >= WINDOW_MS) {
+      logger.warn('Form emails hit the site-wide hourly limit; submissions are still stored')
+      capLoggedAt = now
     }
   }
-
-  recentTotal.push(now)
-  return data
+  const allowed = emails.slice(0, room)
+  for (let i = 0; i < allowed.length; i++) emailsSent.push(now)
+  return allowed
 }
 
 const usesSubmittedValue = (template: string | null | undefined): boolean =>
@@ -87,7 +103,7 @@ export const dropEmailsToSubmittedAddresses: BeforeEmail = async (emails, { data
   })
   const templates = form?.emails ?? []
 
-  return emails.filter((_email, index) => {
+  const allowed = emails.filter((_email, index) => {
     const template = templates[index]
     const fromSubmission =
       !template ||
@@ -99,4 +115,6 @@ export const dropEmailsToSubmittedAddresses: BeforeEmail = async (emails, { data
     }
     return !fromSubmission
   })
+
+  return capEmails(allowed, req.payload.logger)
 }
