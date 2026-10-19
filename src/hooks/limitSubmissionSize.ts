@@ -11,8 +11,11 @@ export const SUBMISSION_LIMITS = {
 type SubmissionRow = { field?: unknown; value?: unknown }
 
 /**
- * Rejects oversized public form submissions before anything else runs (no Turnstile call, no
- * database write). Payload's own field validation only checks that values exist.
+ * Rejects oversized or malformed public form submissions before anything else runs (no Turnstile
+ * call, no database write). Payload's own field validation only checks that values exist, so a
+ * value that isn't text, a number or a true/false (an object, null) would otherwise fail at the
+ * database insert with a 500 and could leave an empty submission behind. Applies to every form
+ * built in the CMS; the limits are generous for normal use.
  */
 export const limitSubmissionSize: CollectionBeforeValidateHook = ({ data, operation }) => {
   if (operation !== 'create' || !data) return data
@@ -27,13 +30,26 @@ export const limitSubmissionSize: CollectionBeforeValidateHook = ({ data, operat
       null,
       true,
     )
+  const malformed = () =>
+    new APIError(
+      'This form couldn’t be read. Please reload the page and try again.',
+      400,
+      null,
+      true,
+    )
 
-  if (!Array.isArray(rows) || rows.length > SUBMISSION_LIMITS.maxFields) throw tooLarge()
+  if (!Array.isArray(rows)) throw malformed()
+  if (rows.length > SUBMISSION_LIMITS.maxFields) throw tooLarge()
 
   let total = 0
-  for (const row of rows as SubmissionRow[]) {
-    const field = typeof row?.field === 'string' ? row.field : ''
-    const value = typeof row?.value === 'string' ? row.value : String(row?.value ?? '')
+  for (const row of rows as unknown[]) {
+    if (typeof row !== 'object' || row === null || Array.isArray(row)) throw malformed()
+    const { field, value: raw } = row as SubmissionRow
+    if (typeof field !== 'string') throw malformed()
+    if (typeof raw !== 'string' && typeof raw !== 'number' && typeof raw !== 'boolean') {
+      throw malformed()
+    }
+    const value = String(raw)
     if (field.length > SUBMISSION_LIMITS.maxFieldNameLength) throw tooLarge()
     if (value.length > SUBMISSION_LIMITS.maxValueLength) throw tooLarge()
     total += field.length + value.length

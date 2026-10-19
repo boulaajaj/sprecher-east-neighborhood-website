@@ -56,6 +56,17 @@ export function isTurnstileEnabled(): boolean {
   return enabled
 }
 
+/** Accepts "www.example.org", "https://www.example.org/" or "www.example.org:443". */
+function toHostname(entry: string): string | null {
+  const trimmed = entry.trim()
+  if (!trimmed) return null
+  try {
+    return new URL(trimmed.includes('://') ? trimmed : `https://${trimmed}`).hostname.toLowerCase()
+  } catch {
+    return null
+  }
+}
+
 /**
  * Hostnames a token may come from: the site's own (NEXT_PUBLIC_SERVER_URL) plus any listed in
  * TURNSTILE_ALLOWED_HOSTNAMES (comma-separated). A token solved on another hostname that uses
@@ -68,9 +79,9 @@ export function turnstileAllowedHostnames(): Set<string> {
   } catch {
     // An invalid server URL leaves only the explicit list; with an empty list, every token fails.
   }
-  for (const host of (process.env.TURNSTILE_ALLOWED_HOSTNAMES ?? '').split(',')) {
-    const trimmed = host.trim().toLowerCase()
-    if (trimmed) hosts.add(trimmed)
+  for (const entry of (process.env.TURNSTILE_ALLOWED_HOSTNAMES ?? '').split(',')) {
+    const hostname = toHostname(entry)
+    if (hostname) hosts.add(hostname)
   }
   return hosts
 }
