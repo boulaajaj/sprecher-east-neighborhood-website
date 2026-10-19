@@ -20,6 +20,7 @@ import { isSingleAddress } from '@/utilities/email'
  * 3. A Reply-To filled from the submission (e.g. "{{email}}" on the owner notification) is kept
  *    only if it is exactly one plain address; otherwise it falls back to the From address, so a
  *    list or junk can't send the owner's reply elsewhere. The visitor's input stays in the body.
+ *    A From filled from the submission is replaced by the SMTP default sender.
  */
 
 const WINDOW_MS = 60 * 60 * 1000
@@ -118,15 +119,25 @@ export const dropEmailsToSubmittedAddresses: BeforeEmail = async (emails, { data
       req.payload.logger.warn('Form email addressed from submitted data was not sent')
       return []
     }
+    // A From built from submitted data would let a visitor pick the sender (and Mailgun/DMARC
+    // would reject it): use the SMTP default instead (the adapter fills in an empty From).
+    const fromSubmitted = usesSubmittedValue(template.emailFrom)
+    if (fromSubmitted) {
+      req.payload.logger.warn('Form email From used submitted data; sent from the default address')
+    }
+    const from = fromSubmitted ? '' : email.from
+    // With no Reply-To template, the plugin copies the From template into Reply-To
+    const replyToSubmitted =
+      usesSubmittedValue(template.replyTo) || (!template.replyTo && fromSubmitted)
     const replyTo = typeof email.replyTo === 'string' ? email.replyTo.trim() : email.replyTo
-    if (usesSubmittedValue(template.replyTo) && !(replyTo && isSingleAddress(replyTo))) {
+    if (replyToSubmitted && !(replyTo && isSingleAddress(replyTo))) {
       req.payload.logger.warn(
         'Form email Reply-To from submitted data was not one address; replies go to the sender address',
       )
       // The plugin's own default when no Reply-To is configured: the From address
-      return [{ ...email, replyTo: email.from }]
+      return [{ ...email, from, replyTo: from }]
     }
-    return [email]
+    return [fromSubmitted ? { ...email, from } : email]
   })
 
   return capEmails(allowed, req.payload.logger)
