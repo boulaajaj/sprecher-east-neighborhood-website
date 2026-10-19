@@ -125,7 +125,8 @@ export const TurnstileWidget: React.FC<Props> = ({
       <Script
         src={SCRIPT_SRC}
         strategy="afterInteractive"
-        onReady={() => setScriptReady(true)}
+        // next/script also calls onReady on revisits after a failed load, so check the API exists
+        onReady={() => (window.turnstile ? setScriptReady(true) : onLoadError?.())}
         onError={() => onLoadError?.()}
       />
       <div ref={containerRef} className="w-full max-w-full" />

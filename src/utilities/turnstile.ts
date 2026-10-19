@@ -23,6 +23,7 @@ const DUMMY_SECRETS = new Set([
 const MAX_TOKEN_LENGTH = 2048
 
 let warnedHalfConfigured = false
+let warnedTestSecret = false
 
 /**
  * On only when BOTH keys are set. The site key is pinned at build time for server and browser
@@ -39,7 +40,19 @@ export function isTurnstileEnabled(): boolean {
     )
     warnedHalfConfigured = true
   }
-  return secret && siteKey
+  const enabled = secret && siteKey
+  if (
+    enabled &&
+    process.env.NODE_ENV === 'production' &&
+    DUMMY_SECRETS.has(process.env.TURNSTILE_SECRET_KEY ?? '') &&
+    !warnedTestSecret
+  ) {
+    console.warn(
+      '[turnstile] TURNSTILE_SECRET_KEY is a Cloudflare test secret, so the spam check accepts any token. Use the real keys outside local testing.',
+    )
+    warnedTestSecret = true
+  }
+  return enabled
 }
 
 type SiteverifyResponse = {

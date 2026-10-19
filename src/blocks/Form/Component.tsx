@@ -55,7 +55,10 @@ export const FormBlock: React.FC<
   const [turnstileFailed, setTurnstileFailed] = useState(false)
   const onTurnstileToken = useCallback((token: string | null) => {
     setTurnstileToken(token)
-    if (token) setTurnstileFailed(false)
+    if (token) {
+      setTurnstileFailed(false)
+      setTurnstileBlocked(false)
+    }
   }, [])
   const onTurnstileBlocked = useCallback(() => setTurnstileBlocked(true), [])
   const onTurnstileError = useCallback(() => setTurnstileFailed(true), [])
