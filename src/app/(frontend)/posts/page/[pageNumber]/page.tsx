@@ -1,13 +1,14 @@
 import type { Metadata } from 'next/types'
 
-import { CollectionArchive } from '@/components/CollectionArchive'
-import { PageRange } from '@/components/PageRange'
-import { Pagination } from '@/components/Pagination'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
-import PageClient from './page.client'
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
+
+import { PostsFeed } from '@/components/PostsFeed'
+import { findPublishedPosts, parsePageNumber, POSTS_PAGE_SIZE } from '@/utilities/feeds'
+import PageClient from './page.client'
 
 export const revalidate = 600
 
@@ -17,47 +18,37 @@ type Args = {
   }>
 }
 
+/**
+ * Crawlable, no-JavaScript fallback for the news listing. /posts loads more posts as
+ * you scroll; its "Load more" control links here when JavaScript is unavailable.
+ */
 export default async function Page({ params: paramsPromise }: Args) {
   const { pageNumber } = await paramsPromise
-  const payload = await getPayload({ config: configPromise })
+  const page = parsePageNumber(pageNumber)
+  if (page === null) notFound()
 
-  const sanitizedPageNumber = Number(pageNumber)
-
-  if (!Number.isInteger(sanitizedPageNumber)) notFound()
-
-  const posts = await payload.find({
-    collection: 'posts',
-    depth: 1,
-    limit: 12,
-    page: sanitizedPageNumber,
-    overrideAccess: false,
-  })
+  const posts = await findPublishedPosts(page)
+  if (page > 1 && page > posts.totalPages) notFound()
 
   return (
     <div className="pt-24 pb-24">
       <PageClient />
-      <div className="container mb-16">
-        <div className="prose max-w-none dark:prose-invert">
-          <h1>Posts</h1>
-        </div>
+      <div className="container mb-12 md:mb-16">
+        <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">
+          News · Page {page}
+        </p>
+        <h1 className="text-4xl font-bold tracking-tight text-balance text-foreground md:text-5xl">
+          News &amp; Updates
+        </h1>
+        <Link
+          href="/posts"
+          className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-primary hover:underline"
+        >
+          ← Back to the latest news
+        </Link>
       </div>
 
-      <div className="container mb-8">
-        <PageRange
-          collection="posts"
-          currentPage={posts.page}
-          limit={12}
-          totalDocs={posts.totalDocs}
-        />
-      </div>
-
-      <CollectionArchive posts={posts.docs} />
-
-      <div className="container">
-        {posts?.page && posts?.totalPages > 1 && (
-          <Pagination page={posts.page} totalPages={posts.totalPages} />
-        )}
-      </div>
+      <PostsFeed initial={posts} />
     </div>
   )
 }
@@ -65,7 +56,7 @@ export default async function Page({ params: paramsPromise }: Args) {
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { pageNumber } = await paramsPromise
   return {
-    title: `Posts Page ${pageNumber || ''}`,
+    title: `News & Updates — Page ${pageNumber || ''}`,
   }
 }
 
@@ -77,7 +68,7 @@ export async function generateStaticParams() {
       overrideAccess: false,
     })
 
-    const totalPages = Math.ceil(totalDocs / 12)
+    const totalPages = Math.ceil(totalDocs / POSTS_PAGE_SIZE)
 
     const pages: { pageNumber: string }[] = []
 

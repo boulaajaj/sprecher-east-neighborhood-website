@@ -1,80 +1,64 @@
 import type { Metadata } from 'next/types'
 
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 import React from 'react'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
-import { startOfToday } from '@/utilities/timezone'
-import { EventCard } from '@/components/EventCard'
+import { findPublishedEvents } from '@/utilities/feeds'
+import { siteTimeZoneLabel } from '@/utilities/timezone'
+import { EventsFeed } from '@/components/EventsFeed'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
 
 export default async function EventsPage() {
-  const payload = await getPayload({ config: configPromise })
-
-  const events = await payload.find({
-    collection: 'events',
-    depth: 1,
-    limit: 50,
-    sort: 'date',
-    overrideAccess: false,
-  })
-
-  const todayCutoff = new Date(startOfToday())
-
-  const upcoming = events.docs.filter((e) => new Date(e.date) >= todayCutoff)
-  const past = events.docs.filter((e) => new Date(e.date) < todayCutoff).reverse()
+  // First page of each list is rendered on the server; the rest loads as the reader scrolls.
+  const [upcoming, past] = await Promise.all([
+    findPublishedEvents('upcoming', 1),
+    findPublishedEvents('past', 1),
+  ])
 
   return (
     <div className="pt-24 pb-24">
       {/* Page header */}
-      <div className="container mb-16">
+      <div className="container mb-12 md:mb-16">
         <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">
           Community Calendar
         </p>
-        <h1 className="mb-4 text-4xl font-bold tracking-tight text-foreground md:text-5xl">
+        <h1 className="mb-4 text-4xl font-bold tracking-tight text-balance text-foreground md:text-5xl">
           Community Events
         </h1>
         <p className="max-w-2xl text-lg text-muted-foreground">
-          Join your neighbors at upcoming events in the Sprecher East neighborhood.
+          Join your neighbors at upcoming events in and around the Sprecher East neighborhood. All
+          times are {siteTimeZoneLabel()}.
         </p>
       </div>
 
       {/* Upcoming events */}
-      {upcoming.length > 0 && (
-        <div className="container mb-16">
-          <h2 className="mb-8 text-2xl font-bold text-foreground">Upcoming Events</h2>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {upcoming.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {upcoming.length === 0 && (
-        <div className="container mb-16">
-          <div className="rounded-2xl border border-border bg-surface p-12 text-center">
-            <p className="text-lg text-muted-foreground">
-              No upcoming events right now. Check back soon or follow us for updates!
+      <section aria-labelledby="upcoming-heading" className="container mb-16">
+        <h2 id="upcoming-heading" className="mb-8 text-2xl font-bold text-foreground">
+          Upcoming Events
+        </h2>
+        {upcoming.totalDocs > 0 ? (
+          <EventsFeed scope="upcoming" initial={upcoming} />
+        ) : (
+          <div className="rounded-2xl border border-border bg-surface p-8 md:p-12">
+            <p className="text-lg text-foreground">No upcoming events are posted right now.</p>
+            <p className="mt-2 text-muted-foreground">
+              Check back soon, or browse past events below to see what neighbors have been up to.
             </p>
           </div>
-        </div>
-      )}
+        )}
+      </section>
 
       {/* Past events */}
-      {past.length > 0 && (
-        <div className="border-t border-border bg-surface py-16">
+      {past.totalDocs > 0 && (
+        <section aria-labelledby="past-heading" className="border-t border-border bg-surface py-16">
           <div className="container">
-            <h2 className="mb-8 text-2xl font-bold text-muted-foreground">Past Events</h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {past.map((event) => (
-                <EventCard key={event.id} event={event} compact />
-              ))}
-            </div>
+            <h2 id="past-heading" className="mb-8 text-2xl font-bold text-foreground">
+              Past Events
+            </h2>
+            <EventsFeed scope="past" initial={past} />
           </div>
-        </div>
+        </section>
       )}
     </div>
   )

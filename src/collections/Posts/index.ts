@@ -31,6 +31,7 @@ import { slugField } from 'payload'
 // so we use ungeneric CollectionConfig to avoid false type errors on defaultPopulate.meta.image.
 export const Posts: CollectionConfig = {
   slug: 'posts',
+  defaultSort: '-publishedAt',
   access: {
     create: isAdminOrEditor,
     delete: isAdmin,

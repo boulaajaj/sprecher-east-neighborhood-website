@@ -50,6 +50,13 @@ export default async function EventPage({ params: paramsPromise }: Args) {
   const upcomingEvents = await queryUpcomingEvents({ excludeId: event.id })
 
   const hasHeroImage = !!event.heroImage && typeof event.heroImage === 'object'
+  // Use the editor's map link if set; otherwise build a plain search link from the
+  // address (no API key, no embedded map).
+  const mapsHref =
+    event.mapsUrl ||
+    (event.locationAddress
+      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.locationAddress)}`
+      : null)
 
   return (
     <article className="pb-24">
@@ -73,19 +80,20 @@ export default async function EventPage({ params: paramsPromise }: Args) {
           <div>
             {(event.locationName || event.locationAddress) && (
               <div className="mb-8 rounded-lg border border-border bg-surface p-4">
-                <h3 className="mb-2 font-semibold">Location</h3>
+                <h2 className="mb-2 text-base font-semibold">Location</h2>
                 {event.locationName && <p>{event.locationName}</p>}
                 {event.locationAddress && (
                   <p className="text-sm text-muted-foreground">{event.locationAddress}</p>
                 )}
-                {event.mapsUrl && (
+                {mapsHref && (
                   <a
-                    href={event.mapsUrl}
+                    href={mapsHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-2 inline-block text-sm text-primary hover:underline"
+                    className="mt-2 inline-flex min-h-11 items-center text-sm font-medium text-primary hover:underline"
                   >
-                    View on Google Maps →
+                    Open in Google Maps
+                    <span className="sr-only"> (opens in a new tab)</span> →
                   </a>
                 )}
               </div>
@@ -97,9 +105,10 @@ export default async function EventPage({ params: paramsPromise }: Args) {
                   href={event.registrationUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center rounded-lg bg-primary px-6 py-3 font-medium text-white hover:bg-primary/90"
+                  className="inline-flex min-h-11 items-center rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground hover:bg-primary/90"
                 >
-                  Register for This Event →
+                  Register for This Event
+                  <span className="sr-only"> (opens in a new tab)</span> →
                 </a>
               </div>
             )}

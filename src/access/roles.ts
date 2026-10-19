@@ -58,3 +58,10 @@ export const isAdminOrSelf: Access = ({ req: { user }, id }) => {
  * Same logic as isAdmin but typed as FieldAccess (Payload requires a different signature).
  */
 export const isAdminFieldAccess: FieldAccess = ({ req: { user } }) => hasAdmin(user as User | null)
+
+/**
+ * Field-level: only admins and editors can read.
+ * Used to hide internal fields (e.g. form email routing) on publicly readable documents.
+ */
+export const isAdminOrEditorFieldAccess: FieldAccess = ({ req: { user } }) =>
+  hasAdminOrEditor(user as User | null)

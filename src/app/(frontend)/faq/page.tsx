@@ -59,13 +59,14 @@ export default async function FAQPage() {
   return (
     <div className="pt-24 pb-24">
       <JsonLd data={faqJsonLd} />
-      <div className="container mb-16">
-        <div className="prose max-w-none">
-          <h1>Frequently Asked Questions</h1>
-          <p className="text-muted-foreground">
-            Common questions about the Sprecher East Neighborhood Association.
-          </p>
-        </div>
+      <div className="container mb-12 md:mb-16">
+        <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">FAQ</p>
+        <h1 className="mb-4 text-4xl font-bold tracking-tight text-balance text-foreground md:text-5xl">
+          Frequently Asked Questions
+        </h1>
+        <p className="max-w-2xl text-lg text-muted-foreground">
+          Common questions about Sprecher East, how it works, and how to get involved.
+        </p>
       </div>
 
       <div className="container max-w-3xl space-y-12">

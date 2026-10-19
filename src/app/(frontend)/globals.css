@@ -115,7 +115,8 @@
   --muted: #f0ede6;
   --muted-foreground: #6b6b6b;
   --accent: #e8923a;
-  --accent-foreground: #ffffff;
+  /* Dark text on the orange accent: white on #e8923a is 2.4:1 and fails WCAG AA; #1a1a1a is 7.1:1 */
+  --accent-foreground: #1a1a1a;
   --destructive: #dc2626;
   --destructive-foreground: #dc2626;
   --border: #e2ddd6;
@@ -221,4 +222,16 @@
 /* Ensure no flash of unstyled content while theme initializes */
 html {
   opacity: initial;
+}
+
+/* Respect reduced-motion preferences: no hover lifts, zooms, or long transitions */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

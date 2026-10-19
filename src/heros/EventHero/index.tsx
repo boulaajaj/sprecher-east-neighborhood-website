@@ -4,7 +4,8 @@ import type { Event } from '@/payload-types'
 
 import { Media } from '@/components/Media'
 import { categoryPillClassName } from '@/utilities/ui'
-import { formatDateTime } from '@/utilities/formatDateTime'
+import { formatDateTime, toDateTimeAttr } from '@/utilities/formatDateTime'
+import { siteTimeZoneLabel } from '@/utilities/timezone'
 import { getCategoryLabel } from '@/utilities/eventCategories'
 
 export const EventHero: React.FC<{
@@ -38,7 +39,7 @@ export const EventHero: React.FC<{
             <div className="flex flex-wrap gap-6 text-sm">
               <div className="flex flex-col gap-1">
                 <span className="text-white/70">Date</span>
-                <time dateTime={date}>{formatDateTime(date)}</time>
+                <time dateTime={toDateTimeAttr(date)}>{formatDateTime(date)}</time>
               </div>
 
               {timeStart && (
@@ -46,7 +47,7 @@ export const EventHero: React.FC<{
                   <span className="text-white/70">Time</span>
                   <span>
                     {timeStart}
-                    {timeEnd ? ` – ${timeEnd}` : ''}
+                    {timeEnd ? ` – ${timeEnd}` : ''} {siteTimeZoneLabel()}
                   </span>
                 </div>
               )}
@@ -82,14 +83,14 @@ export const EventHero: React.FC<{
         <div className="flex flex-wrap gap-6 text-muted-foreground">
           <div>
             <span className="font-medium text-foreground">Date: </span>
-            <time dateTime={date}>{formatDateTime(date)}</time>
+            <time dateTime={toDateTimeAttr(date)}>{formatDateTime(date)}</time>
           </div>
 
           {timeStart && (
             <div>
               <span className="font-medium text-foreground">Time: </span>
               {timeStart}
-              {timeEnd ? ` – ${timeEnd}` : ''}
+              {timeEnd ? ` – ${timeEnd}` : ''} {siteTimeZoneLabel()}
             </div>
           )}
 

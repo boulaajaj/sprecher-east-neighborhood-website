@@ -27,10 +27,12 @@ export const Search: React.FC = () => {
         </Label>
         <Input
           id="search"
+          type="search"
+          className="h-12 text-base"
           onChange={(event) => {
             setValue(event.target.value)
           }}
-          placeholder="Search"
+          placeholder="Search news and events"
         />
         <button type="submit" className="sr-only">
           submit

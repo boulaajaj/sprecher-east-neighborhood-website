@@ -12,6 +12,20 @@
 export const SITE_TIMEZONE = process.env.SITE_TIMEZONE || 'America/Chicago'
 
 /**
+ * Human label for the site timezone, e.g. "Central Time" for America/Chicago.
+ * Used next to event times, which are entered as plain text in site-local time.
+ */
+export function siteTimeZoneLabel(): string {
+  const part = new Intl.DateTimeFormat('en-US', {
+    timeZone: SITE_TIMEZONE,
+    timeZoneName: 'longGeneric',
+  })
+    .formatToParts(new Date())
+    .find((p) => p.type === 'timeZoneName')
+  return part?.value ?? SITE_TIMEZONE
+}
+
+/**
  * Returns an ISO string representing the start of today in the site timezone.
  *
  * Event dates are stored as day-only (midnight UTC, e.g. "2026-03-03T00:00:00.000Z").

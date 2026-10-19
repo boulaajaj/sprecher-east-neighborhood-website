@@ -43,7 +43,7 @@ export const Card: React.FC<{
   return (
     <article
       className={cn(
-        'group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:cursor-pointer hover:shadow-lg',
+        'group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-200 hover:cursor-pointer hover:shadow-lg motion-safe:hover:-translate-y-1',
         className,
       )}
       ref={card.ref}
@@ -64,7 +64,7 @@ export const Card: React.FC<{
             <Media
               resource={metaImage}
               size="33vw"
-              imgClassName="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              imgClassName="h-full w-full object-cover transition-transform duration-300 motion-safe:group-hover:scale-105"
             />
           </div>
         )}

@@ -43,18 +43,27 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
             columns.length > 0 &&
             columns.map((col, index) => {
               const { enableLink, link, richText, size } = col
+              // A column holding only a heading is a section title, not a card
+              const nodes = richText?.root?.children ?? []
+              const isHeadingOnly =
+                isCardGrid &&
+                !enableLink &&
+                nodes.length > 0 &&
+                nodes.every((node) => node.type === 'heading')
 
               return (
                 <div
                   className={cn({
                     // Four-column stats grid — compact cards with icon-friendly styling
-                    'col-span-1 rounded-2xl border border-border bg-card p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md md:p-6 [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-foreground [&_p]:mt-1 [&_p]:text-sm [&_p]:leading-relaxed [&_p]:text-muted-foreground':
+                    'col-span-1 rounded-2xl border border-border bg-card p-5 shadow-sm transition-all duration-200 hover:shadow-md motion-safe:hover:-translate-y-0.5 md:p-6 [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-foreground [&_p]:mt-1 [&_p]:text-sm [&_p]:leading-relaxed [&_p]:text-muted-foreground':
                       isFourColumns,
                     [colSpanClasses[(size as ColumnSize) ?? 'full'] ?? colSpanClasses.full]:
                       !isFourColumns,
-                    'md:col-span-2': isCardGrid && size !== 'full',
-                    'rounded-2xl border border-border bg-card p-6 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg md:p-8':
-                      isCardGrid,
+                    'md:col-span-2': isCardGrid && size !== 'full' && !isHeadingOnly,
+                    'rounded-2xl border border-border bg-card p-6 shadow-md transition-all duration-200 hover:shadow-lg motion-safe:hover:-translate-y-0.5 md:p-8':
+                      isCardGrid && !isHeadingOnly,
+                    'col-span-4 lg:col-span-12 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:tracking-tight [&_h2]:text-foreground md:[&_h2]:text-3xl':
+                      isHeadingOnly,
                     // Content columns — clean text layout, no card boxes
                     '[&_h2]:mb-4 [&_h2]:text-3xl [&_h2]:font-bold [&_h2]:tracking-tight [&_h2]:text-foreground md:[&_h2]:text-4xl [&_p]:text-base [&_p]:leading-relaxed [&_p]:text-muted-foreground md:[&_p]:text-lg':
                       isContentColumns && index === 0,

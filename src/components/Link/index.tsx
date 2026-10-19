@@ -7,6 +7,8 @@ import type { Page, Post } from '@/payload-types'
 
 type CMSLinkType = {
   appearance?: 'inline' | ButtonProps['variant']
+  /** Marks the link as the current page for assistive tech (aria-current="page"). */
+  ariaCurrent?: boolean
   children?: React.ReactNode
   className?: string
   label?: string | null
@@ -24,6 +26,7 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
   const {
     type,
     appearance = 'inline',
+    ariaCurrent,
     children,
     className,
     label,
@@ -44,11 +47,12 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
 
   const size = appearance === 'link' ? 'clear' : sizeFromProps
   const newTabProps = newTab ? { rel: 'noopener noreferrer', target: '_blank' } : {}
+  const currentProps = ariaCurrent ? { 'aria-current': 'page' as const } : {}
 
   /* Ensure we don't break any styles set by richText */
   if (appearance === 'inline') {
     return (
-      <Link className={cn(className)} href={href || url || ''} {...newTabProps}>
+      <Link className={cn(className)} href={href || url || ''} {...newTabProps} {...currentProps}>
         {label && label}
         {children && children}
       </Link>
@@ -57,7 +61,7 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
 
   return (
     <Button asChild className={className} size={size} variant={appearance}>
-      <Link className={cn(className)} href={href || url || ''} {...newTabProps}>
+      <Link className={cn(className)} href={href || url || ''} {...newTabProps} {...currentProps}>
         {label && label}
         {children && children}
       </Link>

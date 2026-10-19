@@ -40,12 +40,12 @@
 - Never store tokens or secrets in localStorage — use httpOnly cookies (Payload handles this)
 - Never expose user roles or permissions in client-side JavaScript beyond what's needed for UI
 - **Never surface raw backend errors on auth endpoints** — login, password reset, and registration must show fixed generic messages to prevent account enumeration and information leakage. Log raw errors server-side for debugging, never render them in the UI.
-- **RBAC is enforced via `src/access/roles.ts`**: All access control uses role-based functions (`isAdmin`, `isAdminOrEditor`, `isAdminOrSelf`, `isAdminFieldAccess`). The old `authenticated.ts` and `authenticatedSelf.ts` files are deleted — never recreate flat access checks.
+- **RBAC is enforced via `src/access/roles.ts`**: All access control uses role-based functions (`isAdmin`, `isAdminOrEditor`, `isAdminOrSelf`, `isAdminFieldAccess`, `isAdminOrEditorFieldAccess`). The old `authenticated.ts` and `authenticatedSelf.ts` files are deleted — never recreate flat access checks.
 - **Three roles**: `admin` (full access), `editor` (content CRUD, admin panel), `resident` (read published, own profile only). Default for new users is `resident`.
 - **Users collection access**: `admin: isAdminOrEditorBoolean`, `create/delete: isAdmin`, `read/update: isAdminOrSelf`. The role field has field-level access (`isAdminFieldAccess`) so only admins can assign roles.
 - **Content collections** (Pages, Posts, Events, FAQ, Resources): `create/update: isAdminOrEditor`, `delete: isAdmin`, `read: authenticatedOrPublished`.
 - **Utility collections** (Categories, Media, TeamMembers): `create/update: isAdminOrEditor`, `delete: isAdmin`, `read: anyone`.
-- **Plugin collections**: Redirects → `isAdmin` for all ops. Forms → `isAdminOrEditor` for CRUD, `isAdmin` for delete. Form submissions → `isAdmin` for read/update/delete, `anyone` for create (public form submissions).
+- **Plugin collections**: Redirects → `isAdmin` for all ops. Forms → `anyone` for read (visitors need the field definitions to fill a form in; with restricted read the public contact form rendered empty), `isAdminOrEditor` for create/update, `isAdmin` for delete; the `emails` field (recipients, reply-to, templates) is field-level `isAdminOrEditorFieldAccess`. Form submissions → `isAdmin` for read/update/delete, `anyone` for create (public form submissions).
 - **Audit access control when adding new collections**: Every new collection must use role-based access from `src/access/roles.ts`. Never use a flat `authenticated` check.
 - **When changing roles or adding new roles**: Update `src/access/roles.ts`, the `role` field options in Users collection, the `UserRole` type, and generate a migration.
 
