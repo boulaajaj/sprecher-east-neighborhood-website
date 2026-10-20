@@ -118,7 +118,7 @@ Cards are the primary content container pattern:
 
 Three tiers of visual importance:
 
-1. **Primary CTA**: `bg-primary text-white rounded-lg px-6 py-3 font-semibold hover:bg-primary/90 transition-colors`
+1. **Primary CTA**: `bg-primary text-primary-foreground rounded-lg px-6 py-3 font-semibold hover:bg-primary/90 transition-colors`
 2. **Secondary CTA**: `border border-primary text-primary rounded-lg px-6 py-3 font-semibold hover:bg-primary/10 transition-colors`
 3. **Tertiary/Ghost**: `text-primary font-semibold hover:underline`
 

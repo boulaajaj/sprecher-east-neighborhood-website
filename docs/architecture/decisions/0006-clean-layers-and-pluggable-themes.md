@@ -18,7 +18,7 @@ hex or `rgba()` values and 2 inline styles, all of which ignore the theme.
 
 1. **Layers inside each module** ([0001](0001-modular-monolith.md) keeps the split by business
    area). The domain (types and rules in plain TypeScript) depends on nothing. The application
-   layer (`server.ts`, `actions.ts`: the use cases) depends on the domain. Adapters (`data/`,
+   layer (`use-cases/` and `actions.ts`) depends on the domain. Adapters (`data/`,
    `cms/`, outside services) and presentation (`app/`, `ui/`) depend on the domain and, for
    presentation, on the application layer. Use cases return plain objects (DTOs), never Payload
    documents.

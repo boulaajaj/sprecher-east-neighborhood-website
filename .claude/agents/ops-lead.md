@@ -83,7 +83,6 @@ After deployment:
 - `DATABASE_URI` — `file:./data/payload.db`
 - `NEXT_PUBLIC_SERVER_URL` — production URL or localhost
 - `PREVIEW_SECRET` — Draft preview URL signing
-- Future: Facebook, Apple, Twitter OAuth credentials when providers are enabled
 
 ## Monitoring
 

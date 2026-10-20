@@ -6,14 +6,14 @@ which module owns it).
 
 ## People and roles
 
-| Term     | Meaning                                                                                                                | Where the rule lives               |
-| -------- | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| Visitor  | Anyone on the site who isn't signed in.                                                                                | n/a                                |
-| Resident | A signed-in account with the `resident` role: reads published content, edits only their own profile. The default role. | `src/access/roles.ts` → `accounts` |
-| Editor   | A signed-in account with the `editor` role: creates and edits content, opens `/admin`.                                 | same                               |
-| Admin    | A signed-in account with the `admin` role: everything, including users, roles and deletes.                             | same                               |
-| Staff    | Admins and editors together (`hasAdminOrEditor`). Staff skip the form rate limit and robot check.                      | same                               |
-| Owner    | The person who approves changes by merging pull requests (see `AGENTS.md`).                                            | n/a                                |
+| Term     | Meaning                                                                                                                | Where the rule lives                        |
+| -------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| Visitor  | Anyone on the site who isn't signed in.                                                                                | n/a                                         |
+| Resident | A signed-in account with the `resident` role: reads published content, edits only their own profile. The default role. | `src/access/roles.ts` → `platform/payload/` |
+| Editor   | A signed-in account with the `editor` role: creates and edits content, opens `/admin`.                                 | same                                        |
+| Admin    | A signed-in account with the `admin` role: everything, including users, roles and deletes.                             | same                                        |
+| Staff    | Admins and editors together (`hasAdminOrEditor`). Staff skip the form rate limit and robot check.                      | same                                        |
+| Owner    | The person who approves changes by merging pull requests (see `AGENTS.md`).                                            | n/a                                         |
 
 ## Content states
 
@@ -70,5 +70,6 @@ which module owns it).
 | Module       | One business area's folder under `src/modules/` ([architecture](README.md)).                                                                                      |
 | Entry file   | `index.ts` (client-safe), `server.ts` (server-only), `actions.ts` (server actions) or `cms.ts` (Payload config): the only files other code imports from a module. |
 | Domain layer | `domain/`: pure rules and types, no framework.                                                                                                                    |
+| Use case     | `use-cases/`: one thing a caller can do (list upcoming events, submit a form), returning the module's own types. Server-only.                                     |
 | Data layer   | `data/`: server-only queries over Payload that return the module's own types.                                                                                     |
 | Platform     | `src/platform/`: code every module shares.                                                                                                                        |
