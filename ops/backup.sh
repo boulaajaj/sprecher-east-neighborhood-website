@@ -26,6 +26,11 @@ esac
 
 # The database file, from DATABASE_URI (file:./data/payload.db) relative to the app folder.
 db_uri=$(env_value DATABASE_URI)
+if [ -n "$db_uri" ] && [ "${db_uri#file:}" = "$db_uri" ]; then
+  # Not a local SQLite file. Never print the value: a remote URI can carry a token.
+  report "ERROR: DATABASE_URI is not a local file: URI, so the $KIND backup cannot copy the database"
+  exit 1
+fi
 db_path="${db_uri#file:}"
 db_path="${db_path:-./data/payload.db}"
 case "$db_path" in

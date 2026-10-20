@@ -25,5 +25,5 @@ EOF
 install -m 644 "$tmp" "$CRON_FILE"
 rm -f "$tmp"
 
-latest=$(find /var/backups/sprecher-east/daily -maxdepth 1 -name 'sprecher-east-*.tar.gz' -printf '%f\n' 2>/dev/null | sort -r | head -n 1)
+latest=$({ find /var/backups/sprecher-east/daily -maxdepth 1 -name 'sprecher-east-*.tar.gz' -printf '%f\n' 2>/dev/null || true; } | sort -r | head -n 1)
 report "daily backup job installed (08:15 UTC); latest daily archive: ${latest:-none yet}"

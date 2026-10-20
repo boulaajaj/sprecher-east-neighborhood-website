@@ -94,7 +94,7 @@ src/
 | `src/fields/`                    | Reusable field groups (slug, link, hero)          |
 | `src/Header/`                    | Header global component                           |
 | `src/Footer/`                    | Footer global component                           |
-| `ecosystem.config.js`            | PM2 config for VPS                                |
+| `ecosystem.config.cjs`           | PM2 config for VPS (CommonJS: package is ESM)     |
 
 ## Design Tokens
 

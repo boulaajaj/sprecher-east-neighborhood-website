@@ -6,20 +6,22 @@
 
 APP_DIR="${APP_DIR:-/var/www/sprecher-east}"
 
-# report "message" → notice; report "WARNING: …" or "ERROR: …" → warning.
+# report "message" → notice; "WARNING: …" → warning; "ERROR: …" → error.
 report() {
   case "$*" in
-    ERROR:* | WARNING:*) echo "::warning title=Server::$*" ;;
+    ERROR:*) echo "::error title=Server::$*" ;;
+    WARNING:*) echo "::warning title=Server::$*" ;;
     *) echo "::notice title=Server::$*" ;;
   esac
 }
 
-# The value of a setting in .env.local (last one wins, quotes removed). Prints nothing if unset.
+# The value of a setting in .env.local (last one wins; `export`, quotes and a trailing
+# ` # comment` removed). Prints nothing if unset.
 # Only for non-secret settings: the value must never be printed.
 env_value() {
   [ -r "$APP_DIR/.env.local" ] || return 0
-  sed -n "s/^[[:space:]]*$1[[:space:]]*=[[:space:]]*//p" "$APP_DIR/.env.local" |
-    tail -n 1 | tr -d "\"'\r" | sed 's/[[:space:]]*$//'
+  sed -n -E "s/^[[:space:]]*(export[[:space:]]+)?$1[[:space:]]*=[[:space:]]*//p" "$APP_DIR/.env.local" |
+    tail -n 1 | tr -d "\r" | sed -E 's/[[:space:]]+#.*$//; s/[[:space:]]*$//' | tr -d "\"'"
 }
 
 # The site's public origin, e.g. https://sprechereast.com, from SITE_URL or the app's own
@@ -65,3 +67,14 @@ site_status() { # <path> [curl args…]
 # True when the public home page answers 200 through Caddy on this machine. A redirect doesn't
 # count: Caddy can answer one without ever reaching the app.
 site_is_up() { [ "$(site_status /)" = 200 ]; }
+
+# True once the home page answers 200 through Caddy, waiting up to the given number of seconds
+# (default 90). Use it right after a restart or reload, while the app may still be starting.
+wait_until_up() {
+  local deadline=$((SECONDS + ${1:-90}))
+  while [ "$SECONDS" -lt "$deadline" ]; do
+    if site_is_up; then return 0; fi
+    sleep 2
+  done
+  return 1
+}

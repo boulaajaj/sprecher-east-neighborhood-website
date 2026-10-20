@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Restarts the site under PM2 with the settings in ecosystem.config.js (#118).
+# Restarts the site under PM2 with the settings in ecosystem.config.cjs (#118).
 #
 # Next listens on 127.0.0.1:3000 only, so visitors reach it through Caddy and nowhere else.
-# When the start arguments PM2 has stored differ from ecosystem.config.js (the first run after
+# When the start arguments PM2 has stored differ from ecosystem.config.cjs (the first run after
 # #118, or any later change to them), the app is started fresh: the site is checked through
 # Caddy before and after, and the previous arguments come back if it stops answering. Otherwise
 # it is a plain reload.
@@ -15,7 +15,15 @@ CADDYFILE="${CADDYFILE:-/etc/caddy/Caddyfile}"
 DEADLINE_SECONDS="${DEADLINE_SECONDS:-90}"
 cd "$APP_DIR"
 
-# The start arguments of $NAME, as PM2 stored them (stored) or as ecosystem.config.js has them.
+# Any unexpected failure still ends with the app reloaded on the new build, and says so.
+on_unexpected_error() {
+  trap - ERR
+  report "ERROR: restart-app.sh failed unexpectedly at line $1; reloading the app as it was"
+  pm2 reload "$NAME" --update-env >/dev/null 2>&1 || true
+}
+trap 'on_unexpected_error $LINENO' ERR
+
+# The start arguments of $NAME, as PM2 stored them (stored) or as ecosystem.config.cjs has them.
 args_of() { # stored|wanted
   if [ "$1" = stored ]; then
     pm2 jlist 2>/dev/null | node -e '
@@ -30,29 +38,19 @@ args_of() { # stored|wanted
     node -e '
       const app = require(process.argv[1]).apps.find((a) => a.name === process.argv[2])
       console.log(Array.isArray(app?.args) ? app.args.join(" ") : app?.args || "")
-    ' "$APP_DIR/ecosystem.config.js" "$NAME"
+    ' "$APP_DIR/ecosystem.config.cjs" "$NAME"
   fi
 }
 
 reload() { pm2 reload "$NAME" --update-env >/dev/null; }
 
-# True once the site answers through Caddy, waiting up to DEADLINE_SECONDS.
-wait_until_up() {
-  local started=$SECONDS
-  while [ $((SECONDS - started)) -lt "$DEADLINE_SECONDS" ]; do
-    if site_is_up; then return 0; fi
-    sleep 2
-  done
-  return 1
-}
-
 stored=$(args_of stored)
 wanted=$(args_of wanted)
 
 if ! pm2 describe "$NAME" >/dev/null 2>&1; then
-  pm2 start ecosystem.config.js --only "$NAME" >/dev/null
+  pm2 start ecosystem.config.cjs --only "$NAME" >/dev/null
   pm2 save --force >/dev/null
-  if wait_until_up; then
+  if wait_until_up "$DEADLINE_SECONDS"; then
     report "app was not running; started it with '$wanted'"
   else
     report "WARNING: app was not running; started it with '$wanted', but the home page does not answer 200 through Caddy"
@@ -70,7 +68,7 @@ fi
 # own public address (used for absolute links and images) doesn't point at port 3000.
 if [[ "$wanted" == *"-H 127.0.0.1"* ]]; then
   upstreams=$({ grep -hoE '^[[:space:]]*reverse_proxy[[:space:]]+[^{]*' "$CADDYFILE" 2>/dev/null || true; } |
-    tr -s '[:space:]' '\n' | grep -E ':3000$' | sort -u | tr '\n' ' ')
+    tr -s '[:space:]' '\n' | { grep -E ':3000$' || true; } | sort -u | tr '\n' ' ')
   loopback_only=yes
   [ -n "$upstreams" ] || loopback_only=no
   for upstream in $upstreams; do
@@ -99,26 +97,26 @@ if ! site_is_up; then
   exit 0
 fi
 
-rollback_config=$(mktemp /tmp/sprecher-east-rollback-XXXXXX.config.js)
+rollback_config=$(mktemp /tmp/sprecher-east-rollback-XXXXXX.config.cjs)
 node -e '
   const fs = require("fs")
   const [file, name, args, out] = process.argv.slice(1)
   const config = require(file)
   config.apps = config.apps.filter((a) => a.name === name).map((a) => ({ ...a, args }))
   fs.writeFileSync(out, "module.exports = " + JSON.stringify(config, null, 2) + "\n")
-' "$APP_DIR/ecosystem.config.js" "$NAME" "$stored" "$rollback_config"
+' "$APP_DIR/ecosystem.config.cjs" "$NAME" "${stored:-start}" "$rollback_config"
 
 pm2 delete "$NAME" >/dev/null 2>&1 || true
-pm2 start ecosystem.config.js --only "$NAME" >/dev/null
+pm2 start ecosystem.config.cjs --only "$NAME" >/dev/null
 
-if wait_until_up; then
+if wait_until_up "$DEADLINE_SECONDS"; then
   pm2 save --force >/dev/null
   rm -f "$rollback_config"
   report "app restarted with '$wanted' (was '$stored'); the site answers through Caddy"
   exit 0
 fi
 
-report "ERROR: the site did not answer within ${DEADLINE_SECONDS}s after restarting with '$wanted'; restoring '$stored'"
+report "ERROR: the site did not answer within ${DEADLINE_SECONDS}s after restarting with '$wanted'; restoring '${stored:-start}'"
 pm2 delete "$NAME" >/dev/null 2>&1 || true
 pm2 start "$rollback_config" --only "$NAME" >/dev/null
 pm2 save --force >/dev/null
