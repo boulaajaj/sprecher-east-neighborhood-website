@@ -2,6 +2,7 @@ import { createLocalReq, getPayload } from 'payload'
 
 import { hasAdmin } from '@/access/roles'
 import { seed } from '@/endpoints/seed'
+import { isSeedEnabled } from '@/endpoints/seed/isSeedEnabled'
 import type { User } from '@/payload-types'
 import config from '@payload-config'
 import { headers } from 'next/headers'
@@ -9,6 +10,11 @@ import { headers } from 'next/headers'
 export const maxDuration = 60 // This function can run for a maximum of 60 seconds
 
 export async function POST(): Promise<Response> {
+  // Off on the live site: the route doesn't exist there (#147)
+  if (!isSeedEnabled()) {
+    return new Response('Not found.', { status: 404 })
+  }
+
   const payload = await getPayload({ config })
   const requestHeaders = await headers()
 
