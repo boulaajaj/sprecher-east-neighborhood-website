@@ -16,8 +16,9 @@ spread further.
 ## Decision
 
 One Next.js app, organized by business area under `src/modules/<area>/`, each layered inside
-(`domain/`, `data/`, `cms/`, `ui/`, and entry files; see the [README](../README.md#inside-a-module)), with shared code in
-`src/platform/` and routes only in `src/app/`. Only a module's `data/` and `cms/` talk to Payload.
+(`domain/`, `use-cases/`, `data/`, `cms/`, `ui/`, and entry files; see the
+[README](../README.md#inside-a-module)), with shared code in `src/platform/` (which imports no
+module) and routes only in `src/app/`. Only a module's `data/` and `cms/` talk to Payload.
 Rules are enforced with ESLint (`eslint-plugin-boundaries`) and `server-only`.
 
 Rejected: keeping the template layout (the cost grows with every feature); Feature-Sliced Design

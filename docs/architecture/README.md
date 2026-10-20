@@ -81,17 +81,18 @@ src/modules/events/
   index.ts      client-safe entry: types, pure helpers, components that load no data, browser clients
   server.ts     server-only entry: re-exports use cases and the components that load data
   actions.ts    server actions ("Load more"); each validates its input and calls a use case
-  cms.ts        Payload entry: collection configs, blocks and plugin setup for this area
+  cms.ts        Payload entry: collection and global configs, blocks, plugin setup for this area
   domain/       types (DTOs included) and rules in plain TypeScript; unit-tested
   use-cases/    listUpcomingEvents: check who is asking, load through data/, apply rules, return DTOs
   data/         Local API queries; map documents to the domain's types
-  cms/          collection config, fields, hooks, plugin options
+  cms/          collection config, fields, hooks, plugin options, admin components (RowLabel)
   ui/           React components, headless hooks (useEventFilters), and a browser client for
                 Payload's REST endpoints if the module needs one (ui/api.ts)
 ```
 
 Entry files are for code outside the module. Inside it, import the folder you need directly, so
-the entry files never import each other.
+the entry files never import each other. The one exception: `ui/` may import its own module's
+`actions.ts`, because server actions must live in a `'use server'` file (the "Load more" feeds).
 
 A module only has the folders it needs. Tests sit next to the file they test (`isUpcoming.test.ts`).
 
@@ -161,7 +162,9 @@ What this buys:
 9. **No colors in components.** Semantic token classes only: `text-primary-foreground` on
    `bg-primary`, never `text-white`; no palette classes, hex values or inline styles. Text and
    overlays on photos will use `on-image` and `scrim` tokens (#146); until then `white` and
-   `black` are allowed there only. #146 also replaces the existing raw colors.
+   `black` are allowed there only. #146 also replaces the existing raw colors. Where
+   `skill-ui-ux-design.md` or `skill-frontend-patterns.md` shows `text-white` on `bg-primary`,
+   this rule wins until #146 updates them.
 
 How they are checked, from #130 on (warnings until #137): rules 1–3, 5 and 6 and the type part of
 8 by ESLint (`eslint-plugin-boundaries`, `no-restricted-imports`); rule 4 by `server-only` at

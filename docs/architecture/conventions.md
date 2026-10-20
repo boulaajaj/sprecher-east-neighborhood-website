@@ -51,11 +51,12 @@ A `to…` mapper in `data/` builds them from Payload documents. When generated P
   `use-cases/`) and the server components that load data (from `ui/`).
 - `actions.ts` starts with `'use server'` and exports server actions; each one validates its
   input and calls a use case.
-- `cms.ts` exports the area's collection configs, blocks and plugin options for
+- `cms.ts` exports the area's collection and global configs, blocks and plugin options for
   `payload.config.ts`. Nothing it reaches may be server-only, because the Payload CLI loads it
   outside Next.js.
 - Nothing outside a module imports from its inner folders, and nothing inside it imports its own
-  entry files. If something is missing from an entry file, add it there.
+  entry files, except that `ui/` may import its module's `actions.ts` (server actions must live
+  in a `'use server'` file). If something is missing from an entry file, add it there.
 
 ## Interfaces and adapters
 
