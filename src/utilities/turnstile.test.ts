@@ -61,6 +61,8 @@ describe('verifyTurnstileToken: inputs', () => {
     expect(sent.get('secret')).toBe(REAL_SECRET)
     expect(sent.get('response')).toBe('the-token')
     expect(sent.has('remoteip')).toBe(false)
+    // A hung Cloudflare call must not hold the submission open indefinitely
+    expect(init.signal).toBeInstanceOf(AbortSignal)
   })
 })
 

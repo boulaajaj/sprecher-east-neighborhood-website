@@ -8,7 +8,7 @@ async function loadFormat() {
 }
 
 const DAY_ONLY = '2026-03-03T00:00:00.000Z' // how Payload stores a day-only date (Mar 3)
-const EVENING_CDT = '2026-03-03T23:30:00.000Z' // 5:30 pm on Mar 3 in Madison (CST, UTC-6)
+const EVENING_CST = '2026-03-03T23:30:00.000Z' // 5:30 pm on Mar 3 in Madison (CST, UTC-6)
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] })
@@ -23,7 +23,7 @@ describe('isDayOnly', () => {
   it('recognises the midnight-UTC form Payload uses for day-only dates', async () => {
     const { isDayOnly } = await loadFormat()
     expect(isDayOnly(DAY_ONLY)).toBe(true)
-    expect(isDayOnly(EVENING_CDT)).toBe(false)
+    expect(isDayOnly(EVENING_CST)).toBe(false)
     expect(isDayOnly('2026-03-03T00:00:00Z')).toBe(false)
   })
 })
@@ -36,7 +36,7 @@ describe('toDateTimeAttr', () => {
 
   it('keeps a real date-time as a full ISO string', async () => {
     const { toDateTimeAttr } = await loadFormat()
-    expect(toDateTimeAttr(EVENING_CDT)).toBe(EVENING_CDT)
+    expect(toDateTimeAttr(EVENING_CST)).toBe(EVENING_CST)
   })
 })
 

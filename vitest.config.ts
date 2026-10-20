@@ -6,7 +6,7 @@ const root = path.dirname(fileURLToPath(import.meta.url))
 
 /**
  * Unit tests: pure rules and guards, run in Node with no network and no database.
- * Test files sit next to the code they test as `*.test.ts`. See docs/architecture (#128).
+ * Test files sit next to the code they test as `*.test.ts`.
  */
 export default defineConfig({
   resolve: {
