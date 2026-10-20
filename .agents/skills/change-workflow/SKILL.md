@@ -1,6 +1,6 @@
 ---
 name: change-workflow
-description: Mandatory procedure for any code, config, or docs change to this repo — create a labeled GitHub issue, work on a branch, open a PR from the template, get it independently reviewed, wait for all checks to go green, and hand off to the owner to merge (which deploys). Use before starting any change.
+description: Mandatory procedure for any code, config, or docs change to this repo — create a labeled GitHub issue, work on a branch, open a PR from the template (on a native stack when it depends on another open PR), get it independently reviewed, wait for all checks to go green, and hand off to the owner to merge (which deploys). Use before starting any change.
 ---
 
 # Change workflow
@@ -33,6 +33,9 @@ git checkout main && git pull origin main
 git checkout -b agent/<role-tag>/<issue-number>-<short-description>
 ```
 
+If the change depends on another open PR, branch from that PR's branch instead of `main`, and
+follow [`stacked-prs`](../stacked-prs/SKILL.md) from here on.
+
 Role tags: `A-Content`, `B-Research`, `C-Builder`, `D-Community`, `E-Ops`, `F-RD`.
 Humans can use `<name>/<issue-number>-<short-description>`.
 
@@ -52,7 +55,9 @@ npx prettier --check .              # fix with: npx prettier --write <files>
 npm run build                       # when code or dependencies changed
 ```
 
-For UI changes, check the affected pages at mobile and desktop widths, in light and dark themes.
+Then review your own diff with [`self-review`](../self-review/SKILL.md) and fix what it finds. For
+UI changes that includes the [`visual-design-review`](../visual-design-review/SKILL.md): every
+affected page at six widths, in light and dark themes.
 
 ## 4. Pull request
 
@@ -60,6 +65,10 @@ For UI changes, check the affected pages at mobile and desktop widths, in light 
 git push -u origin <branch>
 gh pr create --base main --title "<type>: <summary>" --body-file pr.md
 ```
+
+**Depends on another open PR?** Then `--base` is that PR's branch, and the PR goes on a native
+GitHub stack with it, so GitHub enforces the merge order: [`stacked-prs`](../stacked-prs/SKILL.md),
+steps 2 and 3. Never hand over dependent PRs with the merge order written in prose instead.
 
 `pr.md` follows `.github/pull_request_template.md`. Fill in every section; the `PR Policy`
 check fails otherwise:
@@ -89,12 +98,17 @@ Open it as a draft (`--draft`) while work is incomplete.
    - Review comments → fix or explain. Reply on each thread saying what you did, then
      resolve it. Never leave a conversation unresolved.
 4. **Ready:** everything is green, the review is posted and its findings are addressed. Tell
-   the owner the PR is ready for approval.
+   the owner the PR is ready for approval. For a stack, say which PR to merge: the top one merges
+   the whole stack.
+5. **A PR below yours changed** (stacked PRs): rebase yours onto it and push, as in
+   [`stacked-prs`](../stacked-prs/SKILL.md) step 4.
 
 ## 6. Merge and deploy (owner)
 
-- Only the owner merges (squash); merging is the owner's approval. Agents never merge,
-  and never use `--admin` or any other bypass.
+- Only the owner merges (squash); merging is the owner's approval. Agents never merge (no
+  `gh pr merge`), and never use `--admin` or any other bypass.
+- A stack merges from the bottom up: merging a PR also merges every PR below it, and GitHub
+  rebases the ones above.
 - The merge triggers `Deploy to VPS`. Watch it: `gh run list --workflow deploy.yml -L 1`.
 - Afterwards, check the site (`https://sprechereast.com`) and the specific behavior changed.
 - The issue closes automatically. `issue-fix-summary.yml` comments on it with how it was fixed.

@@ -166,9 +166,10 @@ What this buys:
 9. **No colors in components.** Semantic token classes only: `text-primary-foreground` on
    `bg-primary`, never `text-white`; no palette classes, hex values or inline styles. Text and
    overlays on photos will use `on-image` and `scrim` tokens (#146); until then `white` and `black`
-   are allowed there only. #146 also replaces the existing raw colors. Where `skill-ui-ux-design.md`
-   or `skill-frontend-patterns.md` uses raw `white` or `black` anywhere but text and overlays on
-   photos, this rule wins until #146 updates them.
+   are allowed there only. #146 also replaces the existing raw colors. Where
+   [`ui-ux-design.md`](../guidelines/ui-ux-design.md) or the
+   [frontend patterns](../guidelines/frontend-patterns/README.md) use raw `white` or `black`
+   anywhere but text and overlays on photos, this rule wins until #146 updates them.
 
 How they are checked, from #130 on (warnings until #137): rules 1–3, 5 and 6 and the type part of
 8 by ESLint (`eslint-plugin-boundaries`, `no-restricted-imports`); rule 4 by `server-only` at
@@ -201,7 +202,7 @@ new duplication; if your change needs a rule that already exists elsewhere, reus
 
 New code for an area that hasn't moved yet goes in its future module, with only the folders it
 needs (for example `src/modules/events/domain/isUpcoming.ts` plus an `index.ts` that exports it),
-and the old code imports it through that entry file. Where `.claude/rules/skill-payload-cms.md`
+and the old code imports it through that entry file. Where [`docs/guidelines/payload-cms.md`](../guidelines/payload-cms.md)
 names a template folder, it describes today's code; new code follows this page.
 
 ## More

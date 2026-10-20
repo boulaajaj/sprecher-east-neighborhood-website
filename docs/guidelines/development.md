@@ -1,6 +1,7 @@
 # Development Principles
 
-Engineering principles for building and maintaining this codebase. These apply to all agent profiles.
+Engineering principles for building and maintaining this codebase. They apply to everyone who
+changes it, human or AI agent.
 
 ## Framework First
 
@@ -22,7 +23,7 @@ When evaluating whether to build vs. use:
 
 ## Payload CMS Template Architecture
 
-See `skill-payload-cms.md` for detailed collection, block, hero, hook, and field patterns.
+See [`payload-cms.md`](payload-cms.md) for detailed collection, block, hero, hook, and field patterns.
 
 ## Configuration Over Code
 
@@ -78,7 +79,8 @@ In development, failures should be visible and informative (console warnings, fa
 
 ## Respect Template Conventions
 
-See `skill-payload-cms.md` for where new code belongs (blocks, collections, fields, hooks, etc.).
+See [`docs/architecture/`](../architecture/README.md) for where new code belongs, and
+[`payload-cms.md`](payload-cms.md) for today's template folders (blocks, collections, fields, hooks).
 
 ## Fix Everything You Touch
 
@@ -88,7 +90,7 @@ This also applies during code review. Every review finding must either be fixed 
 
 ## Documentation Is Code
 
-Code examples in rules files (`.claude/rules/`), pattern libraries, and agent configs are templates that developers adapt — they must follow the same standards as production code. Every rule that applies to source files also applies to code snippets in documentation: use project components, use design tokens, follow React patterns, respect linting and formatting. If a snippet would fail a code review in a PR, it doesn't belong in the docs either.
+Code examples in guidelines (`docs/guidelines/`), skills (`.agents/skills/`), pattern libraries, and agent configs are templates that developers adapt — they must follow the same standards as production code. Every rule that applies to source files also applies to code snippets in documentation: use project components, use design tokens, follow React patterns, respect linting and formatting. If a snippet would fail a code review in a PR, it doesn't belong in the docs either.
 
 ## Prefer Props Over Re-Fetching
 
@@ -107,7 +109,7 @@ function ChildForm() {
 
 ## Visual QA Is Mandatory for UI/UX Changes
 
-Changes that touch CSS, Tailwind classes, HTML structure, or component markup that affects rendering **must** be visually verified before committing. Use the Playwright MCP server to screenshot affected pages at all 6 test viewports (see `skill-nextjs-tailwind.md` for the full viewport table and workflow). Skip for backend-only, config-only, or docs-only changes.
+Changes that touch CSS, Tailwind classes, HTML structure, or component markup that affects rendering **must** be visually verified before committing. Use Playwright (the Playwright MCP server, or a Playwright script) to screenshot affected pages at all 6 test viewports (see [`nextjs-tailwind.md`](nextjs-tailwind.md#responsive-design--6-viewport-testing) for the full viewport table and workflow, and the [`visual-design-review`](../../.agents/skills/visual-design-review/SKILL.md) skill). Skip for backend-only, config-only, or docs-only changes.
 
 Code that "builds without errors" but looks broken on mobile is a bug. The visual QA loop is: change → screenshot → inspect → fix → re-screenshot → commit.
 

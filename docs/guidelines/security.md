@@ -58,6 +58,7 @@
 - Never hardcode API keys, passwords, or tokens in source code
 - Use `process.env.VAR_NAME` to access secrets at runtime
 - Before every commit, check staged files for accidental secrets (API keys, passwords, connection strings)
+- Never commit `.env.local`, SSH private keys, or any other file holding a secret. Secret scanning and push protection block most pushes that contain one, but don't rely on them
 
 ## Dependency Security Guardrails
 
@@ -80,7 +81,7 @@ When fixing transitive vulnerabilities:
 - Caddy handles SSL/TLS automatically when domain is configured
 - PM2 runs the app as a managed process (auto-restart on crash)
 - GitHub Actions secrets store VPS credentials (never in code)
-- **NEVER overwrite `/etc/caddy/Caddyfile`** — always read it first, then ADD new server blocks
+- **NEVER overwrite `/etc/caddy/Caddyfile`** — always read it first, then ADD new server blocks. The one automated exception is `ops/caddy-limits.sh`, run by every deploy: it adds an `import` line inside the site blocks that proxy to the app, and refuses any edit that changes more than that (#124)
 - Always back up before editing: `cp /etc/caddy/Caddyfile /etc/caddy/Caddyfile.bak`
 - Always validate before reloading: `caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy`
 - Live domains (`sprechereast.com`, `www.sprechereast.com`) must NEVER be removed from the Caddyfile
@@ -94,3 +95,5 @@ When fixing transitive vulnerabilities:
 - Dependabot grouping: patches and minors batched to reduce PR noise
 - CodeQL: semantic code analysis on every PR
 - Dependency audit: CI blocks PRs with high/critical npm vulnerabilities
+
+Fix CodeQL findings before merging, and review Dependabot PRs promptly.

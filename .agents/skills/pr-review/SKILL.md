@@ -16,6 +16,7 @@ gh pr view <number> --json title,body,author,labels,files,closingIssuesReference
 gh pr diff <number>
 gh issue view <linked-issue-number>
 gh pr checks <number>
+gh api "repos/{owner}/{repo}/stacks?pull_request=<number>" -H 'X-GitHub-Api-Version: 2026-03-10'
 ```
 
 ## 2. Check the process (blockers if missing)
@@ -26,10 +27,15 @@ gh pr checks <number>
       Risk & rollback.
 - [ ] The diff matches the issue. No unrelated changes slipped in.
 - [ ] The test steps are concrete enough for someone else to follow.
+- [ ] **Dependent PRs are stacked.** If this PR needs another open PR, both are on a native
+      GitHub stack ([`stacked-prs`](../stacked-prs/SKILL.md)): the base is the branch of the PR
+      below, the description starts with the stack line, and nothing outside the stack is
+      needed. A merge order written only in prose is a **Blocker**.
 - [ ] **Policy changes are flagged.** If the diff touches `AGENTS.md`, `.agents/`,
-      `.github/` (workflows, templates, label policy), `CLAUDE.md`, or `.claude/`, list
-      each such change under **Major** so the owner signs off on it explicitly. A PR can
-      change the checks that run on itself, so read workflow changes carefully.
+      `.github/` (workflows, templates, label policy), `docs/guidelines/`, `CLAUDE.md`, or
+      `.claude/`, list each such change under **Major** so the owner signs off on it
+      explicitly. A PR can change the checks that run on itself, so read workflow changes
+      carefully.
 
 ## 3. Check the change
 
@@ -38,7 +44,13 @@ gh pr checks <number>
 - **Security:** no secrets in the diff. Input is validated at boundaries. Access control on
   Payload collections and endpoints is unchanged or intentionally changed.
 - **Framework first:** uses Payload/Next.js features and official plugins rather than custom
-  code (`.claude/rules/development.md`).
+  code ([`docs/guidelines/development.md`](../../../docs/guidelines/development.md)).
+- **Guidelines and architecture:** the change follows the guidelines for what it touches
+  ([`docs/guidelines/`](../../../docs/guidelines/README.md)) and puts code where
+  [`docs/architecture/`](../../../docs/architecture/README.md) says it goes.
+- **Tool-neutral guidance:** a new rule, procedure or fact lands in `AGENTS.md`, `docs/` or
+  `.agents/skills/`, never only in a tool adapter (`CLAUDE.md`, `.claude/`,
+  `.github/copilot-instructions.md`).
 - **Configuration over code:** environment-specific values come from env vars, and new env
   vars are documented in `.env.local.example`.
 - **Dependencies:** new packages are needed, maintained, and version-compatible. The lockfile

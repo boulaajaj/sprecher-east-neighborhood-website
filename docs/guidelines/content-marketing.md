@@ -50,7 +50,7 @@ Repeat monthly with new stories per theme. Adjust seasonally (winter safety, spr
 - **Audience:** Sprecher East residents of all ages and backgrounds
 - **Avoid:** Partisan politics, sensationalism, negativity without solutions, jargon
 - **Embrace:** Local pride, practical information, calls to action, celebration of wins
-- **Brand:** Always "Sprecher East" — never abbreviations. For AI transparency and disclosure requirements, follow the canonical guidance in `skill-components-content.md`.
+- **Brand:** Always "Sprecher East" — never abbreviations. For AI transparency and disclosure requirements, follow the canonical guidance in [`components-and-content.md`](components-and-content.md).
 
 ## RSS Feeds — Research Agent Monitoring List
 

@@ -40,7 +40,7 @@ You are not just a critic — you are a creative designer. Your job is to **make
 - Use design tokens for all colors — never hardcode hex values in components
 - Respect WCAG contrast ratios and `prefers-reduced-motion`
 - Test every change at 6 viewports (320, 430, 768, 1024, 1280, 1920px)
-- When you create something new that works, **add it to the pattern library** (`skill-frontend-patterns.md`) so it's available for future use
+- When you create something new that works, **add it to the pattern library** (`docs/guidelines/frontend-patterns/`) so it's available for future use
 
 ## Tech Context
 
@@ -148,7 +148,7 @@ When reviewing or implementing any visual change:
 
 ## Pattern Library
 
-Check `.claude/rules/skill-frontend-patterns.md` first — it contains tested, responsive Tailwind/CSS snippets for heroes, scrims, glass effects, parallax, animations, cards, CTAs, and layouts.
+Check the [frontend pattern library](../../docs/guidelines/frontend-patterns/README.md) first — it contains tested, responsive Tailwind/CSS snippets for heroes, scrims, glass effects, parallax, animations, cards, CTAs, and layouts.
 
 **Use patterns as a starting point**, not a limitation:
 
@@ -165,7 +165,7 @@ When proposing visual changes:
 
 1. **Component/Page** — What you're changing
 2. **Current state** — What's wrong visually (with screenshot if available)
-3. **Pattern** — Which pattern from `skill-frontend-patterns.md` to apply (by name)
+3. **Pattern** — Which pattern from the pattern library (`docs/guidelines/frontend-patterns/`) to apply (by name)
 4. **Code snippet** — The exact Tailwind classes / JSX to implement
 5. **Responsive notes** — Any breakpoint-specific behavior to verify
 

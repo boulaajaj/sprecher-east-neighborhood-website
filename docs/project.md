@@ -1,16 +1,14 @@
-# Sprecher East Neighborhood Website
+# Project facts
 
-@AGENTS.md
-
-> **Read `AGENTS.md` first.** It defines the only way changes reach `main` and production
-> (issue → PR → independent review → all checks green → owner merges → CI/CD deploys).
-> It applies to every agent and human and overrides anything below or in any tool's memory.
+What the Sprecher East website runs on and how to work with it locally: stack, hosting,
+environment variables, and known gotchas. It describes the system; the rules for changing it
+are in [`AGENTS.md`](../AGENTS.md), and where code goes is in [`architecture/`](architecture/README.md).
+Keep it current: a change that makes a line here wrong updates it in the same PR.
 
 ## Project Overview
 
-Grassroots neighborhood association website for Sprecher East (Madison, WI).
-Always use the brand name "Sprecher East" — never "SENA".
-This is an unofficial grassroots initiative. Always be transparent about AI assistance.
+Grassroots neighborhood website for Sprecher East (Madison, WI), live at https://sprechereast.com.
+It is an unofficial, AI-assisted initiative (ground rules in [`AGENTS.md`](../AGENTS.md#ground-rules)).
 
 **Repos:**
 
@@ -39,24 +37,30 @@ This is an unofficial grassroots initiative. Always be transparent about AI assi
 - **OS**: Ubuntu 24.04 with Docker
 - **Plan**: KVM 1 (1 CPU, 4 GB RAM, 50 GB disk)
 - **Deploy path**: /var/www/sprecher-east
-- **Process manager**: PM2 (process: sprecher-east, port 3000)
-- **Web server**: Caddy (HTTPS on 443 and HTTP on 80, reverse proxy → 3000)
+- **Process manager**: PM2 (process `sprecher-east`, config `ecosystem.config.cjs`); Next listens on
+  `127.0.0.1:3000` only (#118), so visitors reach it through Caddy
+- **Web server**: Caddy (HTTPS on 443 and HTTP on 80, reverse proxy → `127.0.0.1:3000`); request
+  body limit on the form endpoints (#124)
+- **Backups**: daily, weekly and pre-deploy archives of the database, media and `.env.local` in
+  `/var/backups/sprecher-east` (#148); restore steps in [`ops/README.md`](../ops/README.md)
 - **Hostinger API**: Use `$HOSTINGER_API_KEY` env var for snapshots and management
   - API base: `https://developers.hostinger.com`
   - Snapshot endpoint: `POST /api/vps/v1/virtual-machines/1371281/snapshot`
 - **SSH**: User `root`, port 22, key at `~/.ssh/id_ed25519_sprecher`
-- **CI/CD**: GitHub Actions → SSH deploy → `npm ci && npm run build && pm2 reload`
-- **Caddy config**: `/etc/caddy/Caddyfile` — NEVER overwrite, only append new server blocks
+- **CI/CD**: every merge to `main` runs `.github/workflows/deploy.yml`: SSH to the VPS, pull, `npm ci`,
+  backup, migrate, build, restart (`ops/restart-app.sh`), Caddy limits (`ops/caddy-limits.sh`).
+  The server scripts are in [`ops/`](../ops/README.md)
+- **Caddy config**: `/etc/caddy/Caddyfile`. Rules for editing it (never overwrite, back up,
+  validate) are in [`guidelines/security.md`](guidelines/security.md#infrastructure-security)
 - **Live domains**: `sprechereast.com` (HTTPS), `www.sprechereast.com` (redirects to it), IP `:80` (HTTP)
-- **Caddy rule**: Always `cp Caddyfile Caddyfile.bak` before editing, always `caddy validate` before reload
 
 ## Architecture
 
-**Read [`docs/architecture/`](docs/architecture/README.md) before writing code.** It has the
+**Read [`docs/architecture/`](architecture/README.md) before writing code.** It has the
 target structure (one module per business area under `src/modules/`, shared code in
 `src/platform/`, routes only in `src/app/`), the dependency rules, where each kind of code goes,
-naming [conventions](docs/architecture/conventions.md), the [glossary](docs/architecture/glossary.md),
-the [data model](docs/architecture/data-model.md) and [decision records](docs/architecture/decisions/README.md).
+naming [conventions](architecture/conventions.md), the [glossary](architecture/glossary.md),
+the [data model](architecture/data-model.md) and [decision records](architecture/decisions/README.md).
 
 The code is moving to that structure in small steps (#127). Until an area has moved, it is still in
 the Payload website template's folders, sorted by technical type:
@@ -104,15 +108,8 @@ src/
 
 ## Design Tokens
 
-| Token                | Value     | Classes                                        |
-| -------------------- | --------- | ---------------------------------------------- |
-| `--color-primary`    | `#3d7a5e` | `bg-primary`, `text-primary`, `border-primary` |
-| `--color-accent`     | `#e8923a` | `bg-accent`, `text-accent`                     |
-| `--color-background` | `#f9f8f5` | `bg-background`                                |
-| `--color-surface`    | `#f0ede6` | `bg-surface`                                   |
-| `--color-foreground` | `#1a1a1a` | `text-foreground`                              |
-| `--color-muted`      | `#6b6b6b` | `text-muted`                                   |
-| `--color-border`     | `#e2ddd6` | `border-border`                                |
+Colors, fonts and dark-mode values are tokens in `src/app/(frontend)/globals.css`; the table of
+light and dark values is in [`guidelines/nextjs-tailwind.md`](guidelines/nextjs-tailwind.md#design-tokens).
 
 ## Payload CMS Plugins
 

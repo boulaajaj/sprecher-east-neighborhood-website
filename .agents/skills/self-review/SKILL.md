@@ -1,68 +1,65 @@
-# Simplify: Code Review and Cleanup
+---
+name: self-review
+description: Review and clean up your own change before opening or updating a pull request — reuse of existing helpers, code quality, efficiency, the repo's guidelines, and a visual design review for UI changes — then fix what it finds. Use when a change is done and before asking for the independent review.
+---
 
-Review all changed files for reuse, quality, efficiency, and visual design. Fix any issues found.
+# Self-review before a PR
 
-## Phase 1: Identify Changes
+The author's own pass over a change. It catches the easy things before the independent review
+([`pr-review`](../pr-review/SKILL.md)), and doesn't replace it. Fix every Critical and High finding
+before opening the PR.
 
-Run `git diff` (or `git diff HEAD` if there are staged changes) to see what changed. If there are no git changes, review the most recently modified files that the user mentioned or that you edited earlier in this conversation.
+## 1. Find the change
 
-## Phase 2: Launch Four Review Agents in Parallel
+```bash
+git diff <base>...HEAD   # <base>: origin/main, or the branch below for a stacked PR
+git diff HEAD            # plus anything not committed yet
+```
 
-Use the Agent tool to launch all four agents concurrently in a single message. Pass each agent the full diff so it has the complete context.
+If there are no changes, review the files you edited in this session.
 
-### Agent 1: Code Reuse Review
+## 2. Review it four ways
 
-For each change:
+Give each review the full diff. If your tool can run sub-agents, run the four in parallel, one
+each; otherwise do them one after another.
 
-1. **Search for existing utilities and helpers** that could replace newly written code. Use Grep to find similar patterns elsewhere in the codebase — common locations are utility directories, shared modules, and files adjacent to the changed ones.
-2. **Flag any new function that duplicates existing functionality.** Suggest the existing function to use instead.
-3. **Flag any inline logic that could use an existing utility** — hand-rolled string manipulation, manual path handling, custom environment checks, ad-hoc type guards, and similar patterns are common candidates.
+### Reuse
 
-### Agent 2: Code Quality Review
+1. Search for existing utilities and helpers that could replace new code: the shared folders in
+   the [DRY search order](../../../docs/guidelines/development.md#dry--dont-repeat-yourself),
+   and files next to the changed ones.
+2. Flag any new function that duplicates an existing one, and name the one to use instead.
+3. Flag inline logic an existing utility already covers: hand-rolled string or path handling,
+   custom environment checks, ad-hoc type guards.
 
-Review the same changes for hacky patterns:
+### Quality
 
-1. **Redundant state**: state that duplicates existing state, cached values that could be derived, observers/effects that could be direct calls
-2. **Parameter sprawl**: adding new parameters to a function instead of generalizing or restructuring existing ones
-3. **Copy-paste with slight variation**: near-duplicate code blocks that should be unified with a shared abstraction
-4. **Leaky abstractions**: exposing internal details that should be encapsulated, or breaking existing abstraction boundaries
-5. **Stringly-typed code**: using raw strings where constants, enums (string unions), or branded types already exist in the codebase
+1. **Redundant state**: state that duplicates other state, cached values that could be derived,
+   effects that could be direct calls.
+2. **Parameter sprawl**: new parameters added instead of generalizing or restructuring.
+3. **Copy-paste with slight variation**: near-duplicates that should share one abstraction.
+4. **Leaky abstractions**: internals exposed, or module boundaries crossed (see the dependency
+   rules in [`docs/architecture/`](../../../docs/architecture/README.md)).
+5. **Stringly-typed code**: raw strings where a constant, a string union or a branded type
+   already exists.
+6. **Guidelines**: anything against [development](../../../docs/guidelines/development.md) or
+   [security](../../../docs/guidelines/security.md).
 
-### Agent 3: Efficiency Review
+### Efficiency
 
-Review the same changes for efficiency:
+1. **Unnecessary work**: repeated computations, file reads or API calls; N+1 queries.
+2. **Missed concurrency**: independent operations run one after another.
+3. **Hot-path bloat**: new blocking work at startup or on every request or render.
+4. **Existence checks before acting** (TOCTOU): do the operation and handle the error instead.
+5. **Memory**: unbounded structures, missing cleanup, listener leaks.
+6. **Overly broad operations**: reading or loading everything when a part is enough.
 
-1. **Unnecessary work**: redundant computations, repeated file reads, duplicate network/API calls, N+1 patterns
-2. **Missed concurrency**: independent operations run sequentially when they could run in parallel
-3. **Hot-path bloat**: new blocking work added to startup or per-request/per-render hot paths
-4. **Unnecessary existence checks**: pre-checking file/resource existence before operating (TOCTOU anti-pattern) — operate directly and handle the error
-5. **Memory**: unbounded data structures, missing cleanup, event listener leaks
-6. **Overly broad operations**: reading entire files when only a portion is needed, loading all items when filtering for one
+### Visual design
 
-### Agent 4: Visual Design Review
+Only when the diff touches CSS, Tailwind classes, HTML structure, component markup or image
+treatment: follow [`visual-design-review`](../visual-design-review/SKILL.md).
 
-**Skip this agent entirely** if the diff does NOT touch CSS, Tailwind classes, HTML structure, component markup, or image treatment (i.e., backend-only, config-only, or docs-only changes).
+## 3. Fix
 
-When the diff DOES affect UI rendering:
-
-1. **Read `.claude/rules/skill-visual-design-review.md`** for the full prioritized review checklist.
-2. **Start the dev server** if not already running (`npm run dev`).
-3. **Screenshot every affected page** at all 6 viewports using the Playwright MCP browser tools:
-   - 320px (Mobile S), 430px (Mobile L), 768px (Tablet S), 1024px (Tablet L), 1280px (Desktop S), 1920px (Desktop L)
-4. **Review each screenshot** against the skill file's priority checklist:
-   - P1: Contrast & Readability — text legible on all backgrounds? Both themes?
-   - P2: Image Treatment — overlays subtle? Image stays vivid? No heavy gradients?
-   - P3: Section Transitions — sections flow naturally? No harsh color boundaries?
-   - P4: Spacing & Rhythm — consistent spacing scale? Generous whitespace?
-   - P5: Typography Hierarchy — clear size/weight contrast? Max 3 font sizes per view?
-   - P6: Color Harmony — using design tokens? Palette feels cohesive?
-   - P7: Component Polish — consistent border-radius? Hover/focus states?
-   - P8: Animation & Motion — transitions 150-300ms? No janky layout shifts?
-5. **Run the "First Impression" test**: 3-second test, squint test, comparison test, theme test, edge test.
-6. **Flag anti-patterns** from the checklist as bugs requiring immediate fix.
-
-## Phase 3: Fix Issues
-
-Wait for all four agents to complete. Aggregate their findings and fix each issue directly. If a finding is a false positive or not worth addressing, note it and move on — do not argue with the finding, just skip it.
-
-When done, briefly summarize what was fixed (or confirm the code was already clean).
+Collect the findings and fix each one. If a finding is a false positive or not worth doing, note
+it and move on. Then say briefly what you fixed, or that the change was already clean.
