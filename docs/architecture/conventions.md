@@ -40,13 +40,16 @@ Data functions return the module's own types, not Payload documents:
 - `…Detail`: what a detail page needs (`EventDetail`).
 
 A `to…` mapper in `data/` builds them from Payload documents. Generated Payload types
-(`@/payload-types`) stay inside `data/` and `cms/`.
+(`@/payload-types`) stay inside `data/` and `cms/`, except in components that render CMS content
+as authored (blocks, heroes, `RichText`, `Media`); see rule 7 in the [README](README.md#dependency-rules).
 
 ## Entry files
 
 - `index.ts` exports what any code, including client components, may import: types, UI parts,
   pure helpers. It never imports server-only code.
-- `server.ts` starts with `import 'server-only'` and exports queries and actions.
+- `server.ts` starts with `import 'server-only'` and exports the module's use cases.
+- `actions.ts` starts with `'use server'` and exports server actions; each one validates its
+  input and calls a use case.
 - Nothing outside a module imports from its inner folders. If something is missing from an entry
   file, add it there.
 

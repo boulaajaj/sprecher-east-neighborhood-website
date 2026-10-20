@@ -23,7 +23,7 @@ Each block in `src/blocks/` has two files:
 
 **IMPORTANT**: Adding a new block requires TWO registration steps:
 
-1. Add the block config to `Pages.ts` layout field's `blocks` array
+1. Add the block config to the `blocks` array of the layout field in `src/collections/Pages/index.ts`
 2. Add the component to the `blockComponents` map in `src/blocks/RenderBlocks.tsx`
 
 Missing either step will silently fail — the block won't render.

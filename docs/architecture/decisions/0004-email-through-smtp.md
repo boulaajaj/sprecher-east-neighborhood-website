@@ -12,8 +12,8 @@ the visitor typed (`{{email}}`) would let anyone make the site send mail to any 
 ## Decision
 
 - Payload's nodemailer adapter, configured from `SMTP_*` env vars (Mailgun in production). With no
-  `SMTP_HOST`, or an invalid setting, email goes to the server log with a clear `[email]` error
-  instead of crashing the app.
+  `SMTP_HOST`, email goes to the server log (normal for local work). With an invalid setting it
+  also goes to the log, with a clear `[email]` error, instead of crashing the app.
 - Form emails whose To, CC or BCC come from submitted values are dropped. A From from submitted
   values is replaced by the default sender; a Reply-To from submitted values is kept only if it is
   exactly one address.

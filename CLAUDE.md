@@ -40,7 +40,7 @@ This is an unofficial grassroots initiative. Always be transparent about AI assi
 - **Plan**: KVM 1 (1 CPU, 4 GB RAM, 50 GB disk)
 - **Deploy path**: /var/www/sprecher-east
 - **Process manager**: PM2 (process: sprecher-east, port 3000)
-- **Web server**: Caddy (reverse proxy port 80 → 3000)
+- **Web server**: Caddy (HTTPS on 443 and HTTP on 80, reverse proxy → 3000)
 - **Hostinger API**: Use `$HOSTINGER_API_KEY` env var for snapshots and management
   - API base: `https://developers.hostinger.com`
   - Snapshot endpoint: `POST /api/vps/v1/virtual-machines/1371281/snapshot`
@@ -65,7 +65,7 @@ the Payload website template's folders, sorted by technical type:
 src/
   access/          Role checks and access functions (roles.ts, authenticatedOrPublished, anyone)
   app/             Next.js App Router
-    (frontend)/    Public routes (home, posts, events, faq, resources, login, account, sitemaps)
+    (frontend)/    Public routes (home, posts, events, faq, resources, search, login, account, sitemaps)
     (payload)/     Payload admin and API routes (generated; leave alone)
   blocks/          Page-builder blocks: Payload config + React component each
   collections/     Payload collections (Pages, Posts, Events, FAQ, Resources, TeamMembers, Users, Media, Categories)
@@ -146,6 +146,7 @@ npm run dev                         # → http://localhost:3000
 | `TURNSTILE_ALLOWED_HOSTNAMES`                                                             | Extra hostnames a Turnstile token may come from (optional)       |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM_ADDRESS`, `SMTP_FROM_NAME` | Outgoing email; unset `SMTP_HOST` logs emails instead            |
 | `CONTACT_NOTIFY_EMAIL`, `CONTACT_EMAIL_FROM`                                              | Used by the seed only, for the contact form's owner notification |
+| `SEED_PASSWORD`                                                                           | Seed only: the demo user's password (random when unset)          |
 
 System-level env vars (not in .env.local):
 | Var | Purpose |

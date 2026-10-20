@@ -26,12 +26,14 @@ What the access functions mean (`src/access/`):
 
 - `anyone`: always true.
 - `authenticatedOrPublished`: admin and editor see everything, including drafts; everyone else only sees `_status = published`.
+- `readVersions` is not set on any draft-enabled collection, so Payload's default lets any signed-in user read every version, drafts included, through `/api/<collection>/versions`. Gap tracked in #140.
+- `unlock` is not set on `users`, so any account in the `users` collection may unlock another. Gap tracked in #140.
 - `isAdmin`: role `admin`. `isAdminOrEditor`: role `admin` or `editor`. A user with no role counts as `resident`.
 - `isAdminOrSelf`: admin, or a user whose id equals the document id. Without an id (a list query) non-admins are denied.
 - `users` also sets `access.admin: isAdminOrEditorBoolean` (who may open `/admin`: admin and editor).
 - "Payload default" means no access function is set, so Payload uses `Boolean(req.user)`: any logged-in user, including `resident`.
 
-Also present, not configured in this repo: `payload-folders` (from `media.folders: true`, Payload default access), `payload-jobs`, `payload-kv`, `payload-locked-documents`, `payload-preferences`, `payload-migrations`. `payload.config.ts` has no `jobs` config or runner, so scheduled publishing may never fire (#141).
+Also present, not configured in this repo: `payload-folders` (from `media.folders: true`, Payload default access: any signed-in user, a gap fixed in #143), `payload-jobs`, `payload-kv`, `payload-locked-documents`, `payload-preferences`, `payload-migrations`. `payload.config.ts` has no `jobs` config or runner, so scheduled publishing may never fire (#141).
 
 ## Fields by collection
 
@@ -100,11 +102,11 @@ Also present, not configured in this repo: `payload-folders` (from `media.folder
 
 ### users
 
-| Field       | Type                                                                                                                           | Required   | Notes                                                                                                                            |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------ | ---------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `name`      | text                                                                                                                           | No         |                                                                                                                                  |
-| `role`      | select                                                                                                                         | Yes        | `admin`, `editor`, `resident`; default `resident`; sidebar                                                                       |
-| auth fields | `email`, `password`, `hash`, `salt`, `resetPasswordToken`, `resetPasswordExpiration`, `loginAttempts`, `lockUntil`, `sessions` | email: Yes | From `auth: true`. `timestamps: true`. No OAuth fields: `payload-oauth2` (named in CLAUDE.md) is not in `package.json` or `src/` |
+| Field       | Type                                                                                                                                                       | Required   | Notes                                                                                                       |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------- |
+| `name`      | text                                                                                                                                                       | No         |                                                                                                             |
+| `role`      | select                                                                                                                                                     | Yes        | `admin`, `editor`, `resident`; default `resident`; sidebar                                                  |
+| auth fields | `email`, `password`, `hash`, `salt`, `resetPasswordToken`, `resetPasswordExpiration`, `resetPasswordRequestedAt`, `loginAttempts`, `lockUntil`, `sessions` | email: Yes | From `auth: true`. `timestamps: true`. No OAuth fields: `payload-oauth2` is not in `package.json` or `src/` |
 
 ### faq
 
@@ -159,13 +161,13 @@ Field `navItems`: array, max 6 rows, optional. Each row is one `link` group: `ty
 - `pages.hero.media` → media (one). `pages.hero.links[].link.reference` → pages | posts (one).
 - `pages.layout`: `cta.links[].link.reference` → pages | posts; `content.columns[].link.reference` → pages | posts; `mediaBlock.media` → media (one); `archive.categories` → categories (many); `archive.selectedDocs` → posts (many); `formBlock.form` → forms (one).
 - `posts.heroImage` → media (one); `posts.relatedPosts` → posts (many); `posts.categories` → categories (many); `posts.authors` → users (many).
-- `posts.content` (Lexical): `mediaBlock` blocks → media; link nodes → pages | posts. The same link rule applies to `faq.answer`.
+- `posts.content` (Lexical): `mediaBlock` blocks → media; link nodes → pages | posts. Every rich-text field built on the site's default editor can hold the same link nodes: `faq.answer`, `events.content`, `pages.hero.richText`, the `cta`, `content`, `archive` and `formBlock` rich text, `media.caption` and `forms.confirmationMessage`.
 - `events.heroImage` → media (one); `team-members.photo` → media (one).
 - `pages.meta.image`, `posts.meta.image`, `events.meta.image` → media (one). Generated types omit `meta.image` but the column exists (`meta_image_id`).
 - `categories.parent` → categories (one); `categories.breadcrumbs[].doc` → categories; `media.folder` → payload-folders (one).
 - `header.navItems[].link.reference`, `footer.navItems[].link.reference` → pages | posts (one).
 - `redirects.to.reference` → pages | posts (one); `form-submissions.form` → forms (one, required); `search.doc` → posts | events (one, required); `search.meta.image` → media (one).
-- `users`, `faq`, `resources`: no outgoing relations.
+- `users`, `resources`: no outgoing relations; `faq` only through rich-text links.
 
 ## Hooks that change data or caches
 
