@@ -29,8 +29,9 @@ Read the other guidelines (frontend patterns, content marketing, Asana) when a t
   [`self-review`](.agents/skills/self-review/SKILL.md) skill, with its four reviews as parallel
   subagents. `.claude/skills/simplify/` replaces Claude Code's built-in `/simplify`, a generic check
   that doesn't apply this repo's guidelines or the visual design review. Because a project
-  `simplify` skill exists, Claude Code also runs it before each commit that isn't docs or tests.
-  Run it again before opening or updating a PR.
+  `simplify` skill exists, Claude Code also runs it before each commit that isn't docs or tests
+  (Claude Code v2.1.286 or later; a personal `~/.claude/skills/simplify` would win over it). Run
+  it again before opening or updating a PR.
 - **After the owner merges,** run `/wrapped` (the [`wrapped`](.agents/skills/wrapped/SKILL.md) skill).
 - **Independent review:** run the [`pr-review`](.agents/skills/pr-review/SKILL.md) skill in a
   separate session or a subagent (for example `qa-reviewer`), never in the context that wrote

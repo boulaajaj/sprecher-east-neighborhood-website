@@ -27,8 +27,10 @@ merges don't deploy).
 
 1. Find the run for the merge commit and wait for it:
    `gh run list --workflow deploy.yml --commit <merge_commit_sha>`, then `gh run watch <id>`.
-   Where the Actions API is blocked, read the commit's check runs instead:
-   `gh api repos/{owner}/{repo}/commits/<merge_commit_sha>/check-runs`.
+   Where the Actions API is blocked, ask for the deploy's check run by name (a `main` commit
+   collects many other check runs):
+   `gh api "repos/{owner}/{repo}/commits/<merge_commit_sha>/check-runs?check_name=Deploy"`.
+   Its `id` is the job id for the next step.
 2. Read its annotations (the `::notice` / `::warning` / `::error` lines the server scripts print):
    `gh api repos/{owner}/{repo}/check-runs/<job id>/annotations`.
 3. Open https://sprechereast.com and check the behavior the PRs changed.
