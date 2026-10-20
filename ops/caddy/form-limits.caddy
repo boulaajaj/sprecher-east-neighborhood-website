@@ -7,7 +7,7 @@
 # GraphQL, where form submissions can also be created. The app's own limit on a submission is
 # about 20,000 characters (src/hooks/limitSubmissionSize.ts), at most about 80 KB of JSON even
 # in a script that takes several bytes per character, so 256KB never blocks a real message.
-@sprecherEastFormSubmissions path /api/form-submissions /api/form-submissions/* /api/graphql
+@sprecherEastFormSubmissions path /api/form-submissions /api/form-submissions/* /api/graphql /api/graphql/*
 request_body @sprecherEastFormSubmissions {
 	max_size 256KB
 }

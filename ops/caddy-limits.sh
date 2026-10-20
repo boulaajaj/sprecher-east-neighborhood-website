@@ -28,7 +28,11 @@ fi
 
 # Never print Caddy's own output: the Caddyfile could hold credentials and the deploy log is public.
 caddy_accepts() { caddy validate --config "$1" --adapter caddyfile >/dev/null 2>&1; }
-caddy_version() { caddy version 2>/dev/null | awk '{ print $1; exit }'; }
+caddy_version() {
+  local v
+  v=$(caddy version 2>/dev/null | awk '{ print $1; exit }' || true)
+  echo "${v:-unknown}"
+}
 
 # Status code for a POST of the given body (read from stdin) to the form endpoint, through Caddy.
 post_status() {
@@ -45,7 +49,7 @@ add_import_lines() {
     {
       text[NR] = $0
       s = clean($0)
-      if (s ~ /<</) bad = 1
+      if ($0 ~ /<</) bad = 1 # the raw line: clean() can cut a quoted "#" and hide a heredoc
       if (depth == 0 && s ~ /\{$/ && s !~ /^\{/ && s !~ /^&?\(/) { start = NR; proxies = 0; has = 0 }
       if (depth > 0 && start && s ~ ("^reverse_proxy[[:space:]](.*[[:space:]])?(http://)?(localhost|127\\.0\\.0\\.1)?:" port "([[:space:]{]|$)")) proxies = 1
       if (depth > 0 && start && s == imp) has = 1
@@ -89,7 +93,9 @@ stamp=$(date -u +%Y%m%dT%H%M%SZ)
 candidate="$CADDYFILE.sprecher-east-new"
 original="$CADDYFILE.sprecher-east-orig"
 limits_backup=""
-trap 'rm -f "$candidate" "$original" "${limits_backup:-}"' EXIT
+# The copy of the previous limit is removed only once it is no longer needed, so an interrupted
+# run leaves it next to the live one.
+trap 'rm -f "$candidate" "$original"' EXIT
 
 set +e
 add_import_lines >"$candidate"
@@ -135,12 +141,19 @@ else
   install -m 644 "$SOURCE" "$LIMITS_FILE"
 
   restore_limits() {
-    if [ -n "$limits_backup" ]; then cp -p "$limits_backup" "$LIMITS_FILE"; else rm -f "$LIMITS_FILE"; fi
+    if [ -n "$limits_backup" ]; then
+      cp -p "$limits_backup" "$LIMITS_FILE" && rm -f "$limits_backup"
+    else
+      rm -f "$LIMITS_FILE"
+    fi
   }
 
   if ! caddy_accepts "$candidate"; then
-    restore_limits
-    report "ERROR: Caddy rejected the request body limit; nothing was changed"
+    if restore_limits; then
+      report "ERROR: Caddy rejected the request body limit; nothing was changed"
+    else
+      report "ERROR: Caddy rejected the request body limit, and the previous limit could not be put back (copy: $limits_backup)"
+    fi
     exit 1
   fi
 
@@ -152,17 +165,38 @@ else
     cat "$candidate" >"$CADDYFILE"
   fi
 
+  # Puts the previous Caddyfile and limit back and reloads. On failure, prints what went wrong.
   restore_all() {
-    if [ "$added" -gt 0 ]; then cat "$CADDYFILE.bak-$stamp" >"$CADDYFILE"; fi
-    restore_limits
-    $RELOAD_CADDY >/dev/null 2>&1 || true
+    local failed=""
+    if [ "$added" -gt 0 ] && ! cat "$CADDYFILE.bak-$stamp" >"$CADDYFILE"; then
+      failed="the Caddyfile (backup: $CADDYFILE.bak-$stamp)"
+    fi
+    if ! restore_limits; then failed="${failed:+$failed and }the limit (copy: $limits_backup)"; fi
+    if [ -n "$failed" ]; then
+      echo "Could not put back $failed."
+      return 1
+    fi
+    if ! $RELOAD_CADDY >/dev/null 2>&1; then
+      echo "The previous files are back, but Caddy would not reload them."
+      return 1
+    fi
   }
 
-  if ! $RELOAD_CADDY >/dev/null 2>&1 || ! wait_until_up 20; then
-    restore_all
-    report "ERROR: the site stopped answering after adding the request body limit; the previous Caddy config is back"
+  problem=""
+  if ! $RELOAD_CADDY >/dev/null 2>&1; then
+    problem="Caddy would not reload with the request body limit"
+  elif ! wait_until_up 20; then
+    problem="the site stopped answering after adding the request body limit"
+  fi
+  if [ -n "$problem" ]; then
+    if detail=$(restore_all); then
+      report "ERROR: $problem; the previous Caddy config is back"
+    else
+      report "ERROR: $problem. $detail"
+    fi
     exit 1
   fi
+  if [ -n "$limits_backup" ]; then rm -f "$limits_backup"; fi
   if [ "$added" -gt 0 ]; then
     report "Caddy request body limit added ($limit_text): $added site block(s) now import $LIMITS_FILE (backup: $CADDYFILE.bak-$stamp)"
   else
