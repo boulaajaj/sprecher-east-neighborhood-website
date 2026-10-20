@@ -2,7 +2,7 @@ import { createLocalReq, getPayload } from 'payload'
 
 import { hasAdmin } from '@/access/roles'
 import { seed } from '@/endpoints/seed'
-import { isSeedEnabled } from '@/endpoints/seed/isSeedEnabled'
+import { isSeedEnabled } from '@/access/isSeedEnabled'
 import type { User } from '@/payload-types'
 import config from '@payload-config'
 import { headers } from 'next/headers'

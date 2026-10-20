@@ -1,72 +1,52 @@
 import { Banner } from '@payloadcms/ui/elements/Banner'
 import React from 'react'
 
-import { isSeedEnabled } from '@/endpoints/seed/isSeedEnabled'
+import { isSeedEnabled } from '@/access/isSeedEnabled'
 
 import { SeedButton } from './SeedButton'
 import './index.scss'
 
 const baseClass = 'before-dashboard'
 
+/** Short orientation for editors at the top of the admin dashboard. */
 const BeforeDashboard: React.FC = () => {
   return (
     <div className={baseClass}>
       <Banner className={`${baseClass}__banner`} type="success">
-        <h4>Welcome to your dashboard!</h4>
+        <h4>Welcome to the Sprecher East admin</h4>
       </Banner>
-      Here&apos;s what to do next:
+      A few things to know:
       <ul className={`${baseClass}__instructions`}>
         {/* The seed deletes nearly all content, so it is offered in local development only (#147) */}
         {isSeedEnabled() && (
           <li>
             <SeedButton />
-            {' with a few pages, posts, and projects to jump-start your new site, then '}
-            <a href="/" target="_blank">
-              visit your website
+            {
+              ' with demo pages, posts and events (local development only; it replaces the content), then '
+            }
+            <a href="/" rel="noopener noreferrer" target="_blank">
+              open the site
             </a>
             {' to see the results.'}
           </li>
         )}
         <li>
-          {'Modify your '}
-          <a
-            href="https://payloadcms.com/docs/configuration/collections"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            collections
-          </a>
-          {' and add more '}
-          <a
-            href="https://payloadcms.com/docs/fields/overview"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            fields
-          </a>
-          {' as needed. If you are new to Payload, we also recommend you check out the '}
-          <a
-            href="https://payloadcms.com/docs/getting-started/what-is-payload"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Getting Started
-          </a>
-          {' docs.'}
+          Pages, posts, events, FAQs and resources stay drafts until you press{' '}
+          <strong>Publish</strong>. Use <strong>Preview</strong> to check a page or post before it
+          goes live.
         </li>
         <li>
-          Commit and push your changes to the repository to trigger a redeployment of your project.
+          Messages sent through the contact form are under <strong>Form Submissions</strong> (admins
+          only).
+        </li>
+        <li>
+          {'Published changes usually show on '}
+          <a href="/" rel="noopener noreferrer" target="_blank">
+            the public site
+          </a>
+          {' right away; lists can take up to 10 minutes to catch up.'}
         </li>
       </ul>
-      {'Pro Tip: This block is a '}
-      <a
-        href="https://payloadcms.com/docs/custom-components/overview"
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        custom component
-      </a>
-      , you can remove it at any time by updating your <strong>payload.config</strong>.
     </div>
   )
 }
