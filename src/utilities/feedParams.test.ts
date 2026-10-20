@@ -1,9 +1,6 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-// feeds.ts imports the Payload config for its queries; these tests only cover input parsing.
-vi.mock('@payload-config', () => ({ default: {} }))
-
-const { isEventScope, parsePageNumber } = await import('./feeds')
+import { isEventScope, parsePageNumber } from './feedParams'
 
 describe('parsePageNumber', () => {
   it.each([
