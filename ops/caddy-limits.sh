@@ -8,11 +8,19 @@
 # reload or the site stops answering, the previous files come back. Running it again changes
 # nothing. Because every deploy runs it, the import line comes back unless this script is
 # removed from the repo.
-set -euo pipefail
+set -Eeuo pipefail
 umask 077
 trap '' HUP # a dropped SSH session must not stop the script between a change and its rollback
 
 . "$(dirname "$0")/lib.sh"
+
+# Any other failure still ends with an annotation (once, from the main shell).
+on_unexpected_error() {
+  [ "$BASH_SUBSHELL" -eq 0 ] || return 0
+  trap - ERR
+  report "ERROR: caddy-limits.sh failed unexpectedly at line $1; check /etc/caddy by hand"
+}
+trap 'on_unexpected_error $LINENO' ERR
 
 CADDYFILE="${CADDYFILE:-/etc/caddy/Caddyfile}"
 LIMITS_FILE="${LIMITS_FILE:-/etc/caddy/sprecher-east-form-limits.caddy}"
@@ -97,10 +105,8 @@ limits_backup=""
 # run leaves it next to the live one.
 trap 'rm -f "$candidate" "$original"' EXIT
 
-set +e
-add_import_lines >"$candidate"
-status=$?
-set -e
+status=0
+add_import_lines >"$candidate" || status=$?
 case $status in
   0) ;;
   4)
@@ -162,13 +168,14 @@ else
   if [ "$added" -gt 0 ]; then
     cp -p "$CADDYFILE" "$CADDYFILE.bak"
     cp -p "$CADDYFILE" "$CADDYFILE.bak-$stamp"
-    cat "$candidate" >"$CADDYFILE"
+    cp "$candidate" "$CADDYFILE" # cp onto the existing file keeps its owner and mode
   fi
 
   # Puts the previous Caddyfile and limit back and reloads. On failure, prints what went wrong.
   restore_all() {
     local failed=""
-    if [ "$added" -gt 0 ] && ! cat "$CADDYFILE.bak-$stamp" >"$CADDYFILE"; then
+    # cp reads the backup before it truncates the Caddyfile, so an unreadable backup can't empty it.
+    if [ "$added" -gt 0 ] && ! cp "$CADDYFILE.bak-$stamp" "$CADDYFILE"; then
       failed="the Caddyfile (backup: $CADDYFILE.bak-$stamp)"
     fi
     if ! restore_limits; then failed="${failed:+$failed and }the limit (copy: $limits_backup)"; fi
