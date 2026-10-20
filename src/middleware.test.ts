@@ -1,22 +1,26 @@
+import { unstable_doesMiddlewareMatch } from 'next/experimental/testing/server'
 import { NextRequest } from 'next/server'
 import { describe, expect, it } from 'vitest'
+
+import { MAX_PAGE } from '@/utilities/feedParams'
 
 import { config, isValidPagingPath, middleware } from './middleware'
 
 describe('isValidPagingPath', () => {
-  it.each(['/posts/page/1', '/posts/page/500', '/events/list/upcoming/2', '/events/list/past/1'])(
-    'lets %s through',
-    (path) => {
-      expect(isValidPagingPath(path)).toBe(true)
-    },
-  )
+  it.each([
+    '/posts/page/1',
+    `/posts/page/${MAX_PAGE}`,
+    '/events/list/upcoming/2',
+    '/events/list/past/1',
+  ])('lets %s through', (path) => {
+    expect(isValidPagingPath(path)).toBe(true)
+  })
 
   it.each([
     '/posts/page/zz',
     '/posts/page/0',
     '/posts/page/02',
-    '/posts/page/501',
-    '/posts/page',
+    `/posts/page/${MAX_PAGE + 1}`,
     '/posts/page/2/extra',
     '/events/list/x1/1',
     '/events/list/upcoming/zz',
@@ -26,7 +30,10 @@ describe('isValidPagingPath', () => {
     expect(isValidPagingPath(path)).toBe(false)
   })
 
-  it('leaves other routes alone', () => {
+  it('leaves slug pages and other routes alone', () => {
+    // A post titled "Page" has the slug `page`; an event titled "List", `list`.
+    expect(isValidPagingPath('/posts/page')).toBe(true)
+    expect(isValidPagingPath('/events/list')).toBe(true)
     expect(isValidPagingPath('/posts/some-post')).toBe(true)
     expect(isValidPagingPath('/events')).toBe(true)
   })
@@ -42,8 +49,23 @@ describe('middleware', () => {
     const response = middleware(new NextRequest('https://sprechereast.example/posts/page/2'))
     expect(response.headers.get('x-middleware-next')).toBe('1')
   })
+})
 
-  it('only runs on the two paging routes', () => {
-    expect(config.matcher).toEqual(['/posts/page/:path*', '/events/list/:path*'])
-  })
+describe('matcher', () => {
+  const runsOn = (path: string) =>
+    unstable_doesMiddlewareMatch({ config, url: `https://sprechereast.example${path}` })
+
+  it.each(['/posts/page/2', '/posts/page/zz', '/events/list/upcoming/1', '/events/list/x1/1'])(
+    'runs on %s',
+    (path) => {
+      expect(runsOn(path)).toBe(true)
+    },
+  )
+
+  it.each(['/posts/page', '/events/list', '/posts/some-post', '/events', '/'])(
+    'does not run on %s',
+    (path) => {
+      expect(runsOn(path)).toBe(false)
+    },
+  )
 })

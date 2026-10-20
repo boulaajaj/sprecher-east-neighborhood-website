@@ -6,10 +6,12 @@ import { isEventScope, parsePageNumber } from '@/utilities/feedParams'
  * Answers 404 for malformed paging URLs (`/posts/page/zz`, `/events/list/x/1`) before Next
  * renders them. The pages would 404 too, but only after caching the result on disk, so a client
  * requesting many junk URLs could grow the page cache without limit (#119). Valid formats are a
- * bounded set (page 1 to 500, two event scopes), so the cache stays bounded on these routes.
+ * bounded set (page 1 to MAX_PAGE, two event scopes), so the cache stays bounded on these routes.
  */
 export function isValidPagingPath(pathname: string): boolean {
   const segments = pathname.split('/').filter(Boolean)
+  // `/posts/page` and `/events/list` alone are slug pages (a post called "Page"), not paging URLs.
+  if (segments.length <= 2) return true
   if (segments[0] === 'posts' && segments[1] === 'page') {
     return segments.length === 3 && parsePageNumber(segments[2]) !== null
   }
@@ -26,6 +28,8 @@ export function middleware(request: NextRequest): NextResponse {
   return new NextResponse('Not found', { status: 404 })
 }
 
+// `:path+` needs at least one segment after the prefix, so slug pages like `/posts/page` never
+// reach the middleware.
 export const config = {
-  matcher: ['/posts/page/:path*', '/events/list/:path*'],
+  matcher: ['/posts/page/:path+', '/events/list/:path+'],
 }
