@@ -7,6 +7,7 @@
 # Caddy before and after, and the previous arguments come back if it stops answering. Otherwise
 # it is a plain reload.
 set -Eeuo pipefail # -E: the ERR trap below also covers failures inside functions
+trap '' HUP # a dropped SSH session must not stop the script between a change and its rollback
 
 . "$(dirname "$0")/lib.sh"
 
@@ -19,16 +20,20 @@ rollback_config="" # set once the app is about to be restarted with new argument
 
 # Any unexpected failure still ends with the app running, and says so: reloaded on the new build,
 # or, if it was already deleted for a fresh start, started again with the previous arguments.
+# Each action comes before its report, so a closed output can't stop the recovery.
 on_unexpected_error() {
   [ "$BASH_SUBSHELL" -eq 0 ] || return 0 # let the main script handle it, once
   trap - ERR
+  local config="${rollback_config:-ecosystem.config.cjs}"
   if pm2 describe "$NAME" >/dev/null 2>&1; then
-    report "ERROR: restart-app.sh failed unexpectedly at line $1; reloading the app as it was"
     pm2 reload "$NAME" --update-env >/dev/null 2>&1 || true
+    report "ERROR: restart-app.sh failed unexpectedly at line $1; reloaded the app as it was"
+  elif pm2 start "$config" --only "$NAME" >/dev/null 2>&1; then
+    pm2 save --force >/dev/null 2>&1 || true # only now: saving an empty list would lose the app on reboot
+    [ -z "$rollback_config" ] || rm -f "$rollback_config"
+    report "ERROR: restart-app.sh failed unexpectedly at line $1 while the app was stopped; started it again"
   else
-    report "ERROR: restart-app.sh failed unexpectedly at line $1 while the app was stopped; starting it again"
-    pm2 start "${rollback_config:-ecosystem.config.cjs}" --only "$NAME" >/dev/null 2>&1 || true
-    pm2 save --force >/dev/null 2>&1 || true
+    report "ERROR: restart-app.sh failed at line $1 and could not start the app again; by hand: cd $APP_DIR && pm2 start $config --only $NAME && pm2 save"
   fi
 }
 trap 'on_unexpected_error $LINENO' ERR
@@ -126,9 +131,10 @@ if wait_until_up "$DEADLINE_SECONDS"; then
   exit 0
 fi
 
-report "ERROR: the site did not answer within ${DEADLINE_SECONDS}s after restarting with '$wanted'; restoring '${stored:-start}'"
+# Roll back before reporting, so a closed output can't stop the rollback halfway.
 pm2 delete "$NAME" >/dev/null 2>&1 || true
 pm2 start "$rollback_config" --only "$NAME" >/dev/null
 pm2 save --force >/dev/null
 rm -f "$rollback_config"
+report "ERROR: the site did not answer within ${DEADLINE_SECONDS}s after restarting with '$wanted'; restored '${stored:-start}'"
 exit 1
