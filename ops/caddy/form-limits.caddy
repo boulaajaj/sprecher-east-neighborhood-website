@@ -2,11 +2,12 @@
 # it to /etc/caddy and imports it into each site block that serves the app. Change it in the
 # repo, not on the server.
 #
-# Caps the request body on the public form endpoint, so an oversized POST is cut off at Caddy
-# (413) instead of being read into Node's memory. The app's own limit on a submission is about
-# 20,000 characters (src/hooks/limitSubmissionSize.ts), which is under 100 KB even in a script
-# that takes 4 bytes per character, so 256KB never blocks a real message.
-@sprecherEastFormSubmissions path /api/form-submissions /api/form-submissions/*
+# Caps the request body on the public form endpoints, so an oversized POST is cut off at Caddy
+# (413) after 256 KB instead of being read in full by Node. That covers the REST endpoint and
+# GraphQL, where form submissions can also be created. The app's own limit on a submission is
+# about 20,000 characters (src/hooks/limitSubmissionSize.ts), at most about 80 KB of JSON even
+# in a script that takes several bytes per character, so 256KB never blocks a real message.
+@sprecherEastFormSubmissions path /api/form-submissions /api/form-submissions/* /api/graphql
 request_body @sprecherEastFormSubmissions {
 	max_size 256KB
 }

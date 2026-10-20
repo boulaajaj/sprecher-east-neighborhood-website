@@ -10,7 +10,7 @@ issue first, then a pull request.
 | `backup-db.mjs`   | Copies the live SQLite database with `VACUUM INTO` and checks the copy                            | #148  |
 | `install-cron.sh` | Installs the daily backup job (08:15 UTC) in `/etc/cron.d/sprecher-east-backup`                   | #148  |
 | `restart-app.sh`  | Restarts the app so it listens on `127.0.0.1:3000` only; puts it back if the site stops answering | #118  |
-| `caddy-limits.sh` | Caps request bodies on `/api/form-submissions` at Caddy (`caddy/form-limits.caddy`)               | #124  |
+| `caddy-limits.sh` | Caps request bodies on the public form endpoints at Caddy (`caddy/form-limits.caddy`)             | #124  |
 | `lib.sh`          | Shared helpers: annotations, reading non-secret settings, checking the site through Caddy         |       |
 
 The scripts print `::notice` and `::warning` lines, which appear as annotations on the deploy run
@@ -27,8 +27,10 @@ leaves it untouched if it can't read the layout safely. Before saving it validat
 and backs up the old one (`Caddyfile.bak` and a dated `Caddyfile.bak-<time>`); if Caddy won't
 reload or the site stops answering, it puts the backup back.
 
-To change the limit, edit `caddy/form-limits.caddy` in a pull request. To remove it by hand:
-delete the `import` lines, then `caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy`.
+To change the limit, edit `caddy/form-limits.caddy` in a pull request. To remove it, revert the
+pull request that added it (#152), then on the server delete the `import` lines and run
+`caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy`. Removing the lines
+without the revert doesn't last: the next deploy adds them back.
 
 ## Backups
 
