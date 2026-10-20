@@ -112,5 +112,5 @@ the [current folders](../project.md#architecture). File size and naming: [conven
 - [ ] All interactive elements are keyboard accessible
 - [ ] Components follow the template architecture (blocks in src/blocks/, heros in src/heros/, shared in src/components/)
 - [ ] No hardcoded content that should come from CMS
-- [ ] Mobile responsive (check 375px, 768px, 1280px)
+- [ ] Responsive at all six [test widths](../guidelines/nextjs-tailwind.md#responsive-design--6-viewport-testing) (320 to 1920px)
 - [ ] No `console.log` left in code

@@ -85,7 +85,7 @@ For comments and user interactions:
   - Form labels and error messages
   - No auto-playing media
   - Captions on video content (future)
-- Run accessibility audits: `axe-core` or `pa11y` via Bash
+- Run accessibility audits: `axe-core` or `pa11y`
 - Document compliance status and known issues
 
 ## Email Compliance (CAN-SPAM)

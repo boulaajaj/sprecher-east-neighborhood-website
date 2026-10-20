@@ -32,10 +32,10 @@ gh api "repos/{owner}/{repo}/stacks?pull_request=<number>" -H 'X-GitHub-Api-Vers
       below, the description starts with the stack line, and nothing outside the stack is
       needed. A merge order written only in prose is a **Blocker**.
 - [ ] **Policy changes are flagged.** If the diff touches `AGENTS.md`, `.agents/`,
-      `.github/` (workflows, templates, label policy), `docs/guidelines/`, or a tool adapter
-      (`CLAUDE.md`, `.claude/`, `GEMINI.md`), list each such change under **Major** so the owner
-      signs off on it explicitly. A PR can change the checks that run on itself, so read workflow changes
-      carefully.
+      `.github/` (workflows, templates, label policy), `docs/guidelines/`, `docs/roles/`, or a
+      tool adapter (`CLAUDE.md`, `.claude/`, `GEMINI.md`), list each such change under **Major**
+      so the owner signs off on it explicitly. A PR can change the checks that run on itself, so
+      read workflow changes carefully.
 
 ## 3. Check the change
 

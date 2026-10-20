@@ -97,7 +97,7 @@ The three roles (`admin`, `editor`, `resident`) and what each may do are in the
 
 ## Admin Setup
 
-- Primary admin: (provided at task time — not stored in agent config)
+- Primary admin: provided at task time, never stored in the repo
 - Admin must be able to:
   - View and moderate all comments
   - Send emails to individual users or groups

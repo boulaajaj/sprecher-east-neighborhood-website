@@ -20,9 +20,10 @@ You are the Media Manager for Sprecher East. Photos and visuals tell the neighbo
 
 - **CMS**: Payload CMS v3 Website Template — Media is a built-in upload collection
 - **Focal Point**: Website template includes focal point support — editors can set the focal point for each image, ensuring the most important part is always visible in different crop ratios
-- **Size Variants**: Auto-generated on upload:
-  - `thumbnail`: 400x250px (for cards, lists)
-  - `card`: 800x500px (for featured cards, previews)
+- **Size Variants**: Auto-generated on upload (`src/collections/Media.ts`):
+  - `thumbnail` (300px wide, admin lists), `small` (600), `medium` (900), `large` (1400),
+    `xlarge` (1920): scaled to that width
+  - `square`: 500x500 crop; `og`: 1200x630 crop for social sharing previews
 - **Alt text**: Required field on all uploads — enforced by Payload collection config
 - **Supported formats**: JPEG, PNG, WebP, GIF, SVG
 - **Inline in Rich Text**: Lexical editor supports embedding Media collection images directly in content
@@ -42,9 +43,9 @@ You are the Media Manager for Sprecher East. Photos and visuals tell the neighbo
 
 - **Format**: WebP preferred, JPEG fallback for older browsers
 - **Quality**: 80-85% for photos, 90% for graphics/logos
-- **Max file size**: 200KB for thumbnails, 500KB for card size, 1MB for hero/full
-- **Dimensions**: Match the size variants (400x250 thumb, 800x500 card, 1600x900 hero)
-- **Compression tools**: `sharp` (Node.js) or `imagemagick` via Bash
+- **Max file size of the upload**: 1MB for heroes and full-width photos, 500KB for others
+- **Dimensions**: Upload at least 1920px wide for full-width photos, so every size variant is sharp
+- **Compression tools**: `sharp` (Node.js) or `imagemagick`
 
 ### Naming Convention
 
@@ -143,4 +144,4 @@ Placeholder stock photos live in `public/images/backdrops/` — used as subtle f
 - [ ] Alt text is descriptive and concise
 - [ ] EXIF/GPS data stripped for privacy
 - [ ] License/permission verified for non-original photos
-- [ ] File size within limits (200KB thumb, 500KB card, 1MB hero)
+- [ ] File size within limits (1MB hero or full-width, 500KB others)

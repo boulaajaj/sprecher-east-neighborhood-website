@@ -41,25 +41,25 @@ The goal: a resident opens the events page and immediately sees what's happening
 
 ## Event Data Model (Payload CMS)
 
-Each event requires:
-| Field | Required | Notes |
-|-------|----------|-------|
-| title | Yes | Clear, descriptive (not just "Meeting") |
-| slug | Auto | Generated from title |
-| date | Yes | Event date |
-| timeStart / timeEnd | Yes | Start and end times |
-| category | Yes | government, community, social, sports, family, other |
-| description | Yes | 2-3 sentence summary visible in cards |
-| body | Optional | Full details (for detail page) |
-| locationType | Yes | in-person, virtual, hybrid |
-| locationName | Conditional | Required for in-person/hybrid |
-| locationAddress | Conditional | Required for in-person/hybrid |
-| mapsUrl | Optional | Google Maps link |
-| registrationUrl | Optional | How to sign up |
-| image | Optional | Event photo or venue photo |
-| tags | Optional | Granular tags for filtering (e.g., "free", "kids", "outdoor") |
-| featured | Optional | Pin to top of events page |
-| contentStatus | Yes | draft, review, published |
+The fields of `src/collections/Events/index.ts`, and what to fill in for every event:
+
+| Field                          | Fill in     | Notes                                                            |
+| ------------------------------ | ----------- | ---------------------------------------------------------------- |
+| title                          | Always      | Clear, descriptive (not just "Meeting")                          |
+| slug                           | Automatic   | Generated from the title                                         |
+| date                           | Always      | Event date                                                       |
+| timeStart / timeEnd            | Always      | Start and end times                                              |
+| category                       | Always      | meeting, social, volunteer, workshop, sports, community, other   |
+| description                    | Always      | Short summary shown in event cards                               |
+| content                        | When useful | Full description for the detail page                             |
+| locationType                   | Always      | in-person, virtual, hybrid                                       |
+| locationName / locationAddress | In person   | Shown for in-person and hybrid events                            |
+| mapsUrl                        | When useful | Google Maps link                                                 |
+| registrationUrl                | When useful | How to sign up                                                   |
+| heroImage                      | When useful | Event or venue photo                                             |
+| featured                       | When useful | Pins it to the top of the events page                            |
+| meta                           | Always      | SEO title, description and image                                 |
+| Status (draft or published)    | Always      | Payload's draft/publish: save a draft, publish when it's checked |
 
 ## Event Discovery Features
 

@@ -49,7 +49,7 @@ Merging code changes to `main` deploys them to production automatically
 
    Changes to the process itself are policy changes, and the review must call them out
    explicitly for the owner. That covers `AGENTS.md`, `.agents/`, `docs/guidelines/`,
-   `.github/`, and the tool adapters (`CLAUDE.md`, `.claude/`, `GEMINI.md`).
+   `docs/roles/`, `.github/`, and the tool adapters (`CLAUDE.md`, `.claude/`, `GEMINI.md`).
 
 4. **Everything green.** All required checks pass before merge: `Type-check & Build`,
    `Prettier`, `ESLint`, `Dependency Audit`, and `PR Policy` (which verifies steps 1–2).

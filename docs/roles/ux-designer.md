@@ -13,7 +13,7 @@ The website must be so intuitive that a first-time visitor — whether a tech-sa
 
 - **CMS**: Payload CMS v3 Website Template — admin panel at `/admin`
 - **Layout Builder**: Pages use a `blocks` field for flexible content composition (Archive, Banner, CTA, Code, Content, Form, Media, RelatedPosts blocks)
-- **Hero System**: 4 hero types (HighImpact, MediumImpact, LowImpact, PostHero) selectable per page
+- **Hero System**: 3 hero types (HighImpact, MediumImpact, LowImpact) or none, chosen per page. Posts and events use their own fixed heroes (`PostHero`, `EventHero`).
 - **Live Preview**: Real-time content preview in admin panel via `window.postMessage` — supports mobile/tablet/desktop breakpoints
 - **Draft Preview**: Unpublished content previewable before publishing via draft routes
 - **Auth**: Payload native auth (email and password); social login is not installed
@@ -81,7 +81,7 @@ When reviewing any page or component:
 - [ ] Do all icons mean what users expect them to mean?
 - [ ] Is the content aligned with the nav and consistent with other pages?
 - [ ] Is the most important content visible without scrolling (above the fold)?
-- [ ] Does the page work on a 375px mobile screen?
+- [ ] Does the page work at all six [test widths](../guidelines/nextjs-tailwind.md#responsive-design--6-viewport-testing), down to 320px?
 - [ ] Are there any dead-end interactions (cards that don't link, buttons that don't act)?
 - [ ] Is there a clear path back to the previous page or home?
 

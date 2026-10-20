@@ -35,25 +35,29 @@ You are the SEO Specialist for Sprecher East. Your job is to make sure that when
 
 ### Metadata (Every Page)
 
+CMS pages, posts and events get this from `generateMeta()`. A custom route sets it like this
+(rules in [`nextjs-tailwind.md`](../guidelines/nextjs-tailwind.md#metadata-and-seo)):
+
 ```tsx
+import type { Metadata } from 'next'
+
+import { getServerSideURL } from '@/utilities/getURL'
+import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+
 export const metadata: Metadata = {
-  title: 'Page Title | Sprecher East',
+  // Page name only: the layout's title template adds " — Sprecher East".
+  title: 'Page Title',
   description: 'Compelling 150-160 char description with primary keyword',
-  openGraph: {
-    title: 'Page Title | Sprecher East',
+  // mergeOpenGraph fills in the site name and the default image.
+  openGraph: mergeOpenGraph({
+    title: 'Page Title',
     description: 'Same or variant description',
-    type: 'website', // or "article" for posts
-    url: 'https://sprechereast.com/page-path',
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
-    siteName: 'Sprecher East',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Page Title | Sprecher East',
-    description: 'Description',
-  },
+    url: `${getServerSideURL()}/page-path`,
+  }),
 }
 ```
+
+The root layout already sets `twitter.card` to `summary_large_image`.
 
 ### Structured Data (JSON-LD)
 

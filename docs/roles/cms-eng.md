@@ -22,8 +22,8 @@ The installed plugins are listed in [`docs/project.md`](../project.md#payload-cm
 
 This project is built on the official Payload CMS v3 Website Template. Key patterns:
 
-- **Layout Builder**: Pages and Posts use the `blocks` field for flexible content layout. Each block has its own schema and React component.
-- **Hero System**: 4 hero types (HighImpact, MediumImpact, LowImpact, PostHero) selectable per page.
+- **Layout Builder**: Pages use the `layout` blocks field for flexible content layout; posts embed blocks (Banner, Code, Media) in their rich text. Each block has its own schema and React component.
+- **Hero System**: 3 hero types (HighImpact, MediumImpact, LowImpact) or none, chosen per page. Posts and events use their own fixed heroes (`PostHero`, `EventHero`).
 - **Live Preview**: Real-time content preview in admin panel via `window.postMessage`. Supports mobile/tablet/desktop breakpoints.
 - **Draft Preview**: Unpublished content can be previewed via draft routes before publishing.
 - **Scheduled Publishing**: Jobs queue enables `waitUntil` for future publish dates.
@@ -60,51 +60,34 @@ patterns are in [`payload-cms.md`](../guidelines/payload-cms.md).
 1. **Everything in the CMS** — No hardcoded content. If text appears on the site, it should be editable from /admin
 2. **Rich content support** — Every content body field must support: markdown, rich text (WYSIWYG), embedded images, links, and HTML blocks
 3. **Consistent slugs** — Auto-generated from title via beforeValidate hook, editable by admin
-4. **Draft/Publish workflow** — `contentStatus` field (draft, review, published) on all content types
-5. **SEO fields** — Every content type gets: metaTitle, metaDescription, ogImage
+4. **Draft/Publish workflow** — Payload drafts (`versions: { drafts: true }`, which adds `_status`: draft or published) on every content type
+5. **SEO fields** — Every content type gets the SEO plugin's `meta` group: title, description, image
 6. **Categorization** — Tags and categories for filtering and discovery
 
-## Current Collections (Existing)
+## Collections
 
-| Collection   | Status  | Issues                                                          |
-| ------------ | ------- | --------------------------------------------------------------- |
-| Events       | Working | `body` richText field exists but never rendered on frontend     |
-| Posts        | Working | `body` richText field exists but never rendered; no detail page |
-| BoardMembers | Working | Basic fields, functional                                        |
-| Media        | Working | Upload to /public/media with size variants                      |
-| Pages        | Defined | Minimally used — needs full page template system                |
-| Resources    | Defined | Minimally used                                                  |
-| Users        | Working | Auth for admin access                                           |
+| Collection  | What it holds                                                   |
+| ----------- | --------------------------------------------------------------- |
+| Pages       | CMS pages built from blocks (`/` and `/[slug]`)                 |
+| Posts       | News articles, listed at `/posts` with detail pages             |
+| Events      | Events, listed at `/events` with detail pages                   |
+| FAQ         | Questions and answers by category, shown at `/faq`              |
+| Resources   | Links and contacts by category, shown at `/resources`           |
+| TeamMembers | People and their roles; the `email` field is staff-only         |
+| Categories  | Post categories                                                 |
+| Media       | Uploads in `public/media`, with size variants and a focal point |
+| Users       | Accounts with the roles `admin`, `editor` and `resident`        |
 
-## What Needs to Be Built
+The exact fields are in [`docs/architecture/data-model.md`](../architecture/data-model.md) and the
+collection configs in `src/collections/`.
 
-### Priority 1: Content Templates
+## What's next
 
-- **Post detail page template** — Render the `body` richText field properly with all formatting
-- **Event detail page template** — Full event page with body content, map, registration
-- **Page template** — Generic CMS page for About, Get Involved, Association, etc.
-- **FAQ collection** — Move hardcoded FAQ to CMS with category grouping
+Open CMS work is tracked in GitHub issues (label `cms`), not in this guide.
 
-### Priority 2: Enhanced Collections
+## Payload CMS Gotchas
 
-- **FAQ Collection** — question, answer (richText), category, order, published status
-- **Site Config** — Homepage hero text, feature strip content, CTA content (singleton)
-- **Navigation** — CMS-managed nav items with ordering
-
-### Priority 3: Admin UX
-
-- **Admin dashboard** — Quick stats, recent content, draft items
-- **Preview** — Live preview of content before publishing
-- **Bulk operations** — Publish/unpublish multiple items
-
-## Payload CMS Gotchas (from project experience)
-
-- `REST_GET(config)` is curried — NOT `REST_GET(req, config)`
-- `defaultSort` goes on collection root, NOT inside `admin: {}`
-- `importMap.js` is auto-generated at dev start — don't edit manually
-- Always use `--legacy-peer-deps` when installing Payload packages
-- `graphql` package must be installed separately from `@payloadcms/graphql`
-- `overrideAccess: true` only in server-side reads — never expose to client
+They are in [`docs/project.md`](../project.md#known-gotchas).
 
 ## Rich Text Configuration
 
@@ -137,7 +120,6 @@ Payload v3 rich text should support:
 
 ## Admin User Setup
 
-- Primary admin: (provided at task time — not stored in agent config)
-- Admin role has full CRUD on all collections
-- Editor role (future): create/edit own content, cannot delete others' content
-- Viewer role (future): read-only access for review
+- Primary admin: provided at task time, never stored in the repo
+- Roles and what each may do: [`security.md`](../guidelines/security.md#when-handling-auth-and-sessions)
+  (`admin`, `editor`, `resident`)

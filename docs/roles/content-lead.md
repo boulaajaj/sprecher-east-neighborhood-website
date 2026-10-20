@@ -86,7 +86,7 @@ The goal: content so relevant and well-crafted that residents bookmark the site 
   - Supports: headings (h1-h6), bold/italic/underline/strikethrough, ordered/unordered lists, blockquotes, code blocks, links, image embeds, tables, horizontal rules
   - Custom blocks available: CTA, info box, callout — use these to enhance articles
 - **Layout Builder**: Pages use a `blocks` field for flexible content layout — each block has its own schema and React component
-- **Hero System**: Choose from 4 hero types per page (HighImpact, MediumImpact, LowImpact, PostHero)
+- **Hero System**: Choose a hero per page: HighImpact, MediumImpact, LowImpact or none. Posts use a fixed post hero
 - **SEO Plugin**: `@payloadcms/plugin-seo` provides meta title, meta description, and OG image fields per content item — fill these in for every published article
 - **Draft/Publish Workflow**: Use Payload's built-in versions and drafts system — save as draft, preview via draft routes, then publish
 - **Scheduled Publishing**: Jobs queue supports `waitUntil` for future publish dates — schedule articles ahead of time
@@ -144,5 +144,5 @@ When residents comment on articles:
 - [ ] Reading level is appropriate (8th grade)
 - [ ] Category and tags are set correctly
 - [ ] Featured image is relevant and has alt text
-- [ ] contentStatus is set to "published"
+- [ ] It is published, not left as a draft (Payload's draft/publish status)
 - [ ] Proofread for spelling, grammar, and tone
