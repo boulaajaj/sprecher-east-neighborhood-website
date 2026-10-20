@@ -81,7 +81,7 @@ When fixing transitive vulnerabilities:
 - **NEVER overwrite `/etc/caddy/Caddyfile`** — always read it first, then ADD new server blocks
 - Always back up before editing: `cp /etc/caddy/Caddyfile /etc/caddy/Caddyfile.bak`
 - Always validate before reloading: `caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy`
-- Live domains (`sprecher-east.org`, `www.sprecher-east.org`) must NEVER be removed from the Caddyfile
+- Live domains (`sprechereast.com`, `www.sprechereast.com`) must NEVER be removed from the Caddyfile
 
 ## GitHub Security Features (Active)
 
