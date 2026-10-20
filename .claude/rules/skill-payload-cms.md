@@ -6,8 +6,7 @@ Technical patterns for working with Payload CMS v3 Website Template in this code
 
 Collection configs live in `src/collections/`. Every collection with public content uses:
 
-- `access: { read: authenticatedOrPublished }` from `src/access/authenticatedOrPublished.ts`
-- `access: { create/update: isAdminOrEditor, delete: isAdmin }` from `src/access/roles.ts`
+- `access: draftContentAccess` from `src/access/draftContentAccess.ts` (published-only reads for non-staff, staff-only writes and version history; see `security.md`)
 - `versions: { drafts: true }` for draft/publish workflow (adds `_status` field)
 - `defaultPopulate` to limit fields returned in relationship queries (e.g., `{ title: true, slug: true }`)
 - `hooks.afterChange` for revalidation (pattern: check `context.disableRevalidate` guard first)

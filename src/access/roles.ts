@@ -53,6 +53,10 @@ export const isAdminOrSelf: Access = ({ req: { user }, id }) => {
   return typedUser.id === id
 }
 
+/** Admin only, as a plain boolean: for access hooks that can't take a query filter (jobs). */
+export const isAdminBoolean = ({ req: { user } }: AccessArgs): boolean =>
+  hasAdmin(user as User | null)
+
 /**
  * Field-level: only admins can create/update.
  * Same logic as isAdmin but typed as FieldAccess (Payload requires a different signature).

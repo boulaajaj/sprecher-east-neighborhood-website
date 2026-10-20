@@ -142,15 +142,34 @@ describe('globals', () => {
   it('let visitors and residents only read them', async () => {
     const problems: string[] = []
     for (const global of config.globals) {
-      for (const operation of ['read', 'update'] as const) {
+      const operations: Operation[] = ['read', 'update']
+      if (global.versions) operations.push('readVersions')
+      for (const operation of operations) {
         for (const audience of Object.keys(AUDIENCES) as Audience[]) {
           const expected = ALLOWED[global.slug]?.[operation]?.includes(audience) ?? false
-          const actual = await allows(global.access[operation], audience)
+          const access = (global.access as Record<string, unknown>)[operation]
+          const actual = await allows(access, audience)
           if (actual !== expected) problems.push(`${global.slug}.${operation} for ${audience}`)
         }
       }
     }
     expect(problems).toEqual([])
+  })
+})
+
+describe('jobs', () => {
+  it('let only staff queue or cancel jobs, and only admins run them', async () => {
+    const access = config.jobs.access ?? {}
+    for (const audience of Object.keys(AUDIENCES) as Audience[]) {
+      expect(await allows(access.queue, audience)).toBe(false)
+      expect(await allows(access.cancel, audience)).toBe(false)
+      expect(await allows(access.run, audience)).toBe(false)
+    }
+    const editor = { req: { user: { id: 2, role: 'editor', collection: 'users' } } }
+    const admin = { req: { user: { id: 1, role: 'admin', collection: 'users' } } }
+    expect(await (access.queue as AccessFn)(editor)).toBe(true)
+    expect(await (access.run as AccessFn)(editor)).toBe(false)
+    expect(await (access.run as AccessFn)(admin)).toBe(true)
   })
 })
 
