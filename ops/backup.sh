@@ -32,6 +32,7 @@ if [ -n "$db_uri" ] && [ "${db_uri#file:}" = "$db_uri" ]; then
   exit 1
 fi
 db_path="${db_uri#file:}"
+db_path="${db_path%%\?*}" # drop URI options such as ?mode=ro
 db_path="${db_path:-./data/payload.db}"
 case "$db_path" in
   /*) ;;

@@ -6,7 +6,7 @@
 # #118, or any later change to them), the app is started fresh: the site is checked through
 # Caddy before and after, and the previous arguments come back if it stops answering. Otherwise
 # it is a plain reload.
-set -euo pipefail
+set -Eeuo pipefail # -E: the ERR trap below also covers failures inside functions
 
 . "$(dirname "$0")/lib.sh"
 
@@ -15,11 +15,21 @@ CADDYFILE="${CADDYFILE:-/etc/caddy/Caddyfile}"
 DEADLINE_SECONDS="${DEADLINE_SECONDS:-90}"
 cd "$APP_DIR"
 
-# Any unexpected failure still ends with the app reloaded on the new build, and says so.
+rollback_config="" # set once the app is about to be restarted with new arguments
+
+# Any unexpected failure still ends with the app running, and says so: reloaded on the new build,
+# or, if it was already deleted for a fresh start, started again with the previous arguments.
 on_unexpected_error() {
+  [ "$BASH_SUBSHELL" -eq 0 ] || return 0 # let the main script handle it, once
   trap - ERR
-  report "ERROR: restart-app.sh failed unexpectedly at line $1; reloading the app as it was"
-  pm2 reload "$NAME" --update-env >/dev/null 2>&1 || true
+  if pm2 describe "$NAME" >/dev/null 2>&1; then
+    report "ERROR: restart-app.sh failed unexpectedly at line $1; reloading the app as it was"
+    pm2 reload "$NAME" --update-env >/dev/null 2>&1 || true
+  else
+    report "ERROR: restart-app.sh failed unexpectedly at line $1 while the app was stopped; starting it again"
+    pm2 start "${rollback_config:-ecosystem.config.cjs}" --only "$NAME" >/dev/null 2>&1 || true
+    pm2 save --force >/dev/null 2>&1 || true
+  fi
 }
 trap 'on_unexpected_error $LINENO' ERR
 

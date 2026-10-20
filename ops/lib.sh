@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Shared helpers for the ops scripts. Sourced, not run: . "$(dirname "$0")/lib.sh"
 #
 # The scripts run inside the deploy's SSH step. Lines they print as `::notice` or `::warning`
