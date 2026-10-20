@@ -55,9 +55,9 @@ A `to…` mapper in `data/` builds them from Payload documents. When generated P
   `payload.config.ts`. Nothing it reaches may be server-only, because the Payload CLI loads it
   outside Next.js.
 - Nothing outside a module imports from its inner folders, and nothing inside it imports its own
-  entry files, except that `ui/` may import its module's `actions.ts` (server actions must live
-  in a `'use server'` file). Any component that imports an `actions.ts` is exported from `server.ts`. If something is
-  missing from an entry file, add it there.
+  entry files, except that `ui/` may import its module's `actions.ts` (server actions must live in a
+  `'use server'` file). Any component that imports an `actions.ts` is exported from `server.ts`. If
+  something is missing from an entry file, add it there.
 
 ## Interfaces and adapters
 

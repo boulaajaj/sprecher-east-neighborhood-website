@@ -93,7 +93,8 @@ src/modules/events/
 Entry files are for code outside the module. Inside it, import the folder you need directly, so
 the entry files never import each other. The one exception: `ui/` may import its own module's
 `actions.ts`, because server actions must live in a `'use server'` file (the "Load more" feeds).
-Any component that imports an `actions.ts`, its own module's or another's, is exported from
+Any component that imports an `actions.ts` (its own module's or another's, directly or through
+another component) is exported from
 `server.ts`, not `index.ts`, so `index.ts` never reaches server-only code.
 
 A module only has the folders it needs. Tests sit next to the file they test (`isUpcoming.test.ts`).
@@ -164,9 +165,10 @@ What this buys:
    the generated types, because its shape is the CMS's.
 9. **No colors in components.** Semantic token classes only: `text-primary-foreground` on
    `bg-primary`, never `text-white`; no palette classes, hex values or inline styles. Text and
-   overlays on photos will use `on-image` and `scrim` tokens (#146); until then `white` and
-   `black` are allowed there only. #146 also replaces the existing raw colors. Where `skill-ui-ux-design.md` or `skill-frontend-patterns.md` uses raw `white` or `black` anywhere
-   but text and overlays on photos, this rule wins until #146 updates them.
+   overlays on photos will use `on-image` and `scrim` tokens (#146); until then `white` and `black`
+   are allowed there only. #146 also replaces the existing raw colors. Where `skill-ui-ux-design.md`
+   or `skill-frontend-patterns.md` uses raw `white` or `black` anywhere but text and overlays on
+   photos, this rule wins until #146 updates them.
 
 How they are checked, from #130 on (warnings until #137): rules 1–3, 5 and 6 and the type part of
 8 by ESLint (`eslint-plugin-boundaries`, `no-restricted-imports`); rule 4 by `server-only` at
