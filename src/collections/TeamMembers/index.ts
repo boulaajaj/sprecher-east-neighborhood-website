@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { isAdmin, isAdminOrEditor } from '../../access/roles'
+import { isAdmin, isAdminOrEditor, isAdminOrEditorFieldAccess } from '../../access/roles'
 import { anyone } from '../../access/anyone'
 
 export const TeamMembers: CollectionConfig = {
@@ -64,6 +64,8 @@ export const TeamMembers: CollectionConfig = {
     {
       name: 'email',
       type: 'email',
+      // Contact details stay private; the public API omits this field (#140)
+      access: { read: isAdminOrEditorFieldAccess },
     },
     {
       name: 'status',

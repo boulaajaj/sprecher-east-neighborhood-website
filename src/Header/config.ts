@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload'
 
+import { isAdminOrEditor } from '@/access/roles'
 import { link } from '@/fields/link'
 import { revalidateHeader } from './hooks/revalidateHeader'
 
@@ -7,6 +8,8 @@ export const Header: GlobalConfig = {
   slug: 'header',
   access: {
     read: () => true,
+    // Set explicitly: Payload's default would let any signed-in account edit it (#140)
+    update: isAdminOrEditor,
   },
   fields: [
     {

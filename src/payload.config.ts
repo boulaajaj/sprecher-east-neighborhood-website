@@ -17,6 +17,7 @@ import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
+import { isAdminOrEditor } from './access/roles'
 import { getServerSideURL } from './utilities/getURL'
 import { emailAdapterFromEnv } from './utilities/email'
 
@@ -65,6 +66,23 @@ export default buildConfig({
   collections: [Pages, Posts, Events, TeamMembers, Resources, FAQ, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
+  folders: {
+    // Media folders are staff-only: Payload's default would let any signed-in account create,
+    // rename or delete them through the API (#140).
+    collectionOverrides: [
+      ({ collection }) => ({
+        ...collection,
+        access: {
+          ...collection.access,
+          read: isAdminOrEditor,
+          readVersions: isAdminOrEditor,
+          create: isAdminOrEditor,
+          update: isAdminOrEditor,
+          delete: isAdminOrEditor,
+        },
+      }),
+    ],
+  },
   // SMTP (Mailgun in production); unset → emails go to the server log
   email: emailAdapterFromEnv(),
   // Absolute links in emails (password reset). Without it Payload derives the origin from the

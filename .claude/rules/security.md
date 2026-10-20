@@ -47,6 +47,7 @@
 - **Utility collections** (Categories, Media, TeamMembers): `create/update: isAdminOrEditor`, `delete: isAdmin`, `read: anyone`.
 - **Plugin collections**: Redirects → `isAdmin` for all ops. Forms → `anyone` for read (visitors need the field definitions to fill a form in; with restricted read the public contact form rendered empty), `isAdminOrEditor` for create/update, `isAdmin` for delete; the `emails` field (recipients, reply-to, templates) is field-level `isAdminOrEditorFieldAccess`. Form submissions → `isAdmin` for read/update/delete, `anyone` for create (public form submissions).
 - **Audit access control when adding new collections**: Every new collection must use role-based access from `src/access/roles.ts`. Never use a flat `authenticated` check.
+- **Set every operation explicitly**: Payload's default for an operation you leave out is "any signed-in user", so a collection or global must set `read`, `create`, `update` and `delete` (globals: `read`, `update`), including plugin and Payload collections where they can be overridden. `src/access/accessPolicy.test.ts` checks the whole config; update its policy table when access changes on purpose.
 - **When changing roles or adding new roles**: Update `src/access/roles.ts`, the `role` field options in Users collection, the `UserRole` type, and generate a migration.
 
 ### Secrets management

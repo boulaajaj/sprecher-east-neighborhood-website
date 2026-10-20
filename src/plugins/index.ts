@@ -136,6 +136,9 @@ export const plugins: Plugin[] = [
     collections: ['posts', 'events'],
     beforeSync: beforeSyncWithSearch,
     searchOverrides: {
+      // The plugin sets only create (off) and read (public); the index is written by its own
+      // sync, which bypasses access, so nobody needs update or delete through the API (#140).
+      access: { update: isAdmin, delete: isAdmin },
       fields: ({ defaultFields }) => {
         return [...defaultFields, ...searchFields]
       },
