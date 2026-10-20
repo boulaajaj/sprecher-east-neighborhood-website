@@ -143,4 +143,5 @@ only in an adapter.
 A tool that needs its own file gets a short adapter that points here, listed in this table and in
 the policy files of step 3. Tools that read both `.claude/skills/` and `.agents/skills/` (Copilot,
 Cursor) list each skill twice. That is expected: the `.claude/skills/` copies only point to the
-`.agents/skills/` ones, so don't delete either.
+`.agents/skills/` ones, so don't delete either. One of them, `simplify`, is Claude Code's name for
+`self-review`.

@@ -25,13 +25,16 @@ owner may have merged only part of it; the PRs still open above are rebased by G
 A merge of code to `main` starts `Deploy to VPS` (`.github/workflows/deploy.yml`; docs-only
 merges don't deploy).
 
-1. Find the run for the merge commit: `gh run list --workflow deploy.yml -L 5`, then
-   `gh run view <id>`. Wait for it to finish.
+1. Find the run for the merge commit and wait for it:
+   `gh run list --workflow deploy.yml --commit <merge_commit_sha>`, then `gh run watch <id>`.
+   Where the Actions API is blocked, read the commit's check runs instead:
+   `gh api repos/{owner}/{repo}/commits/<merge_commit_sha>/check-runs`.
 2. Read its annotations (the `::notice` / `::warning` / `::error` lines the server scripts print):
    `gh api repos/{owner}/{repo}/check-runs/<job id>/annotations`.
 3. Open https://sprechereast.com and check the behavior the PRs changed.
 
-A failed deploy is a new issue and a fix through a PR. Never fix it on the server.
+Never re-run or start the deploy yourself (it can be started by hand). A failed deploy goes to the
+owner as a new issue, fixed through a PR. Never fix it on the server.
 
 ## 3. Close the loop on the issues
 
