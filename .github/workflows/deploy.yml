@@ -65,6 +65,9 @@ jobs:
             echo "→ Restarting app (listens on 127.0.0.1:3000 only, #118)..."
             bash ops/restart-app.sh
 
+            echo "→ Limiting request size on the public form endpoint in Caddy (#124)..."
+            bash ops/caddy-limits.sh
+
             echo "::notice title=Server::disk $(df -h / | awk 'NR == 2 { print $4 " free of " $2 }'), database $(du -h data/payload.db | cut -f1), media $(du -sh public/media 2>/dev/null | cut -f1), page cache $(du -sh .next/server 2>/dev/null | cut -f1)"
             echo "✓ Deploy complete."
 

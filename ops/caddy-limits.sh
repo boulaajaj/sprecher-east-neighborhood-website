@@ -1,0 +1,180 @@
+#!/usr/bin/env bash
+# Caps the request body on the public form endpoint at Caddy, before it reaches Node (#124).
+#
+# The limit lives in ops/caddy/form-limits.caddy, copied to /etc/caddy. Each Caddy site block
+# that proxies to the app (port 3000) gets one line importing it. Nothing else in the Caddyfile
+# changes, and the script checks that before saving. Every change is validated first; if Caddy
+# won't reload or the site stops answering, the previous files come back. Running it again
+# changes nothing.
+set -euo pipefail
+
+. "$(dirname "$0")/lib.sh"
+
+CADDYFILE="${CADDYFILE:-/etc/caddy/Caddyfile}"
+LIMITS_FILE="${LIMITS_FILE:-/etc/caddy/sprecher-east-form-limits.caddy}"
+RELOAD_CADDY="${RELOAD_CADDY:-systemctl reload caddy}"
+APP_PORT="${APP_PORT:-3000}"
+SOURCE="$APP_DIR/ops/caddy/form-limits.caddy"
+IMPORT_LINE="import $LIMITS_FILE"
+
+if ! command -v caddy >/dev/null || [ ! -f "$CADDYFILE" ]; then
+  report "WARNING: Caddy or $CADDYFILE not found, so no request body limit was added"
+  exit 0
+fi
+
+# Never print Caddy's own output: the Caddyfile could hold credentials and the deploy log is public.
+caddy_accepts() { caddy validate --config "$1" --adapter caddyfile >/dev/null 2>&1; }
+
+# Status code for a POST of the given body (read from stdin) to the form endpoint, through Caddy.
+post_status() {
+  site_status /api/form-submissions -X POST -H 'Content-Type: application/json' --data-binary @-
+}
+
+# Prints the Caddyfile with the import line added to each site block that proxies to the app
+# and doesn't import it yet. Exits 3 if the braces don't balance (so the layout can't be trusted)
+# and 4 if no site block proxies to the app.
+add_import_lines() {
+  awk -v imp="$IMPORT_LINE" -v port="$APP_PORT" '
+    function clean(s) { sub(/(^|[[:space:]])#.*$/, "", s); gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); return s }
+    {
+      text[NR] = $0
+      s = clean($0)
+      if (depth == 0 && s ~ /\{$/ && s !~ /^\{/ && s !~ /^&?\(/) { start = NR; proxies = 0; has = 0 }
+      if (depth > 0 && start && s ~ ("^reverse_proxy[[:space:]].*:" port "([[:space:]{]|$)")) proxies = 1
+      if (depth > 0 && start && s == imp) has = 1
+      t = s; opens = gsub(/\{/, "", t)
+      t = s; closes = gsub(/\}/, "", t)
+      depth += opens - closes
+      if (depth < 0) bad = 1
+      if (depth == 0 && start) {
+        if (proxies) found++
+        if (proxies && !has) add[start] = 1
+        start = 0
+      }
+    }
+    END {
+      if (bad || depth != 0) exit 3
+      if (!found) exit 4
+      for (i = 1; i <= NR; i++) {
+        print text[i]
+        if (i in add) {
+          indent = "\t"
+          if ((i + 1) in text && match(text[i + 1], /^[[:space:]]+/)) indent = substr(text[i + 1], 1, RLENGTH)
+          print indent imp
+        }
+      }
+    }' "$CADDYFILE"
+}
+
+if ! caddy_accepts "$CADDYFILE"; then
+  report "WARNING: the current Caddyfile does not validate in the deploy shell, so it was left alone"
+  exit 0
+fi
+
+# The site must answer through Caddy before anything changes, so that a failure afterwards can
+# only mean the change broke it.
+if ! site_is_up; then
+  report "WARNING: the home page did not answer 200 through Caddy ($(site_url), got $(site_status /)), so the request body limit was not touched"
+  exit 0
+fi
+
+stamp=$(date -u +%Y%m%dT%H%M%SZ)
+candidate="$CADDYFILE.sprecher-east-new"
+limits_backup=""
+trap 'rm -f "$candidate"' EXIT
+
+set +e
+add_import_lines >"$candidate"
+status=$?
+set -e
+case $status in
+  0) ;;
+  4)
+    report "WARNING: no Caddy site block proxies to port $APP_PORT, so no request body limit was added"
+    exit 0
+    ;;
+  *)
+    report "WARNING: could not read the Caddyfile's layout safely, so it was left alone"
+    exit 0
+    ;;
+esac
+
+# The new Caddyfile must be the old one plus import lines, nothing else.
+changes=$(diff --unchanged-line-format= --old-line-format='-%L' --new-line-format='+%L' \
+  "$CADDYFILE" "$candidate" || true)
+removed=$(grep -c '^-' <<<"$changes" || true)
+others=$(sed -n 's/^+[[:space:]]*//p' <<<"$changes" | grep -vxF "$IMPORT_LINE" || true)
+if [ "$removed" -ne 0 ] || [ -n "$others" ]; then
+  report "ERROR: the Caddyfile edit changed more than the import lines; nothing was changed"
+  exit 1
+fi
+added=$(grep -c '^+' <<<"$changes" || true)
+
+limits_changed=no
+if ! cmp -s "$SOURCE" "$LIMITS_FILE"; then limits_changed=yes; fi
+
+if [ "$added" -eq 0 ] && [ "$limits_changed" = no ]; then
+  report "Caddy request body limit already in place: $(sed -n 's/^[[:space:]]*max_size[[:space:]]*//p' "$SOURCE") on /api/form-submissions"
+else
+  # Install the limits file so the candidate can be validated, keeping the old one to put back.
+  if [ -f "$LIMITS_FILE" ]; then
+    limits_backup="$LIMITS_FILE.bak-$stamp"
+    cp -p "$LIMITS_FILE" "$limits_backup"
+  fi
+  install -m 644 "$SOURCE" "$LIMITS_FILE"
+
+  restore_limits() {
+    if [ -n "$limits_backup" ]; then cp -p "$limits_backup" "$LIMITS_FILE"; else rm -f "$LIMITS_FILE"; fi
+  }
+
+  if ! caddy_accepts "$candidate"; then
+    restore_limits
+    report "ERROR: Caddy rejected the request body limit; nothing was changed"
+    exit 1
+  fi
+
+  # Same backup the manual procedure uses, plus a dated copy that later runs don't overwrite.
+  cp -p "$CADDYFILE" "$CADDYFILE.bak"
+  cp -p "$CADDYFILE" "$CADDYFILE.bak-$stamp"
+  cat "$candidate" >"$CADDYFILE"
+
+  restore_all() {
+    cat "$CADDYFILE.bak-$stamp" >"$CADDYFILE"
+    restore_limits
+    $RELOAD_CADDY >/dev/null 2>&1 || true
+  }
+
+  healthy=no
+  if $RELOAD_CADDY >/dev/null 2>&1; then
+    for _ in $(seq 1 10); do
+      if site_is_up; then
+        healthy=yes
+        break
+      fi
+      sleep 2
+    done
+  fi
+  if [ "$healthy" != yes ]; then
+    restore_all
+    report "ERROR: the site stopped answering after adding the request body limit; the previous Caddy config is back"
+    exit 1
+  fi
+  if [ "$added" -gt 0 ]; then
+    report "Caddy request body limit added: $added site block(s) now import $LIMITS_FILE (backup: $CADDYFILE.bak-$stamp)"
+  else
+    report "Caddy request body limit updated in $LIMITS_FILE"
+  fi
+fi
+
+# Check the limit from the outside of Caddy: a 1 MB POST should stop at Caddy with 413, and a
+# small one should reach the app. "{}" names no form, so the app refuses it and stores nothing.
+body=$(mktemp /tmp/sprecher-east-body-XXXXXX)
+head -c 1048576 /dev/zero | tr '\0' 'a' >"$body"
+big=$(post_status <"$body")
+rm -f "$body"
+small=$(printf '{}' | post_status)
+if [ "$big" = 413 ] && [ "$small" != 413 ] && [ "$small" != 000 ]; then
+  report "request body limit works: a 1 MB form POST got 413; a small one reached the app ($small)"
+else
+  report "WARNING: request body limit check: a 1 MB form POST got $big (expected 413); a small one got $small"
+fi

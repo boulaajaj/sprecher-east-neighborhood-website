@@ -1,0 +1,12 @@
+# Managed by the website repo (ops/caddy/form-limits.caddy, #124). ops/caddy-limits.sh copies
+# it to /etc/caddy and imports it into each site block that serves the app. Change it in the
+# repo, not on the server.
+#
+# Caps the request body on the public form endpoint, so an oversized POST is cut off at Caddy
+# (413) instead of being read into Node's memory. The app's own limit on a submission is about
+# 20,000 characters (src/hooks/limitSubmissionSize.ts), which is under 100 KB even in a script
+# that takes 4 bytes per character, so 256KB never blocks a real message.
+@sprecherEastFormSubmissions path /api/form-submissions /api/form-submissions/*
+request_body @sprecherEastFormSubmissions {
+	max_size 256KB
+}

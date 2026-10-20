@@ -10,12 +10,25 @@ issue first, then a pull request.
 | `backup-db.mjs`   | Copies the live SQLite database with `VACUUM INTO` and checks the copy                            | #148  |
 | `install-cron.sh` | Installs the daily backup job (08:15 UTC) in `/etc/cron.d/sprecher-east-backup`                   | #148  |
 | `restart-app.sh`  | Restarts the app so it listens on `127.0.0.1:3000` only; puts it back if the site stops answering | #118  |
+| `caddy-limits.sh` | Caps request bodies on `/api/form-submissions` at Caddy (`caddy/form-limits.caddy`)               | #124  |
 | `lib.sh`          | Shared helpers: annotations, reading non-secret settings, checking the site through Caddy         |       |
 
 The scripts print `::notice` and `::warning` lines, which appear as annotations on the deploy run
 whether it succeeds or fails, so the result can be read without opening the logs. The deploy log
 is public, so the scripts never print secrets or file contents. The site address they check comes
 from `NEXT_PUBLIC_SERVER_URL` in `.env.local`, and the check goes to Caddy on the server itself.
+
+## Caddy request limits
+
+`caddy-limits.sh` copies `caddy/form-limits.caddy` to `/etc/caddy/sprecher-east-form-limits.caddy`
+and adds one line, `import /etc/caddy/sprecher-east-form-limits.caddy`, to each site block in
+`/etc/caddy/Caddyfile` that proxies to the app. It changes nothing else in the Caddyfile and
+leaves it untouched if it can't read the layout safely. Before saving it validates the new config
+and backs up the old one (`Caddyfile.bak` and a dated `Caddyfile.bak-<time>`); if Caddy won't
+reload or the site stops answering, it puts the backup back.
+
+To change the limit, edit `caddy/form-limits.caddy` in a pull request. To remove it by hand:
+delete the `import` lines, then `caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy`.
 
 ## Backups
 
