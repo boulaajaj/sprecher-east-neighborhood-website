@@ -82,7 +82,6 @@ After deployment:
 - `PAYLOAD_SECRET` — JWT signing for Payload auth (32+ random chars)
 - `DATABASE_URI` — `file:./data/payload.db`
 - `NEXT_PUBLIC_SERVER_URL` — production URL or localhost
-- `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — for payload-oauth2 Google provider
 - `PREVIEW_SECRET` — Draft preview URL signing
 - Future: Facebook, Apple, Twitter OAuth credentials when providers are enabled
 

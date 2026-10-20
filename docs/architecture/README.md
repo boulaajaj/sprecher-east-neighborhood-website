@@ -17,6 +17,7 @@ data means and how it's shown.
 ```mermaid
 flowchart TD
   app["src/app — routes only<br/>thin pages, route handlers, layouts"]
+  config["payload.config.ts"]
   subgraph modules["src/modules — one folder per business area"]
     events[events]
     news[news]
@@ -25,12 +26,14 @@ flowchart TD
     directory[directory]
     site[site]
   end
-  platform["src/platform — cross-cutting<br/>Payload setup, roles, email, UI kit, dates, URLs, SEO"]
+  platform["src/platform — cross-cutting<br/>Payload setup, roles, email, UI kit, rich text, dates, URLs, SEO"]
   payload[("Payload CMS<br/>Local API · admin · SQLite")]
 
   app -->|"entry files only"| modules
   app -->|"layouts, providers, UI kit"| platform
-  news -->|"server.ts"| events
+  config -->|"cms.ts only"| modules
+  site -->|"server.ts: listing blocks"| news
+  site -->|"server.ts: listing blocks"| events
   modules --> platform
   modules -->|"data/ and cms/ only"| payload
   platform --> payload
@@ -54,23 +57,32 @@ grows should split its top level "into domain oriented modules which are interna
 | `site`      | CMS pages, page-builder blocks, heroes, header, footer, redirects    | `pages`, `redirects`, globals `header`, `footer` | `/[slug]`, home, pages sitemap                      |
 | `comments`  | Resident comments (future)                                           | (future)                                         | (future)                                            |
 
-`src/platform/` holds what every module uses: the Payload client and config pieces, role checks
-and access functions, the email transport, UI primitives (`Button`, `Input`, `Media`, `Link`,
-`RichText`), and helpers for dates, URLs and SEO. `media` (uploads) is platform too. Routes
-that serve no single area (`/api/version`, draft preview under `/next/`, the seed route) belong
-to `platform`; `app/(payload)/` is Payload's generated admin and API.
+`src/platform/` holds what every module uses, and imports no module:
+
+- `lib/`: pure helpers for dates, text, URLs and shared content types; no framework, so the domain
+  may use them.
+- `payload/`: access functions, role checks, reusable fields.
+- `ui/`: primitives (`Button`, `Input`, `Media`, `Link`) with their variants.
+- `theme/`: the token contract (`tokens.ts`) and the Tailwind mapping.
+- `richtext/`: the `RichText` renderer and the blocks that can sit inside rich text (banner, code,
+  media, call to action). Pages reuse them from here.
+- `email/`, `seo/`, and `media` (uploads).
+
+Routes that serve no single area (`/api/version`, draft preview under `/next/`, the seed route)
+belong to `platform`; `app/(payload)/` is Payload's generated admin and API.
 
 ## Inside a module
 
 ```text
 src/modules/events/
-  index.ts      client-safe entry: types, pure helpers and UI parts other code may import
-  server.ts     server-only entry: the use cases other code calls (listUpcomingEvents)
-  actions.ts    server actions ("Load more", form posts); thin, they call the same use cases
-  domain/       types and rules in plain TypeScript (no Next.js, React or Payload); unit-tested
-  data/         server-only queries and mutations over Payload's Local API; return the module's own types
-  cms/          the Payload collection config, fields and hooks for this area
-  ui/           React components for this area, plus headless hooks (useEventFilters)
+  index.ts      client-safe entry: types, pure helpers, components that load no data
+  server.ts     server-only entry: use cases (listUpcomingEvents) and components that load data
+  actions.ts    server actions ("Load more"); each validates its input and calls a use case
+  cms.ts        Payload entry: this area's collection configs, imported only by payload.config.ts
+  domain/       types (DTOs included) and rules in plain TypeScript; unit-tested
+  data/         server-only Local API queries; map documents to the domain's types
+  cms/          collection config, fields and hooks
+  ui/           React components and headless hooks (useEventFilters)
 ```
 
 A module only has the folders it needs. Tests sit next to the file they test (`isUpcoming.test.ts`).
@@ -78,57 +90,72 @@ A module only has the folders it needs. Tests sit next to the file they test (`i
 ## Layers: the core stays still, the edges can change
 
 The site's core idea (what an event is, what counts as upcoming, who may see a draft) is plain
-TypeScript in the middle. Payload, Next.js, outside services and the look sit around it, and each
-can be upgraded or replaced without rewriting the core. Dependencies only point inward.
+TypeScript in the middle. Payload, Next.js, outside services and the look sit around it, so each
+can be upgraded or replaced without rewriting the core.
 
-| Layer        | Where                                                 | Holds                                                                                                  |
-| ------------ | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Domain       | `domain/`                                             | Types, rules and calculations. Imports only other domain code and pure `platform/` helpers (dates).    |
-| Application  | `server.ts`, `actions.ts`                             | Use cases: check who is asking, load through `data/`, apply domain rules, return plain objects (DTOs). |
-| Adapters     | `data/`, `cms/`, `platform/payload/`, service clients | Payload queries and configs, Cloudflare, SMTP. Swappable behind the application layer.                 |
-| Presentation | `app/`, `ui/`, `platform/ui/`                         | Pages and components. They receive DTOs and render them; they hold no business rules.                  |
-| Theme        | `src/themes/<name>/`                                  | Token values: colors, fonts, radius, shadows. Components never name a color.                           |
+| Layer        | Where                                         | Holds                                                                     |
+| ------------ | --------------------------------------------- | ------------------------------------------------------------------------- |
+| Domain       | `domain/`                                     | Types (DTOs included), rules and calculations. Uses only `platform/lib/`. |
+| Application  | `server.ts`, `actions.ts`                     | Use cases: check who is asking, load, apply domain rules, return DTOs.    |
+| Adapters     | `data/`, `cms/`, `platform/payload/`, clients | Payload queries and configs, Cloudflare, SMTP.                            |
+| Presentation | `app/`, `ui/`, `platform/ui/`                 | Pages and components that render DTOs. No business rules.                 |
+| Theme        | `src/themes/default/`                         | Token values: colors, fonts, radius, shadows.                             |
 
-Two consequences matter most:
+One deliberate shortcut: use cases call `data/` functions directly, not through an interface,
+because Payload's Local API is already that abstraction ([0002](decisions/0002-no-repository-layer.md)).
+Replacing Payload would mean rewriting `data/` and `cms/`; the domain and the pages stay. A DTO
+field that holds rich text or an image uses the type-only `RichTextValue` or `ImageRef` from
+`platform/lib/`, which `RichText` and `Media` accept.
 
-- **Another presentation can reuse the core.** Because use cases return plain objects, an iCal
-  feed, a JSON route for a future app, or a redesigned UI kit calls the same `server.ts`
-  functions. Behaviour a component needs (filters, paging, open and closed state) lives in a
-  headless hook that renders nothing, so it survives a redesign.
-- **A theme is a file, not a refactor.** Components use semantic token classes
-  (`bg-primary`, `text-muted-foreground`). `platform/theme/tokens.ts` lists the tokens every theme
-  must define, a test checks each theme against that list in light and dark mode, and changing
-  the look means adding a theme folder ([0006](decisions/0006-clean-layers-and-pluggable-themes.md),
-  #146).
+What this buys:
+
+- **Another presentation can reuse the core.** Use cases return plain objects, so an iCal feed, a
+  JSON route for a future app, or a redesigned UI calls the same `server.ts` functions. Behaviour
+  a component needs (filters, paging, open and closed state) lives in a headless hook that renders
+  nothing, so it survives a redesign.
+- **The look is one file.** Components use semantic token classes (`bg-primary`,
+  `text-muted-foreground`). `platform/theme/tokens.ts` lists every token, a test checks the
+  theme defines each one in light and dark mode, and a new look means new token values, not
+  component edits ([0006](decisions/0006-clean-layers-and-pluggable-themes.md), #146).
 
 ## Dependency rules
 
-1. **Inward only.** Presentation → application → domain. Adapters depend on the domain, never the
-   reverse. `domain/` imports nothing from Next.js, React, Payload, `data/`, `cms/` or `ui/`.
-2. **Entry files only.** Code outside a module imports it only through `index.ts`, `server.ts`
-   or `actions.ts`. `app/` may also import `platform/` directly (layouts, providers, the UI kit).
-3. **Module to module** only for pairs on the allowlist: `news → events` (upcoming events beside
-   a post), `site → news` and `site → events` (page-builder blocks that list posts or events),
-   later `comments → accounts`. Otherwise the page in `app/` combines them.
-4. **Data stays on the server.** Only `server.ts`, `actions.ts` and `cms/` hooks import `data/`. Server
-   components call `server.ts`; client components get DTOs as props and change things through
-   `actions.ts`. `data/` and `server.ts` start with `import 'server-only'`, so a slip fails the
-   build.
-5. **Payload at the edges.** Runtime imports of `payload`, `@payloadcms/*` or `@payload-config`
+1. **Inward only.** Presentation → application → domain, and adapters → domain. `domain/` imports
+   no framework and nothing from `data/`, `cms/` or `ui/`; it may use `platform/lib/`.
+2. **Entry files only.** Outside a module, import it only through its entry files: `index.ts` and
+   `actions.ts` from anywhere, `server.ts` from server code, `cms.ts` from `payload.config.ts`.
+   `app/` may also import `platform/` directly.
+3. **Module to module** only on the allowlist: `site → news` and `site → events` (blocks that list
+   posts or events), later `comments → accounts`. Otherwise the page in `app/` combines them, as
+   the post page does with upcoming events. `platform/` imports no module.
+4. **Server-only code stays out of the CMS config.** `data/` and `server.ts` start with
+   `import 'server-only'`, and only `server.ts` and `actions.ts` import `data/`. `cms/` never
+   imports `data/`, `server.ts` or anything else server-only: the Payload CLI (migrations, seed)
+   loads every hook outside Next.js, where `server-only` throws. Hooks use the `req.payload` they
+   are given.
+5. **Client components** get DTOs as props and never import `data/` or `server.ts`. To change
+   something they call a server action, or one of Payload's own REST endpoints through a small
+   client in the owning module (sign-in and passwords in `accounts`, form submissions in
+   `contact`, where the robot check runs).
+6. **Payload at the edges.** Runtime imports of `payload`, `@payloadcms/*` or `@payload-config`
    are allowed only in `data/`, `cms/`, `platform/` and `payload.config.ts`. `import type` is
    allowed anywhere; the generated `app/(payload)/` and `migrations/` are exempt.
-6. **Access is explicit.** Every Local API call passes `overrideAccess`: Payload's Local API
-   skips access control by default
-   ([Payload access control](https://payloadcms.com/docs/access-control/overview)).
-7. **DTOs out.** `server.ts` returns the module's own types (`EventSummary`, `EventDetail`), never
-   raw Payload documents. The exception is code that renders CMS content as it was authored
-   (page-builder blocks, heroes, `RichText`, `Media`): its shape is the CMS's, so it takes the
-   generated Payload types.
-8. **No colors in components.** Semantic token classes only; no palette classes (`bg-gray-500`),
-   hex values or inline styles. The one exception is black overlays (scrims) on photos.
+7. **Access is explicit.** Every Local API call passes `overrideAccess`: the Local API skips
+   access control by default ([Payload access control](https://payloadcms.com/docs/access-control/overview)).
+8. **DTOs out.** `server.ts` returns the module's own types (`EventSummary`, `EventDetail`), never
+   raw Payload documents. A read-only list that needs no reshaping (FAQ, resources) may define its
+   type as a named `Pick<>` of the generated type, loaded with `select`, instead of a mapper. Code
+   that renders CMS content as authored (page-builder blocks, heroes, `RichText`, `Media`) takes
+   the generated types, because its shape is the CMS's.
+9. **No colors in components.** Semantic token classes only: no palette classes, hex values or
+   inline styles. Text and overlays on photos will use `on-image` and `scrim` tokens (#146); until
+   then `white` and `black` are allowed there and nowhere else.
 
-Rules 1–5 are checked by ESLint (`eslint-plugin-boundaries`) and the `server-only` package from
-#130 on, rule 8 from #146; they are warnings until #137.
+How they are checked, from #130 on (warnings until #137): rules 1–3, 5 and 6 and the type part of
+8 by ESLint (`eslint-plugin-boundaries`, `no-restricted-imports`); rule 4 by `server-only` at
+build time plus a boundaries rule for `cms/`; rule 7 by a lint check for Local API calls
+without `overrideAccess` (#145) and review; rule 9 by lint and the theme test (#146). Vitest
+aliases `server-only` to an empty module so `data/` mappers can be unit-tested.
 
 ## Where does it go?
 
@@ -136,10 +163,10 @@ Rules 1–5 are checked by ESLint (`eslint-plugin-boundaries`) and the `server-o
 | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | A business rule ("what counts as upcoming")                    | the module's `domain/`, with a unit test                                                                 |
 | A use case other code calls (list, submit, publish)            | the module's `server.ts` or `actions.ts`, built from `domain/` and `data/`                               |
-| A database read or write                                       | the module's `data/`, called only from `server.ts` or `actions.ts`                                       |
-| A color, font, corner radius or shadow                         | a token in `platform/theme/tokens.ts`, with values in each theme under `src/themes/`                     |
+| A database read or write                                       | the module's `data/`, called only from `server.ts` or `actions.ts`; in a hook, `req.payload`             |
+| A color, font, corner radius or shadow                         | a token in `platform/theme/tokens.ts`, with its value in `src/themes/default/`                           |
 | A button size, card style or other UI variant                  | the primitive in `platform/ui/` (its `cva` variants), not in the feature component                       |
-| A collection, field, or Payload hook                           | the module's `cms/`, registered in `payload.config.ts`                                                   |
+| A collection, field, or Payload hook                           | the module's `cms/`, exported from `cms.ts` and registered in `payload.config.ts`                        |
 | A component used by one module                                 | the module's `ui/`                                                                                       |
 | A component or helper used by two or more modules              | `src/platform/` (move it there on the second use)                                                        |
 | A page or URL                                                  | `src/app/`, as a thin file that calls a module                                                           |
@@ -152,6 +179,10 @@ technical type: `src/collections/`, `src/components/`, `src/blocks/`, `src/heros
 `src/utilities/`, `src/access/`, `src/fields/`, `src/Header/`, `src/Footer/`, `src/search/`,
 `src/plugins/`, `src/providers/`, `src/endpoints/` (seed). When you touch code there, don't add
 new duplication; if your change needs a rule that already exists elsewhere, reuse it.
+
+New code for an area that hasn't moved yet goes in its future module, with only the folders it
+needs (for example `src/modules/events/domain/isUpcoming.ts`), and the old code imports it from
+there. Don't add new files to the template folders.
 
 ## More
 

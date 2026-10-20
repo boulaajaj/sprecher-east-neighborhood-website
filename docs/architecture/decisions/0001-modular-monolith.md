@@ -16,7 +16,7 @@ spread further.
 ## Decision
 
 One Next.js app, organized by business area under `src/modules/<area>/`, each layered inside
-(`domain/`, `data/`, `cms/`, `ui/`, entry files `index.ts` and `server.ts`), with shared code in
+(`domain/`, `data/`, `cms/`, `ui/`, and entry files; see the [README](../README.md#inside-a-module)), with shared code in
 `src/platform/` and routes only in `src/app/`. Only a module's `data/` and `cms/` talk to Payload.
 Rules are enforced with ESLint (`eslint-plugin-boundaries`) and `server-only`.
 

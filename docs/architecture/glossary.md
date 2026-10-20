@@ -65,10 +65,10 @@ which module owns it).
 
 ## Code structure
 
-| Term         | Meaning                                                                                                 |
-| ------------ | ------------------------------------------------------------------------------------------------------- |
-| Module       | One business area's folder under `src/modules/` ([architecture](README.md)).                            |
-| Entry file   | `index.ts` (client-safe) or `server.ts` (server-only): the only files other code imports from a module. |
-| Domain layer | `domain/`: pure rules and types, no framework.                                                          |
-| Data layer   | `data/`: server-only queries over Payload that return the module's own types.                           |
-| Platform     | `src/platform/`: code every module shares.                                                              |
+| Term         | Meaning                                                                                                                                                           |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Module       | One business area's folder under `src/modules/` ([architecture](README.md)).                                                                                      |
+| Entry file   | `index.ts` (client-safe), `server.ts` (server-only), `actions.ts` (server actions) or `cms.ts` (Payload config): the only files other code imports from a module. |
+| Domain layer | `domain/`: pure rules and types, no framework.                                                                                                                    |
+| Data layer   | `data/`: server-only queries over Payload that return the module's own types.                                                                                     |
+| Platform     | `src/platform/`: code every module shares.                                                                                                                        |

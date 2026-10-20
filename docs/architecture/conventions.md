@@ -41,15 +41,18 @@ Data functions return the module's own types, not Payload documents:
 
 A `to…` mapper in `data/` builds them from Payload documents. Generated Payload types
 (`@/payload-types`) stay inside `data/` and `cms/`, except in components that render CMS content
-as authored (blocks, heroes, `RichText`, `Media`); see rule 7 in the [README](README.md#dependency-rules).
+as authored (blocks, heroes, `RichText`, `Media`); see rule 8 in the [README](README.md#dependency-rules).
 
 ## Entry files
 
-- `index.ts` exports what any code, including client components, may import: types, UI parts,
-  pure helpers. It never imports server-only code.
-- `server.ts` starts with `import 'server-only'` and exports the module's use cases.
+- `index.ts` exports what any code, including client components, may import: types, pure
+  helpers, components that load no data. It never imports server-only code.
+- `server.ts` starts with `import 'server-only'` and exports the module's use cases and the
+  server components that load data.
 - `actions.ts` starts with `'use server'` and exports server actions; each one validates its
   input and calls a use case.
+- `cms.ts` exports the area's collection configs for `payload.config.ts`. Nothing it reaches may
+  be server-only, because the Payload CLI loads it outside Next.js.
 - Nothing outside a module imports from its inner folders. If something is missing from an entry
   file, add it there.
 

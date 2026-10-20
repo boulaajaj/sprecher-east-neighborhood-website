@@ -161,7 +161,7 @@ Field `navItems`: array, max 6 rows, optional. Each row is one `link` group: `ty
 - `pages.hero.media` → media (one). `pages.hero.links[].link.reference` → pages | posts (one).
 - `pages.layout`: `cta.links[].link.reference` → pages | posts; `content.columns[].link.reference` → pages | posts; `mediaBlock.media` → media (one); `archive.categories` → categories (many); `archive.selectedDocs` → posts (many); `formBlock.form` → forms (one).
 - `posts.heroImage` → media (one); `posts.relatedPosts` → posts (many); `posts.categories` → categories (many); `posts.authors` → users (many).
-- `posts.content` (Lexical): `mediaBlock` blocks → media; link nodes → pages | posts. Every rich-text field built on the site's default editor can hold the same link nodes: `faq.answer`, `events.content`, `pages.hero.richText`, the `cta`, `content`, `archive` and `formBlock` rich text, `media.caption` and `forms.confirmationMessage`.
+- `posts.content` (Lexical): `mediaBlock` blocks → media; link nodes → pages | posts. Every rich-text field built on the site's default editor can hold the same link nodes: `faq.answer`, `events.content`, `pages.hero.richText`, the `cta`, `content`, `archive` and `formBlock` rich text, `media.caption`, `forms.confirmationMessage`, `forms.emails[].message` and the `banner` block's text.
 - `events.heroImage` → media (one); `team-members.photo` → media (one).
 - `pages.meta.image`, `posts.meta.image`, `events.meta.image` → media (one). Generated types omit `meta.image` but the column exists (`meta_image_id`).
 - `categories.parent` → categories (one); `categories.breadcrumbs[].doc` → categories; `media.folder` → payload-folders (one).
