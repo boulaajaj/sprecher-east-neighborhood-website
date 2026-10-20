@@ -4,7 +4,8 @@ module.exports = {
     {
       name: 'sprecher-east',
       script: 'node_modules/.bin/next',
-      args: 'start',
+      // Listen on loopback only: the internet reaches the app through Caddy, never directly (#118).
+      args: 'start -H 127.0.0.1',
       cwd: '/var/www/sprecher-east',
       instances: 1,
       exec_mode: 'fork',

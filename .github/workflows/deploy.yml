@@ -27,8 +27,10 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Deploy via SSH
+        id: ssh
         uses: appleboy/ssh-action@v1.2.5
         with:
+          capture_stdout: true
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
@@ -48,13 +50,44 @@ jobs:
             echo "→ Ensuring data directory..."
             mkdir -p data
 
+            echo "→ Backing up data before migrations (#148)..."
+            bash ops/backup.sh pre-deploy
+
             echo "→ Running database migrations..."
             npx payload migrate
 
             echo "→ Building..."
             npm run build
 
-            echo "→ Restarting app..."
-            pm2 reload sprecher-east --update-env
+            echo "→ Restarting app (listens on 127.0.0.1:3000 only, #118)..."
+            bash ops/restart-app.sh
 
+            echo "→ Installing the daily backup job (#148)..."
+            bash ops/install-cron.sh
+
+            echo "REPORT: disk $(df -h / | awk 'NR == 2 { print $4 " free of " $2 }'), database $(du -h data/payload.db | cut -f1), media $(du -sh public/media 2>/dev/null | cut -f1)"
             echo "✓ Deploy complete."
+
+      # Lines the server prints as "REPORT: …" become notices on this run, so the result is
+      # readable without opening the logs.
+      - name: Report what changed on the server
+        if: always()
+        env:
+          OUTPUT: ${{ steps.ssh.outputs.stdout }}
+        run: |
+          printf '%s\n' "$OUTPUT" | sed -n 's/^REPORT: //p' | while IFS= read -r line; do
+            case "$line" in
+              ERROR:* | WARNING:*) echo "::warning title=Server::$line" ;;
+              *) echo "::notice title=Server::$line" ;;
+            esac
+          done
+
+      - name: Check that port 3000 is closed to the internet (#118)
+        env:
+          HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          if timeout 5 bash -c "exec 3<>/dev/tcp/$HOST/3000" 2>/dev/null; then
+            echo "::warning title=Port 3000::reachable from the internet"
+          else
+            echo "::notice title=Port 3000::not reachable from the internet"
+          fi
