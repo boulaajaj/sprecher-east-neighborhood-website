@@ -55,7 +55,7 @@ Where code goes: [`docs/architecture/`](../architecture/README.md).
 ### Auth Flow Testing
 
 - Payload native login/logout works correctly
-- OAuth flows (Google initially, plus any configured providers) redirect properly and create user accounts
+- Social login (OAuth) is not installed; if it's added, test that each provider redirects properly and creates the user account
 - Session cookies are set and cleared correctly
 - Protected routes redirect unauthenticated users to login
 - User roles (admin, editor, resident) have correct access levels

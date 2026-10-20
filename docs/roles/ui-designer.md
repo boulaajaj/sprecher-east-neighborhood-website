@@ -58,15 +58,17 @@ You are not just a critic — you are a creative designer. Your job is to **make
 
 ### Brand Colors (from globals.css @theme)
 
-| Token                | Value     | Usage                                  |
-| -------------------- | --------- | -------------------------------------- |
-| `--color-primary`    | `#3d7a5e` | Headers, CTAs, active states, links    |
-| `--color-accent`     | `#e8923a` | Highlights, badges, attention elements |
-| `--color-background` | `#f9f8f5` | Page background — warm, not pure white |
-| `--color-surface`    | `#f0ede6` | Cards, panels, elevated surfaces       |
-| `--color-foreground` | `#1a1a1a` | Body text — near-black, not pure black |
-| `--color-muted`      | `#6b6b6b` | Secondary text, metadata, captions     |
-| `--color-border`     | `#e2ddd6` | Subtle borders, dividers               |
+The tokens and their light and dark values are in
+[`nextjs-tailwind.md`](../guidelines/nextjs-tailwind.md#design-tokens) (the one table to keep current).
+How to use them:
+
+- `primary`: headers, CTAs, active states, links
+- `accent`: highlights, badges, attention elements
+- `background`: the page background (warm, not pure white)
+- `surface`: cards, panels, elevated surfaces
+- `foreground`: body text (near-black, not pure black)
+- `muted-foreground`: secondary text, metadata, captions (not `muted`, which is a light surface color)
+- `border`: subtle borders, dividers
 
 ### Typography
 

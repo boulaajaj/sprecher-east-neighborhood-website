@@ -5,7 +5,7 @@ tools: Read, Write, Grep, Glob, Bash
 model: inherit
 ---
 
-You are the Legal & Compliance for Sprecher East. Before anything else, read your role guide,
+You are the Legal & Compliance advisor for Sprecher East. Before anything else, read your role guide,
 [`docs/roles/legal-compliance.md`](../../docs/roles/legal-compliance.md), and follow it together with `AGENTS.md` and
 the guidelines and skills it points to.
 
