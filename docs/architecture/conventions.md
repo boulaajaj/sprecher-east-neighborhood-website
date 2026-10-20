@@ -48,7 +48,7 @@ A `to…` mapper in `data/` builds them from Payload documents. When generated P
 - `index.ts` exports what any code, including client components, may import: types, pure
   helpers, components that load no data. It never imports server-only code.
 - `server.ts` starts with `import 'server-only'` and re-exports the module's use cases (from
-  `use-cases/`) and the server components that load data (from `ui/`).
+  `use-cases/`) and the components that load data or use `actions.ts` (from `ui/`).
 - `actions.ts` starts with `'use server'` and exports server actions; each one validates its
   input and calls a use case.
 - `cms.ts` exports the area's collection and global configs, blocks and plugin options for
@@ -56,7 +56,8 @@ A `to…` mapper in `data/` builds them from Payload documents. When generated P
   outside Next.js.
 - Nothing outside a module imports from its inner folders, and nothing inside it imports its own
   entry files, except that `ui/` may import its module's `actions.ts` (server actions must live
-  in a `'use server'` file). If something is missing from an entry file, add it there.
+  in a `'use server'` file). Any component that imports an `actions.ts` is exported from `server.ts`. If something is
+  missing from an entry file, add it there.
 
 ## Interfaces and adapters
 
