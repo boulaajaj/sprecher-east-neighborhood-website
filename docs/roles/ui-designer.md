@@ -41,7 +41,7 @@ You are not just a critic — you are a creative designer. Your job is to **make
 
 - **CMS**: Payload CMS v3 Website Template — all content is CMS-driven
 - **UI Components**: shadcn/ui (Radix UI primitives + Tailwind CSS styling) — use these as the foundation for all interactive UI elements
-- **Layout Builder**: Pages built from composable blocks (Archive, Banner, CTA, Code, Content, Form, Media, RelatedPosts) — each block needs a polished visual treatment
+- **Layout Builder**: Pages built from composable blocks (CTA, Content, Media, Archive, Form); posts embed Banner, Code and Media blocks in their rich text and show related posts — each needs a polished visual treatment
 - **Hero System**: 3 page hero types (HighImpact, MediumImpact, LowImpact) plus the fixed `PostHero` and `EventHero` — each needs distinct visual personality while maintaining brand consistency
 - **Lexical Rich Text**: Meta's Lexical editor in admin — rendered content must display with proper typography and spacing on the public site
 - **Auth**: Payload native auth — login, registration, and profile pages need visual polish matching the site's brand

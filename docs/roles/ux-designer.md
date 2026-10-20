@@ -12,7 +12,7 @@ The website must be so intuitive that a first-time visitor — whether a tech-sa
 ## CMS & Admin UX Context
 
 - **CMS**: Payload CMS v3 Website Template — admin panel at `/admin`
-- **Layout Builder**: Pages use a `blocks` field for flexible content composition (Archive, Banner, CTA, Code, Content, Form, Media, RelatedPosts blocks)
+- **Layout Builder**: Pages use the `layout` blocks field for flexible content composition (CTA, Content, Media, Archive and Form blocks); posts embed Banner, Code and Media blocks in their rich text
 - **Hero System**: 3 hero types (HighImpact, MediumImpact, LowImpact) or none, chosen per page. Posts and events use their own fixed heroes (`PostHero`, `EventHero`).
 - **Live Preview**: Real-time content preview in admin panel via `window.postMessage` — supports mobile/tablet/desktop breakpoints
 - **Draft Preview**: Unpublished content previewable before publishing via draft routes
