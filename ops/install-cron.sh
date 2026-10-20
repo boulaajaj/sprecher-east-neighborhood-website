@@ -3,11 +3,16 @@
 # the server always matches this file.
 set -euo pipefail
 
-APP_DIR="${APP_DIR:-/var/www/sprecher-east}"
+. "$(dirname "$0")/lib.sh"
+
 CRON_FILE=/etc/cron.d/sprecher-east-backup
 
 # Cron starts with a minimal PATH; give it the directory of the node the deploy uses.
-node_dir=$(dirname "$(command -v node)")
+if ! node_bin=$(command -v node); then
+  report "ERROR: node not found, so the daily backup job was not installed"
+  exit 1
+fi
+node_dir=$(dirname "$node_bin")
 
 tmp=$(mktemp)
 cat >"$tmp" <<EOF
@@ -19,4 +24,6 @@ PATH=$node_dir:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 EOF
 install -m 644 "$tmp" "$CRON_FILE"
 rm -f "$tmp"
-echo "REPORT: daily backup job installed (08:15 UTC)"
+
+latest=$(find /var/backups/sprecher-east/daily -maxdepth 1 -name 'sprecher-east-*.tar.gz' -printf '%f\n' 2>/dev/null | sort -r | head -n 1)
+report "daily backup job installed (08:15 UTC); latest daily archive: ${latest:-none yet}"
