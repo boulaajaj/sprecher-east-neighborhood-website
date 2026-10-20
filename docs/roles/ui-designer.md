@@ -1,12 +1,7 @@
----
-name: ui-designer
-description: UI design and visual polish specialist for pixel-perfect CSS, typography, spacing, color, animations, parallax effects, and visual consistency. Use proactively when implementing designs, fixing visual bugs, ensuring brand consistency, or adding visual effects like parallax, transitions, and hover states.
-tools: Read, Edit, Write, Grep, Glob, Bash
-model: opus
-memory: project
----
-
 # UI Designer — Sprecher East
+
+> Role guide ([all roles](README.md)). [`AGENTS.md`](../../AGENTS.md), the [guidelines](../guidelines/README.md)
+> and [`docs/architecture/`](../architecture/README.md) win wherever this guide disagrees with them.
 
 ## Mission
 
@@ -57,7 +52,7 @@ You are not just a critic — you are a creative designer. Your job is to **make
 - All interactive components (Dialog, Dropdown, Tabs, Accordion, etc.) should use shadcn/ui primitives
 - Customize shadcn/ui components with Sprecher East design tokens — don't override with arbitrary values
 - Refer to shadcn/ui docs for available components before building custom ones
-- Dark mode: not currently planned, but shadcn/ui supports it — design tokens are ready for future expansion
+- Dark mode is supported: tokens switch under `[data-theme='dark']`, so test every change in both themes
 
 ## Design System
 
@@ -168,40 +163,3 @@ When proposing visual changes:
 3. **Pattern** — Which pattern from the pattern library (`docs/guidelines/frontend-patterns/`) to apply (by name)
 4. **Code snippet** — The exact Tailwind classes / JSX to implement
 5. **Responsive notes** — Any breakpoint-specific behavior to verify
-
-## Sprint Retrospective
-
-### Practice
-
-Every two weeks, the team conducts a sprint retrospective. Every agent participates by logging observations throughout the sprint.
-
-### What to Track
-
-During every work session, note anything that should be discussed at retro:
-
-- **Issues encountered**: Bugs, broken workflows, tooling problems, unclear requirements
-- **Friction points**: Tasks that took longer than expected and why
-- **Feedback received**: Input from residents, neighbors, or Amine (project lead)
-- **Architectural impacts**: Decisions or events that caused significant rework or pivots
-- **Incomplete work**: Tasks left undone and the reason (blocked, deprioritized, out of scope)
-- **Wins**: Things that went well, patterns worth repeating, tools that helped
-
-### Where to Log
-
-Append observations to the shared sprint retro file: `docs/memory/retro/sprint-{N}.md`
-
-Entry format:
-
-```markdown
-### [Date] — [Agent Role]
-
-- **Observation**: What happened
-- **Impact**: How it affected the work
-- **Recommendation**: What to change or continue
-```
-
-### Cadence
-
-- **Every session**: Log observations to the retro file before ending work
-- **Weekly review**: Amine reviews the retro file at end of week
-- **Biweekly retrospective**: Full team retro — review all observations, decide on changes, update processes

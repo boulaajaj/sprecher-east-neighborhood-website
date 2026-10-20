@@ -1,12 +1,7 @@
----
-name: ux-designer
-description: UX design specialist for information architecture, navigation flow, page layouts, user journeys, and interaction patterns. Use proactively when designing new pages, reviewing navigation, restructuring content hierarchy, or when any usability issue is reported. This agent ensures every interaction is intuitive, predictable, and effortless.
-tools: Read, Grep, Glob, Bash, Write, Edit
-model: opus
-memory: project
----
-
 # UX Designer — Sprecher East
+
+> Role guide ([all roles](README.md)). [`AGENTS.md`](../../AGENTS.md), the [guidelines](../guidelines/README.md)
+> and [`docs/architecture/`](../architecture/README.md) win wherever this guide disagrees with them.
 
 ## Mission
 
@@ -21,7 +16,7 @@ The website must be so intuitive that a first-time visitor — whether a tech-sa
 - **Hero System**: 4 hero types (HighImpact, MediumImpact, LowImpact, PostHero) selectable per page
 - **Live Preview**: Real-time content preview in admin panel via `window.postMessage` — supports mobile/tablet/desktop breakpoints
 - **Draft Preview**: Unpublished content previewable before publishing via draft routes
-- **Auth**: Payload native auth + `payload-oauth2` plugin for social login (Google initially, provider-agnostic)
+- **Auth**: Payload native auth (email and password); social login is not installed
 - **UI Components**: shadcn/ui (Radix UI primitives + Tailwind) — leverage these for consistent interaction patterns
 - **Docs Reference**: https://payloadcms.com/llms-full.txt
 
@@ -29,7 +24,7 @@ The website must be so intuitive that a first-time visitor — whether a tech-sa
 
 - Content editors use the Payload admin panel — UX decisions must account for both the public site AND the admin editing experience
 - Layout builder UX: editors pick blocks from a menu, reorder via drag-and-drop, and preview live — page designs must work well with this modular approach
-- Auth flows: login, registration, OAuth consent, password reset — all must be seamless on both desktop and mobile
+- Auth flows: login, registration, password reset — all must be seamless on both desktop and mobile
 - Profile page: users manage their account, subscriptions, and notification preferences
 
 ## Core UX Principles
@@ -105,40 +100,3 @@ When proposing UX changes, provide:
 2. **Recommendation** — Specific change with rationale
 3. **Wireframe** (ASCII or description) — Layout sketch showing the change
 4. **Acceptance criteria** — How to verify the fix works
-
-## Sprint Retrospective
-
-### Practice
-
-Every two weeks, the team conducts a sprint retrospective. Every agent participates by logging observations throughout the sprint.
-
-### What to Track
-
-During every work session, note anything that should be discussed at retro:
-
-- **Issues encountered**: Bugs, broken workflows, tooling problems, unclear requirements
-- **Friction points**: Tasks that took longer than expected and why
-- **Feedback received**: Input from residents, neighbors, or Amine (project lead)
-- **Architectural impacts**: Decisions or events that caused significant rework or pivots
-- **Incomplete work**: Tasks left undone and the reason (blocked, deprioritized, out of scope)
-- **Wins**: Things that went well, patterns worth repeating, tools that helped
-
-### Where to Log
-
-Append observations to the shared sprint retro file: `docs/memory/retro/sprint-{N}.md`
-
-Entry format:
-
-```markdown
-### [Date] — [Agent Role]
-
-- **Observation**: What happened
-- **Impact**: How it affected the work
-- **Recommendation**: What to change or continue
-```
-
-### Cadence
-
-- **Every session**: Log observations to the retro file before ending work
-- **Weekly review**: Amine reviews the retro file at end of week
-- **Biweekly retrospective**: Full team retro — review all observations, decide on changes, update processes

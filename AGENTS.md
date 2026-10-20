@@ -111,6 +111,7 @@ support skills load them from there; any other agent or human reads them as plai
 | [`docs/project.md`](docs/project.md)                | The system: stack, hosting, environment variables, local setup, known gotchas.                        |
 | [`docs/architecture/`](docs/architecture/README.md) | Where code goes, dependency rules, naming, data model, decisions. Read before coding.                 |
 | [`docs/guidelines/`](docs/guidelines/README.md)     | Conventions by topic: development, security, Payload, Next.js and Tailwind, UI/UX, patterns, content. |
+| [`docs/roles/`](docs/roles/README.md)               | Role guides (backend, CMS, frontend, UI, UX, content, events, media, SEO, legal, ops, QA).            |
 | [`ops/README.md`](ops/README.md)                    | Server scripts: deploy steps, backups and restore, Caddy limits.                                      |
 
 ## Where knowledge lives
@@ -121,6 +122,7 @@ above. Not in a tool's private memory, a chat, or loose notes.
 - A rule everyone follows on every change goes in this file.
 - A convention goes in a guideline in `docs/guidelines/`.
 - A procedure goes in a skill in `.agents/skills/`.
+- What a role focuses on and checks goes in its role guide in `docs/roles/`.
 - A fact about the system goes in `docs/project.md` or `docs/architecture/`; the reason behind a
   decision goes in a decision record (`docs/architecture/decisions/`).
 
@@ -133,12 +135,12 @@ Some tools look for their own file. Those files are thin adapters: they import o
 files above and hold only what is specific to that tool. Never put a rule, procedure or fact
 only in an adapter.
 
-| Tool           | Adapter                                                                                      |
-| -------------- | -------------------------------------------------------------------------------------------- |
-| Claude Code    | `CLAUDE.md` (imports this file and the core references), `.claude/`                          |
-| Gemini CLI     | `GEMINI.md` (imports this file); it reads `.agents/skills/` itself                           |
-| GitHub Copilot | `.github/copilot-instructions.md`; Copilot also reads this file and `.agents/skills/` itself |
-| Codex, Cursor  | None needed: they read this file and `.agents/skills/`.                                      |
+| Tool           | Adapter                                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------------------------- |
+| Claude Code    | `CLAUDE.md` (imports this file and the core references), `.claude/` (skill pointers, subagents for the roles) |
+| Gemini CLI     | `GEMINI.md` (imports this file); it reads `.agents/skills/` itself                                            |
+| GitHub Copilot | `.github/copilot-instructions.md`; Copilot also reads this file and `.agents/skills/` itself                  |
+| Codex, Cursor  | None needed: they read this file and `.agents/skills/`.                                                       |
 
 A tool that needs its own file gets a short adapter that points here, listed in this table and in
 the policy files of step 3. Tools that read both `.claude/skills/` and `.agents/skills/` (Copilot,

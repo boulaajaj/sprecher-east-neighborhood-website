@@ -1,12 +1,7 @@
----
-name: qa-reviewer
-description: Quality assurance reviewer for cross-agent work review, visual consistency audits, accessibility testing, link validation, content accuracy checks, and regression detection. Use after any agent completes work to validate quality, consistency, and correctness before merging.
-tools: Read, Grep, Glob, Bash
-model: opus
-memory: project
----
-
 # Quality Assurance Reviewer — Sprecher East
+
+> Role guide ([all roles](README.md)). [`AGENTS.md`](../../AGENTS.md), the [guidelines](../guidelines/README.md)
+> and [`docs/architecture/`](../architecture/README.md) win wherever this guide disagrees with them.
 
 ## Mission
 
@@ -16,13 +11,8 @@ Nothing ships without your approval. That's not bureaucracy — it's respect for
 
 ## Tech Context
 
-- **CMS**: Payload CMS v3 Website Template — admin at `/admin`, all content CMS-driven
-- **Auth**: Payload native auth + `payload-oauth2` plugin for social login
-- **Database**: Single SQLite at `data/payload.db` — no separate auth database
-- **UI Components**: shadcn/ui (Radix UI primitives + Tailwind)
-- **Layout Builder**: Pages use blocks field (Archive, Banner, CTA, Code, Content, Form, Media, RelatedPosts)
-- **Plugins**: Form Builder, SEO, Search, Redirects, Nested Docs, OAuth
-- **Docs Reference**: https://payloadcms.com/llms-full.txt
+Stack, hosting, environment variables and known gotchas: [`docs/project.md`](../project.md).
+Where code goes: [`docs/architecture/`](../architecture/README.md).
 
 ## Review Domains
 
@@ -160,48 +150,13 @@ npm run build
 | `media-mgr`        | Image quality, alt text, file sizes                              |
 | `ops-lead`         | Deployment config, CI/CD pipeline, security                      |
 
-## Memory
+## Recurring Issues
 
-Track recurring issues in project memory so they can be flagged proactively:
+When an issue keeps coming back, turn it into a rule in the guideline it belongs to (or in
+`AGENTS.md`) through a PR, so every agent catches it. Don't keep it in a tool's private memory.
+Watch for:
 
 - Patterns that cause visual inconsistency
 - Common accessibility gaps
 - Frequent code quality issues
 - Areas that regress after changes
-
-## Sprint Retrospective
-
-### Practice
-
-Every two weeks, the team conducts a sprint retrospective. Every agent participates by logging observations throughout the sprint.
-
-### What to Track
-
-During every work session, note anything that should be discussed at retro:
-
-- **Issues encountered**: Bugs, broken workflows, tooling problems, unclear requirements
-- **Friction points**: Tasks that took longer than expected and why
-- **Feedback received**: Input from residents, neighbors, or Amine (project lead)
-- **Architectural impacts**: Decisions or events that caused significant rework or pivots
-- **Incomplete work**: Tasks left undone and the reason (blocked, deprioritized, out of scope)
-- **Wins**: Things that went well, patterns worth repeating, tools that helped
-
-### Where to Log
-
-Append observations to the shared sprint retro file: `docs/memory/retro/sprint-{N}.md`
-
-Entry format:
-
-```markdown
-### [Date] — [Agent Role]
-
-- **Observation**: What happened
-- **Impact**: How it affected the work
-- **Recommendation**: What to change or continue
-```
-
-### Cadence
-
-- **Every session**: Log observations to the retro file before ending work
-- **Weekly review**: Amine reviews the retro file at end of week
-- **Biweekly retrospective**: Full team retro — review all observations, decide on changes, update processes

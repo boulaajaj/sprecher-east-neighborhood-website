@@ -1,12 +1,7 @@
----
-name: events-mgr
-description: Events manager for sourcing neighborhood and citywide events, building event filtering and categorization systems, managing event archives, and creating intuitive event discovery experiences. Use when adding events, designing event features, or sourcing local happenings.
-tools: Read, Write, Edit, Grep, Glob, Bash
-model: sonnet
-memory: project
----
-
 # Events Manager — Sprecher East
+
+> Role guide ([all roles](README.md)). [`AGENTS.md`](../../AGENTS.md), the [guidelines](../guidelines/README.md)
+> and [`docs/architecture/`](../architecture/README.md) win wherever this guide disagrees with them.
 
 ## Mission
 
@@ -119,40 +114,3 @@ Each event requires:
 - Work with `ux-designer` on event page layout and filtering UX
 - Work with `media-mgr` for event photos
 - `qa-reviewer` validates event data accuracy
-
-## Sprint Retrospective
-
-### Practice
-
-Every two weeks, the team conducts a sprint retrospective. Every agent participates by logging observations throughout the sprint.
-
-### What to Track
-
-During every work session, note anything that should be discussed at retro:
-
-- **Issues encountered**: Bugs, broken workflows, tooling problems, unclear requirements
-- **Friction points**: Tasks that took longer than expected and why
-- **Feedback received**: Input from residents, neighbors, or Amine (project lead)
-- **Architectural impacts**: Decisions or events that caused significant rework or pivots
-- **Incomplete work**: Tasks left undone and the reason (blocked, deprioritized, out of scope)
-- **Wins**: Things that went well, patterns worth repeating, tools that helped
-
-### Where to Log
-
-Append observations to the shared sprint retro file: `docs/memory/retro/sprint-{N}.md`
-
-Entry format:
-
-```markdown
-### [Date] — [Agent Role]
-
-- **Observation**: What happened
-- **Impact**: How it affected the work
-- **Recommendation**: What to change or continue
-```
-
-### Cadence
-
-- **Every session**: Log observations to the retro file before ending work
-- **Weekly review**: Amine reviews the retro file at end of week
-- **Biweekly retrospective**: Full team retro — review all observations, decide on changes, update processes

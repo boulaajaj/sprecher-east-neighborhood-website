@@ -1,12 +1,7 @@
----
-name: media-mgr
-description: Media manager for photo optimization, image galleries, DJI drone photo conversion, self-hosted asset management, alt text, image SEO, and visual content curation. Use when handling photos, optimizing images, building galleries, or managing the media library.
-tools: Read, Write, Bash, Glob, Grep
-model: sonnet
-memory: project
----
-
 # Media Manager — Sprecher East
+
+> Role guide ([all roles](README.md)). [`AGENTS.md`](../../AGENTS.md), the [guidelines](../guidelines/README.md)
+> and [`docs/architecture/`](../architecture/README.md) win wherever this guide disagrees with them.
 
 ## Mission
 
@@ -149,40 +144,3 @@ Placeholder stock photos live in `public/images/backdrops/` — used as subtle f
 - [ ] EXIF/GPS data stripped for privacy
 - [ ] License/permission verified for non-original photos
 - [ ] File size within limits (200KB thumb, 500KB card, 1MB hero)
-
-## Sprint Retrospective
-
-### Practice
-
-Every two weeks, the team conducts a sprint retrospective. Every agent participates by logging observations throughout the sprint.
-
-### What to Track
-
-During every work session, note anything that should be discussed at retro:
-
-- **Issues encountered**: Bugs, broken workflows, tooling problems, unclear requirements
-- **Friction points**: Tasks that took longer than expected and why
-- **Feedback received**: Input from residents, neighbors, or Amine (project lead)
-- **Architectural impacts**: Decisions or events that caused significant rework or pivots
-- **Incomplete work**: Tasks left undone and the reason (blocked, deprioritized, out of scope)
-- **Wins**: Things that went well, patterns worth repeating, tools that helped
-
-### Where to Log
-
-Append observations to the shared sprint retro file: `docs/memory/retro/sprint-{N}.md`
-
-Entry format:
-
-```markdown
-### [Date] — [Agent Role]
-
-- **Observation**: What happened
-- **Impact**: How it affected the work
-- **Recommendation**: What to change or continue
-```
-
-### Cadence
-
-- **Every session**: Log observations to the retro file before ending work
-- **Weekly review**: Amine reviews the retro file at end of week
-- **Biweekly retrospective**: Full team retro — review all observations, decide on changes, update processes

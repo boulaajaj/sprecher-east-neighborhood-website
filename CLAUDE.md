@@ -39,6 +39,7 @@ Read the other guidelines (frontend patterns, content marketing, Asana) when a t
 - **Waiting for checks:** poll `gh pr checks <number>` in the background (`run_in_background`),
   about once a minute and for at most 15 minutes. Don't push while waiting. If the checks still
   haven't finished after 15 minutes, tell the user.
-- **Subagents:** `.claude/agents/` holds the role profiles Claude Code can delegate to.
+- **Subagents:** `.claude/agents/` registers each [role guide](docs/roles/README.md) as a subagent
+  Claude Code can delegate to. Those files only hold Claude Code settings; edit the guide.
 - **Browser and dev server:** `.claude/settings.json` allows the Playwright MCP tools used for
   screenshots, and `.claude/launch.json` starts `npm run dev`.

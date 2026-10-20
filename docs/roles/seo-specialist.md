@@ -1,12 +1,7 @@
----
-name: seo-specialist
-description: SEO specialist for metadata optimization, structured data (JSON-LD), local SEO, sitemap generation, Open Graph tags, page speed optimization, and search engine visibility. Use when optimizing pages for search, adding metadata, or improving discoverability.
-tools: Read, Edit, Grep, Glob, Bash
-model: sonnet
-memory: project
----
-
 # SEO Specialist — Sprecher East
+
+> Role guide ([all roles](README.md)). [`AGENTS.md`](../../AGENTS.md), the [guidelines](../guidelines/README.md)
+> and [`docs/architecture/`](../architecture/README.md) win wherever this guide disagrees with them.
 
 ## Mission
 
@@ -48,7 +43,7 @@ export const metadata: Metadata = {
     title: 'Page Title | Sprecher East',
     description: 'Same or variant description',
     type: 'website', // or "article" for posts
-    url: 'https://sprecher-east.org/page-path',
+    url: 'https://sprechereast.com/page-path',
     images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
     siteName: 'Sprecher East',
   },
@@ -84,7 +79,7 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 Disallow: /login
-Sitemap: https://sprecher-east.org/sitemap.xml
+Sitemap: https://sprechereast.com/sitemap.xml
 ```
 
 ### Performance (Core Web Vitals)
@@ -162,40 +157,3 @@ The project uses `@payloadcms/plugin-seo` which automatically adds SEO fields to
 - Google Search Console integration (when domain is live)
 - Check for crawl errors, index coverage, mobile usability
 - Monthly SEO health check: broken links, missing metadata, duplicate content
-
-## Sprint Retrospective
-
-### Practice
-
-Every two weeks, the team conducts a sprint retrospective. Every agent participates by logging observations throughout the sprint.
-
-### What to Track
-
-During every work session, note anything that should be discussed at retro:
-
-- **Issues encountered**: Bugs, broken workflows, tooling problems, unclear requirements
-- **Friction points**: Tasks that took longer than expected and why
-- **Feedback received**: Input from residents, neighbors, or Amine (project lead)
-- **Architectural impacts**: Decisions or events that caused significant rework or pivots
-- **Incomplete work**: Tasks left undone and the reason (blocked, deprioritized, out of scope)
-- **Wins**: Things that went well, patterns worth repeating, tools that helped
-
-### Where to Log
-
-Append observations to the shared sprint retro file: `docs/memory/retro/sprint-{N}.md`
-
-Entry format:
-
-```markdown
-### [Date] — [Agent Role]
-
-- **Observation**: What happened
-- **Impact**: How it affected the work
-- **Recommendation**: What to change or continue
-```
-
-### Cadence
-
-- **Every session**: Log observations to the retro file before ending work
-- **Weekly review**: Amine reviews the retro file at end of week
-- **Biweekly retrospective**: Full team retro — review all observations, decide on changes, update processes

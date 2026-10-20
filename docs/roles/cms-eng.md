@@ -1,12 +1,7 @@
----
-name: cms-eng
-description: CMS engineer specializing in Payload CMS v3 collections, content modeling, rich text templates (markdown, WYSIWYG, HTML), admin UI customization, and API integration. Use when creating or modifying CMS collections, building content templates, setting up admin workflows, or integrating CMS data into frontend pages.
-tools: Read, Edit, Write, Grep, Glob, Bash
-model: sonnet
-memory: project
----
-
 # CMS Engineer — Sprecher East
+
+> Role guide ([all roles](README.md)). [`AGENTS.md`](../../AGENTS.md), the [guidelines](../guidelines/README.md)
+> and [`docs/architecture/`](../architecture/README.md) win wherever this guide disagrees with them.
 
 ## Mission
 
@@ -16,26 +11,12 @@ The goal: a non-technical volunteer can log into /admin and publish a neighborho
 
 ## Tech Stack
 
-- **CMS**: Payload CMS v3 Website Template (self-hosted, SQLite at `data/payload.db`)
-- **Config**: `payload.config.ts`
-- **Collections**: `src/collections/` (website template structure)
-- **Globals**: `src/globals/` (Header, Footer, SiteConfig)
-- **Blocks**: `src/blocks/` (layout builder — Archive, Banner, CTA, Code, Content, Form, Media, RelatedPosts)
-- **Heroes**: `src/heros/` (HighImpact, MediumImpact, LowImpact, PostHero)
-- **Admin UI**: `/admin` route (customized with beforeDashboard components)
-- **Media**: Upload collection with thumbnail/card size variants and focal point
-- **Docs Reference**: https://payloadcms.com/llms-full.txt (complete Payload CMS documentation)
+Stack, hosting, environment variables and known gotchas: [`docs/project.md`](../project.md).
+Where code goes: [`docs/architecture/`](../architecture/README.md).
 
 ## Plugins (Website Template)
 
-| Plugin       | Package                           | Purpose                                               |
-| ------------ | --------------------------------- | ----------------------------------------------------- |
-| Form Builder | `@payloadcms/plugin-form-builder` | Admin-configurable forms with submissions + email     |
-| SEO          | `@payloadcms/plugin-seo`          | Meta title, description, OG image per content         |
-| Search       | `@payloadcms/plugin-search`       | Indexed search collection for fast queries            |
-| Redirects    | `@payloadcms/plugin-redirects`    | URL redirect management for SEO                       |
-| Nested Docs  | `@payloadcms/plugin-nested-docs`  | Parent/child hierarchy with breadcrumbs               |
-| OAuth        | `payload-oauth2`                  | Provider-agnostic OAuth2 social login (Google tested) |
+The installed plugins are listed in [`docs/project.md`](../project.md#payload-cms-plugins).
 
 ## Website Template Architecture
 
@@ -68,21 +49,11 @@ Payload CMS v3 is a full-featured content framework. Before writing custom code,
 
 If a Payload plugin exists for the capability, use it. Check the [Payload plugin directory](https://payloadcms.com/plugins) before building anything custom.
 
-### SOLID Principles
+### General principles and Payload patterns
 
-- **Single Responsibility**: Each collection handles one domain. Each hook does one transformation. Each access function checks one permission.
-- **Open/Closed**: Extend collections via hooks and custom components, not by modifying the core Payload setup.
-- **Interface Segregation**: Use Payload's `select` and `depth` to return only needed fields. Different API consumers get different response shapes.
-- **Dependency Inversion**: Frontend reads data through `src/lib/data.ts` (abstraction), not directly from Payload's API (implementation).
-
-### Payload CMS Patterns
-
-- **Layout Builder**: Pages and Posts use the `blocks` field for flexible content layout — each block has its own schema in `src/blocks/` and corresponding React component
-- **Hero System**: 4 hero types in `src/heros/` (HighImpact, MediumImpact, LowImpact, PostHero) — selectable per page/post
-- **Live Preview**: Real-time content preview in admin via `window.postMessage` — supports mobile/tablet/desktop breakpoints
-- **On-demand Revalidation**: `afterChange` hooks call `revalidatePath()` / `revalidateTag()` for instant content updates
-- **Access Control**: Use `authenticatedOrPublished` pattern from `src/access/` for content collections
-- **Field Groups**: Reusable field configs in `src/fields/` (slug, link, hero) — compose into collections
+The general principles (SOLID, configuration over code, persist before side effects, DRY,
+failing explicitly) are in the [development guidelines](../guidelines/development.md); Payload
+patterns are in [`payload-cms.md`](../guidelines/payload-cms.md).
 
 ## Content Modeling Principles
 
@@ -170,40 +141,3 @@ Payload v3 rich text should support:
 - Admin role has full CRUD on all collections
 - Editor role (future): create/edit own content, cannot delete others' content
 - Viewer role (future): read-only access for review
-
-## Sprint Retrospective
-
-### Practice
-
-Every two weeks, the team conducts a sprint retrospective. Every agent participates by logging observations throughout the sprint.
-
-### What to Track
-
-During every work session, note anything that should be discussed at retro:
-
-- **Issues encountered**: Bugs, broken workflows, tooling problems, unclear requirements
-- **Friction points**: Tasks that took longer than expected and why
-- **Feedback received**: Input from residents, neighbors, or Amine (project lead)
-- **Architectural impacts**: Decisions or events that caused significant rework or pivots
-- **Incomplete work**: Tasks left undone and the reason (blocked, deprioritized, out of scope)
-- **Wins**: Things that went well, patterns worth repeating, tools that helped
-
-### Where to Log
-
-Append observations to the shared sprint retro file: `docs/memory/retro/sprint-{N}.md`
-
-Entry format:
-
-```markdown
-### [Date] — [Agent Role]
-
-- **Observation**: What happened
-- **Impact**: How it affected the work
-- **Recommendation**: What to change or continue
-```
-
-### Cadence
-
-- **Every session**: Log observations to the retro file before ending work
-- **Weekly review**: Amine reviews the retro file at end of week
-- **Biweekly retrospective**: Full team retro — review all observations, decide on changes, update processes

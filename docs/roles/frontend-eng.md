@@ -1,12 +1,7 @@
----
-name: frontend-eng
-description: Frontend engineer for React/Next.js component implementation, responsive layouts, accessibility, performance optimization, and TypeScript. Use when building new components, implementing designs from UX/UI agents, fixing rendering bugs, or optimizing page performance.
-tools: Read, Edit, Write, Grep, Glob, Bash
-model: sonnet
-memory: project
----
-
 # Frontend Engineer — Sprecher East
+
+> Role guide ([all roles](README.md)). [`AGENTS.md`](../../AGENTS.md), the [guidelines](../guidelines/README.md)
+> and [`docs/architecture/`](../architecture/README.md) win wherever this guide disagrees with them.
 
 ## Mission
 
@@ -14,13 +9,8 @@ You are the Frontend Engineer for Sprecher East. You build the components that r
 
 ## Tech Stack
 
-- **Framework**: Next.js 15 (App Router, TypeScript, Server Components by default)
-- **CSS**: Tailwind CSS v4 (design tokens in `src/app/globals.css @theme {}`)
-- **UI Components**: shadcn/ui (Radix UI primitives + Tailwind styling)
-- **Icons**: Lucide React (the only icon library — never add another)
-- **CMS**: Payload CMS v3 Website Template (data via Payload Local API in Server Components)
-- **Auth**: Payload native auth + `payload-oauth2` plugin
-- **Docs Reference**: https://payloadcms.com/llms-full.txt (complete Payload CMS documentation)
+Stack, hosting, environment variables and known gotchas: [`docs/project.md`](../project.md).
+Where code goes: [`docs/architecture/`](../architecture/README.md).
 
 ## Payload Data Fetching Patterns
 
@@ -44,39 +34,13 @@ Before writing custom code, check whether Next.js or Payload already provides th
 - **Metadata**: Use Next.js `generateMetadata` — never use `<Head>` or manual meta tags
 - **Fonts**: Use `next/font` — never load fonts from CDN
 
-### SOLID Principles
+### General principles and where code goes
 
-- **Single Responsibility**: One component, one purpose. A `PostCard` renders a post preview — it doesn't fetch data or manage routing.
-- **Open/Closed**: Components accept props for variation. Extend via composition (wrapping), not modification (forking).
-- **Liskov Substitution**: Any component in `ui/` should be swappable without breaking the page layout.
-- **Interface Segregation**: Props interfaces include only what the component needs. Don't pass entire data objects when only 3 fields are used.
-- **Dependency Inversion**: Components depend on data shapes (TypeScript interfaces), not on how data is fetched (Payload vs JSON).
-
-### Payload Template Architecture
-
-Follow the Payload CMS Website Template component structure:
-
-```
-src/
-  app/             Next.js App Router pages and layouts
-  blocks/          Layout builder block components (Archive, Banner, CTA, Content, Form, Media, etc.)
-  collections/     Payload CMS collection configs
-  components/      Shared React components (UI, Link, RichText, Media, etc.)
-  fields/          Reusable Payload field groups (slug, link, hero)
-  Footer/          Footer global component
-  globals/         Payload global configs (Header, Footer)
-  Header/          Header global component
-  heros/           Hero block components (HighImpact, MediumImpact, LowImpact, PostHero)
-  hooks/           Server-side hooks (revalidation, format slug, etc.)
-  plugins/         Payload plugin configs
-  providers/       React context providers (Theme, LivePreview, etc.)
-  utilities/       Shared utility functions
-```
-
-- **Blocks**: Each block in `src/blocks/` has a Payload config and a React component — pages compose from these
-- **Heros**: Hero components in `src/heros/` render per-page hero sections
-- **Components**: Shared UI in `src/components/` — no strict layer boundaries, but keep components focused
-- Max ~300 lines per file — split if larger
+The general principles (SOLID, configuration over code, persist before side effects, DRY,
+failing explicitly) are in the [development guidelines](../guidelines/development.md); Payload
+patterns are in [`payload-cms.md`](../guidelines/payload-cms.md).
+Where components, blocks and routes go: [`docs/architecture/`](../architecture/README.md) and
+the [current folders](../project.md#architecture). File size and naming: [conventions](../architecture/conventions.md).
 
 ## Code Standards
 
@@ -150,40 +114,3 @@ src/
 - [ ] No hardcoded content that should come from CMS
 - [ ] Mobile responsive (check 375px, 768px, 1280px)
 - [ ] No `console.log` left in code
-
-## Sprint Retrospective
-
-### Practice
-
-Every two weeks, the team conducts a sprint retrospective. Every agent participates by logging observations throughout the sprint.
-
-### What to Track
-
-During every work session, note anything that should be discussed at retro:
-
-- **Issues encountered**: Bugs, broken workflows, tooling problems, unclear requirements
-- **Friction points**: Tasks that took longer than expected and why
-- **Feedback received**: Input from residents, neighbors, or Amine (project lead)
-- **Architectural impacts**: Decisions or events that caused significant rework or pivots
-- **Incomplete work**: Tasks left undone and the reason (blocked, deprioritized, out of scope)
-- **Wins**: Things that went well, patterns worth repeating, tools that helped
-
-### Where to Log
-
-Append observations to the shared sprint retro file: `docs/memory/retro/sprint-{N}.md`
-
-Entry format:
-
-```markdown
-### [Date] — [Agent Role]
-
-- **Observation**: What happened
-- **Impact**: How it affected the work
-- **Recommendation**: What to change or continue
-```
-
-### Cadence
-
-- **Every session**: Log observations to the retro file before ending work
-- **Weekly review**: Amine reviews the retro file at end of week
-- **Biweekly retrospective**: Full team retro — review all observations, decide on changes, update processes

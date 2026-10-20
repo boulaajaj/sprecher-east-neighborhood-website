@@ -90,7 +90,7 @@ This also applies during code review. Every review finding must either be fixed 
 
 ## Documentation Is Code
 
-Code examples in guidelines (`docs/guidelines/`), skills (`.agents/skills/`), pattern libraries, and agent configs are templates that developers adapt — they must follow the same standards as production code. Every rule that applies to source files also applies to code snippets in documentation: use project components, use design tokens, follow React patterns, respect linting and formatting. If a snippet would fail a code review in a PR, it doesn't belong in the docs either.
+Code examples in guidelines (`docs/guidelines/`), skills (`.agents/skills/`), role guides (`docs/roles/`), pattern libraries, and tool adapters are templates that developers adapt — they must follow the same standards as production code. Every rule that applies to source files also applies to code snippets in documentation: use project components, use design tokens, follow React patterns, respect linting and formatting. If a snippet would fail a code review in a PR, it doesn't belong in the docs either.
 
 ## Prefer Props Over Re-Fetching
 
