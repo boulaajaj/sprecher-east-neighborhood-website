@@ -136,9 +136,9 @@ export const plugins: Plugin[] = [
     collections: ['posts', 'events'],
     beforeSync: beforeSyncWithSearch,
     searchOverrides: {
-      // The plugin sets only create (off) and read (public); the index is written by its own
-      // sync, which bypasses access, so nobody needs update or delete through the API (#140).
-      access: { update: isAdmin, delete: isAdmin },
+      // The plugin sets only create (off) and read (public). Its own sync bypasses access, so
+      // these only gate the admin screens: staff may reindex (needs both) and set priority (#140).
+      access: { update: isAdminOrEditor, delete: isAdminOrEditor },
       fields: ({ defaultFields }) => {
         return [...defaultFields, ...searchFields]
       },

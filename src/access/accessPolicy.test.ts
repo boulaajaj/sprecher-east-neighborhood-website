@@ -8,7 +8,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
  * `access` entry fails here instead of reaching production (#140).
  */
 
-type Operation = 'read' | 'create' | 'update' | 'delete'
+type Operation = 'read' | 'create' | 'update' | 'delete' | 'readVersions' | 'unlock'
 type Audience = 'visitor' | 'resident'
 
 const AUDIENCES: Record<Audience, unknown> = {
@@ -62,14 +62,21 @@ const ALLOWED: Record<string, Partial<Record<Operation, Audience[]>>> = {
 
 type AccessFn = (args: unknown) => unknown
 
-/** True when the access function lets the audience through (a query filter counts as yes). */
-async function allows(access: unknown, audience: Audience, id?: number): Promise<boolean> {
+/** Runs an access function the way Payload does for this audience and returns its result. */
+async function accessResult(access: unknown, audience: Audience, id?: number): Promise<unknown> {
+  const user = AUDIENCES[audience]
+  // With no access function, Payload lets any signed-in user through (`executeAccess`)
+  if (access === undefined) return user !== null
   if (typeof access !== 'function') throw new Error('access is not a function')
-  const result = await (access as AccessFn)({
-    req: { user: AUDIENCES[audience], headers: new Headers() },
+  return (access as AccessFn)({
+    req: { user, headers: new Headers(), payload: { config: { admin: { user: 'users' } } } },
     id,
   })
-  return result !== false
+}
+
+/** True when the access function lets the audience through (a query filter counts as yes). */
+async function allows(access: unknown, audience: Audience, id?: number): Promise<boolean> {
+  return (await accessResult(access, audience, id)) !== false
 }
 
 let config: SanitizedConfig
@@ -79,11 +86,13 @@ beforeAll(async () => {
 }, 60_000)
 
 describe('collections', () => {
-  const operations: Operation[] = ['read', 'create', 'update', 'delete']
-
   it('let visitors and residents do only what the policy allows', async () => {
     const problems: string[] = []
     for (const collection of config.collections) {
+      // Version history and unlocking only exist where versions and logins do
+      const operations: Operation[] = ['read', 'create', 'update', 'delete']
+      if (collection.versions) operations.push('readVersions')
+      if (collection.auth) operations.push('unlock')
       for (const operation of operations) {
         for (const audience of Object.keys(AUDIENCES) as Audience[]) {
           const expected = ALLOWED[collection.slug]?.[operation]?.includes(audience) ?? false
@@ -95,6 +104,22 @@ describe('collections', () => {
       }
     }
     expect(problems).toEqual([])
+  })
+
+  it('show visitors and residents only published documents where drafts exist', async () => {
+    const withDrafts = config.collections.filter(
+      (c) => typeof c.versions === 'object' && c.versions.drafts,
+    )
+    expect(withDrafts.map((c) => c.slug).sort()).toEqual(
+      ['events', 'faq', 'pages', 'posts', 'resources'].sort(),
+    )
+    for (const collection of withDrafts) {
+      for (const audience of ['visitor', 'resident'] as const) {
+        expect(await accessResult(collection.access.read, audience)).toEqual({
+          _status: { equals: 'published' },
+        })
+      }
+    }
   })
 
   it('let a resident reach their own user record and nobody else’s', async () => {

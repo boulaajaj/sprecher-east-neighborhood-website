@@ -15,6 +15,8 @@ export const Users: CollectionConfig = {
     create: isAdmin,
     delete: isAdmin,
     read: isAdminOrSelf,
+    // Payload's default lets any account unlock any other, undoing the login lockout (#140)
+    unlock: isAdmin,
     update: isAdminOrSelf,
   },
   admin: {

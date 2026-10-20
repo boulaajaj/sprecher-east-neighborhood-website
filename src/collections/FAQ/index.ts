@@ -1,19 +1,13 @@
 import type { CollectionConfig } from 'payload'
 
-import { isAdmin, isAdminOrEditor } from '../../access/roles'
-import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
+import { draftContentAccess } from '../../access/draftContentAccess'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { revalidateDelete, revalidateFAQ } from './hooks/revalidateFAQ'
 
 export const FAQ: CollectionConfig = {
   slug: 'faq',
   defaultSort: 'order',
-  access: {
-    create: isAdminOrEditor,
-    delete: isAdmin,
-    read: authenticatedOrPublished,
-    update: isAdminOrEditor,
-  },
+  access: draftContentAccess,
   admin: {
     defaultColumns: ['question', 'category', 'order', '_status', 'updatedAt'],
     useAsTitle: 'question',

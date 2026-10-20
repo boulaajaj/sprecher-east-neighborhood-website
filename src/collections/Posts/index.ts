@@ -9,8 +9,7 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { isAdmin, isAdminOrEditor } from '../../access/roles'
-import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
+import { draftContentAccess } from '../../access/draftContentAccess'
 import { Banner } from '../../blocks/Banner/config'
 import { Code } from '../../blocks/Code/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
@@ -32,12 +31,7 @@ import { slugField } from 'payload'
 export const Posts: CollectionConfig = {
   slug: 'posts',
   defaultSort: '-publishedAt',
-  access: {
-    create: isAdminOrEditor,
-    delete: isAdmin,
-    read: authenticatedOrPublished,
-    update: isAdminOrEditor,
-  },
+  access: draftContentAccess,
   defaultPopulate: {
     title: true,
     slug: true,

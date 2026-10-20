@@ -1,5 +1,8 @@
 import { createLocalReq, getPayload } from 'payload'
+
+import { hasAdmin } from '@/access/roles'
 import { seed } from '@/endpoints/seed'
+import type { User } from '@/payload-types'
 import config from '@payload-config'
 import { headers } from 'next/headers'
 
@@ -12,7 +15,9 @@ export async function POST(): Promise<Response> {
   // Authenticate by passing request headers
   const { user } = await payload.auth({ headers: requestHeaders })
 
-  if (!user) {
+  // The seed deletes nearly all content and creates a demo admin, so only admins may run it.
+  // Being signed in is not enough: residents and editors are refused (#140).
+  if (!user || !hasAdmin(user as User)) {
     return new Response('Action forbidden.', { status: 403 })
   }
 
