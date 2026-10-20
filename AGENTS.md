@@ -49,7 +49,7 @@ Merging code changes to `main` deploys them to production automatically
 
    Changes to the process itself are policy changes, and the review must call them out
    explicitly for the owner. That covers `AGENTS.md`, `.agents/`, `docs/guidelines/`,
-   `.github/`, `CLAUDE.md`, and `.claude/`.
+   `.github/`, and the tool adapters (`CLAUDE.md`, `.claude/`, `GEMINI.md`).
 
 4. **Everything green.** All required checks pass before merge: `Type-check & Build`,
    `Prettier`, `ESLint`, `Dependency Audit`, and `PR Policy` (which verifies steps 1–2).
@@ -102,6 +102,7 @@ support skills load them from there; any other agent or human reads them as plai
 | [`self-review`](.agents/skills/self-review/SKILL.md)                   | A change is done: review your own diff before opening or updating the PR. |
 | [`visual-design-review`](.agents/skills/visual-design-review/SKILL.md) | The change affects how pages look.                                        |
 | [`pr-review`](.agents/skills/pr-review/SKILL.md)                       | You are the independent reviewer of a PR you didn't write.                |
+| [`wrapped`](.agents/skills/wrapped/SKILL.md)                           | The owner has merged: verify, check the deploy, close the loop, report.   |
 
 ## References: what is true here
 
@@ -132,8 +133,14 @@ Some tools look for their own file. Those files are thin adapters: they import o
 files above and hold only what is specific to that tool. Never put a rule, procedure or fact
 only in an adapter.
 
-| Tool                      | Adapter                                                                                                                       |
-| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| Claude Code               | `CLAUDE.md` (imports this file and the core references), `.claude/`                                                           |
-| GitHub Copilot            | `.github/copilot-instructions.md`; Copilot also reads this file and `.agents/skills/` itself                                  |
-| Codex, Cursor, and others | None needed: they read this file. A tool that needs its own file gets a short adapter that points here, listed in this table. |
+| Tool           | Adapter                                                                                      |
+| -------------- | -------------------------------------------------------------------------------------------- |
+| Claude Code    | `CLAUDE.md` (imports this file and the core references), `.claude/`                          |
+| Gemini CLI     | `GEMINI.md` (imports this file); it reads `.agents/skills/` itself                           |
+| GitHub Copilot | `.github/copilot-instructions.md`; Copilot also reads this file and `.agents/skills/` itself |
+| Codex, Cursor  | None needed: they read this file and `.agents/skills/`.                                      |
+
+A tool that needs its own file gets a short adapter that points here, listed in this table and in
+the policy files of step 3. Tools that read both `.claude/skills/` and `.agents/skills/` (Copilot,
+Cursor) list each skill twice. That is expected: the `.claude/skills/` copies only point to the
+`.agents/skills/` ones, so don't delete either.

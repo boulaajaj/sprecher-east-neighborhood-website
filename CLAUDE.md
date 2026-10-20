@@ -24,8 +24,10 @@ Read the other guidelines (frontend patterns, content marketing, Asana) when a t
 - **Skills:** each `.claude/skills/<name>/SKILL.md` is a pointer to
   `.agents/skills/<name>/SKILL.md`, so Claude Code finds the repo's skills. Edit the
   `.agents/skills/` copy. A new skill gets a pointer too, with the same `name` and `description`.
-- **`/simplify`** runs the [`self-review`](.agents/skills/self-review/SKILL.md) skill. Run it
-  before opening a PR, with its four reviews as parallel subagents.
+- **Before opening a PR,** run `/self-review` (this repo's [`self-review`](.agents/skills/self-review/SKILL.md)
+  skill), with its four reviews as parallel subagents. Claude Code's built-in `/simplify` is a
+  different, shorter check without the visual design review.
+- **After the owner merges,** run `/wrapped` (the [`wrapped`](.agents/skills/wrapped/SKILL.md) skill).
 - **Independent review:** run the [`pr-review`](.agents/skills/pr-review/SKILL.md) skill in a
   separate session or a subagent (for example `qa-reviewer`), never in the context that wrote
   the change.

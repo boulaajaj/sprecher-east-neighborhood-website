@@ -92,7 +92,7 @@ src/
 | File                              | Purpose                                           |
 | --------------------------------- | ------------------------------------------------- |
 | `src/payload.config.ts`           | Payload CMS config (SQLite, collections, plugins) |
-| `src/app/(frontend)/globals.css`  | Tailwind v4 @theme block — all design tokens      |
+| `src/app/(frontend)/globals.css`  | Tailwind v4 `@theme` block — all design tokens    |
 | `src/collections/Pages/index.ts`  | Pages collection with layout builder blocks       |
 | `src/collections/Posts/index.ts`  | Blog posts collection                             |
 | `src/collections/Events/index.ts` | Events collection (custom)                        |

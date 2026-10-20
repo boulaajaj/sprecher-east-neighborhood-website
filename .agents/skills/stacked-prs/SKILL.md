@@ -67,13 +67,17 @@ anywhere `gh api` does:
 ```bash
 H='X-GitHub-Api-Version: 2026-03-10'
 # Create: PR numbers from the bottom of the stack to the top.
-gh api -X POST repos/{owner}/{repo}/stacks -H "$H" --input - <<<'{"pull_requests":[101,102,103]}'
+gh api -X POST repos/{owner}/{repo}/stacks -H "$H" \
+  -F 'pull_requests[]=101' -F 'pull_requests[]=102' -F 'pull_requests[]=103'
 # Add on top of an existing stack: only the new PRs, from the current top upward.
-gh api -X POST repos/{owner}/{repo}/stacks/<stack>/add -H "$H" --input - <<<'{"pull_requests":[104]}'
+gh api -X POST repos/{owner}/{repo}/stacks/<stack>/add -H "$H" -F 'pull_requests[]=104'
 # Find the stack a PR is in, or read one.
 gh api "repos/{owner}/{repo}/stacks?pull_request=<number>" -H "$H"
 gh api repos/{owner}/{repo}/stacks/<stack> -H "$H"
 ```
+
+(`-F` sends the numbers as integers, and `name[]=value` builds the list, so no JSON quoting is
+needed in any shell.)
 
 GitHub refuses a stack unless each PR's base is the head branch of the PR before it (the first
 added PR sits on the current top). A `409` means someone else is changing the stack: wait and
@@ -103,19 +107,22 @@ from the bottom up. Fix a finding in the layer it belongs to, never in a higher 
    `git rebase --onto <branch below> <old head of the branch below>`. Resolve conflicts the same
    way in each layer. For a `package-lock.json` conflict, take either side and regenerate it with
    `npm install --package-lock-only --legacy-peer-deps --ignore-scripts`.
-4. Run the checks on the top layer (`npx tsc --noEmit`, `npm test`, ESLint, Prettier). They cover
-   every layer below it.
-5. Push every changed branch in one atomic push, each with a lease on the head you noted, so
-   the stack is never half-updated and nobody else's push is lost:
+4. Run the checks (`npx tsc --noEmit`, `npm test`, ESLint, Prettier) on the layer you changed and
+   on the top layer. A lower layer can fail on its own while the top passes, so after the push
+   wait for CI on every layer, not just the top one.
+5. Push every changed branch in one atomic push, with one lease per branch on the head you noted,
+   so the stack is never half-updated and nobody else's push is lost:
 
    ```bash
    git push --atomic origin \
-     --force-with-lease=<branch k>:<old head k> --force-with-lease=<branch k+1>:<old head k+1> \
-     <branch k> <branch k+1>
+     --force-with-lease=<branch k>:<old head k> --force-with-lease=<branch k+1>:<old head k+1> … \
+     <branch k> <branch k+1> …
    ```
 
-`gh stack rebase` followed by `gh stack push` does steps 3 and 5 for you, and the PR page on
-GitHub can run the same cascading rebase on the server when there are no conflicts.
+`gh stack rebase --upstack` (from layer _k_) does step 3 for the layers above it, and
+`gh stack push` pushes them, but that push is **not atomic**: some branches can update while
+another is rejected. Use the `git push --atomic` above when that matters. The PR page on GitHub
+can also run the cascading rebase on the server when there are no conflicts.
 
 After the owner merges part of a stack, GitHub rebases the PRs left above it. Before working on
 one of them again, reset your local copy to GitHub's: `git fetch origin` then
@@ -127,9 +134,11 @@ one of them again, reset your local copy to GitHub's: `git fetch origin` then
   every check on its own.
 - When the stack is ready, tell the owner which PR to merge: the top PR merges the whole stack,
   or a lower one merges only up to it. Agents never merge ([`AGENTS.md`](../../../AGENTS.md)).
-- To restructure a stack (reorder, take a PR out), dissolve it with
-  `gh api -X POST repos/{owner}/{repo}/stacks/<stack>/unstack -H "$H"`, which removes every
-  unmerged PR from it. Then fix the bases and create it again. Don't retarget a PR inside a stack
+- To restructure a stack (reorder, drop or insert a layer), use `gh stack modify`; it keeps the
+  stack. Without the extension, dissolve it with
+  `gh api -X POST repos/{owner}/{repo}/stacks/<stack>/unstack -H "$H"`, which removes the
+  unmerged PRs (a PR queued for merge stays; the answer is `200` with what's left, or `204` once
+  the stack is gone), then fix the bases and create it again. Don't retarget a PR inside a stack
   by hand.
 
 ## Notes

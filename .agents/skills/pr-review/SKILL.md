@@ -32,9 +32,9 @@ gh api "repos/{owner}/{repo}/stacks?pull_request=<number>" -H 'X-GitHub-Api-Vers
       below, the description starts with the stack line, and nothing outside the stack is
       needed. A merge order written only in prose is a **Blocker**.
 - [ ] **Policy changes are flagged.** If the diff touches `AGENTS.md`, `.agents/`,
-      `.github/` (workflows, templates, label policy), `docs/guidelines/`, `CLAUDE.md`, or
-      `.claude/`, list each such change under **Major** so the owner signs off on it
-      explicitly. A PR can change the checks that run on itself, so read workflow changes
+      `.github/` (workflows, templates, label policy), `docs/guidelines/`, or a tool adapter
+      (`CLAUDE.md`, `.claude/`, `GEMINI.md`), list each such change under **Major** so the owner
+      signs off on it explicitly. A PR can change the checks that run on itself, so read workflow changes
       carefully.
 
 ## 3. Check the change
@@ -49,7 +49,7 @@ gh api "repos/{owner}/{repo}/stacks?pull_request=<number>" -H 'X-GitHub-Api-Vers
   ([`docs/guidelines/`](../../../docs/guidelines/README.md)) and puts code where
   [`docs/architecture/`](../../../docs/architecture/README.md) says it goes.
 - **Tool-neutral guidance:** a new rule, procedure or fact lands in `AGENTS.md`, `docs/` or
-  `.agents/skills/`, never only in a tool adapter (`CLAUDE.md`, `.claude/`,
+  `.agents/skills/`, never only in a tool adapter (`CLAUDE.md`, `.claude/`, `GEMINI.md`,
   `.github/copilot-instructions.md`).
 - **Configuration over code:** environment-specific values come from env vars, and new env
   vars are documented in `.env.local.example`.
