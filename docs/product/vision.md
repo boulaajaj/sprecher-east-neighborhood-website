@@ -63,8 +63,8 @@ neighborhood better, in any way, big or small.
 
 ## Not in scope yet
 
-- **Speaking for the association.** The site is unofficial and says so
-  ([`AGENTS.md`](../../AGENTS.md#ground-rules)); it isn't the association's official voice.
+- **Acting as an official body.** Sprecher East isn't a government body or a registered nonprofit,
+  and the site never presents itself as one ([brand voice](../brand-voice-guidelines.md)).
 - **A comment system on the site.** Discussions link to the forum instead (#161).
 - **Anything nobody has asked for.** New ideas start as GitHub issues and earn a place on the
   [roadmap](roadmap.md).
