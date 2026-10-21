@@ -5,7 +5,7 @@ live status:**
 
 - **Milestones:** dated outcomes.
 - **Epics:** issues labeled `epic`, with their sub-issues.
-- **The project board:** the current sprint (being set up in #90).
+- **[The project board](https://github.com/users/boulaajaj/projects/2):** the current sprint.
 
 This file lists only the milestones and their epics, as a snapshot. GitHub is the source: this
 command prints the open epics by milestone, and the tables below must match it. Update the tables
@@ -35,8 +35,10 @@ The site is useful and inviting enough to promote across the neighborhood.
 
 | Epic                                                                                                                | Why it has no milestone                                                 |
 | ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| [#164](https://github.com/boulaajaj/sprecher-east-neighborhood-website/issues/164) Photo contest                    | Needs the resident-verification decision first (#168).                  |
+| [#164](https://github.com/boulaajaj/sprecher-east-neighborhood-website/issues/164) Photo contest                    | Not scheduled yet. It needs resident sign-up first (#183).              |
 | [#127](https://github.com/boulaajaj/sprecher-east-neighborhood-website/issues/127) Reorganize the code into modules | Under way. Foundation work, done step by step alongside the milestones. |
+| [#181](https://github.com/boulaajaj/sprecher-east-neighborhood-website/issues/181) Keep the site safe and running   | Ongoing upkeep: server, backups and dependencies.                       |
+| [#182](https://github.com/boulaajaj/sprecher-east-neighborhood-website/issues/182) Agents stay inside the rules     | Ongoing: guardrails, lean agent context and review checks.              |
 
 New ideas start as GitHub issues: a new capability as an epic, anything smaller under the epic it
 belongs to. An epic gets a milestone when it's planned.
