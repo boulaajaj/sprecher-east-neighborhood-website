@@ -7,6 +7,9 @@ import type { NextRequest } from 'next/server'
 
 import configPromise from '@payload-config'
 
+import { hasAdminOrEditor } from '@/access/roles'
+import type { User } from '@/payload-types'
+
 export async function GET(req: NextRequest): Promise<Response> {
   const payload = await getPayload({ config: configPromise })
 
@@ -43,12 +46,11 @@ export async function GET(req: NextRequest): Promise<Response> {
 
   const draft = await draftMode()
 
-  if (!user?.user) {
+  // Draft mode makes pages read with access overridden, so only staff may turn it on (#140)
+  if (!hasAdminOrEditor((user?.user ?? null) as User | null)) {
     draft.disable()
     return new Response('You are not allowed to preview this page', { status: 403 })
   }
-
-  // You can add additional checks here to see if the user is allowed to preview this page
 
   draft.enable()
 

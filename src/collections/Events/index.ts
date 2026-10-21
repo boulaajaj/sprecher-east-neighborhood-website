@@ -8,8 +8,7 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { isAdmin, isAdminOrEditor } from '../../access/roles'
-import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
+import { draftContentAccess } from '../../access/draftContentAccess'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { revalidateDelete, revalidateEvent } from './hooks/revalidateEvent'
@@ -23,12 +22,7 @@ import {
 
 export const Events: CollectionConfig<'events'> = {
   slug: 'events',
-  access: {
-    create: isAdminOrEditor,
-    delete: isAdmin,
-    read: authenticatedOrPublished,
-    update: isAdminOrEditor,
-  },
+  access: draftContentAccess,
   defaultPopulate: {
     title: true,
     slug: true,
