@@ -7,7 +7,7 @@ Read this before writing a helper, a component or a query, and when you find a d
 In this order (the [DRY search order](../../../../docs/guidelines/development.md#dry--dont-repeat-yourself)
 covers today's template folders):
 
-1. The module you're in, through its entry files.
+1. The module you're in: all its folders, imported directly.
 2. `src/platform/`: `lib/`, `ui/`, `payload/`, `email/`, `seo/`, `richtext/`.
 3. Template folders that haven't moved yet: `src/utilities/`, `src/components/` (and `ui/`),
    `src/fields/`, `src/access/`, `src/hooks/`.
@@ -27,7 +27,9 @@ Ask, in order:
    the form builder, SEO, search, redirects. The whole manual is at
    https://payloadcms.com/llms-full.txt.
 2. Does Next.js do it? Routing, caching, server actions, metadata, images.
-3. Does a dependency we already have do it? Radix, `cva`, Zod, date utilities.
+3. Does a dependency we already have do it? Radix, `cva`, `clsx` and `tailwind-merge`,
+   `react-hook-form`, `lucide-react`; dates through `src/utilities/timezone.ts` and
+   `formatDateTime.ts`.
 4. Is there an established, maintained library for it? Check downloads, the last release and open
    issues, and run `npm audit` ([security](../../../../docs/guidelines/security.md)).
 

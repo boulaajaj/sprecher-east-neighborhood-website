@@ -59,7 +59,7 @@ It is an unofficial, AI-assisted initiative (ground rules in [`AGENTS.md`](../AG
 
 **Read [`docs/architecture/`](architecture/README.md) before writing code.** It has the
 target structure (one module per business area under `src/modules/`, shared code in
-`src/platform/`, routes only in `src/app/`), the dependency rules, where each kind of code goes,
+`src/platform/`, routes and composition only in `src/app/`), the dependency rules, where each kind of code goes,
 naming [conventions](architecture/conventions.md), the [glossary](architecture/glossary.md),
 the [data model](architecture/data-model.md) and [decision records](architecture/decisions/README.md).
 

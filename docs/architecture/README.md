@@ -16,7 +16,7 @@ data means and how it's shown.
 
 ```mermaid
 flowchart TD
-  app["src/app — routes only<br/>thin pages, route handlers, layouts"]
+  app["src/app — routes and composition only<br/>thin pages, route handlers, layouts"]
   config["payload.config.ts"]
   subgraph modules["src/modules — one folder per business area"]
     events[events]
@@ -133,7 +133,8 @@ What this buys:
    from `data/`, `cms/` or `ui/`; it may use `platform/lib/`.
 2. **Entry files only.** Outside a module, import it only through its entry files: `index.ts` and
    `actions.ts` from `app/`, `server.ts` from server code in `app/`, and `cms.ts` from
-   `payload.config.ts`. `app/` may also import `platform/` directly.
+   `payload.config.ts`. `app/` may also import `platform/` directly. Until an area moves (#127),
+   the template folders may import a module's entry files too.
 3. **No module imports another.** Modules meet only in the composition roots: pages, layouts
    and the block registry in `app/`, and `payload.config.ts`
    ([0008](decisions/0008-compose-modules-at-the-app-level.md)). For example, the post page calls

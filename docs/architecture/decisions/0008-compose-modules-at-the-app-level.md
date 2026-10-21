@@ -10,7 +10,8 @@
 The first version of the map let the `site` module import other modules to build pages, the
 header and the page builder. That makes `site` depend on every area, so removing or replacing an
 area means editing `site`. The owner asked on 2026-10-21 (Claude Code session, text) to "avoid all
-those anti-patterns, like modules referencing other modules", and for code that is "plug and play".
+those anti-patterns, like modules referencing other modules", and for code that is "very easy to
+plug with different themes, and very easy to plug with different CMS systems".
 
 Two widely used references say the same: Bulletproof React composes features "at the application
 level" and forbids cross-feature imports with ESLint, and Feature-Sliced Design lets a slice import
@@ -33,7 +34,7 @@ only from layers strictly below it.
 
 - Any module can be removed or replaced by editing the composition roots only.
 - `site` needs small seams: a renderer that takes a block map, and a Pages collection factory.
-- The boundary lint gets a simpler rule: `modules/*` may import `platform` only.
+- The boundary lint gets a simpler rule: a module may not import another module.
 
 ## Links
 

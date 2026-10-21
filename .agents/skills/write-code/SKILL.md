@@ -20,8 +20,9 @@ Amine, 2026-10-20 and 2026-10-21 (in the Claude Code sessions that planned #127 
 - "we don't want to reinvent the wheel or overengineer"
 - "very manageable, even for a human to browse and understand the structure of the website just
   from the folder structure"
-- Files of about 100 to 250 lines; each rule, component or utility "written and tested once and
-  then used everywhere"; components instead of plain HTML elements.
+- From the epics built on his requests (#127, #163): files of about 100 to 250 lines, each rule
+  and component written and tested once and reused, shared components instead of plain HTML
+  elements.
 
 ## 1. Find what exists first
 
@@ -49,12 +50,12 @@ files, a new feature, a new module: [`references/placement.md`](references/place
 
 ## 3. Keep the dependencies pointing one way
 
-Lint enforces these ([rules](../../../docs/architecture/README.md#dependency-rules)):
+Check these yourself until #130 adds them to lint ([rules](../../../docs/architecture/README.md#dependency-rules)):
 
 - **Inward only:** `ui/` → `use-cases/` → `domain/`; `data/` and `cms/` → `domain/`. The domain
   imports no framework.
-- **No module imports another module.** Two modules meet only where they are composed: a page or
-  the block registry in `src/app/`, or `payload.config.ts` ([0008](../../../docs/architecture/decisions/0008-compose-modules-at-the-app-level.md)).
+- **No module imports another module.** Two modules meet only where they are composed: a page, a
+  layout or the block registry in `src/app/`, or `payload.config.ts` ([0008](../../../docs/architecture/decisions/0008-compose-modules-at-the-app-level.md)).
 - **Entry files only:** code outside a module imports its `index.ts`, `server.ts`, `actions.ts` or
   `cms.ts`, never its inner folders. `src/platform/` imports no module.
 - **Payload at the edges:** runtime Payload imports only in `data/`, `cms/`, `src/platform/` and
