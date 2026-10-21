@@ -59,8 +59,8 @@ It is an unofficial, AI-assisted initiative (ground rules in [`AGENTS.md`](../AG
 
 **Read [`docs/architecture/`](architecture/README.md) before writing code.** It has the
 target structure (one module per business area under `src/modules/`, shared code in
-`src/platform/`, routes and composition only in `src/app/`), the dependency rules, where each kind of code goes,
-naming [conventions](architecture/conventions.md), the [glossary](architecture/glossary.md),
+`src/platform/`, routes and composition only in `src/app/`), the dependency rules, where each kind
+of code goes, naming [conventions](architecture/conventions.md), the [glossary](architecture/glossary.md),
 the [data model](architecture/data-model.md) and [decision records](architecture/decisions/README.md).
 
 The code is moving to that structure in small steps (#127). Until an area has moved, it is still in
@@ -106,6 +106,7 @@ src/
 | `src/Header/`                     | Header global component                           |
 | `src/Footer/`                     | Footer global component                           |
 | `ecosystem.config.cjs`            | PM2 config for VPS (CommonJS: package is ESM)     |
+| `eslint.boundaries.config.mjs`    | Dependency rules as lint (warnings until #137)    |
 
 ## Design Tokens
 
@@ -160,7 +161,8 @@ System-level env vars (not in .env.local):
 - **`defaultSort`**: Must be on collection root, NOT inside `admin: {}`
 - **`npx payload run` broken on Node v24**: Use direct node scripts instead
 - **`graphql` package**: Must install separately from `@payloadcms/graphql`
-- **`overrideAccess: true`**: Only in server-side Payload reads — never expose to client
+- **`overrideAccess`**: Set it on every Local API call: `false` for what a visitor may see, `true` only where access must be bypassed, with a comment saying why. The seed's writes don't set it yet (#135)
+- **`server-only`**: Server code outside the CMS config that queries Payload or reads cookies (utilities, `data/`, `use-cases/`, `server.ts`) starts with `import 'server-only'`, so a client component importing it fails the build. Collections, hooks and plugins never import it: the Payload CLI (`migrate`, seed) loads them outside Next.js, where it throws. Hooks use the `req.payload` they are given
 - **Live Preview**: Uses `window.postMessage` — component must use `useLivePreview()` hook
 - **Draft Preview**: Requires `PREVIEW_SECRET` env var for signed preview URLs
 - **Timezone**: Configured via `SITE_TIMEZONE` env var (default: `America/Chicago`). Use `startOfToday()` and `SITE_TIMEZONE` from `src/utilities/timezone.ts`. Never hardcode timezone strings or use bare `new Date().setHours(0,0,0,0)`. Day-only dates (midnight UTC) must be formatted with `timeZone: 'UTC'` to avoid off-by-one; `formatDateTime()` handles this automatically.

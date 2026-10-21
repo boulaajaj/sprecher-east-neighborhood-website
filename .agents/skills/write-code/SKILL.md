@@ -20,7 +20,7 @@ Amine, 2026-10-20 and 2026-10-21 (in the Claude Code sessions that planned #127 
 - "we don't want to reinvent the wheel or overengineer"
 - "very manageable, even for a human to browse and understand the structure of the website just
   from the folder structure"
-- From the epics built on his requests (#127, #163): files of about 100 to 250 lines, each rule
+- From the epics built on his requests (#127, #163): files under 250 lines, each rule
   and component written and tested once and reused, shared components instead of plain HTML
   elements.
 
@@ -50,7 +50,9 @@ files, a new feature, a new module: [`references/placement.md`](references/place
 
 ## 3. Keep the dependencies pointing one way
 
-Check these yourself until #130 adds them to lint ([rules](../../../docs/architecture/README.md#dependency-rules)):
+Lint warns on the first four ([`eslint.boundaries.config.mjs`](../../../eslint.boundaries.config.mjs); errors from
+#137). Check `overrideAccess`, DTOs, `server-only` and colors yourself; #146 adds a color check
+([rules](../../../docs/architecture/README.md#dependency-rules)):
 
 - **Inward only:** `ui/` → `use-cases/` → `domain/`; `data/` and `cms/` → `domain/`. The domain
   imports no framework.

@@ -14,6 +14,8 @@ export default defineConfig({
       // Same aliases as tsconfig.json. A string key matches "@" or "@/…", not "@payloadcms/…".
       '@': path.join(root, 'src'),
       '@payload-config': path.join(root, 'src/payload.config.ts'),
+      // 'server-only' throws outside Next.js; tests load its empty build
+      'server-only': path.join(root, 'node_modules/server-only/empty.js'),
     },
   },
   test: {

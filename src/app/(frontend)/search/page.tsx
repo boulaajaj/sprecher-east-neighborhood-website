@@ -29,6 +29,7 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
     },
     // pagination: false reduces overhead if you don't need totalDocs
     pagination: false,
+    overrideAccess: false,
     ...(query
       ? {
           where: {
