@@ -8,9 +8,9 @@ In short:
    area, and priority labels.
 2. **Open a pull request** from a branch. It links the issue (`Closes #123`) and fills in the
    template: what changed, why, how, how to test, and risk & rollback.
-3. **Get it reviewed.** An independent reviewer posts a review, and the owner approves.
+3. **Get it reviewed.** An independent reviewer posts a review that ends with "Ready to merge".
 4. **All checks green.** Type-check & Build, Prettier, ESLint, Dependency Audit, PR Policy.
-5. **The owner merges**, and GitHub Actions deploys `main` to production.
+5. **Merge** (squash, with every rule enforced). GitHub Actions then deploys `main` to production.
 
 Nobody changes code directly on the server. Step-by-step instructions are in
 [`.agents/skills/change-workflow/SKILL.md`](.agents/skills/change-workflow/SKILL.md).

@@ -13,7 +13,7 @@ which module owns it).
 | Editor   | A signed-in account with the `editor` role: creates and edits content, opens `/admin`.                                 | same                                        |
 | Admin    | A signed-in account with the `admin` role: everything, including users, roles and deletes.                             | same                                        |
 | Staff    | Admins and editors together (`hasAdminOrEditor`). Staff skip the form rate limit and robot check.                      | same                                        |
-| Owner    | The person who approves changes by merging pull requests (see `AGENTS.md`).                                            | n/a                                         |
+| Owner    | The repo owner. Decides policy and `needs owner` items, and can merge or revert anything (`AGENTS.md`).                | n/a                                         |
 
 ## Content states
 

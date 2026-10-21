@@ -1,6 +1,6 @@
 ---
 name: stacked-prs
-description: Put pull requests that depend on each other on a native GitHub stack, so GitHub enforces the order they merge in — build the branches, create or extend the stack, keep it current when a lower PR changes, and hand it over. Use whenever a change depends on another open PR, when adding a PR on top of an existing stack, or when a PR in a stack has to change.
+description: Put pull requests that depend on each other on a native GitHub stack, so GitHub enforces the order they merge in — build the branches, create or extend the stack, keep it current when a lower PR changes, and merge it one layer at a time. Use whenever a change depends on another open PR, when adding a PR on top of an existing stack, or when a PR in a stack has to change.
 ---
 
 # Stacked pull requests
@@ -90,7 +90,7 @@ diff (GitHub also shows the stack in the PR's merge box):
 
 ```markdown
 > **Layer <n> of native GitHub stack #<stack>.** It sits on #<PR below> (`<branch below>`).
-> Merging it also merges every PR below it; GitHub enforces the order.
+> Layers merge one at a time from the bottom; GitHub enforces the order.
 ```
 
 The bottom PR says it sits on `main`. Don't list the whole stack or its size in the line: GitHub
@@ -119,21 +119,28 @@ from the bottom up. Fix a finding in the layer it belongs to, never in a higher 
      <branch k> <branch k+1> …
    ```
 
+6. Ask for a new review of every layer above _k_, even when its own diff didn't change: the code
+   under it did ([`AGENTS.md`](../../../AGENTS.md) step 5). It can be short, checking the layer
+   against what changed below.
+
 `gh stack rebase --upstack` (from layer _k_) does step 3 for the layers above it, and
 `gh stack push` pushes them, but that push is **not atomic**: some branches can update while
 another is rejected. Use the `git push --atomic` above when that matters. The PR page on GitHub
 can also run the cascading rebase on the server when there are no conflicts.
 
-After the owner merges part of a stack, GitHub rebases the PRs left above it. Before working on
+After part of a stack merges, GitHub rebases the PRs left above it. Before working on
 one of them again, reset your local copy to GitHub's: `git fetch origin` then
 `git switch -C <branch> origin/<branch>` (only when you have no unpushed work on it).
 
-## 5. Review and hand-off
+## 5. Review and merge
 
 - Each layer gets its own independent review ([`pr-review`](../pr-review/SKILL.md)) and must pass
   every check on its own.
-- When the stack is ready, tell the owner which PR to merge: the top PR merges the whole stack,
-  or a lower one merges only up to it. Agents never merge ([`AGENTS.md`](../../../AGENTS.md)).
+- Merge one layer at a time, from the bottom, with the asynchronous merge API and every rule
+  enforced ([`change-workflow`](../change-workflow/SKILL.md), step 6). After each merge, GitHub
+  retargets the next layer to `main` and rebases it. Wait for its checks on the new head, and for
+  the previous deploy if that merge started one, before merging it. Merging a higher PR would merge
+  everything below it in one go, which skips those checks between layers.
 - To restructure a stack (reorder, drop or insert a layer), use `gh stack modify`; it keeps the
   stack. Without the extension, dissolve it with
   `gh api -X POST repos/{owner}/{repo}/stacks/<stack>/unstack -H "$H"`, which removes the

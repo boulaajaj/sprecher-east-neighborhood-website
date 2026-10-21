@@ -36,7 +36,7 @@ jobs:
           script: |
             const pr = context.payload.pull_request;
             if (pr.user.login === 'dependabot[bot]') {
-              core.info('Dependabot PR: exempt from the issue/description rules (AGENTS.md). Checks and owner merge still apply.');
+              core.info('Dependabot PR: exempt from the issue/description rules (AGENTS.md). Checks and review still apply.');
               return;
             }
 

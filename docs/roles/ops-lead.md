@@ -21,7 +21,7 @@ Before every deployment:
 - [ ] All CI checks pass (type-check, build, CodeQL, dependency audit)
 - [ ] No high/critical npm vulnerabilities in production deps
 - [ ] No secrets in the diff
-- [ ] PR is approved and reviewed
+- [ ] The independent review says **Ready to merge**
 - [ ] VPS snapshot taken (if significant changes)
 
 After deployment:
@@ -67,7 +67,7 @@ All environment variables are listed in [`docs/project.md`](../project.md).
 
 - Follow `AGENTS.md` and `.agents/skills/change-workflow/SKILL.md`: issue, branch
   (`agent/<role-tag>/<issue>-<description>`), PR from the template, independent review,
-  checks green, owner merges (squash), deploy runs automatically
+  checks green, merge (squash, rules enforced), deploy runs automatically
 - Server, env, DNS, and dashboard changes need an `infra` issue first, and code is never
   edited on the server
 

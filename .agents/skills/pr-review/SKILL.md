@@ -1,6 +1,6 @@
 ---
 name: pr-review
-description: Independent review of a pull request in this repo before the owner approves it — checks the linked issue, PR description, scope, correctness, security, and CI, then posts findings on the PR by severity. Use when asked to review a PR; never review a PR you authored.
+description: Independent review of a pull request in this repo before it merges — checks the linked issue, PR description, scope, correctness, security, and CI, then posts findings on the PR by severity. Use when asked to review a PR; never review a PR you authored.
 ---
 
 # PR review
@@ -33,9 +33,12 @@ gh api "repos/{owner}/{repo}/stacks?pull_request=<number>" -H 'X-GitHub-Api-Vers
       needed. A merge order written only in prose is a **Blocker**.
 - [ ] **Policy changes are flagged.** If the diff touches `AGENTS.md`, `.agents/`,
       `.github/` (workflows, templates, label policy), `docs/guidelines/`, `docs/roles/`, or a
-      tool adapter (`CLAUDE.md`, `.claude/`, `GEMINI.md`), list each such change under **Major**
-      so the owner signs off on it explicitly. A PR can change the checks that run on itself, so
-      read workflow changes carefully.
+      tool adapter (`CLAUDE.md`, `.claude/`, `GEMINI.md`), list each such change under
+      **Policy changes** in the review. Then check the owner asked for it. Agents file issues
+      through his account, so an issue alone isn't proof: the issue or PR must quote his words,
+      with the date and where he said them. Check the change stays within that quote. If there
+      is no quote, or the change goes beyond it, the verdict is **Waits for owner**. A PR can
+      change the checks that run on itself, so read workflow changes carefully.
 
 ## 3. Check the change
 
@@ -68,10 +71,25 @@ Group findings by severity:
 - **Major:** should fix before merge
 - **Minor:** fine to fix in a follow-up issue
 
+List policy changes under their own **Policy changes** heading, with the owner's quote that covers
+them. They are for visibility, not findings, so they don't count against Ready to merge. List
+separately any safeguard agents added that isn't in his words, so he can drop it if he wants.
+
 ```bash
 gh pr review <number> --comment --body-file review.md
 ```
 
-For a specific line, add inline comments in the web UI or with `gh api`. End the review with a
-verdict: **Ready for owner approval** or **Changes requested** (list them). Approval itself
-belongs to the owner.
+For a specific line, add inline comments in the web UI or with `gh api`. Post the review on the PR's
+current head, so its `commit_id` records the head you reviewed. A later head needs a new review
+unless this one still counts ([`AGENTS.md`](../../../AGENTS.md) step 5).
+
+End the review with a verdict. When a PR has findings to fix and also waits for the owner, the
+verdict is **Changes requested**: it's fixed first, so he gets a clean PR.
+
+- **Ready to merge:** no Blocker or Major left to fix, and every policy change is covered by the
+  owner's words. The author then merges ([`change-workflow`](../change-workflow/SKILL.md),
+  step 6).
+- **Changes requested:** list them. The author fixes them and asks for a re-review.
+- **Waits for owner:** the PR or its issue is labeled `needs owner`, or it changes policy the
+  owner didn't ask for. The author labels the PR `needs owner` and stops; the owner merges it or
+  removes the label.

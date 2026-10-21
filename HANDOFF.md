@@ -6,7 +6,7 @@ VPS at https://sprechereast.com.
 
 For current information, read:
 
-- [`AGENTS.md`](AGENTS.md): how changes are made (issue → PR → review → owner merges).
+- [`AGENTS.md`](AGENTS.md): how changes are made (issue → PR → review → green checks → merge).
 - [`docs/project.md`](docs/project.md): stack, hosting, env vars, local setup.
 - [`docs/architecture/`](docs/architecture/README.md): how the code is organized and where new code goes.
 

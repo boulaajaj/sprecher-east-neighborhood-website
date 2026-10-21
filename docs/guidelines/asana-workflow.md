@@ -148,7 +148,7 @@ If a session produces multiple fixes, create multiple tasks and multiple PRs. Sp
 
 ## Post-Merge Checklist
 
-When the owner says the PRs are merged, follow the
+After a merge (yours or anyone's), follow the
 [`wrapped`](../../.agents/skills/wrapped/SKILL.md) skill. Its Asana step completes the linked task.
 
 ## Integration Notes
