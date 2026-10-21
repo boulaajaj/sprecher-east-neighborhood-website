@@ -12,7 +12,7 @@ Collection configs live in `src/collections/`. Every collection with public cont
 - `defaultPopulate` to limit fields returned in relationship queries (e.g., `{ title: true, slug: true }`)
 - `hooks.afterChange` for revalidation (pattern: check `context.disableRevalidate` guard first)
 
-Slug fields use the shared `slugField()` helper from `src/fields/slug.ts`.
+Slug fields use Payload's built-in `slugField()` (`import { slugField } from 'payload'`).
 
 ## Blocks
 
@@ -23,7 +23,7 @@ Each block in `src/blocks/` has two files:
 
 **IMPORTANT**: Adding a new block requires TWO registration steps:
 
-1. Add the block config to `Pages.ts` layout field's `blocks` array
+1. Add the block config to the `blocks` array of the layout field in `src/collections/Pages/index.ts`
 2. Add the component to the `blockComponents` map in `src/blocks/RenderBlocks.tsx`
 
 Missing either step will silently fail — the block won't render.
@@ -34,11 +34,11 @@ Existing blocks: `archive`, `content`, `cta`, `formBlock`, `mediaBlock`, `banner
 
 Hero components live in `src/heros/`. Four types: `highImpact`, `mediumImpact`, `lowImpact`, `none`.
 
-`src/heros/RenderHero.tsx` maps the `type` field to the correct component. Hero config fields are defined in `src/fields/hero.ts` as a reusable field group.
+`src/heros/RenderHero.tsx` maps the `type` field to the correct component. Hero config fields are defined in `src/heros/config.ts` as a reusable field group.
 
 **Two kinds of hero components:**
 
-- **CMS heroes** (`HighImpact`, `MediumImpact`, `LowImpact`) — registered in `src/fields/hero.ts` type selector and wired through `RenderHero.tsx`. Used by Pages via the layout builder.
+- **CMS heroes** (`HighImpact`, `MediumImpact`, `LowImpact`) — registered in the `src/heros/config.ts` type selector and wired through `RenderHero.tsx`. Used by Pages via the layout builder.
 - **Standalone heroes** (`PostHero`, `EventHero`) — used directly by their detail pages, NOT registered in the CMS hero config. These are hardcoded per-collection detail pages and don't need CMS selection.
 
 ## Hooks
@@ -63,8 +63,6 @@ Reusable field helpers in `src/fields/`:
 - `link.ts` — `link()` creates a group field with `type` (reference/custom), `label`, `url`, `reference`, `newTab`, `appearance`
 - `linkGroup.ts` — `linkGroup()` creates an array of link fields
 - `defaultLexical.ts` — Standard Lexical editor config with toolbar features
-- `slug.ts` — `slugField()` creates auto-generated slug from title
-- `hero.ts` — Hero field group (type selector + media + richText + links)
 
 ## SEO Plugin Type Gap
 

@@ -33,7 +33,7 @@ You are the Operations Lead for Sprecher East. You keep the lights on. The websi
 
 - Reverse proxy: port 80/443 → 3000
 - Config: `/etc/caddy/Caddyfile`
-- Live domains: `sprecher-east.org` + `www.sprecher-east.org` (HTTPS) + IP `:80` (HTTP)
+- Live domains: `sprechereast.com` (HTTPS), `www.sprechereast.com` (redirects to it), IP `:80` (HTTP)
 - **CRITICAL RULES**:
   - NEVER overwrite Caddyfile — always read first, then append
   - Always backup: `cp /etc/caddy/Caddyfile /etc/caddy/Caddyfile.bak`
@@ -82,9 +82,7 @@ After deployment:
 - `PAYLOAD_SECRET` — JWT signing for Payload auth (32+ random chars)
 - `DATABASE_URI` — `file:./data/payload.db`
 - `NEXT_PUBLIC_SERVER_URL` — production URL or localhost
-- `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — for payload-oauth2 Google provider
 - `PREVIEW_SECRET` — Draft preview URL signing
-- Future: Facebook, Apple, Twitter OAuth credentials when providers are enabled
 
 ## Monitoring
 

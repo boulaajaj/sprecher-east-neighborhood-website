@@ -85,5 +85,8 @@ These follow the open Agent Skills format (`SKILL.md`), so any agent can read an
 
 ## Project context
 
-Stack, architecture, conventions, and hosting details are in `CLAUDE.md` and `.claude/rules/`.
+Before writing code, read [`docs/architecture/`](docs/architecture/README.md): where each kind of
+code goes, the dependency rules, naming, and the decisions behind them.
+
+Stack, conventions, and hosting details are in `CLAUDE.md` and `.claude/rules/`.
 Despite the folder name, those apply to every agent and human, not just Claude.
