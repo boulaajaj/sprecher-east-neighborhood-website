@@ -26,7 +26,12 @@ The owner decided on 2026-10-21 (quoted on #168):
 How it's built safely (the agents' design, following [0003](0003-turnstile-robot-check.md) and
 [0004](0004-email-through-smtp.md)):
 
-- No account exists until the link is clicked. The link is single-use and expires.
+- Nobody can sign in until the link is clicked. The link is single-use and expires. This reads
+  "once they confirm it, we should create an account" as: the account is usable only after the
+  click, even if the unconfirmed sign-up is stored before it.
+- Framework first: #183 uses Payload's built-in email verification (`auth.verify`, with its hooks
+  for the email's subject and HTML) if it meets these rules. If it doesn't, #183 records why. If
+  Payload's link doesn't expire, adding an expiry is the fix, not a reason for custom tokens.
 - The account's role is always `resident`. The role field stays admin-only
   (`src/access/roles.ts`), and a test fails if sign-up can produce any other role.
 - The email has fixed text, goes to the one validated address the person typed, and is sent by the
@@ -41,6 +46,10 @@ How it's built safely (the agents' design, following [0003](0003-turnstile-robot
   is weaker than with a phone code. A phone check can be added later if that matters.
 - Sign-up depends on email delivery (Mailgun). A failed send must say so, not pretend it worked.
 - Fixing edit locks (#147) comes first, because residents will have accounts.
+- Addresses that never confirm are personal data, so unconfirmed sign-ups are deleted after a set
+  time.
+- The contact form still sends visitors nothing. Form-builder emails keep 0004's rule, so a
+  confirmation for people who write in needs its own design later.
 
 ## Links
 
