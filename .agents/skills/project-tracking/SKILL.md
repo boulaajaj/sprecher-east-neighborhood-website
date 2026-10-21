@@ -31,9 +31,9 @@ issue is **Ready**:
 - it isn't labeled `needs owner`
 - no open PR already closes it (the list in §2 step 3)
 
-Cloud sessions can't read the board, so they skip the size check and say so in a comment on the
-issue. If the issue isn't Ready, make it Ready (add what's missing) or pick another one. Read the
-parent epic too: it says what the issue is part of.
+When the board can't be read (cloud sessions, or until #90 is done), skip the size check and say so
+in a comment on the issue. If the issue isn't Ready, make it Ready (add what's missing) or pick
+another one. Read the parent epic too: it says what the issue is part of.
 
 ## 2. "What's next?"
 
@@ -119,8 +119,9 @@ parent epic too: it says what the issue is part of.
 - New work found along the way becomes a new issue (§3). Don't widen the current PR.
 - On the owner's computer, move the board's **Status** (`In progress`, `In review`) with
   `gh project item-edit`. It needs the item, project, field and option IDs: get them from
-  `gh project item-list <project-number> --owner boulaajaj --format json` and
-  `gh project field-list <project-number> --owner boulaajaj --format json`. Closing an issue or
+  `gh project item-list <project-number> --owner boulaajaj --format json`,
+  `gh project field-list <project-number> --owner boulaajaj --format json` and
+  `gh project view <project-number> --owner boulaajaj --format json -q .id`. Closing an issue or
   merging a PR moves the item to Done on its own. In cloud sessions, leave the board to its
   automations.
 

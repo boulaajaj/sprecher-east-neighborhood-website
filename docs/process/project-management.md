@@ -85,8 +85,9 @@ An issue is **Ready** when it has:
 
 - what and why, in plain language
 - acceptance criteria someone else could check
-- a parent epic, labels (type, area, priority) and a size. Cloud sessions can't read Size; they
-  say so on the issue ([`project-tracking`](../../.agents/skills/project-tracking/SKILL.md) §1)
+- a parent epic, labels (type, area, priority) and a size. When the board can't be read (cloud
+  sessions, or until #90 is done), skip Size and say so on the issue
+  ([`project-tracking`](../../.agents/skills/project-tracking/SKILL.md) §1)
 - no open blocker: nothing it's **blocked by** is still open
 - no `needs owner` label: that work waits for the owner, not for a sprint
 
