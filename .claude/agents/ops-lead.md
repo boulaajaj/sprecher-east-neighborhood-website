@@ -25,7 +25,7 @@ You are the Operations Lead for Sprecher East. You keep the lights on. The websi
 
 - Process name: `sprecher-east`
 - Port: 3000
-- Config: `ecosystem.config.js`
+- Config: `ecosystem.config.cjs` (CommonJS, because `package.json` is `"type": "module"`)
 - Commands: `pm2 reload sprecher-east`, `pm2 logs sprecher-east`
 - Auto-restart on crash enabled
 

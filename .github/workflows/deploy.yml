@@ -26,6 +26,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      # The ops scripts print `::notice` / `::warning` lines, which GitHub shows as annotations on
+      # this run, whether the deploy succeeds or fails (ops/lib.sh).
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.5
         with:
@@ -48,13 +50,30 @@ jobs:
             echo "→ Ensuring data directory..."
             mkdir -p data
 
+            echo "→ Backing up data before migrations (#148)..."
+            bash ops/backup.sh pre-deploy
+
+            echo "→ Installing the daily backup job (#148)..."
+            bash ops/install-cron.sh
+
             echo "→ Running database migrations..."
             npx payload migrate
 
             echo "→ Building..."
             npm run build
 
-            echo "→ Restarting app..."
-            pm2 reload sprecher-east --update-env
+            echo "→ Restarting app (listens on 127.0.0.1:3000 only, #118)..."
+            bash ops/restart-app.sh
 
+            echo "::notice title=Server::disk $(df -h / | awk 'NR == 2 { print $4 " free of " $2 }'), database $(du -h data/payload.db | cut -f1), media $(du -sh public/media 2>/dev/null | cut -f1), page cache $(du -sh .next/server 2>/dev/null | cut -f1)"
             echo "✓ Deploy complete."
+
+      - name: Check that port 3000 is closed to the internet (#118)
+        env:
+          HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          if timeout 5 bash -c "exec 3<>/dev/tcp/$HOST/3000" 2>/dev/null; then
+            echo "::warning title=Port 3000::reachable from the internet"
+          else
+            echo "::notice title=Port 3000::not reachable from the internet"
+          fi
