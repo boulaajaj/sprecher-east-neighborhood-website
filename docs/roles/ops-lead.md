@@ -21,7 +21,7 @@ Before every deployment:
 - [ ] All CI checks pass (type-check, build, CodeQL, dependency audit)
 - [ ] No high/critical npm vulnerabilities in production deps
 - [ ] No secrets in the diff
-- [ ] PR is approved and reviewed
+- [ ] The independent review says **Ready to merge**
 - [ ] VPS snapshot taken (if significant changes)
 
 After deployment:

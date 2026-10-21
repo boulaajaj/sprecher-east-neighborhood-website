@@ -97,14 +97,14 @@ Open it as a draft (`--draft`) while work is incomplete.
    - Check failed → fix, push, then wait again.
    - Review comments → fix or explain. Reply on each thread saying what you did, then
      resolve it. Never leave a conversation unresolved.
-4. **Ready:** every required check passes on the current head, a review of that head (its
-   `commit_id`) says **Ready to merge**, and its findings are addressed with every conversation
-   resolved. A review of an earlier head still counts when the only change since is a rebase that
-   leaves the PR's own diff the same (a stack layer after the one below merged). Note the head SHA
-   and go to step 6. Exceptions that wait for the
-   owner: an issue or PR labeled `needs owner`, and a policy change he didn't ask for
-   ([`AGENTS.md`](../../../AGENTS.md) step 3). For those, label the PR `needs owner` and stop;
-   he merges it or removes the label.
+4. **Ready:** every required check passes on the current head, and a review says **Ready to merge**
+   for that head (its `commit_id`) or for an earlier head that still counts
+   ([`AGENTS.md`](../../../AGENTS.md) step 5). Every finding is addressed and every conversation
+   resolved. To check that the PR's own diff is unchanged since the review, run
+   `git range-diff <old base>..<reviewed head> <new base>..<current head>`; it should show only `=`
+   lines. Unless the PR waits for the owner (an issue or PR labeled `needs owner`, or a policy
+   change he didn't ask for, `AGENTS.md` step 3), note the head SHA and go to step 6. If it waits
+   for him, label the PR `needs owner` and stop; he merges it or removes the label.
 5. **A PR below yours changed** (stacked PRs): rebase yours onto it and push, as in
    [`stacked-prs`](../stacked-prs/SKILL.md) step 4.
 
@@ -126,8 +126,9 @@ gh api repos/{owner}/{repo}/pulls/<number>/merge-async/<uuid> -H "$H"
 A `409` means a merge of this PR is already running: poll it instead of starting another. A
 `200` means it was already merged.
 
-- Never merge with `--admin`, `bypass_rules=true` or any other bypass. If GitHub refuses, read
-  its message, fix the cause, and try again.
+- Never merge with `--admin`, `bypass_rules=true` or any other bypass. If GitHub refuses, read its
+  message and fix the cause. If the head moved since step 5.4, go back to step 5.4: the new head
+  needs green checks and a review that counts before you merge it.
 - **A stack merges one layer at a time, from the bottom.** Merge the lowest open layer. GitHub
   then retargets the next layer to `main` and rebases it. Wait for that layer's checks on its new
   head, and, if the previous merge started a deploy, for it to succeed, before merging it.

@@ -65,21 +65,25 @@ Merging code changes to `main` deploys them to production automatically
 
 5. **Merge, then CI/CD takes over.** The agent that owns the PR merges it (squash merge) once steps
    3 and 4 are done: every required check passes on the PR's current head, the review of that head
-   says **Ready to merge**, and no conversation is open. (A review of an earlier head still counts
-   when the only change since is a rebase that leaves the PR's own diff the same.) The owner
+   says **Ready to merge**, and no conversation is open. A review of an earlier head still counts
+   only when the head changed because a PR below it merged (or `main` moved) and the PR's own diff
+   is unchanged. If a PR below changed after the review, this PR needs a new review even when its
+   own diff didn't change; it can be short, checking this PR against what changed below. The owner
    doesn't need to be involved, but he can merge, hold or revert anything himself. A PR labeled
    `needs owner`, or one whose issue is, waits for him: he merges it or removes the label. A stack
    merges one layer at a time from the bottom. Before the next layer, wait for its checks on its
    rebased head and, if the merge started a deploy, for the deploy to succeed
-   ([`change-workflow`](.agents/skills/change-workflow/SKILL.md), step 6). The deploy workflow
-   ships `main` to the VPS. After the merge, the linked issue is closed and gets a comment
-   summarizing how it was fixed (`.github/workflows/issue-fix-summary.yml`).
+   ([`change-workflow`](.agents/skills/change-workflow/SKILL.md), step 6). The deploy workflow ships
+   `main` to the VPS. After the merge, the linked issue is closed and gets a comment summarizing how
+   it was fixed (`.github/workflows/issue-fix-summary.yml`).
 
 ### Never
 
 - Never push to `main` directly, and never merge a PR whose checks or review aren't done.
 - Never bypass a rule: no `--admin`, no `bypass_rules: true`, no other ruleset bypass, even when
   the account you're using has admin rights.
+- Never remove the `needs owner` label yourself. If you find the owner's words later, quote them on
+  the PR and leave the label for him.
 - **Never change code on the server.** No editing files in `/var/www/sprecher-east`, no
   `git apply` or hotfixes over SSH. If production is broken, fix or revert through a PR.
 - Never commit secrets (`.env.local`, keys, tokens, passwords).

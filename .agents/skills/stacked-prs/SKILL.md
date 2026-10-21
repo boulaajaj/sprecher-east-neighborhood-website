@@ -119,6 +119,10 @@ from the bottom up. Fix a finding in the layer it belongs to, never in a higher 
      <branch k> <branch k+1> …
    ```
 
+6. Ask for a new review of every layer above _k_, even when its own diff didn't change: the code
+   under it did ([`AGENTS.md`](../../../AGENTS.md) step 5). It can be short, checking the layer
+   against what changed below.
+
 `gh stack rebase --upstack` (from layer _k_) does step 3 for the layers above it, and
 `gh stack push` pushes them, but that push is **not atomic**: some branches can update while
 another is rejected. Use the `git push --atomic` above when that matters. The PR page on GitHub
@@ -135,8 +139,8 @@ one of them again, reset your local copy to GitHub's: `git fetch origin` then
 - Merge one layer at a time, from the bottom, with the asynchronous merge API and every rule
   enforced ([`change-workflow`](../change-workflow/SKILL.md), step 6). After each merge, GitHub
   retargets the next layer to `main` and rebases it. Wait for its checks on the new head, and for
-  the previous deploy if that merge started one, before merging it. Merging a higher PR would merge everything below it in
-  one go, which skips those checks between layers.
+  the previous deploy if that merge started one, before merging it. Merging a higher PR would merge
+  everything below it in one go, which skips those checks between layers.
 - To restructure a stack (reorder, drop or insert a layer), use `gh stack modify`; it keeps the
   stack. Without the extension, dissolve it with
   `gh api -X POST repos/{owner}/{repo}/stacks/<stack>/unstack -H "$H"`, which removes the

@@ -71,19 +71,20 @@ Group findings by severity:
 - **Major:** should fix before merge
 - **Minor:** fine to fix in a follow-up issue
 
-List policy changes under their own **Policy changes** heading, with the owner's quote that
-covers them. They are for visibility, not findings, so they don't count against Ready to merge.
+List policy changes under their own **Policy changes** heading, with the owner's quote that covers
+them. They are for visibility, not findings, so they don't count against Ready to merge. List
+separately any safeguard agents added that isn't in his words, so he can drop it if he wants.
 
 ```bash
 gh pr review <number> --comment --body-file review.md
 ```
 
-For a specific line, add inline comments in the web UI or with `gh api`. End the review with a
-verdict:
+For a specific line, add inline comments in the web UI or with `gh api`. Post the review on the PR's
+current head, so its `commit_id` records the head you reviewed. A later head needs a new review
+unless this one still counts ([`AGENTS.md`](../../../AGENTS.md) step 5).
 
-Post the review on the PR's current head, so its `commit_id` records the head you reviewed. A
-later push that changes the PR's own diff needs a new review; a rebase that leaves it the same
-doesn't.
+End the review with a verdict. When a PR has findings to fix and also waits for the owner, the
+verdict is **Changes requested**: it's fixed first, so he gets a clean PR.
 
 - **Ready to merge:** no Blocker or Major left to fix, and every policy change is covered by the
   owner's words. The author then merges ([`change-workflow`](../change-workflow/SKILL.md),
