@@ -128,9 +128,6 @@ What this buys:
 
 ## Dependency rules
 
-[`eslint.boundaries.mjs`](../../eslint.boundaries.mjs) checks the imports these rules forbid, as warnings
-until #137 makes them errors.
-
 1. **Inward only.** Presentation (`ui/`, `app/`) → application (`use-cases/`, `actions.ts`) →
    domain, and adapters (`data/`, `cms/`) → domain. `domain/` imports no framework and nothing
    from `data/`, `cms/` or `ui/`; it may use `platform/lib/`.
@@ -171,11 +168,12 @@ until #137 makes them errors.
    [frontend patterns](../guidelines/frontend-patterns/README.md) use raw `white` or `black`
    anywhere but text and overlays on photos, this rule wins until #146 updates them.
 
-How they are checked, from #130 on (warnings until #137): rules 1–3, 5 and 6 and the type part of
-8 by ESLint (`eslint-plugin-boundaries`, `no-restricted-imports`); rule 4 by `server-only` at
-build time plus a boundaries rule for `cms/`; rule 7 by a lint check for Local API calls
-without `overrideAccess` (#145) and review; rule 9 by lint and the theme test (#146). Vitest
-aliases `server-only` to an empty module so `data/` mappers can be unit-tested.
+How they are checked (warnings until #137): [`eslint.boundaries.mjs`](../../eslint.boundaries.mjs)
+checks the imports in rules 1–3 and 6 and the `cms/` part of rule 4. For the rest of rule 4,
+`server-only` fails the build when browser code imports server code, and CI's `payload migrate`
+fails when the CMS config reaches it. Review covers rules 5, 7 and 8 until a lint check for
+`overrideAccess` exists (#145); rule 9 comes with lint and the theme test (#146). Vitest aliases
+`server-only` to an empty module so `data/` mappers can be unit-tested.
 
 ## Where does it go?
 

@@ -14,7 +14,9 @@ async function getGlobal(slug: Global, depth = 0) {
   const global = await payload.findGlobal({
     slug,
     depth,
-    overrideAccess: false,
+    // Keeps today's behavior: nav links populate whether or not their page is published yet, since
+    // nothing revalidates the header or footer when a page is published
+    overrideAccess: true,
   })
 
   return global

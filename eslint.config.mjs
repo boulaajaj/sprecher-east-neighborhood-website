@@ -34,6 +34,7 @@ export default [
       'src/migrations/**',
       'src/endpoints/seed/**',
       '.eslintcache',
+      '.claude/**',
     ],
   },
 
@@ -65,6 +66,8 @@ export default [
         'error',
         { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
       ],
+      // `import { type A }` alone becomes `import type { A }`, so lint and bundlers see no runtime import
+      '@typescript-eslint/no-import-type-side-effects': 'error',
 
       // ── React best practices ──────────────────────────────────────────────
       'react/self-closing-comp': 'error',

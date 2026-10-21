@@ -1,5 +1,4 @@
 import type React from 'react'
-import type { Page, Post } from '@/payload-types'
 
 import { getCachedDocument } from '@/utilities/getDocument'
 import { getCachedRedirects } from '@/utilities/getRedirects'
@@ -26,8 +25,7 @@ export const PayloadRedirects: React.FC<Props> = async ({ disableNotFound, url }
 
     // An unpopulated reference is an ID: look it up as a visitor would (null for a draft)
     if (typeof reference?.value === 'number') {
-      const found = await getCachedDocument(reference.relationTo, reference.value)()
-      target = found as Page | Post | null
+      target = await getCachedDocument(reference.relationTo, reference.value)()
     }
 
     if (reference && target?.slug) {

@@ -78,6 +78,11 @@ const LAYER_LIMITS = [
     ['{use-cases,data,ui}/**', '{index,server,actions}.ts'],
     'cms.ts exports cms/ and domain/ only',
   ],
+  [
+    'actions.ts',
+    ['{cms,ui}/**', '{index,server,cms}.ts'],
+    'actions.ts calls use cases, not ui/ or cms/',
+  ],
 ]
 
 const rule = (number) => `docs/architecture/README.md rule ${number}`
@@ -96,7 +101,11 @@ export const boundariesConfig = {
         partialMatch: false,
       },
     ],
-    'boundaries/files': [{ pattern: STILL_QUERYING_PAYLOAD, category: 'still-querying-payload' }],
+    'boundaries/files': [
+      // Root files (payload.config.ts, middleware.ts) belong to no element; this makes them checked
+      { pattern: 'src/*.ts', category: 'root' },
+      { pattern: STILL_QUERYING_PAYLOAD, category: 'still-querying-payload' },
+    ],
   },
   rules: {
     'boundaries/dependencies': [
@@ -111,6 +120,11 @@ export const boundariesConfig = {
           {
             disallow: { to: { element: { type: 'module', fileInternalPath: `!${ENTRY_FILES}` } } },
             message: `Import a module only through its entry files (${rule(2)})`,
+          },
+          {
+            from: { element: { type: 'app' } },
+            disallow: { to: { element: { type: 'module', fileInternalPath: 'cms.ts' } } },
+            message: `Only payload.config.ts imports a module's cms.ts (${rule(2)})`,
           },
           {
             from: { element: { type: ['module', 'platform'] } },
@@ -147,6 +161,11 @@ export const boundariesConfig = {
               dependency: { kind: 'value' },
             },
             message: `The domain imports no framework (${rule(1)})`,
+          },
+          {
+            from: { element: { type: 'module', fileInternalPath: 'domain/**' } },
+            disallow: { to: { element: { type: 'platform', fileInternalPath: '!lib/**' } } },
+            message: `The domain may use only platform/lib/ (${rule(1)})`,
           },
         ],
       },

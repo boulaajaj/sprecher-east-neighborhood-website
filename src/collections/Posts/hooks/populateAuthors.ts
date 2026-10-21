@@ -18,6 +18,8 @@ export const populateAuthors: CollectionAfterReadHook = async ({ doc, req }) => 
               // Users are private; this reads only the name, which posts show publicly
               select: { name: true },
               overrideAccess: true,
+              // A missing author returns null instead of throwing inside the post's request
+              disableErrors: true,
               req,
             })
           } catch {
