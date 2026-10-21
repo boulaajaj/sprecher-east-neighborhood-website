@@ -36,10 +36,11 @@ The site is useful and inviting enough to promote across the neighborhood.
 
 | Epic                                                                                                                | Why it has no milestone                                                 |
 | ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| [#164](https://github.com/boulaajaj/sprecher-east-neighborhood-website/issues/164) Photo contest                    | Not scheduled yet. It needs resident sign-up first (#183).              |
+| [#164](https://github.com/boulaajaj/sprecher-east-neighborhood-website/issues/164) Photo contest                    | Not scheduled yet. It needs email confirmation first (#183).            |
 | [#127](https://github.com/boulaajaj/sprecher-east-neighborhood-website/issues/127) Reorganize the code into modules | Under way. Foundation work, done step by step alongside the milestones. |
 | [#181](https://github.com/boulaajaj/sprecher-east-neighborhood-website/issues/181) Keep the site safe and running   | Ongoing upkeep: server, backups and dependencies.                       |
 | [#182](https://github.com/boulaajaj/sprecher-east-neighborhood-website/issues/182) Agents stay inside the rules     | Ongoing: guardrails, lean agent context and review checks.              |
+| [#190](https://github.com/boulaajaj/sprecher-east-neighborhood-website/issues/190) A new design for the site        | Later, once the themes and components are pluggable (#146, #170).       |
 
 New ideas start as GitHub issues: a new capability as an epic, anything smaller under the epic it
 belongs to. An epic gets a milestone when it's planned.
