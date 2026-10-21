@@ -124,6 +124,7 @@ through the pointers in `.claude/skills/`, and a human reads them as plain Markd
 
 | Doc                                                 | What's in it                                                                                          |
 | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| [`docs/product/`](docs/product/vision.md)           | Why the site exists, who it serves, what's out of scope, and the roadmap of milestones and epics.     |
 | [`docs/project.md`](docs/project.md)                | The system: stack, hosting, environment variables, local setup, known gotchas.                        |
 | [`docs/architecture/`](docs/architecture/README.md) | Where code goes, dependency rules, naming, data model, decisions. Read before coding.                 |
 | [`docs/guidelines/`](docs/guidelines/README.md)     | Conventions by topic: development, security, Payload, Next.js and Tailwind, UI/UX, patterns, content. |
@@ -135,6 +136,7 @@ through the pointers in `.claude/skills/`, and a human reads them as plain Markd
 Durable knowledge about this project lives in this repository and changes through the workflow
 above. Not in a tool's private memory, a chat, or loose notes.
 
+- Why the site exists and what comes next go in `docs/product/` (vision and roadmap).
 - A rule everyone follows on every change goes in this file.
 - A convention goes in a guideline in `docs/guidelines/`.
 - A procedure goes in a skill in `.agents/skills/`.
