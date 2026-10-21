@@ -22,11 +22,7 @@ export const Card: React.FC<{
   const { className, doc, relationTo, showCategories, title: titleFromProps } = props
 
   const { slug, categories, meta, publishedAt, title } = doc || {}
-  const { description } = meta || {}
-  // meta.image is added by the SEO plugin but missing from Payload's generated types
-  const metaImage = (meta as Record<string, unknown> | undefined)?.image as
-    | Post['heroImage']
-    | undefined
+  const { description, image: metaImage } = meta || {}
 
   const renderableCategories =
     showCategories && Array.isArray(categories)
