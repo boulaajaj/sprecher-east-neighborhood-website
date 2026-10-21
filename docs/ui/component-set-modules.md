@@ -3,7 +3,8 @@
 Part of the [UI inventory](inventory.md) (#170). The shared components are in
 [component-set.md](component-set.md).
 
-> **Status: proposal.** The owner reviews and approves the set before any component is built.
+> **Status: proposal.** The owner reviews and approves the set before any component is built,
+> then closes #170.
 
 ## Area components
 
@@ -17,7 +18,7 @@ page or layout in `src/app/` composes them ([0008](../architecture/decisions/000
 | `site`      | `SiteFooter`        | one look                                        | `navItems`; hides a column with no links                              | `Container`, `Heading · overline`, `Link · muted`, `MetaList`        | `src/Footer/Component.tsx`                                       | L6         |
 | `site`      | `Logo`              | `size`: `md`, `lg`                              | —                                                                     | —                                                                    | `src/components/Logo/Logo.tsx`                                   | L3, L4     |
 | `site`      | `PageHero`          | `variant`: `high`, `medium`, `low`              | `title` and `body` (`RichTextValue`), `image`, `links`                | `Media`, `RichText`, `Button`                                        | `src/heros/` (three components and `RenderHero`)                 | H1, H4, H5 |
-| `site`      | `ContentBlock`      | `layout`: `single`, `columns`, `cards`, `stats` | `columns` (`{ size, body, link? }[]`)                                 | `Section`, `Card`, `RichText · compact`, `Button`                    | `src/blocks/Content/Component.tsx` (layout guessed from sizes)   | B8–B11     |
+| `site`      | `ContentBlock`      | `layout`: `single`, `columns`, `cards`, `stats` | `columns` (`{ size, body, link? }[]`)                                 | `Section`, `CardGrid`, `Card`, `RichText · compact`, `Button`        | `src/blocks/Content/Component.tsx` (layout guessed from sizes)   | B8–B11     |
 | `site`      | `CallToActionBlock` | one look                                        | `body`, `links`                                                       | `Section · brand`, `RichText · inverse`, `Button · inverse`          | `src/blocks/CallToAction/Component.tsx`                          | B13        |
 | `site`      | `ArchiveBlock`      | one look                                        | `intro`, `posts` (loaded by a use case, not inside the component)     | `Section · surface`, `CardGrid`, the `news` card passed in by `app/` | `src/blocks/ArchiveBlock/Component.tsx` (queries Payload itself) | B16        |
 | `news`      | `PostCard`          | `variant`: `default`, `compact`                 | `post` (`PostSummary`: title, href, date, categories, summary, image) | `Card · elevated`, `Media`, `Badge`, `DateTime`                      | `src/components/Card`, `src/components/SidebarPosts`             | C1, C2, C8 |
@@ -26,26 +27,29 @@ page or layout in `src/app/` composes them ([0008](../architecture/decisions/000
 | `directory` | `ResourceCard`      | one look                                        | `resource` (`ResourceSummary`)                                        | `Card · elevated`, `Link · action`                                   | markup in `resources/page.tsx`                                   | C13        |
 | `contact`   | `FormBlock`         | one look                                        | `form` (fields mapped to field components), `intro`                   | `Form`, the field components, `Card · outline`, `Alert`              | `src/blocks/Form/` (nine field files)                            | B17        |
 | `contact`   | `TurnstileWidget`   | one look                                        | `onToken`, `onLoadError`, `onWidgetError`, `resetSignal`              | —                                                                    | `src/components/TurnstileWidget`                                 | F18        |
-| `platform`  | `AdminBar`          | one look                                        | wraps Payload's admin bar; shown to staff only                        | —                                                                    | `src/components/AdminBar` (shown to residents too)               | L5         |
 
 Compositions with no element of their own: `PostsFeed` and `EventsFeed` (a `CardGrid` of cards plus
 `LoadMore`), the search form in `news` (`TextField · search` plus the URL), `AccountMenu` in
 `accounts` (`Link · nav` and `Button · ghost`), `LoginForm` and `ChangePasswordForm` (`Form`), and
 `VersionCheck` (`Toast`). Variants with no element of their own (`Card · elevated`,
-`Card · outline`, `Section · brand`, `Button` size `sm`) are used inside the area components.
+`Card · outline`, `CardGrid` columns `2` and `4`, `Section · brand`, `Button` size `sm`) are used inside the area components.
 
 ## Not needed yet
 
-The epic's first guess listed about 20 components. The inventory keeps most, and finds no element for
-these:
+The set holds only what an element needs. The epic's first guess listed about 20 components; the
+inventory keeps most, and finds no element for these components and variants:
 
-| From the epic | Why not now                                                                       |
-| ------------- | --------------------------------------------------------------------------------- |
-| `RadioGroup`  | no public form has radio buttons; Payload's `radio` fields stay in the admin      |
-| `Switch`      | no on/off control on the site (the theme selector exists in code but isn't shown) |
-| `Tabs`        | no tabbed content                                                                 |
-| `Table`       | no tables, in content or in screens                                               |
-| `Pagination`  | lists use "Load more" with a no-JavaScript fallback page; `LoadMore` covers it    |
+| Component or variant           | Why not now                                                                       |
+| ------------------------------ | --------------------------------------------------------------------------------- |
+| `RadioGroup`                   | no public form has radio buttons; Payload's `radio` fields stay in the admin      |
+| `Switch`                       | no on/off control on the site (the theme selector exists in code but isn't shown) |
+| `Tabs`                         | no tabbed content                                                                 |
+| `Table`                        | no tables, in content or in screens                                               |
+| `Pagination`                   | lists use "Load more" with a no-JavaScript fallback page; `LoadMore` covers it    |
+| `TextField` types `tel`, `url` | no public form asks for a phone number or a web address                           |
+| `Text · body`                  | body copy comes through `RichText`; no element uses a plain body paragraph        |
+| `Alert` sizes                  | every alert today is the same size                                                |
+| `Dialog · center`              | the only dialog is the mobile menu, a sheet                                       |
 
 Added by the inventory, with no counterpart in the epic: `CardGrid`, `DateTime`, `MetaList`,
 `Heading`, `Text`, `PageHeader`, `EmptyState`, `Skeleton`, `DetailHero`, `Container`, `Section`,
@@ -55,7 +59,7 @@ Added by the inventory, with no counterpart in the epic: `CardGrid`, `DateTime`,
 ## Coverage
 
 Every element in the inventory maps to exactly one component and variant: 138 elements, 94
-component-variant pairs, 45 components (31 shared, 14 area). `{style}` and `{appearance}` mean the
+component-variant pairs, 45 components (32 shared, 13 area). `{style}` and `{appearance}` mean the
 CMS field picks the variant. The table below was checked against the element tables and the
 component tables by script: no element is missing, none maps twice, and every component row lists
 exactly the elements that point to it.
@@ -65,11 +69,11 @@ exactly the elements that point to it.
 | Button · primary            | N8, H2, C16, C18, F14, F15, F21, F24, S7, S10 |    10 |
 | Button · secondary          | B7                                            |     1 |
 | Button · accent             | H3                                            |     1 |
-| Button · ghost              | N3, N7, N9, S11                               |     4 |
+| Button · ghost              | N7, N9, S11                                   |     3 |
 | Button · inverse            | B14                                           |     1 |
 | Button · inverse-outline    | B15                                           |     1 |
 | Button · {appearance}       | B12                                           |     1 |
-| Link · nav                  | N1, N2, N4, N5, N6                            |     5 |
+| Link · nav                  | N1, N2, N3, N4, N5, N6                        |     6 |
 | Link · muted                | N11                                           |     1 |
 | Link · action               | N14, N17, N18, N19                            |     4 |
 | Link · inline               | N20                                           |     1 |

@@ -38,17 +38,38 @@ none is fixed here.
    box rewrites the address to `/search` after 200 ms (`src/search/Component.tsx:9–16`).
 3. **The search query isn't encoded.** Typing `a&b` produces `?q=a&b`, so the server searches for
    `a` (`src/search/Component.tsx:15`; the security guideline asks for `encodeURIComponent`).
-4. **The header ignores the visitor's theme.** CMS pages and search force a light header, posts
-   force a dark one (`[slug]/page.client.tsx:10`, `search/page.client.tsx:10`,
-   `posts/[slug]/page.client.tsx:10`); their comments say the opposite. Dark mode gets a light
-   header on [home](screenshots/home-1280-dark.webp); light mode gets a dark header on
-   [posts](screenshots/post-1280-light.webp).
+4. **The header ignores the visitor's theme.** Five pages force a theme on the header, and a sixth
+   does when the event has a photo:
+   - light: CMS pages (`[slug]/page.client.tsx:10`), `/posts` (`posts/page.client.tsx:10`),
+     `/posts/page/[n]` (`posts/page/[pageNumber]/page.client.tsx:10`) and `/search`
+     (`search/page.client.tsx:10`);
+   - dark: a post (`posts/[slug]/page.client.tsx:10`) and an event with a photo
+     (`events/[slug]/page.client.tsx:14`).
+
+   Their comments say "dark" where the code sets light. Dark mode gets a light header on
+   [home](screenshots/home-1280-dark.webp); light mode gets a dark header on a
+   [post](screenshots/post-1280-light.webp).
+
 5. **A post without a photo gets an empty 80vh band** with a black fade behind the title; the post
    hero has no plain look (`src/heros/PostHero/index.tsx:65`).
    [Screenshot](screenshots/post-no-image-1280-light.webp).
-6. **Post cards and sidebar thumbnails ignore the post's photo.** They read only the SEO
-   `meta.image` (`src/components/Card/index.tsx:27`, `src/components/SidebarPosts/index.tsx:24`),
-   so every seeded post shows a placeholder. [Screenshot](screenshots/home-1280-light.webp).
+6. **The SEO image never reaches the site (#196).** The seed sets `meta.image` on every post, and
+   the database stores it, but reads return `meta` without `image`. The cause: `pages`, `posts`
+   and `events` each have two `meta` fields. One is the hand-written SEO tab, which has the image
+   (`src/collections/Posts/index.ts:131`). The other is the group the SEO plugin adds itself,
+   because `seoPlugin` is given `collections: ['pages', 'posts', 'events']`
+   (`src/plugins/index.ts:74–78`). That group has no image, and reads return it. The Payload
+   website template leaves `collections` out of `seoPlugin` for this reason. It's also why the
+   generated types lack `meta.image` (the
+   [SEO plugin type gap](../guidelines/payload-cms.md#seo-plugin-type-gap)). Impact:
+   - post cards and sidebar thumbnails show placeholders (`src/components/Card/index.tsx:27`,
+     `src/components/SidebarPosts/index.tsx:24`) ([screenshot](screenshots/home-1280-light.webp));
+   - every page, post and event shares the default Open Graph image (`/images/photo.jpeg`)
+     instead of its own (`src/utilities/generateMeta.ts:28`).
+
+   The fix belongs in the plugin config (#196), not in the cards: making cards read `heroImage`
+   would hide the symptom and leave every share image wrong.
+
 7. **Residents see the Payload admin bar** ("Dashboard", "New Page", "Logout") for an admin they
    can't open; it shows for any signed-in user (`src/components/AdminBar/index.tsx:41`).
    [Screenshot](screenshots/account-1280-light.webp).
@@ -68,6 +89,10 @@ none is fixed here.
     `--destructive` (`src/app/(frontend)/globals.css:120–121`, `:156–157`). Unused today.
 13. **The medium-impact hero sits flush under the header** with no top spacing
     (`src/heros/MediumImpact/index.tsx:12`). [Screenshot](screenshots/ui-fixture-1280-light.webp).
+14. **The empty events page points to a section that isn't there.** With no upcoming events it says
+    "browse past events below" (`events/page.tsx:46`), but with no past events either, the past
+    section is hidden and the sentence leads nowhere (S2).
+    [Screenshot](screenshots/events-empty-1280-light.webp).
 
 ## Inconsistencies
 
@@ -91,9 +116,12 @@ none is fixed here.
 - **Colours outside the tokens:** `text-red-500` (`src/blocks/Form/Error/index.tsx:11`),
   `bg-white` and `border-white` in the CTA block (`CallToAction/Component.tsx:38`), `text-white`
   in the toast (`VersionCheck/index.tsx:117`), `bg-black` in the code block
-  (`Code/Component.client.tsx:17`), `text-white` in the post placeholder (`Card/index.tsx:55`).
-  Rule 9 allows white and black only on photos until #146.
-- **Inline style:** the form field width uses `style={{ maxWidth }}` (`Width/index.tsx:9`).
+  (`Code/Component.client.tsx:17`), `text-white` in the post placeholder (`Card/index.tsx:55`),
+  `focus:text-white` on the skip link (`src/app/(frontend)/layout.tsx:44`), and `bg-black` and
+  `text-white` on the admin bar (`src/components/AdminBar/index.tsx:47`, `:55–59`). Rule 9 allows
+  white and black only on photos until #146.
+- **Inline style:** the form field width uses `style={{ maxWidth }}` (`Width/index.tsx:9`), and the
+  admin bar passes a `style` object to Payload's bar (`src/components/AdminBar/index.tsx:75`).
 - **Admin icon in public UI:** the code block's copy button imports Payload's admin icon
   (`src/blocks/Code/CopyButton.tsx:3`) instead of Lucide.
 - **Unthemed browser control:** the search box shows the browser's blue clear button.

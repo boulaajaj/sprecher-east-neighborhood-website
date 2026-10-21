@@ -5,7 +5,8 @@ the data each element shows, and the component set the elements point to.
 
 > **Owner review comes first.** The [proposed component set](component-set.md) is a proposal. The
 > owner (Amine) reviews it, changes it if he wants, and approves it before any component is built.
-> No issue under #163 starts building a component until then.
+> No issue under #163 starts building a component until then. The owner closes #170 once he
+> approves the set.
 
 ## The files
 
@@ -19,11 +20,14 @@ the data each element shows, and the component set the elements point to.
 | [`component-set.md`](component-set.md)                           | The proposed shared components: variants, props, where they live.    |
 | [`component-set-modules.md`](component-set-modules.md)           | Area components, what's not needed yet, and the coverage check.      |
 | [`evidence.md`](evidence.md)                                     | Duplication, inconsistencies and bugs found, with file references.   |
-| [`screenshots/`](screenshots/)                                   | 172 WebP screenshots (6.5 MB).                                       |
+| [`screenshots/`](screenshots/)                                   | 172 WebP screenshots (6.4 MB, 6,446,992 bytes).                      |
 
 ## How it was made
 
 - **Code:** `main` at `e887427` (2026-10-21).
+- **Routes come from the code:** every `page.tsx` under `src/app/(frontend)/`, `not-found.tsx`,
+  and the CMS pages the seed creates. Production may have extra CMS pages, or header and footer
+  links, made in its admin. The owner confirms that nothing extra exists on the live site.
 - **Local, not live.** The live site (https://sprechereast.com) can't be reached from the agent's
   sandbox, so the site ran locally. The components are the same code as production; the content is
   the seed data plus the fixtures below, so text and pictures differ from the live site.
@@ -39,6 +43,7 @@ the data each element shows, and the component set the elements point to.
   `InitTheme`). Interactive states are clipped to the element that changes. Real Poppins fonts.
 - **States that need a server answer** (sending, server error, "Load more" failing, a new build)
   were produced by intercepting the request in the browser, not by breaking the server.
+- **A dated snapshot.** The screenshots show `e887427` and are never refreshed in place.
 
 ## How to read the element tables
 
