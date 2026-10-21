@@ -3,7 +3,11 @@ import { getPayload, type Where } from 'payload'
 
 import type { CardPostData } from '@/components/Card'
 import type { EventCardData } from '@/components/EventCard'
+import type { EventScope } from './feedParams'
 import { startOfToday } from './timezone'
+
+// URL parameter checks live in feedParams.ts (no Payload import, so middleware can use them).
+export { isEventScope, parsePageNumber, type EventScope } from './feedParams'
 
 /**
  * Server-side queries behind the incrementally loaded listings (/posts, /events).
@@ -15,9 +19,6 @@ export const POSTS_PAGE_SIZE = 12
 export const UPCOMING_EVENTS_PAGE_SIZE = 12
 export const PAST_EVENTS_PAGE_SIZE = 9
 
-/** Highest page a client may request — a sanity bound, far above real content. */
-const MAX_PAGE = 500
-
 export type FeedPage<T> = {
   docs: T[]
   page: number
@@ -27,25 +28,6 @@ export type FeedPage<T> = {
 }
 
 export type PostFeedItem = CardPostData & { id: number | string }
-
-export type EventScope = 'upcoming' | 'past'
-
-/** Validates a page number coming from a URL or a client request. */
-export function parsePageNumber(value: unknown): number | null {
-  // Only plain decimal digits without leading zeros, or an integer: rejects "0x10", "2e2",
-  // "02" (a duplicate of page 2), true, [2], etc.
-  const page =
-    typeof value === 'number'
-      ? value
-      : typeof value === 'string' && /^[1-9]\d{0,3}$/.test(value)
-        ? Number(value)
-        : NaN
-  return Number.isInteger(page) && page >= 1 && page <= MAX_PAGE ? page : null
-}
-
-export function isEventScope(value: unknown): value is EventScope {
-  return value === 'upcoming' || value === 'past'
-}
 
 // Always filter on _status explicitly. `overrideAccess: false` without a user already
 // limits results to published documents, but this keeps drafts out even if a caller

@@ -1,15 +1,12 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-// feeds.ts imports the Payload config for its queries; these tests only cover input parsing.
-vi.mock('@payload-config', () => ({ default: {} }))
-
-const { isEventScope, parsePageNumber } = await import('./feeds')
+import { isEventScope, MAX_PAGE, parsePageNumber } from './feedParams'
 
 describe('parsePageNumber', () => {
   it.each([
     ['1', 1],
     ['12', 12],
-    ['500', 500],
+    [String(MAX_PAGE), MAX_PAGE],
     [3, 3],
   ])('accepts %j', (input, expected) => {
     expect(parsePageNumber(input)).toBe(expected)
@@ -23,7 +20,7 @@ describe('parsePageNumber', () => {
     ['exponent notation', '2e2'],
     ['a decimal', '1.5'],
     ['surrounding spaces', ' 2 '],
-    ['above the sanity bound', '501'],
+    ['above the sanity bound', String(MAX_PAGE + 1)],
     ['a huge number', '99999'],
     ['a non-integer number', 2.5],
     ['NaN', Number.NaN],
