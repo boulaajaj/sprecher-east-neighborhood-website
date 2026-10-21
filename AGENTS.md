@@ -1,8 +1,8 @@
 # AGENTS.md — Sprecher East website
 
 This file is the repository's own memory of **how work is done here**, and the entry point for
-everyone who changes it: any AI agent (Claude, ChatGPT/Codex, Copilot, Cursor, Gemini, or anything
-else) and any human. Start here; it links to everything else.
+everyone who changes it: AI agents and humans. The supported agents are Claude Code (primary) and
+Codex ([Tool adapters](#tool-adapters)). Start here; it links to everything else.
 
 It does not depend on any tool's private memory. If a tool's memory, a chat instruction, or
 another doc in this repo conflicts with this file, **this file wins**. To change the rules,
@@ -48,7 +48,7 @@ Merging code changes to `main` deploys them to production automatically
 
    Changes to the process itself are policy changes, and the review must call them out
    explicitly. That covers `AGENTS.md`, `.agents/`, `docs/guidelines/`, `docs/roles/`,
-   `.github/`, and the tool adapters (`CLAUDE.md`, `.claude/`, `GEMINI.md`). A policy change
+   `.github/`, and the Claude Code adapter (`CLAUDE.md`, `.claude/`). A policy change
    the owner (Amine) asked for follows the normal path. Agents file issues through his account,
    so an issue alone doesn't show he asked: the issue or PR quotes his words, with the date and
    where he said them, and the reviewer checks the change stays within that quote. A policy
@@ -107,9 +107,9 @@ rules enforced (`bypass_rules: false`).
 
 ## Skills: how to do things
 
-Procedures are [Agent Skills](https://agentskills.io), an open format: a folder in
-`.agents/skills/` with a `SKILL.md` that starts with a `name` and a `description`. Tools that
-support skills load them from there; any other agent or human reads them as plain Markdown.
+Procedures are [Agent Skills](https://agentskills.io): a folder in `.agents/skills/` with a
+`SKILL.md` that starts with a `name` and a `description`. Codex loads them from there, Claude Code
+through the pointers in `.claude/skills/`, and a human reads them as plain Markdown.
 
 | Skill                                                                  | Use it when                                                               |
 | ---------------------------------------------------------------------- | ------------------------------------------------------------------------- |
@@ -147,19 +147,13 @@ each file under 250 lines.
 
 ## Tool adapters
 
-Some tools look for their own file. Those files are thin adapters: they import or point to the
-files above and hold only what is specific to that tool. Never put a rule, procedure or fact
-only in an adapter.
+The repo supports two agents: **Claude Code**, the primary one, and **Codex**. Other tools aren't
+supported, and the repo doesn't keep a file for each tool.
 
-| Tool           | Adapter                                                                                                       |
-| -------------- | ------------------------------------------------------------------------------------------------------------- |
-| Claude Code    | `CLAUDE.md` (imports this file and the core references), `.claude/` (skill pointers, subagents for the roles) |
-| Gemini CLI     | `GEMINI.md` (imports this file); it reads `.agents/skills/` itself                                            |
-| GitHub Copilot | `.github/copilot-instructions.md`; Copilot also reads this file and `.agents/skills/` itself                  |
-| Codex, Cursor  | None needed: they read this file and `.agents/skills/`.                                                       |
+- **Codex** reads this file and `.agents/skills/` itself. It needs nothing else.
+- **Claude Code** needs a thin adapter: `CLAUDE.md`, which imports this file and the core
+  references, and `.claude/`. `.claude/` holds a pointer to each skill in `.agents/skills/`
+  (`simplify` is Claude Code's name for `self-review`), plus the subagents for the role guides.
 
-A tool that needs its own file gets a short adapter that points here, listed in this table and in
-the policy files of step 3. Tools that read both `.claude/skills/` and `.agents/skills/` (Copilot,
-Cursor) list each skill twice. That is expected: the `.claude/skills/` copies only point to the
-`.agents/skills/` ones, so don't delete either. One of them, `simplify`, is Claude Code's name for
-`self-review`.
+An adapter holds only what is specific to its tool. Never put a rule, procedure or fact only in an
+adapter: Codex wouldn't see it.
