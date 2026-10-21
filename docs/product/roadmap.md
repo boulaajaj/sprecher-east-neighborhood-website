@@ -5,7 +5,8 @@ live status:**
 
 - **Milestones:** dated outcomes.
 - **Epics:** issues labeled `epic`, with their sub-issues.
-- **[The project board](https://github.com/users/boulaajaj/projects/2):** the current sprint.
+- **[The project board](https://github.com/users/boulaajaj/projects/2):** the current sprint. It's
+  private, so only the owner's account can open it.
 
 This file lists only the milestones and their epics, as a snapshot. GitHub is the source: this
 command prints the open epics by milestone, and the tables below must match it. Update the tables
