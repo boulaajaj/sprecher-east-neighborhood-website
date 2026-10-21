@@ -16,7 +16,7 @@ data means and how it's shown.
 
 ```mermaid
 flowchart TD
-  app["src/app — routes only<br/>thin pages, route handlers, layouts"]
+  app["src/app — routes and composition only<br/>thin pages, route handlers, layouts"]
   config["payload.config.ts"]
   subgraph modules["src/modules — one folder per business area"]
     events[events]
@@ -29,13 +29,9 @@ flowchart TD
   platform["src/platform — cross-cutting<br/>Payload setup, role checks, email, UI kit, rich text, dates, URLs, SEO"]
   payload[("Payload CMS<br/>Local API · admin · SQLite")]
 
-  app -->|"entry files only"| modules
+  app -->|"composes modules through their entry files"| modules
   app -->|"layouts, providers, UI kit"| platform
-  config -->|"cms.ts only"| modules
-  site -->|"composes pages from their entry files"| news
-  site --> events
-  site --> contact
-  site --> accounts
+  config -->|"composes each cms.ts"| modules
   modules --> platform
   modules -->|"data/ and cms/ only"| payload
   platform --> payload
@@ -93,8 +89,8 @@ src/modules/events/
 Entry files are for code outside the module. Inside it, import the folder you need directly, so
 the entry files never import each other. The one exception: `ui/` may import its own module's
 `actions.ts`, because server actions must live in a `'use server'` file (the "Load more" feeds).
-Any component that imports an `actions.ts` (its own module's or another's, directly or through
-another component) is exported from
+Any component that imports its module's `actions.ts` (directly or through another component) is
+exported from
 `server.ts`, not `index.ts`, so `index.ts` never reaches server-only code.
 
 A module only has the folders it needs. Tests sit next to the file they test (`isUpcoming.test.ts`).
@@ -136,14 +132,15 @@ What this buys:
    domain, and adapters (`data/`, `cms/`) → domain. `domain/` imports no framework and nothing
    from `data/`, `cms/` or `ui/`; it may use `platform/lib/`.
 2. **Entry files only.** Outside a module, import it only through its entry files: `index.ts` and
-   `actions.ts` from anywhere, `server.ts` from server code, `cms.ts` from `payload.config.ts` and
-   from another module's `cms/` where rule 3 allows; `cms/` reaches other modules only through
-   their `cms.ts` or `import type`. `app/` may also import `platform/` directly.
-3. **Module to module.** `site` composes pages, the header and the page builder from the other
-   modules, so it may import any module's entry files (the form block from `contact`, sign-in
-   state from `accounts`, listing blocks from `news` and `events`). No module imports `site`.
-   Other pairs need a line here: later `comments → accounts`. Otherwise the page in `app/`
-   combines them, as the post page does with upcoming events. `platform/` imports no module.
+   `actions.ts` from `app/`, `server.ts` from server code in `app/`, and `cms.ts` from
+   `payload.config.ts`. `app/` may also import `platform/` directly. Until an area moves (#127),
+   the template folders may import a module's entry files too.
+3. **No module imports another.** Modules meet only in the composition roots: pages, layouts
+   and the block registry in `app/`, and `payload.config.ts`
+   ([0008](decisions/0008-compose-modules-at-the-app-level.md)). For example, the post page calls
+   `news` and `events` and passes both results to its components, and `payload.config.ts` hands
+   the form block from `contact` to `site`'s Pages collection factory. `platform/` imports no
+   module.
 4. **Server-only code stays out of the CMS config.** `data/`, `use-cases/` and `server.ts` start
    with `import 'server-only'`, and only `use-cases/` and `actions.ts` import `data/`. `cms/` and
    `cms.ts` never reach anything server-only: the Payload CLI (migrations, seed) loads every hook
@@ -190,6 +187,7 @@ aliases `server-only` to an empty module so `data/` mappers can be unit-tested.
 | A component used by one module                                 | the module's `ui/`                                                                                       |
 | A component or helper used by two or more modules              | `src/platform/` (move it there on the second use)                                                        |
 | A page or URL                                                  | `src/app/`, as a thin file that calls a module                                                           |
+| Code where two modules meet                                    | `src/app/` (a page, layout or the block registry) or `payload.config.ts`, never inside a module          |
 | An outside service (Cloudflare, Mailgun, a city calendar feed) | an interface in the module, an adapter beside it ([conventions](conventions.md#interfaces-and-adapters)) |
 
 ## Where things are today

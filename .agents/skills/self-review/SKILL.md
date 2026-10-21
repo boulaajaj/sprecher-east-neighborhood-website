@@ -27,7 +27,7 @@ each; otherwise do them one after another.
 
 1. Search for existing utilities and helpers that could replace new code: the shared folders in
    the [DRY search order](../../../docs/guidelines/development.md#dry--dont-repeat-yourself),
-   and files next to the changed ones.
+   and files next to the changed ones ([`write-code`](../write-code/SKILL.md) §1).
 2. Flag any new function that duplicates an existing one, and name the one to use instead.
 3. Flag inline logic an existing utility already covers: hand-rolled string or path handling,
    custom environment checks, ad-hoc type guards.

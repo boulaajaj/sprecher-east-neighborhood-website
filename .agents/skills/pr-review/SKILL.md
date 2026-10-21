@@ -50,7 +50,11 @@ gh api "repos/{owner}/{repo}/stacks?pull_request=<number>" -H 'X-GitHub-Api-Vers
   code ([`docs/guidelines/development.md`](../../../docs/guidelines/development.md)).
 - **Guidelines and architecture:** the change follows the guidelines for what it touches
   ([`docs/guidelines/`](../../../docs/guidelines/README.md)) and puts code where
-  [`docs/architecture/`](../../../docs/architecture/README.md) says it goes.
+  [`docs/architecture/`](../../../docs/architecture/README.md) says it goes. For code under
+  `src/`, check it against [`write-code`](../write-code/SKILL.md): the right module and layer, no
+  module importing another, no runtime Payload import outside `data/`, `cms/`, `platform/` and
+  `payload.config.ts`, existing code and libraries reused instead of copied, tests for new rules,
+  and files under 250 lines.
 - **Tool-neutral guidance:** a new rule, procedure or fact lands in `AGENTS.md`, `docs/` or
   `.agents/skills/`, never only in the Claude Code adapter (`CLAUDE.md`, `.claude/`), where
   Codex wouldn't see it.
