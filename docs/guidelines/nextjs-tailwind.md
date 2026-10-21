@@ -47,7 +47,7 @@ Fetch data directly with `payload.find()` (not Route Handlers). Use `select` to 
 - Use React `cache()` to deduplicate server-side fetches within a request
 - Use `revalidatePath()` or `revalidateTag()` in afterChange hooks for on-demand revalidation
 - Never call Route Handlers from Server Components — use the Payload Local API directly
-- For site URL, use the shared `getServerSideURL()` from `src/utilities/getURL.ts` (see DRY principle in `development.md`)
+- For site URL, use the shared `getServerSideURL()` from `src/utilities/getURL.ts` (see the DRY principle in [`development.md`](development.md#dry--dont-repeat-yourself))
 - Static pages use `revalidate = 600` (10 minutes) as default ISR interval
 
 ## Styling Rules
@@ -94,7 +94,7 @@ The site timezone is configured via `SITE_TIMEZONE` env var (default: `America/C
 
 ## Responsive Design — 6-Viewport Testing
 
-Changes that affect rendering (CSS, Tailwind classes, HTML structure, component markup) **must** be visually verified at 6 viewports before committing. Use the Playwright MCP server to screenshot affected pages. Skip for backend-only, config-only, or docs-only changes.
+Changes that affect rendering (CSS, Tailwind classes, HTML structure, component markup) **must** be visually verified at 6 viewports before committing. Use Playwright (the Playwright MCP server, or a Playwright script) to screenshot affected pages. Skip for backend-only, config-only, or docs-only changes.
 
 **Test viewports (min + max of each breakpoint range):**
 
@@ -129,7 +129,7 @@ Changes that affect rendering (CSS, Tailwind classes, HTML structure, component 
 
 1. Make the UI/UX change
 2. Start dev server if not running (`npm run dev`)
-3. Use Playwright MCP to screenshot affected pages at all 6 viewports
+3. Screenshot affected pages at all 6 viewports with Playwright
 4. Inspect each screenshot — check alignment, spacing, text wrapping, image sizing, touch targets
 5. Fix any issues found
 6. Re-screenshot to verify fixes

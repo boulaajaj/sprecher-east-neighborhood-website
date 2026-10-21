@@ -45,7 +45,7 @@ Every PR that relates to an Asana task must have two-way linking:
 - **PR → Asana**: PR description contains `Asana: https://app.asana.com/0/0/<task_gid>/f` on its own line
 - **Asana → PR**: Asana task comment contains the PR URL (added when PR is created and when merged)
 
-This enables `/wrapped` to auto-complete tasks and makes it easy to navigate between project management and code.
+This lets the [`wrapped`](../../.agents/skills/wrapped/SKILL.md) skill complete tasks and makes it easy to navigate between project management and code.
 
 ## Asana API Access
 
@@ -146,17 +146,10 @@ If a session produces multiple fixes, create multiple tasks and multiple PRs. Sp
 7. Link PR when created
 8. Complete the task when the PR merges to main (for Spike tasks that don't produce a PR, complete when the investigation is done — link any output such as a decision comment or research summary instead)
 
-## Post-Merge Checklist (`/wrapped`)
+## Post-Merge Checklist
 
-When the user says "all PRs are merged", "/wrapped", or similar — run this checklist automatically without being asked:
-
-1. **Identify**: Use the PR numbers from the current session. Verify each with `gh pr view <number> --json state` — confirm actually merged, don't assume.
-2. **Asana**: For each verified merged PR, extract the Asana task GID from the PR body (`Asana: https://app.asana.com/0/0/<task_gid>/f`). Add a completion comment with the PR link and mark the task complete. If no Asana link in the PR body, skip — not every PR maps to a task.
-3. **Memory**: Durable project context belongs in the repository (`AGENTS.md`, `docs/memory/`), updated through a PR, not in any tool's private memory.
-4. **Sync**: `git checkout main && git pull origin main`
-5. **Report**: Brief summary of what was closed.
-
-Never skip steps or assume state — always verify first.
+When the owner says the PRs are merged, follow the
+[`wrapped`](../../.agents/skills/wrapped/SKILL.md) skill. Its Asana step completes the linked task.
 
 ## Integration Notes
 

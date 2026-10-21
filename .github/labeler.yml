@@ -49,7 +49,12 @@ process:
           [
             'AGENTS.md',
             'CONTRIBUTING.md',
+            'CLAUDE.md',
+            'GEMINI.md',
             '.agents/**',
+            '.claude/**',
+            'docs/guidelines/**',
+            '.github/copilot-instructions.md',
             '.github/ISSUE_TEMPLATE/**',
             '.github/pull_request_template.md',
             '.github/workflows/pr-policy.yml',

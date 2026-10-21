@@ -1,6 +1,6 @@
 ---
 name: change-workflow
-description: Mandatory procedure for any code, config, or docs change to this repo — create a labeled GitHub issue, work on a branch, open a PR from the template, get it independently reviewed, wait for all checks to go green, and hand off to the owner to merge (which deploys). Use before starting any change.
+description: Mandatory procedure for any code, config, or docs change to this repo — create a labeled GitHub issue, work on a branch, open a PR from the template (on a native stack when it depends on another open PR), get it independently reviewed, wait for all checks to go green, and hand off to the owner to merge (which deploys). Use before starting any change.
 ---
 
 # change-workflow (pointer)

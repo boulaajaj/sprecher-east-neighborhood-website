@@ -1,6 +1,8 @@
 <!--
 Every PR must link an issue and fill in every section below. The "PR Policy" check enforces
 this. Rules: AGENTS.md. Procedure: .agents/skills/change-workflow/SKILL.md
+If this PR depends on another open PR, put both on a native GitHub stack and start this
+description with the stack line: .agents/skills/stacked-prs/SKILL.md
 -->
 
 Closes #

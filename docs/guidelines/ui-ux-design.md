@@ -1,6 +1,6 @@
 # World-Class UI/UX Design Standards
 
-Design principles for creating a pixel-perfect, modern, intuitive neighborhood website. Every agent building UI must follow these standards — they are not aspirational, they are requirements.
+Design principles for creating a pixel-perfect, modern, intuitive neighborhood website. Everyone building UI, human or AI agent, must follow these standards — they are not aspirational, they are requirements.
 
 ## Design Philosophy
 
@@ -61,7 +61,7 @@ Consistent spacing creates visual rhythm. Use Tailwind's spacing scale exclusive
 
 **Testing contrast:**
 
-- Use the Playwright MCP to screenshot in both light (`data-theme="light"`) and dark (`data-theme="dark"`) modes
+- Use Playwright (the Playwright MCP server, or a Playwright script) to screenshot in both light (`data-theme="light"`) and dark (`data-theme="dark"`) modes
 - Visually inspect every text element against its background
 - When in doubt, increase contrast — readability always wins over subtlety
 

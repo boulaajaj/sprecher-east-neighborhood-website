@@ -89,7 +89,7 @@ Every image must have alt text that:
 
 ### Section Backdrop Photos
 
-Placeholder stock photos live in `public/images/backdrops/` — used as subtle faded backgrounds behind content sections (see "Section Backdrop Patterns" in `skill-frontend-patterns.md`). These are temporary until real neighborhood photos are available.
+Placeholder stock photos live in `public/images/backdrops/` — used as subtle faded backgrounds behind content sections (see "Section Backdrop Patterns" in `docs/guidelines/frontend-patterns/backdrops-and-glass.md`). These are temporary until real neighborhood photos are available.
 
 | File                      | Section   | Subject                     | Source   |
 | ------------------------- | --------- | --------------------------- | -------- |
