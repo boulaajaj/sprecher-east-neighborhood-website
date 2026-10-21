@@ -63,8 +63,6 @@
     "postcss": "$postcss"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.5",
-    "@eslint/js": "^10.0.1",
     "@tailwindcss/postcss": "^4.2.1",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^25.3.5",
@@ -86,5 +84,8 @@
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.56.1",
     "vitest": "^4.1.12"
+  },
+  "engines": {
+    "node": ">=20.9.0"
   }
 }

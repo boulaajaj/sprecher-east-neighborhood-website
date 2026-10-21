@@ -48,6 +48,9 @@ const nextConfig = {
 
     return webpackConfig
   },
+  // Next 16 writes a block into AGENTS.md when an AI agent runs `next dev`. AGENTS.md is a policy
+  // file, so it stays off until the owner decides (#194).
+  agentRules: false,
   reactStrictMode: true,
   redirects,
   turbopack: {

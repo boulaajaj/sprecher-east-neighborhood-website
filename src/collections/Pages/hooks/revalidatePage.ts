@@ -2,7 +2,7 @@ import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'paylo
 
 import { revalidatePath } from 'next/cache'
 
-import { expireCacheTag } from '@/utilities/expireCacheTag'
+import { expireCacheTag } from '@/platform/payload/expireCacheTag'
 
 import type { Page } from '../../../payload-types'
 

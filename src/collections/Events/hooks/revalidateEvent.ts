@@ -1,7 +1,7 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 import { revalidatePath } from 'next/cache'
 
-import { expireCacheTag } from '@/utilities/expireCacheTag'
+import { expireCacheTag } from '@/platform/payload/expireCacheTag'
 
 /**
  * The no-JavaScript list pages (/events/list/<scope>/<n>) are cached per URL; refresh them all

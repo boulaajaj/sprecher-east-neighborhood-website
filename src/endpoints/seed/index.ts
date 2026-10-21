@@ -419,7 +419,7 @@ async function loadLocalImage(filename: string, mimetype: string): Promise<File>
 
   for (const filePath of possiblePaths) {
     try {
-      const data = await fs.readFile(filePath)
+      const data = await fs.readFile(/*turbopackIgnore: true*/ filePath)
       return {
         name: filename,
         data: Buffer.from(data),

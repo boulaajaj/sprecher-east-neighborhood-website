@@ -9,8 +9,9 @@ import { getServerSideURL } from './getURL'
 export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | null): string => {
   if (!url) return ''
 
-  const siteURL = getServerSideURL()
-  const path = url.startsWith(`${siteURL}/`) ? url.slice(siteURL.length) : url
+  const site = new URL(getServerSideURL())
+  const parsed = new URL(url, site)
+  const path = parsed.origin === site.origin ? `${parsed.pathname}${parsed.search}` : url
 
   return cacheTag ? `${path}?${encodeURIComponent(cacheTag)}` : path
 }
