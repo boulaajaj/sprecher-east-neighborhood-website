@@ -1,0 +1,135 @@
+# Evidence: duplication, inconsistencies, bugs
+
+Part of the [UI inventory](inventory.md) (#170). What the inventory found, with file references. The
+duplication is the case for each shared component in the [proposed set](component-set.md). Route
+folders are under `src/app/(frontend)/`. Nothing here is fixed in this change; the fixes belong to
+the component work under #163 or to their own issues.
+
+## Duplication
+
+| ID  | What is repeated                                                                                                                                                                                                                                                      | Where                                                                                                                                                                                                                                                                                                             | Shared component                        |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| D1  | Buttons built from raw classes instead of `Button`, eight times. Heights `h-9`, `min-h-10`, `min-h-11`; corners `rounded-md`, `rounded-lg`, `rounded-xl`; weight medium or semibold.                                                                                  | `src/Header/Component.client.tsx:125`, `:200`; `src/components/SidebarCTA/index.tsx:16`; `events/[slug]/page.tsx:108`; `src/heros/HighImpact/index.tsx:12`; `src/blocks/CallToAction/Component.tsx:34`; `src/components/LoadMore/index.tsx:150`; `src/components/VersionCheck/index.tsx:117`                      | `Button`                                |
+| D2  | Text links built by hand: raw `<a>` in three places, two back links, and the same nav classes written for desktop and mobile.                                                                                                                                         | `events/[slug]/page.tsx:89`; `resources/page.tsx:82`, `:93`; `posts/page/[pageNumber]/page.tsx:43`; `events/list/[scope]/[page]/page.tsx:44`; `src/Header/Nav/index.tsx:64`, `:76`, `:101`, `:111`; `src/Header/Component.client.tsx:106`, `:117`, `:169`, `:189`                                                 | `Link`                                  |
+| D3  | Fourteen card shells, each with its own corner, shadow and padding (`rounded-lg`/`xl`/`2xl`/`[0.8rem]`; `shadow-sm`/`md`/none; `p-4` to `p-12`). Every elevated card has both a border and a shadow; the UI guideline says one or the other. `ui/card.tsx` is unused. | `src/components/Card/index.tsx:46`; `src/components/EventCard/index.tsx:74`, `:91`; `resources/page.tsx:72`, `:109`; `faq/page.tsx:82`; `account/page.tsx:19`, `:33`; `events/[slug]/page.tsx:82`; `events/page.tsx:43`; `src/blocks/Content/Component.tsx:58`, `:63`, `:70`; `src/blocks/Form/Component.tsx:160` | `Card`                                  |
+| D4  | Form-field scaffolding (label, required mark, error, width) copied into eight files. `Select`, `State` and `Country` are one component written three times. Login and account use a third pattern.                                                                    | `src/blocks/Form/{Text,Email,Number,Textarea,Select,State,Country,Checkbox}/index.tsx`; `login/LoginForm.tsx:51`; `account/ChangePasswordForm.tsx:65`                                                                                                                                                             | `Field`, `TextField`, `SelectField`     |
+| D5  | Page header (eyebrow, h1, lead) copied nine times with drift: search has no eyebrow, resources and search lack `text-balance`, bottom margins differ, login and account use a smaller h1.                                                                             | `posts/page.tsx:19`; `posts/page/[pageNumber]/page.tsx:36`; `events/page.tsx:22`; `events/list/[scope]/[page]/page.tsx:37`; `faq/page.tsx:62`; `resources/page.tsx:50`; `search/page.tsx:65`; `login/page.tsx:17`; `account/page.tsx:17`                                                                          | `PageHeader`                            |
+| D6  | Six empty states with five looks: boxed or plain, centred or left, `text-lg` or not, `p-8` to `p-12`.                                                                                                                                                                 | `src/components/PostsFeed/index.tsx:17`; `events/page.tsx:43`; `faq/page.tsx:100`; `resources/page.tsx:109`; `search/page.tsx:77`; `not-found.tsx:9`                                                                                                                                                              | `EmptyState`                            |
+| D7  | The event hero with a photo is a copy of the post hero: same grid, classes and fade.                                                                                                                                                                                  | `src/heros/PostHero/index.tsx:18–70`; `src/heros/EventHero/index.tsx:28–69`                                                                                                                                                                                                                                       | `DetailHero`                            |
+| D8  | Two date-badge implementations, and `<time>` plus a format helper written by hand six times, with `dateTime` set two different ways.                                                                                                                                  | `src/components/EventCard/index.tsx:33`; `src/components/SidebarEvents/index.tsx:28`; `src/components/Card/index.tsx:76`; `src/components/EventCard/index.tsx:77`, `:124`; `src/heros/PostHero/index.tsx:59`; `src/heros/EventHero/index.tsx:42`, `:86`                                                           | `DateBadge`, `DateTime`                 |
+| D9  | Metadata lists: icon-and-text rows and label-and-value pairs in five layouts.                                                                                                                                                                                         | `src/components/EventCard/index.tsx:121`; `src/Footer/Component.tsx:55`; `src/heros/PostHero/index.tsx:45`; `src/heros/EventHero/index.tsx:39`, `:83`; `account/page.tsx:21`                                                                                                                                      | `MetaList`                              |
+| D10 | Option labels kept in more than one place: event categories, event formats, FAQ and resource categories. The category pill is a class string.                                                                                                                         | `src/utilities/eventCategories.ts:3` and `src/collections/Events/index.ts`; `src/heros/EventHero/index.tsx:16` and `src/collections/Events/index.ts:105`; `faq/page.tsx:15`; `resources/page.tsx:12`; `src/utilities/ui.ts:14`                                                                                    | `Badge`; one `as const` list per module |
+| D11 | Rich text restyled from outside with `[&_h1]`, `[&_h2]`, `[&_p]` selectors.                                                                                                                                                                                           | `src/heros/HighImpact/index.tsx:41`, `:54`; `src/heros/LowImpact/index.tsx:25`; `src/blocks/ArchiveBlock/Component.tsx:61`; `src/blocks/CallToAction/Component.tsx:20`; `src/blocks/Content/Component.tsx:58–73`                                                                                                  | `RichText` variants                     |
+| D12 | Three different "no image" placeholders.                                                                                                                                                                                                                              | `src/components/Card/index.tsx:53`; `src/components/EventCard/index.tsx:101`; `src/components/SidebarPosts/index.tsx:40`                                                                                                                                                                                          | `Media` `fallback`                      |
+| D13 | Five grid class sets for card lists.                                                                                                                                                                                                                                  | `src/components/CollectionArchive/index.tsx:17`; `src/components/EventsFeed/index.tsx:22`; `resources/page.tsx:68`; `src/blocks/Content/Component.tsx:36`, `:37`                                                                                                                                                  | `CardGrid`                              |
+| D14 | Two ways to make a whole card clickable: a JavaScript hook and a CSS stretched link.                                                                                                                                                                                  | `src/utilities/useClickableCard.ts` used by `src/components/Card/index.tsx:21`; `src/components/EventCard/index.tsx:30`                                                                                                                                                                                           | `Card` (`CardTitle href`)               |
+| D15 | Header markup written twice (desktop and mobile), and the menu's Escape, focus return and scroll lock written by hand.                                                                                                                                                | `src/Header/Nav/index.tsx:50–86` and `:88–119`; `src/Header/Component.client.tsx:100–128` and `:162–203`, `:51–82`                                                                                                                                                                                                | `SiteHeader`, `Dialog`                  |
+
+## Bugs found while taking the inventory
+
+Each one is visible in the linked screenshot or was checked in the browser. Worth an issue each;
+none is fixed here.
+
+1. **Search sends event results to a 404.** The search index holds posts and events
+   (`src/plugins/index.ts:136`), but every result is drawn as a post card linking to
+   `/posts/<slug>` (`src/components/CollectionArchive/index.tsx:22`). All four "council" results
+   are events and all four links return 404. [Screenshot](screenshots/search-results-1280-light.webp).
+2. **A search link loses its query.** Opening `/search?q=council` shows results, then the empty
+   box rewrites the address to `/search` after 200 ms (`src/search/Component.tsx:9–16`).
+3. **The search query isn't encoded.** Typing `a&b` produces `?q=a&b`, so the server searches for
+   `a` (`src/search/Component.tsx:15`; the security guideline asks for `encodeURIComponent`).
+4. **The header ignores the visitor's theme.** Five pages force a theme on the header, and a sixth
+   does when the event has a photo:
+   - light: CMS pages (`[slug]/page.client.tsx:10`), `/posts` (`posts/page.client.tsx:10`),
+     `/posts/page/[n]` (`posts/page/[pageNumber]/page.client.tsx:10`) and `/search`
+     (`search/page.client.tsx:10`);
+   - dark: a post (`posts/[slug]/page.client.tsx:10`) and an event with a photo
+     (`events/[slug]/page.client.tsx:14`).
+
+   Their comments say "dark" where the code sets light. Dark mode gets a light header on
+   [home](screenshots/home-1280-dark.webp); light mode gets a dark header on a
+   [post](screenshots/post-1280-light.webp).
+
+5. **A post without a photo gets an empty 80vh band** with a black fade behind the title; the post
+   hero has no plain look (`src/heros/PostHero/index.tsx:65`).
+   [Screenshot](screenshots/post-no-image-1280-light.webp).
+6. **The SEO image never reaches the site (#196).** The seed sets `meta.image` on every post, and
+   the database stores it, but reads return `meta` without `image`. The cause: `pages`, `posts`
+   and `events` each have two `meta` fields. One is the hand-written SEO tab, which has the image
+   (`src/collections/Posts/index.ts:131`). The other is the group the SEO plugin adds itself,
+   because `seoPlugin` is given `collections: ['pages', 'posts', 'events']`
+   (`src/plugins/index.ts:74–78`). That group has no image, and reads return it. The Payload
+   website template leaves `collections` out of `seoPlugin` for this reason. It's also why the
+   generated types lack `meta.image` (the
+   [SEO plugin type gap](../guidelines/payload-cms.md#seo-plugin-type-gap)). Impact:
+   - post cards and sidebar thumbnails show placeholders (`src/components/Card/index.tsx:27`,
+     `src/components/SidebarPosts/index.tsx:24`) ([screenshot](screenshots/home-1280-light.webp));
+   - every page, post and event shares the default Open Graph image (`/images/photo.jpeg`)
+     instead of its own (`src/utilities/generateMeta.ts:28`).
+
+   The fix belongs in the plugin config (#196), not in the cards: making cards read `heroImage`
+   would hide the symptom and leave every share image wrong.
+
+7. **Residents see the Payload admin bar** ("Dashboard", "New Page", "Logout") for an admin they
+   can't open; it shows for any signed-in user (`src/components/AdminBar/index.tsx:41`).
+   [Screenshot](screenshots/account-1280-light.webp).
+8. **Server error text reaches visitors.** The contact form shows "Internal Server Error"
+   (`src/blocks/Form/Component.tsx:119`); the password form shows the server's message
+   (`account/ChangePasswordForm.tsx:49`). The conventions ask for fixed, friendly messages.
+   [Screenshot](screenshots/contact-server-error-1280-light.webp).
+9. **Half-width form fields never share a row**, and stay half width on phones
+   (`src/blocks/Form/Width/index.tsx:9`). [Screenshot](screenshots/ui-fixture-form-errors-375-light.webp).
+10. **Field errors are silent to screen readers:** no `role`, no `aria-describedby`, no
+    `aria-invalid` (`src/blocks/Form/Error/index.tsx:11`).
+11. **White text on the primary colour fails contrast in dark mode:** 3.35:1 on `#4e9b76`, below
+    4.5:1. It affects the header's Contact button, form and login buttons, the sidebar box and the
+    toast. The home hero and CTA block work around it with `primary-dark`
+    (`src/heros/HighImpact/index.tsx:73`); the token fix belongs to #146.
+12. **`Button`'s `destructive` variant is unreadable:** `--destructive-foreground` equals
+    `--destructive` (`src/app/(frontend)/globals.css:120–121`, `:156–157`). Unused today.
+13. **The medium-impact hero sits flush under the header** with no top spacing
+    (`src/heros/MediumImpact/index.tsx:12`). [Screenshot](screenshots/ui-fixture-1280-light.webp).
+14. **The empty events page points to a section that isn't there.** With no upcoming events it says
+    "browse past events below" (`events/page.tsx:46`), but with no past events either, the past
+    section is hidden and the sentence leads nowhere (S2).
+    [Screenshot](screenshots/events-empty-1280-light.webp).
+
+## Inconsistencies
+
+- **Reading widths:** five different caps for the same job (L10), plus two form widths (L11).
+- **Spacing:** page paddings `pt-24`, `py-16`, `pt-16`, `py-28`; block paddings `py-8 md:py-10`
+  and `py-10 md:py-14`. The UI guideline asks for `py-16 md:py-20 lg:py-24` between sections.
+- **Corners:** buttons `rounded-md`, `rounded-lg`, `rounded-xl`; cards `rounded-lg`,
+  `rounded-2xl`; the form box and framed image `rounded-[0.8rem]`; the banner `rounded`.
+- **Heading weight:** the post hero and the event hero with a photo render their h1 at weight 400
+  (`globals.css:13` resets heading weight; `PostHero/index.tsx:42`, `EventHero/index.tsx:37`).
+  Every other h1, including the plain event hero, is bold.
+- **Wording:** "Log In" in the header and page title, "Sign In" on the button; "Sign Out" in the
+  header, "Logout" in the admin bar.
+- **Required mark:** before the label on checkboxes, after it elsewhere, missing in login and
+  account (where every field is required).
+- **Overline headings:** `tracking-widest` in the footer, `tracking-wider` in the sidebar.
+- **New-tab links:** the map and register links tell screen readers they open a new tab; "Visit
+  Website" and CMS links that open a new tab don't.
+- **Repeated date:** the compact event card shows the date in its badge and again as text (C6).
+- **Hover without a link:** resource cards lift on hover but go nowhere (`resources/page.tsx:72`).
+- **Colours outside the tokens:** `text-red-500` (`src/blocks/Form/Error/index.tsx:11`),
+  `bg-white` and `border-white` in the CTA block (`CallToAction/Component.tsx:38`), `text-white`
+  in the toast (`VersionCheck/index.tsx:117`), `bg-black` in the code block
+  (`Code/Component.client.tsx:17`), `text-white` in the post placeholder (`Card/index.tsx:55`),
+  `focus:text-white` on the skip link (`src/app/(frontend)/layout.tsx:44`), and `bg-black` and
+  `text-white` on the admin bar (`src/components/AdminBar/index.tsx:47`, `:55–59`). Rule 9 allows
+  white and black only on photos until #146.
+- **Inline style:** the form field width uses `style={{ maxWidth }}` (`Width/index.tsx:9`), and the
+  admin bar passes a `style` object to Payload's bar (`src/components/AdminBar/index.tsx:75`).
+- **Admin icon in public UI:** the code block's copy button imports Payload's admin icon
+  (`src/blocks/Code/CopyButton.tsx:3`) instead of Lucide.
+- **Unthemed browser control:** the search box shows the browser's blue clear button.
+
+## Code with no visible UI
+
+- `src/blocks/RelatedPosts/Component.tsx`: not used anywhere.
+- `src/providers/Theme/ThemeSelector`: built but never rendered, so visitors can't choose a theme;
+  dark mode only follows the system setting.
+- `src/components/ui/card.tsx`: not used; every card is hand-built (D3).
+- `team-members` and `events.featured`: stored, never shown ([data types](data-types.md#data-with-no-public-ui-today)).
