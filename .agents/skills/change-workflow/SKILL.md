@@ -10,7 +10,9 @@ Commands use the GitHub CLI (`gh`). Without it, do the same steps in the GitHub 
 
 ## 1. Issue
 
-1. Search first, so you don't open a duplicate: `gh issue list --search "<keywords>"`.
+1. Search first, so you don't open a duplicate: `gh issue list --search "<keywords>"`. Where
+   GraphQL is blocked (some cloud sessions), use the REST search in
+   [`project-tracking`](../project-tracking/SKILL.md) §3.
 2. If there's no issue, create one from an issue form (web UI: **New issue** → pick a form).
    The CLI has no form support, so give it the same sections and labels by hand:
 
@@ -21,7 +23,9 @@ Commands use the GitHub CLI (`gh`). Without it, do the same steps in the GitHub 
    ```
 
    `issue.md` needs these sections: `### Problem`, `### Proposed fix`,
-   `### Acceptance criteria`, `### Area`, `### Priority`.
+   `### Acceptance criteria`, `### Area`, `### Priority`. The REST form, and how to give the
+   issue its epic, milestone and blockers, are in [`project-tracking`](../project-tracking/SKILL.md)
+   §3.
 
 3. Labels: exactly one type, at least one area, and one priority. Allowed values are in
    `.github/label-policy.json`.
