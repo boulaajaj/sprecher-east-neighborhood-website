@@ -15,7 +15,7 @@ GitHub is the only tracker for new work. Asana is being retired (#89: export #91
 | Milestone     | What outcome do we deliver, by when?               | 1–3 months (\*) | A milestone with a due date                      |
 | Epic          | What capability is part of that outcome?           | weeks           | An issue labeled `epic`, with sub-issues         |
 | Feature, task | What does a user get? What single change ships it? | a day or a few  | A sub-issue of an epic; one PR closes it         |
-| Bug           | What's broken?                                     | any             | A sub-issue of the epic it belongs to            |
+| Bug           | What's broken?                                     | S to L          | A sub-issue of the epic it belongs to            |
 
 (\*) Guidance, not a rule.
 
@@ -23,10 +23,11 @@ Rules:
 
 - **Every feature, task and bug belongs to an epic.**
 - **Every planned epic belongs to a milestone.** Unscheduled epics wait in the backlog with no
-  milestone.
-- **Milestones are dated outcomes, not topics.** Topics are epics and area labels. Sprints are not
-  milestones; they're the board's Sprint field.
-- **One PR closes one issue** (`Closes #N`). A PR that's one of several uses `Part of #N`.
+  milestone, and so does foundation work done step by step alongside the milestones (#127).
+- **A milestone groups the work for one outcome or context, with a due date,** such as "Ready for
+  neighbors". Sprints are not milestones; they're the board's Sprint field.
+- **One PR closes one issue** (`Closes #N`). When an issue needs several PRs, each uses
+  `Part of #N` and the last one uses `Closes #N`.
 - **Split ahead of time.** Split anything bigger than size L (3 days). An epic's features become
   sub-issues when they're planned, not all up front.
 
@@ -43,8 +44,8 @@ The allowed labels are in [`.github/label-policy.json`](../../.github/label-poli
     stays the epic it belongs to. The issues that depend on it are marked **blocked by** it, so
     nobody starts them too early.
 
-Priority lives only in the `priority:` label. GitHub's issue types (Bug, Feature, Task) can be set
-in the web UI. Agents in cloud sessions can't set them, so the type label stays the required one.
+Priority lives only in the `priority:` label. GitHub's issue types (Bug, Feature, Task) are
+optional; the type label stays the required one because the `PR Policy` check reads labels.
 
 ## Sprints
 
@@ -57,24 +58,25 @@ in the web UI. Agents in cloud sessions can't set them, so the type label stays 
 
 ## The board
 
-GitHub Project "Sprecher East", owned by `boulaajaj`. The full setup is in #90.
+GitHub Project "Sprecher East", owned by `boulaajaj`. The full setup is in #90. Until it exists,
+there's no Sprint or Size field: plan from the milestone.
 
-| Status      | Means                                                                             |
-| ----------- | --------------------------------------------------------------------------------- |
-| Backlog     | Captured, not ready yet.                                                          |
-| Ready       | Meets the Definition of Ready (below). Can go into a sprint.                      |
-| In progress | Someone (person or agent) is working on it. A PR may be open as a draft.          |
-| In review   | The PR is open and waiting for its independent review or checks.                  |
-| Done        | Merged, deployed and verified. Closing the issue or merging the PR moves it here. |
+| Status      | Means                                                                                     |
+| ----------- | ----------------------------------------------------------------------------------------- |
+| Backlog     | Captured, not ready yet.                                                                  |
+| Ready       | Meets the Definition of Ready (below). Can go into a sprint.                              |
+| In progress | Someone (person or agent) is working on it. A PR may be open as a draft.                  |
+| In review   | The PR is open and waiting for its independent review or checks.                          |
+| Done        | Merged: the issue closes and the item moves here on its own. `wrapped` checks any deploy. |
 
 - **Fields:** Status, Sprint, Size (S is under half a day, M is 1–2 days, L is up to 3 days),
   plus the built-in Labels, Milestone, Parent issue and Sub-issue progress.
 - **Views:** This sprint (board), Backlog (grouped by epic), Roadmap (by milestone), and Done last
   7 days.
-- **Access:** only Claude Code on the owner's computer, signed in with `gh` and the `project`
-  scope, can create the board and change its fields. Agents in cloud sessions can't reach a
-  board on a personal account, so they keep issue state, labels, parents and milestones right,
-  and the board's automations do the rest.
+- **Access:** changing the board needs the owner's account with the `project` scope: the owner in
+  the web UI, or an agent on his computer signed in with `gh` and that scope. Agents in cloud
+  sessions can't reach a board on a personal account, so they keep issue state, labels, parents
+  and milestones right, and the board's automations do the rest.
 
 ## Definition of Ready
 
