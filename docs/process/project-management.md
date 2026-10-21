@@ -8,6 +8,10 @@ skill is the step-by-step version for agents.
 
 GitHub is the only tracker for new work. Asana is being retired (#89: export #91, cutover #93).
 
+Changing a rule here (how the team works: sprint length, Ready or Done, the levels, the board's
+columns and fields) is a policy change, so the owner agrees first ([`AGENTS.md`](../../AGENTS.md),
+step 3). Fixing wording, links or facts isn't.
+
 ## Levels of work
 
 | Level         | Answers                                            | Size            | On GitHub                                        |
