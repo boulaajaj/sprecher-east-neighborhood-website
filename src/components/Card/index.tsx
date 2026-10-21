@@ -22,7 +22,9 @@ export const Card: React.FC<{
   const { className, doc, relationTo, showCategories, title: titleFromProps } = props
 
   const { slug, categories, meta, publishedAt, title } = doc || {}
-  const { description, image: metaImage } = meta || {}
+  const { description, image } = meta || {}
+  // An unpopulated image is just an ID: show the placeholder rather than a broken image
+  const metaImage = image && typeof image === 'object' ? image : null
 
   const renderableCategories =
     showCategories && Array.isArray(categories)
@@ -55,7 +57,7 @@ export const Card: React.FC<{
             </div>
           </div>
         )}
-        {metaImage && typeof metaImage !== 'string' && (
+        {metaImage && (
           <div className="aspect-video overflow-hidden">
             <Media
               resource={metaImage}
