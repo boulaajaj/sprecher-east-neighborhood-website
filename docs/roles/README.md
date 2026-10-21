@@ -31,9 +31,8 @@ out a change to one, and a change the owner didn't ask for waits for him
 
 - **Claude Code** registers each role as a subagent in `.claude/agents/<role>.md`. Those files only
   hold Claude Code settings and point here.
-- **Other tools** that support custom agents can do the same: a short adapter that points to the
-  guide, listed under [Tool adapters](../../AGENTS.md#tool-adapters). Without one, read the guide
-  for the role you're working in.
+- **Codex** and humans read the guide for the role they're working in
+  ([Tool adapters](../../AGENTS.md#tool-adapters)).
 
 ## Sprint retrospective (every role)
 

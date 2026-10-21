@@ -24,5 +24,5 @@ Guidelines say how things should be. Step-by-step procedures are Agent Skills in
 
 Guidelines are policy. A change goes through the normal workflow, and the reviewer calls it out as a
 policy change; one the owner didn't ask for waits for him ([`AGENTS.md`](../../AGENTS.md), step 3).
-Keep each file under 250 lines and free of tool- or model-specific instructions; those belong in a
-tool adapter (see [Tool adapters](../../AGENTS.md#tool-adapters)).
+Keep each file under 250 lines and free of tool- or model-specific instructions; those belong in the
+tool's adapter (today only Claude Code has one; see [Tool adapters](../../AGENTS.md#tool-adapters)).
