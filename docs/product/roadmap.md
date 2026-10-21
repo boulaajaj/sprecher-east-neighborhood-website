@@ -5,7 +5,7 @@ live status:**
 
 - **Milestones:** dated outcomes.
 - **Epics:** issues labeled `epic`, with their sub-issues.
-- **The project board:** the current sprint.
+- **The project board:** the current sprint (being set up in #90).
 
 This file lists only the milestones and their epics, as a snapshot. GitHub is the source: this
 command prints the open epics by milestone, and the tables below must match it. Update the tables
@@ -37,4 +37,5 @@ The site is useful and inviting enough to promote across the neighborhood.
 | [#164](https://github.com/boulaajaj/sprecher-east-neighborhood-website/issues/164) Photo contest                    | Needs the resident-verification decision first (#168).                  |
 | [#127](https://github.com/boulaajaj/sprecher-east-neighborhood-website/issues/127) Reorganize the code into modules | Under way. Foundation work, done step by step alongside the milestones. |
 
-New ideas start as GitHub issues. They get an epic and a milestone when they're planned.
+New ideas start as GitHub issues: a new capability as an epic, anything smaller under the epic it
+belongs to. An epic gets a milestone when it's planned.

@@ -39,8 +39,9 @@ neighborhood better, in any way, big or small.
 3. **Celebrate the neighborhood.** Activities that invite everyone in. The first idea is a photo
    contest: residents share photos of places they appreciate, enjoy or want to improve, and the
    neighborhood votes.
-4. **Talk it over.** Discussions happen on the neighborhood forum (Discourse, at
-   discourse.sprechereast.org). It stays independent of this site, and the site links to it.
+4. **Talk it over.** Discussions happen on the neighborhood's Discourse forum, which the owner
+   plans to run at discourse.sprechereast.org. It stays independent of this site, and the site
+   links to it.
 
 ## Principles
 
@@ -62,8 +63,11 @@ neighborhood better, in any way, big or small.
 
 ## Not in scope yet
 
-Anything nobody has asked for. New ideas start as GitHub issues and earn a place on the
-[roadmap](roadmap.md).
+- **Speaking for the association.** The site is unofficial and says so
+  ([`AGENTS.md`](../../AGENTS.md#ground-rules)); it isn't the association's official voice.
+- **A comment system on the site.** Discussions link to the forum instead (#161).
+- **Anything nobody has asked for.** New ideas start as GitHub issues and earn a place on the
+  [roadmap](roadmap.md).
 
 ## How we'll know it's working
 
