@@ -22,8 +22,9 @@ gh api repos/{owner}/{repo}/issues/<n>/parent -q '"#\(.number) \(.title)"'      
 gh api repos/{owner}/{repo}/issues/<n>/dependencies/blocked_by -q '.[] | "#\(.number) \(.state)"'
 ```
 
-The sprint and the size are board fields: read them as in §2 step 4. Start only if the issue is
-**Ready**:
+The sprint and the size are board fields. On the owner's computer, read them from the board's
+items (§2 step 4 without `--query`, then find the issue by number in the JSON). Start only if the
+issue is **Ready**:
 
 - it has acceptance criteria, a parent, type, area and priority labels, and a size
 - nothing it's blocked by is still open
@@ -77,30 +78,34 @@ parent epic too: it says what the issue is part of.
    ```
 
 3. **Create it** with the issue form's sections (`### Problem`, `### Proposed fix`,
-   `### Acceptance criteria`, `### Area`, `### Priority`) in `issue.md`:
+   `### Acceptance criteria`, `### Area`, `### Priority`) in `issue.md`. `parent_issue_id` is the
+   epic's `id` (not its number); leave it out for a new epic.
 
    ```bash
+   epic=$(gh api repos/{owner}/{repo}/issues/<epic> -q .id)
    gh api -X POST repos/{owner}/{repo}/issues -f title='<type>: <short problem statement>' \
      -F body=@issue.md -f 'labels[]=bug' -f 'labels[]=cms' -f 'labels[]=priority: medium' \
-     -F milestone=<number>   # only if it's planned
+     -F parent_issue_id=$epic -F milestone=<number>   # milestone only if it's planned
    ```
 
-   Exactly one type, at least one area and one priority ([`.github/label-policy.json`](../../../.github/label-policy.json)).
+   Exactly one type, at least one area and one priority
+   ([`.github/label-policy.json`](../../../.github/label-policy.json)). GitHub's issue `type` field
+   is dropped when set this way from the owner's token, so rely on the type label.
 
-4. **Link it:**
+4. **Link it** when it already exists, or when it can't start before another issue is done:
 
    ```bash
-   id=$(gh api repos/{owner}/{repo}/issues/<new> -q .id)
+   id=$(gh api repos/{owner}/{repo}/issues/<issue> -q .id)
    gh api -X POST repos/{owner}/{repo}/issues/<epic>/sub_issues -F sub_issue_id=$id
-   # It can't start before another issue is done:
    blocker=$(gh api repos/{owner}/{repo}/issues/<blocker> -q .id)
-   gh api -X POST repos/{owner}/{repo}/issues/<new>/dependencies/blocked_by -F issue_id=$blocker
+   gh api -X POST repos/{owner}/{repo}/issues/<issue>/dependencies/blocked_by -F issue_id=$blocker
    ```
 
    A sub-issue has one parent. Don't move an issue to another epic just to group it; use a label
    or a link in the epic's description instead.
 
-5. **Needs the owner?** If only the owner can do it (a login, a payment, a decision):
+5. **Needs the owner?** If only the owner can do it (a login, a payment, a decision), or it
+   changes policy he didn't ask for ([`AGENTS.md`](../../../AGENTS.md) step 3):
    - label it `needs owner`
    - add it to the checklist in the owner-actions epic (#169); its parent stays its own epic
    - mark the issues that depend on it as blocked by it
@@ -113,8 +118,11 @@ parent epic too: it says what the issue is part of.
   plan changes.
 - New work found along the way becomes a new issue (§3). Don't widen the current PR.
 - On the owner's computer, move the board's **Status** (`In progress`, `In review`) with
-  `gh project item-edit`. Closing an issue or merging a PR moves the item to Done on its own.
-  In cloud sessions, leave the board to its automations.
+  `gh project item-edit`. It needs the item, project, field and option IDs: get them from
+  `gh project item-list <project-number> --owner boulaajaj --format json` and
+  `gh project field-list <project-number> --owner boulaajaj --format json`. Closing an issue or
+  merging a PR moves the item to Done on its own. In cloud sessions, leave the board to its
+  automations.
 
 ## 5. Weekly report: "what got done this week?"
 
@@ -123,6 +131,7 @@ since=$(date -u -d '7 days ago' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v-7d
 gh api "repos/{owner}/{repo}/issues?state=closed&since=$since&per_page=100" \
   -q ".[] | select(.pull_request | not) | select(.state_reason == \"completed\") | select(.closed_at >= \"$since\") | \"#\\(.number) \\(.title)\""
 gh api "repos/{owner}/{repo}/milestones?state=open" -q '.[] | "\(.title): \(.closed_issues) done, \(.open_issues) open, due \(.due_on)"'
+gh api "repos/{owner}/{repo}/issues?labels=needs%20owner&state=open&per_page=100" -q '.[] | "#\(.number) \(.title)"'
 ```
 
 `since` filters by last update, so the `closed_at` check keeps only the issues closed in the
@@ -131,7 +140,7 @@ window, and `state_reason` drops duplicates and won't-fix. Report:
 - what shipped (closed issues, grouped by epic: one `/parent` call per issue, as in §1)
 - what's in progress (the open-PR list in §2 step 3)
 - what's Ready next (§2)
-- what's waiting on the owner (`needs owner`)
+- what's waiting on the owner (the `needs owner` list)
 - milestone progress
 
 Keep it short. It's for reading in a minute.
