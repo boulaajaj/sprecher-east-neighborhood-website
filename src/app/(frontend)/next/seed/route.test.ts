@@ -31,7 +31,16 @@ describe('POST /next/seed', () => {
     expect(seed).not.toHaveBeenCalled()
   })
 
-  it('runs the seed for an admin', async () => {
+  it('does not exist on the live site, even for an admin', async () => {
+    vi.stubEnv('NODE_ENV', 'production')
+    auth.mockResolvedValue({ user: user('admin') })
+    const response = await POST()
+    expect(response.status).toBe(404)
+    expect(auth).not.toHaveBeenCalled()
+    expect(seed).not.toHaveBeenCalled()
+  })
+
+  it('runs the seed for an admin in local development', async () => {
     auth.mockResolvedValue({ user: user('admin') })
     const response = await POST()
     expect(response.status).toBe(200)
