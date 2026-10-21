@@ -7,8 +7,14 @@ live status:**
 - **Epics:** issues labeled `epic`, with their sub-issues.
 - **The project board:** the current sprint.
 
-This file lists only the milestones and their epics. Update it when one is added, rescheduled or
-finished, not as work moves.
+This file lists only the milestones and their epics, as a snapshot. GitHub is the source: this
+command prints the open epics by milestone, and the tables below must match it. Update the tables
+when an epic is added, rescheduled or finished, not as work moves.
+
+```bash
+gh api "repos/{owner}/{repo}/issues?labels=epic&state=open&per_page=100" \
+  -q 'sort_by(.milestone.due_on // "9999") | .[] | "\(.milestone.title // "No milestone")\t#\(.number) \(.title)"'
+```
 
 ## Milestone 1: Ready for neighbors (due 2026-11-30)
 
@@ -24,11 +30,11 @@ The site is useful and inviting enough to promote across the neighborhood.
 | [#89](https://github.com/boulaajaj/sprecher-east-neighborhood-website/issues/89) Run the project on GitHub               | The board, the conventions and the move off Asana are done.                                                           |
 | [#169](https://github.com/boulaajaj/sprecher-east-neighborhood-website/issues/169) Owner actions                         | Everything that needs the owner's login, money or decision is done or decided.                                        |
 
-## Not scheduled yet
+## No milestone
 
-| Epic                                                                                                                | Why it waits                                                         |
-| ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| [#164](https://github.com/boulaajaj/sprecher-east-neighborhood-website/issues/164) Photo contest                    | Needs the resident-verification decision first (#168).               |
-| [#127](https://github.com/boulaajaj/sprecher-east-neighborhood-website/issues/127) Reorganize the code into modules | Ongoing foundation work, done step by step alongside the milestones. |
+| Epic                                                                                                                | Why it has no milestone                                                 |
+| ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| [#164](https://github.com/boulaajaj/sprecher-east-neighborhood-website/issues/164) Photo contest                    | Needs the resident-verification decision first (#168).                  |
+| [#127](https://github.com/boulaajaj/sprecher-east-neighborhood-website/issues/127) Reorganize the code into modules | Under way. Foundation work, done step by step alongside the milestones. |
 
 New ideas start as GitHub issues. They get an epic and a milestone when they're planned.

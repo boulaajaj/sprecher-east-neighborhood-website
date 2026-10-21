@@ -6,28 +6,20 @@ next steps are in the [roadmap](roadmap.md). The rules for changing the site are
 
 ## Why it exists
 
-Neighbors want to make Sprecher East better, but it's hard to know what's going on and how to
-help:
-
-- City council decisions that affect the neighborhood are buried in agendas and minutes.
-- Events, news and local issues are scattered across Nextdoor, Facebook, email and word of mouth.
-- People with time or a skill to offer don't know where to start, or who to ask.
-
-The site is the one place to find out what's happening and how to take part. It brings neighbors
-together around projects and activities that make the neighborhood better, in any way, big or
-small.
+The site's job is to bring the neighborhood together. A resident who visits should find it
+useful: recent news, what's going on, the top issues, and what was discussed at city council.
+From there, it encourages people to take part in projects and activities that make the
+neighborhood better, in any way, big or small.
 
 ## Who it serves
 
 - **Residents of all ages and backgrounds**, including new neighbors, who want to know what's going
   on.
-- **Volunteers with any skill:**
+- **Volunteers with any skill**, such as:
   - building websites
-  - fundraising
-  - photography
-  - organizing
-  - writing
-  - or just showing up
+  - raising money
+  - taking photos
+  - anything else that moves the neighborhood forward
 - **The people who keep it running.** The association's volunteer roles are:
   - president
   - marketing
@@ -55,27 +47,23 @@ small.
 - **Unofficial and transparent.** The site is a grassroots, AI-assisted initiative and says so. The
   name is always "Sprecher East".
 - **Factual and fair.**
-  - Sourced, inclusive and nonpartisan.
-  - No political endorsements.
+  - Sourced and inclusive, and it avoids partisan politics.
   - Problems are named honestly, with something the reader can do about them (see the
     [brand voice](../brand-voice-guidelines.md)).
 - **Safe with people's information.**
   - No real personal data in the code.
-  - Nothing a resident submits is public until an editor approves it.
-  - Photos need the photographer's permission and the consent of anyone recognizable in them.
+  - A submitted photo is public only after an editor approves it, with the photographer's
+    permission and the consent of anyone recognizable in it (#164).
 - **Easy for volunteers to run.** Editors work in the CMS, not in code. Any content the site
   publishes regularly must stay manageable for a small team.
-- **Free to run.** Free tiers only. A paid service needs a clear reason and the owner's decision.
-- **Works for everyone.** Mobile first, accessible (WCAG 2.2 AA), fast on a slow phone.
+- **Low cost.** Prefer free tiers. A new paid service needs a clear reason and the owner's
+  decision.
+- **Works for everyone.** Mobile first, accessible (WCAG 2.1 AA), fast on a slow phone.
 
-## Out of scope (for now)
+## Not in scope yet
 
-- Official association business, such as dues or member voting. The site isn't the association's
-  official channel.
-- Comment threads and discussions on the site. They belong on the forum.
-- Paid services and ads.
-- Features nobody has asked for yet. New ideas start as GitHub issues and earn a place on the
-  [roadmap](roadmap.md).
+Anything nobody has asked for. New ideas start as GitHub issues and earn a place on the
+[roadmap](roadmap.md).
 
 ## How we'll know it's working
 
@@ -84,5 +72,7 @@ small.
 - Neighbors take part: they come to events, submit photos and ideas, and join forum
   discussions.
 
-These are signals to watch, not targets. How to measure them without tracking people (for example
-cookieless analytics) is its own decision when the time comes.
+These are the site-wide signals. The per-post targets for news and blog content are in the
+[content guideline](../guidelines/content-marketing.md#success-metrics-posthog--when-configured).
+How to measure without tracking people (for example cookieless analytics) is its own decision when
+the time comes.
