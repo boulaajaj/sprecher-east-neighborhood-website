@@ -8,7 +8,7 @@ import type { EventCardData } from '@/components/EventCard'
 import type { EventScope } from './feedParams'
 import { startOfToday } from './timezone'
 
-// URL parameter checks live in feedParams.ts (no Payload import, so middleware can use them).
+// URL parameter checks live in feedParams.ts (no Payload import, so the proxy can use them).
 export { isEventScope, parsePageNumber, type EventScope } from './feedParams'
 
 /**

@@ -1,6 +1,8 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath } from 'next/cache'
+
+import { expireCacheTag } from '@/utilities/expireCacheTag'
 
 import type { Post } from '../../../payload-types'
 
@@ -29,7 +31,7 @@ export const revalidatePost: CollectionAfterChangeHook<Post> = ({
 
       revalidatePath(path)
       revalidatePostLists()
-      revalidateTag('posts-sitemap')
+      expireCacheTag('posts-sitemap')
     }
 
     // If the post was previously published, we need to revalidate the old path
@@ -40,7 +42,7 @@ export const revalidatePost: CollectionAfterChangeHook<Post> = ({
 
       revalidatePath(oldPath)
       revalidatePostLists()
-      revalidateTag('posts-sitemap')
+      expireCacheTag('posts-sitemap')
     }
   }
   return doc
@@ -52,7 +54,7 @@ export const revalidateDelete: CollectionAfterDeleteHook<Post> = ({ doc, req: { 
 
     revalidatePath(path)
     revalidatePostLists()
-    revalidateTag('posts-sitemap')
+    expireCacheTag('posts-sitemap')
   }
 
   return doc

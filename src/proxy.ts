@@ -23,13 +23,13 @@ export function isValidPagingPath(pathname: string): boolean {
   return true
 }
 
-export function middleware(request: NextRequest): NextResponse {
+export function proxy(request: NextRequest): NextResponse {
   if (isValidPagingPath(request.nextUrl.pathname)) return NextResponse.next()
   return new NextResponse('Not found', { status: 404 })
 }
 
 // `:path+` needs at least one segment after the prefix, so slug pages like `/posts/page` never
-// reach the middleware.
+// reach the proxy.
 export const config = {
   matcher: ['/posts/page/:path+', '/events/list/:path+'],
 }

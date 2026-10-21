@@ -1,11 +1,13 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath } from 'next/cache'
+
+import { expireCacheTag } from '@/utilities/expireCacheTag'
 
 export const revalidateFAQ: CollectionAfterChangeHook = ({ doc, req: { payload, context } }) => {
   if (!context.disableRevalidate) {
     payload.logger.info('Revalidating FAQ page')
     revalidatePath('/faq')
-    revalidateTag('faq')
+    expireCacheTag('faq')
   }
 
   return doc
@@ -14,7 +16,7 @@ export const revalidateFAQ: CollectionAfterChangeHook = ({ doc, req: { payload, 
 export const revalidateDelete: CollectionAfterDeleteHook = ({ doc, req: { context } }) => {
   if (!context.disableRevalidate) {
     revalidatePath('/faq')
-    revalidateTag('faq')
+    expireCacheTag('faq')
   }
 
   return doc

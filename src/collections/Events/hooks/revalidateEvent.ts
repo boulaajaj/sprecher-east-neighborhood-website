@@ -1,5 +1,7 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath } from 'next/cache'
+
+import { expireCacheTag } from '@/utilities/expireCacheTag'
 
 /**
  * The no-JavaScript list pages (/events/list/<scope>/<n>) are cached per URL; refresh them all
@@ -19,8 +21,8 @@ export const revalidateEvent: CollectionAfterChangeHook = ({
       revalidatePath(`/events/${doc.slug}`)
       revalidatePath('/events')
       revalidateEventLists()
-      revalidateTag('events')
-      revalidateTag('events-sitemap')
+      expireCacheTag('events')
+      expireCacheTag('events-sitemap')
     }
 
     if (previousDoc?._status === 'published' && doc._status !== 'published') {
@@ -28,8 +30,8 @@ export const revalidateEvent: CollectionAfterChangeHook = ({
       revalidatePath(`/events/${previousDoc.slug}`)
       revalidatePath('/events')
       revalidateEventLists()
-      revalidateTag('events')
-      revalidateTag('events-sitemap')
+      expireCacheTag('events')
+      expireCacheTag('events-sitemap')
     }
   }
 
@@ -41,8 +43,8 @@ export const revalidateDelete: CollectionAfterDeleteHook = ({ doc, req: { contex
     revalidatePath(`/events/${doc.slug}`)
     revalidatePath('/events')
     revalidateEventLists()
-    revalidateTag('events')
-    revalidateTag('events-sitemap')
+    expireCacheTag('events')
+    expireCacheTag('events-sitemap')
   }
 
   return doc

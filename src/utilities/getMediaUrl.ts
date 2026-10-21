@@ -1,24 +1,16 @@
-import { getClientSideURL } from '@/utilities/getURL'
+import { getServerSideURL } from './getURL'
 
 /**
- * Processes media resource URL to ensure proper formatting
- * @param url The original URL from the resource
- * @param cacheTag Optional cache tag to append to the URL
- * @returns Properly formatted URL with cache tag if provided
+ * The URL to render an upload with, plus its cache tag. Uploads on this site come back relative
+ * (`/api/media/file/park.webp`): Payload prefixes them with its `serverURL`, and this removes it.
+ * next/image then reads them as local files: since Next 16 it refuses remote URLs that resolve to
+ * a private IP, such as localhost. URLs on other hosts pass through unchanged.
  */
 export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | null): string => {
   if (!url) return ''
 
-  if (cacheTag && cacheTag !== '') {
-    cacheTag = encodeURIComponent(cacheTag)
-  }
+  const siteURL = getServerSideURL()
+  const path = url.startsWith(`${siteURL}/`) ? url.slice(siteURL.length) : url
 
-  // Check if URL already has http/https protocol
-  if (url.startsWith('http://') || url.startsWith('https://')) {
-    return cacheTag ? `${url}?${cacheTag}` : url
-  }
-
-  // Otherwise prepend client-side URL
-  const baseUrl = getClientSideURL()
-  return cacheTag ? `${baseUrl}${url}?${cacheTag}` : `${baseUrl}${url}`
+  return cacheTag ? `${path}?${encodeURIComponent(cacheTag)}` : path
 }
