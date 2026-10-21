@@ -5,6 +5,7 @@ import { FlatCompat } from '@eslint/eslintrc'
 import tseslint from 'typescript-eslint'
 import unusedImports from 'eslint-plugin-unused-imports'
 import eslintConfigPrettier from 'eslint-config-prettier'
+import { boundariesConfig } from './eslint.boundaries.mjs'
 
 // FlatCompat bridge for eslint-config-next (still uses legacy format)
 const __filename = fileURLToPath(import.meta.url)
@@ -95,6 +96,9 @@ export default [
     },
   },
 
-  // ─── 6. Prettier must be last ────────────────────────────────────────────────
+  // ─── 6. Architecture boundaries (warnings while code moves, #130) ────────────
+  boundariesConfig,
+
+  // ─── 7. Prettier must be last ────────────────────────────────────────────────
   eslintConfigPrettier,
 ]

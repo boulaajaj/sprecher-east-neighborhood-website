@@ -37,6 +37,8 @@ export const beforeSyncWithSearch: BeforeSync = async ({ req, originalDoc, searc
         disableErrors: true,
         depth: 0,
         select: { title: true },
+        // Indexing runs for every save, signed in or not; categories are public anyway
+        overrideAccess: true,
         req,
       })
 

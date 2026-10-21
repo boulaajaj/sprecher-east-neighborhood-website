@@ -21,25 +21,19 @@ export const PayloadRedirects: React.FC<Props> = async ({ disableNotFound, url }
       redirect(redirectItem.to.url)
     }
 
-    let redirectUrl: string
+    const reference = redirectItem.to?.reference
+    let target = typeof reference?.value === 'object' ? reference.value : null
 
-    if (typeof redirectItem.to?.reference?.value === 'string') {
-      const collection = redirectItem.to?.reference?.relationTo
-      const id = redirectItem.to?.reference?.value
-
-      const document = (await getCachedDocument(collection, id)()) as Page | Post
-      redirectUrl = `${redirectItem.to?.reference?.relationTo !== 'pages' ? `/${redirectItem.to?.reference?.relationTo}` : ''}/${
-        document?.slug
-      }`
-    } else {
-      redirectUrl = `${redirectItem.to?.reference?.relationTo !== 'pages' ? `/${redirectItem.to?.reference?.relationTo}` : ''}/${
-        typeof redirectItem.to?.reference?.value === 'object'
-          ? redirectItem.to?.reference?.value?.slug
-          : ''
-      }`
+    // An unpopulated reference is an ID: look it up as a visitor would (null for a draft)
+    if (typeof reference?.value === 'number') {
+      const found = await getCachedDocument(reference.relationTo, reference.value)()
+      target = found as Page | Post | null
     }
 
-    if (redirectUrl) redirect(redirectUrl)
+    if (reference && target?.slug) {
+      const prefix = reference.relationTo !== 'pages' ? `/${reference.relationTo}` : ''
+      redirect(`${prefix}/${target.slug}`)
+    }
   }
 
   if (disableNotFound) return null

@@ -1,3 +1,5 @@
+import 'server-only'
+
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { unstable_cache } from 'next/cache'
@@ -10,6 +12,8 @@ export async function getRedirects(depth = 1) {
     depth,
     limit: 0,
     pagination: false,
+    // Redirects are admin-only in the admin panel; the site still has to read them to follow them
+    overrideAccess: true,
   })
 
   return redirects

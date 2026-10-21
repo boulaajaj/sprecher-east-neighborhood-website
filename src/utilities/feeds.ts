@@ -1,3 +1,5 @@
+import 'server-only'
+
 import configPromise from '@payload-config'
 import { getPayload, type Where } from 'payload'
 
