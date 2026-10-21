@@ -3,7 +3,8 @@
 How work is organized on GitHub: what each level means, how a sprint runs, what the board shows,
 and when work is ready or done. It applies to every person and agent. How a change reaches `main`
 is in [`AGENTS.md`](../../AGENTS.md). Where the work is heading is in the
-[roadmap](../product/roadmap.md).
+[roadmap](../product/roadmap.md). The [`project-tracking`](../../.agents/skills/project-tracking/SKILL.md)
+skill is the step-by-step version for agents.
 
 GitHub is the only tracker for new work. Asana is being retired (#89: export #91, cutover #93).
 
@@ -84,7 +85,9 @@ An issue is **Ready** when it has:
 
 - what and why, in plain language
 - acceptance criteria someone else could check
-- a parent epic, labels (type, area, priority) and a size
+- a parent epic, labels (type, area, priority) and a size. When the board can't be read (cloud
+  sessions, or until #90 is done), skip Size and say so on the issue
+  ([`project-tracking`](../../.agents/skills/project-tracking/SKILL.md) §1)
 - no open blocker: nothing it's **blocked by** is still open
 - no `needs owner` label: that work waits for the owner, not for a sprint
 
