@@ -45,7 +45,7 @@ const STILL_QUERYING_PAYLOAD = [
   '(frontend)/(sitemaps)/events-sitemap.xml/route.ts',
   '(frontend)/(sitemaps)/pages-sitemap.xml/route.ts',
   '(frontend)/(sitemaps)/posts-sitemap.xml/route.ts',
-].map((file) => `src/app/${file}`.replace(/[()[\]]/g, '\\$&')) // literal brackets, not globs
+].map((file) => `src/app/${file}`.replace(/[\\()[\]{}*?!+@]/g, '\\$&')) // escape glob characters
 
 // Inside a module, what each part must not import from the same module (rules 1, 4 and 5).
 // Entry files never import each other; inner folders import folders, not entry files.

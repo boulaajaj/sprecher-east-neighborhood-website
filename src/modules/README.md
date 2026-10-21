@@ -11,5 +11,5 @@ the site. Areas move here from the template folders one at a time (#127).
   registry in `src/app/`, and `payload.config.ts`, put modules together
   ([0008](../../docs/architecture/decisions/0008-compose-modules-at-the-app-level.md)).
 
-Lint warns when code breaks these rules (`eslint.boundaries.mjs`). The full map is in
+Lint warns when code breaks these rules (`eslint.boundaries.config.mjs`). The full map is in
 [`docs/architecture/`](../../docs/architecture/README.md#inside-a-module).

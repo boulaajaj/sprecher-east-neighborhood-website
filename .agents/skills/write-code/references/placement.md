@@ -46,7 +46,7 @@ Inside a module, import the folder you need directly; entry files are only for c
 2. Create `src/modules/<area>/` with only `index.ts` and the folders the first feature needs.
 3. Register its `cms.ts` in `payload.config.ts` if it owns collections.
 
-Lint needs no change: `eslint.boundaries.mjs` covers every folder in `src/modules/`.
+Lint needs no change: `eslint.boundaries.config.mjs` covers every folder in `src/modules/`.
 
 ## Composing two modules
 
@@ -67,6 +67,6 @@ Where two areas meet:
 2. Update the imports to the module's entry files; add exports there as needed.
 3. Update Payload admin component paths and run `npm run generate:importmap` if any moved.
 4. Remove the old file once nothing imports it; no re-export shims left behind.
-5. In `eslint.boundaries.mjs`, drop moved pages from `STILL_QUERYING_PAYLOAD` and emptied folders
+5. In `eslint.boundaries.config.mjs`, drop moved pages from `STILL_QUERYING_PAYLOAD` and emptied folders
    from `TEMPLATE_FOLDERS`.
 6. The site must look and behave the same: run the tests, and screenshot the affected pages.

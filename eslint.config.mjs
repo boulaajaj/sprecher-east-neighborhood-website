@@ -5,7 +5,7 @@ import { FlatCompat } from '@eslint/eslintrc'
 import tseslint from 'typescript-eslint'
 import unusedImports from 'eslint-plugin-unused-imports'
 import eslintConfigPrettier from 'eslint-config-prettier'
-import { boundariesConfig } from './eslint.boundaries.mjs'
+import { boundariesConfig } from './eslint.boundaries.config.mjs'
 
 // FlatCompat bridge for eslint-config-next (still uses legacy format)
 const __filename = fileURLToPath(import.meta.url)

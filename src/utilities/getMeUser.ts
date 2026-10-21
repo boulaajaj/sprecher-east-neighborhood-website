@@ -10,7 +10,6 @@ export const getMeUser = async (args?: {
   nullUserRedirect?: string
   validUserRedirect?: string
 }): Promise<{
-  token: string
   user: User
 }> => {
   const { nullUserRedirect, validUserRedirect } = args || {}
@@ -37,9 +36,5 @@ export const getMeUser = async (args?: {
     redirect(nullUserRedirect)
   }
 
-  // Token will exist here because if it doesn't the user will be redirected
-  return {
-    token: token!,
-    user,
-  }
+  return { user }
 }

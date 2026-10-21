@@ -50,7 +50,7 @@ files, a new feature, a new module: [`references/placement.md`](references/place
 
 ## 3. Keep the dependencies pointing one way
 
-Lint warns on the first four ([`eslint.boundaries.mjs`](../../../eslint.boundaries.mjs); errors from
+Lint warns on the first four ([`eslint.boundaries.config.mjs`](../../../eslint.boundaries.config.mjs); errors from
 #137). Check `overrideAccess`, DTOs, `server-only` and colors yourself; #146 adds a color check
 ([rules](../../../docs/architecture/README.md#dependency-rules)):
 

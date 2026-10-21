@@ -168,11 +168,11 @@ What this buys:
    [frontend patterns](../guidelines/frontend-patterns/README.md) use raw `white` or `black`
    anywhere but text and overlays on photos, this rule wins until #146 updates them.
 
-How they are checked (warnings until #137): [`eslint.boundaries.mjs`](../../eslint.boundaries.mjs)
+How they are checked (warnings until #137): [`eslint.boundaries.config.mjs`](../../eslint.boundaries.config.mjs)
 checks the imports in rules 1–3 and 6 and the `cms/` part of rule 4. For the rest of rule 4,
 `server-only` fails the build when browser code imports server code, and CI's `payload migrate`
-fails when the CMS config reaches it. Review covers rules 5, 7 and 8 until a lint check for
-`overrideAccess` exists (#145); rule 9 comes with lint and the theme test (#146). Vitest aliases
+fails when the CMS config reaches it. Review covers rules 5, 7 and 8 (#137 adds a lint check for
+`overrideAccess`); rule 9 comes with lint and the theme test (#146). Vitest aliases
 `server-only` to an empty module so `data/` mappers can be unit-tested.
 
 ## Where does it go?
