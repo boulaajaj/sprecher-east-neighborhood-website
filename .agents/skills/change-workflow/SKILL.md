@@ -97,32 +97,40 @@ Open it as a draft (`--draft`) while work is incomplete.
    - Check failed → fix, push, then wait again.
    - Review comments → fix or explain. Reply on each thread saying what you did, then
      resolve it. Never leave a conversation unresolved.
-4. **Ready:** every required check passes on the current head, the review's verdict is
-   **Ready to merge**, and its findings are addressed with every conversation resolved. Go to
-   step 6. Exceptions that wait for the owner: an issue or PR labeled `needs owner`, and a policy
-   change he didn't ask for ([`AGENTS.md`](../../../AGENTS.md) step 3).
+4. **Ready:** every required check passes on the current head, a review of that head (its
+   `commit_id`) says **Ready to merge**, and its findings are addressed with every conversation
+   resolved. A review of an earlier head still counts when the only change since is a rebase that
+   leaves the PR's own diff the same (a stack layer after the one below merged). Note the head SHA
+   and go to step 6. Exceptions that wait for the
+   owner: an issue or PR labeled `needs owner`, and a policy change he didn't ask for
+   ([`AGENTS.md`](../../../AGENTS.md) step 3). For those, label the PR `needs owner` and stop;
+   he merges it or removes the label.
 5. **A PR below yours changed** (stacked PRs): rebase yours onto it and push, as in
    [`stacked-prs`](../stacked-prs/SKILL.md) step 4.
 
 ## 6. Merge and deploy
 
 Merge with GitHub's asynchronous merge API, which is the only one that merges stacked PRs. It
-keeps every rule enforced (`bypass_rules=false`) and refuses if the head moved since you checked:
+keeps every rule enforced (`bypass_rules=false`). Pass the head SHA you noted in step 5.4, so
+GitHub refuses if anything was pushed after the checks and the review:
 
 ```bash
 H='X-GitHub-Api-Version: 2026-03-10'
-sha=$(gh api repos/{owner}/{repo}/pulls/<number> -q .head.sha)
+sha=<head SHA noted in step 5.4>
 gh api -X PUT repos/{owner}/{repo}/pulls/<number>/merge-async -H "$H" \
   -f merge_method=squash -f merge_action=direct_merge -F bypass_rules=false -f sha="$sha"
-# The answer has details.uuid. Poll until status is merged or failed:
+# 202: the answer has details.uuid. Poll until status is merged or failed:
 gh api repos/{owner}/{repo}/pulls/<number>/merge-async/<uuid> -H "$H"
 ```
+
+A `409` means a merge of this PR is already running: poll it instead of starting another. A
+`200` means it was already merged.
 
 - Never merge with `--admin`, `bypass_rules=true` or any other bypass. If GitHub refuses, read
   its message, fix the cause, and try again.
 - **A stack merges one layer at a time, from the bottom.** Merge the lowest open layer. GitHub
   then retargets the next layer to `main` and rebases it. Wait for that layer's checks on its new
-  head, and for the deploy of the previous layer to succeed, before merging it.
+  head, and, if the previous merge started a deploy, for it to succeed, before merging it.
 - The merge triggers `Deploy to VPS` (docs-only changes don't deploy). Then run
   [`wrapped`](../wrapped/SKILL.md): verify the merge, read the deploy's annotations, check the
   site (`https://sprechereast.com`) and the behavior that changed, and report.

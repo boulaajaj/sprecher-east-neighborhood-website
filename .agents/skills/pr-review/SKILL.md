@@ -33,10 +33,12 @@ gh api "repos/{owner}/{repo}/stacks?pull_request=<number>" -H 'X-GitHub-Api-Vers
       needed. A merge order written only in prose is a **Blocker**.
 - [ ] **Policy changes are flagged.** If the diff touches `AGENTS.md`, `.agents/`,
       `.github/` (workflows, templates, label policy), `docs/guidelines/`, `docs/roles/`, or a
-      tool adapter (`CLAUDE.md`, `.claude/`, `GEMINI.md`), list each such change under **Major**.
-      Check that the owner asked for it (link his issue or message). If he didn't, the verdict is
-      **Waits for owner**. A PR can change the checks that run on itself, so read workflow changes
-      carefully.
+      tool adapter (`CLAUDE.md`, `.claude/`, `GEMINI.md`), list each such change under
+      **Policy changes** in the review. Then check the owner asked for it. Agents file issues
+      through his account, so an issue alone isn't proof: the issue or PR must quote his words,
+      with the date and where he said them. Check the change stays within that quote. If there
+      is no quote, or the change goes beyond it, the verdict is **Waits for owner**. A PR can
+      change the checks that run on itself, so read workflow changes carefully.
 
 ## 3. Check the change
 
@@ -69,6 +71,9 @@ Group findings by severity:
 - **Major:** should fix before merge
 - **Minor:** fine to fix in a follow-up issue
 
+List policy changes under their own **Policy changes** heading, with the owner's quote that
+covers them. They are for visibility, not findings, so they don't count against Ready to merge.
+
 ```bash
 gh pr review <number> --comment --body-file review.md
 ```
@@ -76,8 +81,14 @@ gh pr review <number> --comment --body-file review.md
 For a specific line, add inline comments in the web UI or with `gh api`. End the review with a
 verdict:
 
-- **Ready to merge:** no Blocker or Major left to fix. The author then merges
-  ([`change-workflow`](../change-workflow/SKILL.md), step 6).
+Post the review on the PR's current head, so its `commit_id` records the head you reviewed. A
+later push that changes the PR's own diff needs a new review; a rebase that leaves it the same
+doesn't.
+
+- **Ready to merge:** no Blocker or Major left to fix, and every policy change is covered by the
+  owner's words. The author then merges ([`change-workflow`](../change-workflow/SKILL.md),
+  step 6).
 - **Changes requested:** list them. The author fixes them and asks for a re-review.
-- **Waits for owner:** the PR is labeled `needs owner`, or it changes policy the owner didn't ask
-  for.
+- **Waits for owner:** the PR or its issue is labeled `needs owner`, or it changes policy the
+  owner didn't ask for. The author labels the PR `needs owner` and stops; the owner merges it or
+  removes the label.

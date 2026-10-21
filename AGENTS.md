@@ -49,22 +49,28 @@ Merging code changes to `main` deploys them to production automatically
    Changes to the process itself are policy changes, and the review must call them out
    explicitly. That covers `AGENTS.md`, `.agents/`, `docs/guidelines/`, `docs/roles/`,
    `.github/`, and the tool adapters (`CLAUDE.md`, `.claude/`, `GEMINI.md`). A policy change
-   the owner (Amine) asked for, in an issue or in his own words, follows the normal path. One he
-   didn't ask for waits for him.
+   the owner (Amine) asked for follows the normal path. Agents file issues through his account,
+   so an issue alone doesn't show he asked: the issue or PR quotes his words, with the date and
+   where he said them, and the reviewer checks the change stays within that quote. A policy
+   change an agent proposes on its own is labeled `needs owner` when it's filed, and waits for
+   him.
 
 4. **Everything green.** All required checks pass before merge: `Type-check & Build`,
    `Prettier`, `ESLint`, `Dependency Audit`, and `PR Policy` (which verifies steps 1–2).
    Never bypass a failing or missing check. In a stack, every PR must be green on its own.
 
    Dependabot PRs are exempt from the issue and description rules only. They still need green
-   checks and a review before they merge.
+   checks and a review before they merge. Whoever picks one up (usually the ops lead) owns it and
+   merges it.
 
-5. **Merge, then CI/CD takes over.** The agent that owns the PR merges it (squash merge) once
-   steps 3 and 4 are done: every required check passes on the PR's current head, the review says
-   **Ready to merge**, and no conversation is open. The owner doesn't need to be involved, but he
-   can merge, hold or reopen anything himself. Anything labeled `needs owner` waits for him. A
-   stack merges one layer at a time from the bottom. Before the next layer, wait for its checks
-   on its rebased head and for the deploy to succeed
+5. **Merge, then CI/CD takes over.** The agent that owns the PR merges it (squash merge) once steps
+   3 and 4 are done: every required check passes on the PR's current head, the review of that head
+   says **Ready to merge**, and no conversation is open. (A review of an earlier head still counts
+   when the only change since is a rebase that leaves the PR's own diff the same.) The owner
+   doesn't need to be involved, but he can merge, hold or revert anything himself. A PR labeled
+   `needs owner`, or one whose issue is, waits for him: he merges it or removes the label. A stack
+   merges one layer at a time from the bottom. Before the next layer, wait for its checks on its
+   rebased head and, if the merge started a deploy, for the deploy to succeed
    ([`change-workflow`](.agents/skills/change-workflow/SKILL.md), step 6). The deploy workflow
    ships `main` to the VPS. After the merge, the linked issue is closed and gets a comment
    summarizing how it was fixed (`.github/workflows/issue-fix-summary.yml`).

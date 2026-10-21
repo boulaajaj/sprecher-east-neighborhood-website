@@ -90,7 +90,7 @@ diff (GitHub also shows the stack in the PR's merge box):
 
 ```markdown
 > **Layer <n> of native GitHub stack #<stack>.** It sits on #<PR below> (`<branch below>`).
-> Merging it also merges every PR below it; GitHub enforces the order.
+> Layers merge one at a time from the bottom; GitHub enforces the order.
 ```
 
 The bottom PR says it sits on `main`. Don't list the whole stack or its size in the line: GitHub
@@ -135,7 +135,7 @@ one of them again, reset your local copy to GitHub's: `git fetch origin` then
 - Merge one layer at a time, from the bottom, with the asynchronous merge API and every rule
   enforced ([`change-workflow`](../change-workflow/SKILL.md), step 6). After each merge, GitHub
   retargets the next layer to `main` and rebases it. Wait for its checks on the new head, and for
-  the previous deploy, before merging it. Merging a higher PR would merge everything below it in
+  the previous deploy if that merge started one, before merging it. Merging a higher PR would merge everything below it in
   one go, which skips those checks between layers.
 - To restructure a stack (reorder, drop or insert a layer), use `gh stack modify`; it keeps the
   stack. Without the extension, dissolve it with
