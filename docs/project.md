@@ -26,6 +26,7 @@ It is an unofficial, AI-assisted initiative (ground rules in [`AGENTS.md`](../AG
 - **Tests**: Vitest unit tests next to the code (`*.test.ts`), run with `npm test` and in CI (#139)
 - **Rich Text**: Lexical editor with slash menu, toolbars, inline images, and custom blocks
 - **Icons**: Lucide React
+- **Payload docs for agents**: https://payloadcms.com/llms-full.txt (the whole Payload documentation in one file)
 - **Hosting**: Hostinger VPS (Ubuntu 24.04, PM2 + Caddy)
 
 ## VPS / Hosting

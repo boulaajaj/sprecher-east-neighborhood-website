@@ -54,6 +54,7 @@ process:
             '.agents/**',
             '.claude/**',
             'docs/guidelines/**',
+            'docs/roles/**',
             '.github/copilot-instructions.md',
             '.github/ISSUE_TEMPLATE/**',
             '.github/pull_request_template.md',
