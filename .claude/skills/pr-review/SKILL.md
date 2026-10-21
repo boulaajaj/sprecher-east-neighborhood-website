@@ -1,6 +1,6 @@
 ---
 name: pr-review
-description: Independent review of a pull request in this repo before the owner approves it — checks the linked issue, PR description, scope, correctness, security, and CI, then posts findings on the PR by severity. Use when asked to review a PR; never review a PR you authored.
+description: Independent review of a pull request in this repo before it merges — checks the linked issue, PR description, scope, correctness, security, and CI, then posts findings on the PR by severity. Use when asked to review a PR; never review a PR you authored.
 ---
 
 # pr-review (pointer)

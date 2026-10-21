@@ -32,7 +32,7 @@ Read the other guidelines (frontend patterns, content marketing, Asana) when a t
   `simplify` skill exists, Claude Code also runs it before each commit that isn't docs or tests
   (Claude Code v2.1.286 or later; a personal `~/.claude/skills/simplify` would win over it). Run
   it again before opening or updating a PR.
-- **After the owner merges,** run `/wrapped` (the [`wrapped`](.agents/skills/wrapped/SKILL.md) skill).
+- **After every merge,** run `/wrapped` (the [`wrapped`](.agents/skills/wrapped/SKILL.md) skill).
 - **Independent review:** run the [`pr-review`](.agents/skills/pr-review/SKILL.md) skill in a
   separate session or a subagent (for example `qa-reviewer`), never in the context that wrote
   the change.

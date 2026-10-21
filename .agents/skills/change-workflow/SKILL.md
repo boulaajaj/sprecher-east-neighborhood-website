@@ -1,6 +1,6 @@
 ---
 name: change-workflow
-description: Mandatory procedure for any code, config, or docs change to this repo — create a labeled GitHub issue, work on a branch, open a PR from the template (on a native stack when it depends on another open PR), get it independently reviewed, wait for all checks to go green, and hand off to the owner to merge (which deploys). Use before starting any change.
+description: Mandatory procedure for any code, config, or docs change to this repo — create a labeled GitHub issue, work on a branch, open a PR from the template (on a native stack when it depends on another open PR), get it independently reviewed, wait for all checks to go green, then merge it yourself once it's green and reviewed (which deploys). Use before starting any change.
 ---
 
 # Change workflow
@@ -97,20 +97,36 @@ Open it as a draft (`--draft`) while work is incomplete.
    - Check failed → fix, push, then wait again.
    - Review comments → fix or explain. Reply on each thread saying what you did, then
      resolve it. Never leave a conversation unresolved.
-4. **Ready:** everything is green, the review is posted and its findings are addressed. Tell
-   the owner the PR is ready for approval. For a stack, say which PR to merge: the top one merges
-   the whole stack.
+4. **Ready:** every required check passes on the current head, the review's verdict is
+   **Ready to merge**, and its findings are addressed with every conversation resolved. Go to
+   step 6. Exceptions that wait for the owner: an issue or PR labeled `needs owner`, and a policy
+   change he didn't ask for ([`AGENTS.md`](../../../AGENTS.md) step 3).
 5. **A PR below yours changed** (stacked PRs): rebase yours onto it and push, as in
    [`stacked-prs`](../stacked-prs/SKILL.md) step 4.
 
-## 6. Merge and deploy (owner)
+## 6. Merge and deploy
 
-- Only the owner merges (squash); merging is the owner's approval. Agents never merge (no
-  `gh pr merge`), and never use `--admin` or any other bypass.
-- A stack merges from the bottom up: merging a PR also merges every PR below it, and GitHub
-  rebases the ones above.
-- The merge triggers `Deploy to VPS`. Watch it: `gh run list --workflow deploy.yml -L 1`.
-- Afterwards, check the site (`https://sprechereast.com`) and the specific behavior changed.
+Merge with GitHub's asynchronous merge API, which is the only one that merges stacked PRs. It
+keeps every rule enforced (`bypass_rules=false`) and refuses if the head moved since you checked:
+
+```bash
+H='X-GitHub-Api-Version: 2026-03-10'
+sha=$(gh api repos/{owner}/{repo}/pulls/<number> -q .head.sha)
+gh api -X PUT repos/{owner}/{repo}/pulls/<number>/merge-async -H "$H" \
+  -f merge_method=squash -f merge_action=direct_merge -F bypass_rules=false -f sha="$sha"
+# The answer has details.uuid. Poll until status is merged or failed:
+gh api repos/{owner}/{repo}/pulls/<number>/merge-async/<uuid> -H "$H"
+```
+
+- Never merge with `--admin`, `bypass_rules=true` or any other bypass. If GitHub refuses, read
+  its message, fix the cause, and try again.
+- **A stack merges one layer at a time, from the bottom.** Merge the lowest open layer. GitHub
+  then retargets the next layer to `main` and rebases it. Wait for that layer's checks on its new
+  head, and for the deploy of the previous layer to succeed, before merging it.
+- The merge triggers `Deploy to VPS` (docs-only changes don't deploy). Then run
+  [`wrapped`](../wrapped/SKILL.md): verify the merge, read the deploy's annotations, check the
+  site (`https://sprechereast.com`) and the behavior that changed, and report.
+- A failed deploy is fixed or reverted through a new PR, never on the server.
 - The issue closes automatically. `issue-fix-summary.yml` comments on it with how it was fixed.
 
 ## Server or dashboard changes (`infra`)

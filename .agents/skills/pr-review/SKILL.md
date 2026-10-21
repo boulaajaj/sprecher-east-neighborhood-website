@@ -1,6 +1,6 @@
 ---
 name: pr-review
-description: Independent review of a pull request in this repo before the owner approves it — checks the linked issue, PR description, scope, correctness, security, and CI, then posts findings on the PR by severity. Use when asked to review a PR; never review a PR you authored.
+description: Independent review of a pull request in this repo before it merges — checks the linked issue, PR description, scope, correctness, security, and CI, then posts findings on the PR by severity. Use when asked to review a PR; never review a PR you authored.
 ---
 
 # PR review
@@ -33,9 +33,10 @@ gh api "repos/{owner}/{repo}/stacks?pull_request=<number>" -H 'X-GitHub-Api-Vers
       needed. A merge order written only in prose is a **Blocker**.
 - [ ] **Policy changes are flagged.** If the diff touches `AGENTS.md`, `.agents/`,
       `.github/` (workflows, templates, label policy), `docs/guidelines/`, `docs/roles/`, or a
-      tool adapter (`CLAUDE.md`, `.claude/`, `GEMINI.md`), list each such change under **Major**
-      so the owner signs off on it explicitly. A PR can change the checks that run on itself, so
-      read workflow changes carefully.
+      tool adapter (`CLAUDE.md`, `.claude/`, `GEMINI.md`), list each such change under **Major**.
+      Check that the owner asked for it (link his issue or message). If he didn't, the verdict is
+      **Waits for owner**. A PR can change the checks that run on itself, so read workflow changes
+      carefully.
 
 ## 3. Check the change
 
@@ -73,5 +74,10 @@ gh pr review <number> --comment --body-file review.md
 ```
 
 For a specific line, add inline comments in the web UI or with `gh api`. End the review with a
-verdict: **Ready for owner approval** or **Changes requested** (list them). Approval itself
-belongs to the owner.
+verdict:
+
+- **Ready to merge:** no Blocker or Major left to fix. The author then merges
+  ([`change-workflow`](../change-workflow/SKILL.md), step 6).
+- **Changes requested:** list them. The author fixes them and asks for a re-review.
+- **Waits for owner:** the PR is labeled `needs owner`, or it changes policy the owner didn't ask
+  for.

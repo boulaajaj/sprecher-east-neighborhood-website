@@ -43,30 +43,37 @@ Merging code changes to `main` deploys them to production automatically
 3. **Review.** Every PR is reviewed before merge:
    - an **independent review** by a reviewer that did not write the change (a separate agent
      session following [`pr-review`](.agents/skills/pr-review/SKILL.md), or a human), posted
-     on the PR
+     on the PR, ending with the verdict **Ready to merge**
    - every review comment answered and its conversation resolved
-   - the **owner (Amine)** reviews the PR and approves it **by merging**
 
    Changes to the process itself are policy changes, and the review must call them out
-   explicitly for the owner. That covers `AGENTS.md`, `.agents/`, `docs/guidelines/`,
-   `docs/roles/`, `.github/`, and the tool adapters (`CLAUDE.md`, `.claude/`, `GEMINI.md`).
+   explicitly. That covers `AGENTS.md`, `.agents/`, `docs/guidelines/`, `docs/roles/`,
+   `.github/`, and the tool adapters (`CLAUDE.md`, `.claude/`, `GEMINI.md`). A policy change
+   the owner (Amine) asked for, in an issue or in his own words, follows the normal path. One he
+   didn't ask for waits for him.
 
 4. **Everything green.** All required checks pass before merge: `Type-check & Build`,
    `Prettier`, `ESLint`, `Dependency Audit`, and `PR Policy` (which verifies steps 1–2).
    Never bypass a failing or missing check. In a stack, every PR must be green on its own.
 
    Dependabot PRs are exempt from the issue and description rules only. They still need green
-   checks, and the owner still merges them.
+   checks and a review before they merge.
 
-5. **Merge, then CI/CD takes over.** Only the owner merges (squash merge). A stack merges from
-   the bottom up: merging a PR also merges every PR below it. The deploy workflow ships `main`
-   to the VPS. After the merge, the linked issue is closed and gets a comment summarizing how it
-   was fixed (`.github/workflows/issue-fix-summary.yml`).
+5. **Merge, then CI/CD takes over.** The agent that owns the PR merges it (squash merge) once
+   steps 3 and 4 are done: every required check passes on the PR's current head, the review says
+   **Ready to merge**, and no conversation is open. The owner doesn't need to be involved, but he
+   can merge, hold or reopen anything himself. Anything labeled `needs owner` waits for him. A
+   stack merges one layer at a time from the bottom. Before the next layer, wait for its checks
+   on its rebased head and for the deploy to succeed
+   ([`change-workflow`](.agents/skills/change-workflow/SKILL.md), step 6). The deploy workflow
+   ships `main` to the VPS. After the merge, the linked issue is closed and gets a comment
+   summarizing how it was fixed (`.github/workflows/issue-fix-summary.yml`).
 
 ### Never
 
-- Never push to `main` directly or merge a PR as an agent. That includes `--admin`
-  merges and any other ruleset bypass, even when the account you're using has admin rights.
+- Never push to `main` directly, and never merge a PR whose checks or review aren't done.
+- Never bypass a rule: no `--admin`, no `bypass_rules: true`, no other ruleset bypass, even when
+  the account you're using has admin rights.
 - **Never change code on the server.** No editing files in `/var/www/sprecher-east`, no
   `git apply` or hotfixes over SSH. If production is broken, fix or revert through a PR.
 - Never commit secrets (`.env.local`, keys, tokens, passwords).
@@ -84,10 +91,9 @@ on that issue with what was actually changed. Never put secret values in the iss
 The `main` ruleset requires a pull request, the five checks above, and resolved conversations.
 It also blocks force pushes and deletion. Stacks enforce the merge order of dependent PRs.
 Agents currently work through the owner's GitHub account, which has admin rights, so GitHub
-can't technically stop an agent from bypassing the ruleset, and it can't record a separate
-approval. Until agents have their own GitHub identity, these rules depend on every agent
-following this file. When agents get their own identity, the ruleset will also require one
-approving review from the owner.
+can't technically stop an agent from bypassing the ruleset. Until agents have their own GitHub
+identity (#106), the no-bypass rule depends on every agent following this file and merging with
+rules enforced (`bypass_rules: false`).
 
 ## Skills: how to do things
 
@@ -97,12 +103,12 @@ support skills load them from there; any other agent or human reads them as plai
 
 | Skill                                                                  | Use it when                                                               |
 | ---------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| [`change-workflow`](.agents/skills/change-workflow/SKILL.md)           | Before any change: issue, branch, PR, review, checks, hand-off.           |
+| [`change-workflow`](.agents/skills/change-workflow/SKILL.md)           | Before any change: issue, branch, PR, review, checks, merge.              |
 | [`stacked-prs`](.agents/skills/stacked-prs/SKILL.md)                   | A PR depends on another open PR, or a PR in a stack has to change.        |
 | [`self-review`](.agents/skills/self-review/SKILL.md)                   | A change is done: review your own diff before opening or updating the PR. |
 | [`visual-design-review`](.agents/skills/visual-design-review/SKILL.md) | The change affects how pages look.                                        |
 | [`pr-review`](.agents/skills/pr-review/SKILL.md)                       | You are the independent reviewer of a PR you didn't write.                |
-| [`wrapped`](.agents/skills/wrapped/SKILL.md)                           | The owner has merged: verify, check the deploy, close the loop, report.   |
+| [`wrapped`](.agents/skills/wrapped/SKILL.md)                           | After a merge: verify it, check the deploy, close the loop, report.       |
 
 ## References: what is true here
 

@@ -1,12 +1,12 @@
 ---
 name: wrapped
-description: Post-merge wrap-up, run when the owner says the PRs are merged (or "wrapped") — verify each merge, check the deploy and the live site, report server results on the linked issues, close out any Asana task, sync your local main, and report. Use after an owner merge; never assume a merge happened.
+description: Post-merge wrap-up, run right after you merge a PR or when someone says the PRs are merged (or "wrapped") — verify each merge, check the deploy and the live site, report server results on the linked issues, close out any Asana task, sync your local main, and report. Use after every merge; never assume a merge happened.
 ---
 
-# Wrapped: after the owner merges
+# Wrapped: after a merge
 
-Run this when the owner says the work is merged ("all PRs are merged", "wrapped", or similar).
-Verify everything; never assume a merge or a deploy happened.
+Run this right after you merge a PR, or when someone says the work is merged ("all PRs are
+merged", "wrapped", or similar). Verify everything; never assume a merge or a deploy happened.
 
 ## 1. Verify the merges
 
@@ -16,8 +16,8 @@ For each PR from the work at hand:
 gh api repos/{owner}/{repo}/pulls/<number> -q '.merged_at, .merge_commit_sha'
 ```
 
-An empty `merged_at` means it isn't merged: say so and stop there for that PR. For a stack, the
-owner may have merged only part of it; the PRs still open above are rebased by GitHub
+An empty `merged_at` means it isn't merged: say so and stop there for that PR. For a stack, only
+part of it may be merged; the PRs still open above are rebased by GitHub
 ([`stacked-prs`](../stacked-prs/SKILL.md), step 4).
 
 ## 2. Check the deploy and the site
@@ -35,8 +35,8 @@ merges don't deploy).
    `gh api repos/{owner}/{repo}/check-runs/<job id>/annotations`.
 3. Open https://sprechereast.com and check the behavior the PRs changed.
 
-Never re-run or start the deploy yourself (it can be started by hand). A failed deploy goes to the
-owner as a new issue, fixed through a PR. Never fix it on the server.
+Never re-run or start the deploy yourself (it can be started by hand). A failed deploy gets a new
+issue and is fixed or reverted through a PR. Never fix it on the server.
 
 ## 3. Close the loop on the issues
 
@@ -58,4 +58,4 @@ git fetch origin && git switch main && git pull --ff-only origin main
 ```
 
 Then report briefly: what merged, what deployed, the deploy's result, anything still open or
-failing, and what the owner still has to do.
+failing, and anything waiting on the owner (`needs owner`).

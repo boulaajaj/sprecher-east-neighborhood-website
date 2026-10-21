@@ -8,8 +8,9 @@ depends on a particular tool or model.
 [`docs/architecture/`](../architecture/README.md) win wherever a role guide disagrees with them. If
 you find a disagreement, fix the role guide in the same PR.
 
-Role guides are policy files, as they were when they lived in `.claude/agents/`: a PR that changes
-one gets the owner's explicit sign-off ([`AGENTS.md`](../../AGENTS.md), step 3).
+Role guides are policy files, as they were when they lived in `.claude/agents/`: the review calls
+out a change to one, and a change the owner didn't ask for waits for him
+([`AGENTS.md`](../../AGENTS.md), step 3).
 
 | Role                       | Guide                                     | Use it for                                                               |
 | -------------------------- | ----------------------------------------- | ------------------------------------------------------------------------ |
