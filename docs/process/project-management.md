@@ -3,7 +3,8 @@
 How work is organized on GitHub: what each level means, how a sprint runs, what the board shows,
 and when work is ready or done. It applies to every person and agent. How a change reaches `main`
 is in [`AGENTS.md`](../../AGENTS.md). Where the work is heading is in the
-[roadmap](../product/roadmap.md).
+[roadmap](../product/roadmap.md). The [`project-tracking`](../../.agents/skills/project-tracking/SKILL.md)
+skill is the step-by-step version for agents.
 
 GitHub is the only tracker for new work. Asana is being retired (#89: export #91, cutover #93).
 

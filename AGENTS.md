@@ -111,14 +111,15 @@ Procedures are [Agent Skills](https://agentskills.io): a folder in `.agents/skil
 `SKILL.md` that starts with a `name` and a `description`. Codex loads them from there, Claude Code
 through the pointers in `.claude/skills/`, and a human reads them as plain Markdown.
 
-| Skill                                                                  | Use it when                                                               |
-| ---------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| [`change-workflow`](.agents/skills/change-workflow/SKILL.md)           | Before any change: issue, branch, PR, review, checks, merge.              |
-| [`stacked-prs`](.agents/skills/stacked-prs/SKILL.md)                   | A PR depends on another open PR, or a PR in a stack has to change.        |
-| [`self-review`](.agents/skills/self-review/SKILL.md)                   | A change is done: review your own diff before opening or updating the PR. |
-| [`visual-design-review`](.agents/skills/visual-design-review/SKILL.md) | The change affects how pages look.                                        |
-| [`pr-review`](.agents/skills/pr-review/SKILL.md)                       | You are the independent reviewer of a PR you didn't write.                |
-| [`wrapped`](.agents/skills/wrapped/SKILL.md)                           | After a merge: verify it, check the deploy, close the loop, report.       |
+| Skill                                                                  | Use it when                                                                |
+| ---------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| [`change-workflow`](.agents/skills/change-workflow/SKILL.md)           | Before any change: issue, branch, PR, review, checks, merge.               |
+| [`stacked-prs`](.agents/skills/stacked-prs/SKILL.md)                   | A PR depends on another open PR, or a PR in a stack has to change.         |
+| [`self-review`](.agents/skills/self-review/SKILL.md)                   | A change is done: review your own diff before opening or updating the PR.  |
+| [`visual-design-review`](.agents/skills/visual-design-review/SKILL.md) | The change affects how pages look.                                         |
+| [`pr-review`](.agents/skills/pr-review/SKILL.md)                       | You are the independent reviewer of a PR you didn't write.                 |
+| [`wrapped`](.agents/skills/wrapped/SKILL.md)                           | After a merge: verify it, check the deploy, close the loop, report.        |
+| [`project-tracking`](.agents/skills/project-tracking/SKILL.md)         | Picking up, filing or reporting work: epics, milestones, sprint, blockers. |
 
 ## References: what is true here
 
