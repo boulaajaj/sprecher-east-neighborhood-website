@@ -128,6 +128,9 @@ What this buys:
 
 ## Dependency rules
 
+[`eslint.boundaries.mjs`](../../eslint.boundaries.mjs) checks the imports these rules forbid, as warnings
+until #137 makes them errors.
+
 1. **Inward only.** Presentation (`ui/`, `app/`) → application (`use-cases/`, `actions.ts`) →
    domain, and adapters (`data/`, `cms/`) → domain. `domain/` imports no framework and nothing
    from `data/`, `cms/` or `ui/`; it may use `platform/lib/`.

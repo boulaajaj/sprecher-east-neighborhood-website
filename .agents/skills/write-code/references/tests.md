@@ -24,7 +24,7 @@ Read this when you add a rule, a guard or a mapper, or change one. The rules are
   (`vi.stubGlobal('fetch', …)`), no database.
 - For an interface (`HumanVerifier`), pass a small fake implementation; don't mock modules
   you own.
-- Once #130 aliases `server-only` to an empty module in Vitest, `data/` mappers can be tested.
+- `server-only` is aliased to an empty module in Vitest, so `data/` mappers can be tested.
 - Fixtures are small literal objects in the test file; build Payload-shaped documents with only
   the fields the mapper reads.
 
