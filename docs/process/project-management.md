@@ -5,29 +5,30 @@ and when work is ready or done. It applies to every person and agent. How a chan
 is in [`AGENTS.md`](../../AGENTS.md). Where the work is heading is in the
 [roadmap](../product/roadmap.md).
 
-GitHub is the only tracker. Asana is retired (#89).
+GitHub is the only tracker for new work. Asana is being retired (#89: export #91, cutover #93).
 
 ## Levels of work
 
-| Level         | Answers                                            | Size           | On GitHub                                            |
-| ------------- | -------------------------------------------------- | -------------- | ---------------------------------------------------- |
-| Vision        | Why does the site exist?                           | years          | [`docs/product/vision.md`](../product/vision.md)     |
-| Milestone     | What outcome do we deliver, by when?               | 1–3 months     | A milestone with a due date                          |
-| Epic          | What capability is part of that outcome?           | weeks          | An issue labeled `epic`, with sub-issues             |
-| Feature, task | What does a user get? What single change ships it? | a day or a few | A sub-issue of an epic; one PR closes it             |
-| Bug           | What's broken?                                     | any            | A sub-issue of the epic it belongs to, or on its own |
+| Level         | Answers                                            | Size            | On GitHub                                        |
+| ------------- | -------------------------------------------------- | --------------- | ------------------------------------------------ |
+| Vision        | Why does the site exist?                           | years           | [`docs/product/vision.md`](../product/vision.md) |
+| Milestone     | What outcome do we deliver, by when?               | 1–3 months (\*) | A milestone with a due date                      |
+| Epic          | What capability is part of that outcome?           | weeks           | An issue labeled `epic`, with sub-issues         |
+| Feature, task | What does a user get? What single change ships it? | a day or a few  | A sub-issue of an epic; one PR closes it         |
+| Bug           | What's broken?                                     | any             | A sub-issue of the epic it belongs to            |
+
+(\*) Guidance, not a rule.
 
 Rules:
 
-- **Every feature, task and bug belongs to an epic.** The exception is a quick bug fix with no
-  natural home.
+- **Every feature, task and bug belongs to an epic.**
 - **Every planned epic belongs to a milestone.** Unscheduled epics wait in the backlog with no
   milestone.
 - **Milestones are dated outcomes, not topics.** Topics are epics and area labels. Sprints are not
   milestones; they're the board's Sprint field.
 - **One PR closes one issue** (`Closes #N`). A PR that's one of several uses `Part of #N`.
-- **Split ahead of time.** Split anything that won't finish within one sprint. An epic's features
-  become sub-issues when they're planned, not all up front.
+- **Split ahead of time.** Split anything bigger than size L (3 days). An epic's features become
+  sub-issues when they're planned, not all up front.
 
 ## Labels
 
@@ -38,8 +39,9 @@ The allowed labels are in [`.github/label-policy.json`](../../.github/label-poli
 - **Markers** (optional, with a fixed meaning):
   - `epic`: a parent issue whose sub-issues are the work.
   - `needs owner`: needs the owner's login, money or decision. Agents can't do it. Every
-    `needs owner` issue sits in the owner-actions epic (#169), and the issues that depend on it
-    are marked **blocked by** it, so nobody starts them too early.
+    `needs owner` issue is listed in the checklist of the owner-actions epic (#169); its parent
+    stays the epic it belongs to. The issues that depend on it are marked **blocked by** it, so
+    nobody starts them too early.
 
 Priority lives only in the `priority:` label. GitHub's issue types (Bug, Feature, Task) can be set
 in the web UI. Agents in cloud sessions can't set them, so the type label stays the required one.
@@ -69,8 +71,6 @@ GitHub Project "Sprecher East", owned by `boulaajaj`. The full setup is in #90.
   plus the built-in Labels, Milestone, Parent issue and Sub-issue progress.
 - **Views:** This sprint (board), Backlog (grouped by epic), Roadmap (by milestone), and Done last
   7 days.
-- **Work in progress:** at most two items **In progress** per person or agent. Finish before
-  starting something new.
 - **Access:** only Claude Code on the owner's computer, signed in with `gh` and the `project`
   scope, can create the board and change its fields. Agents in cloud sessions can't reach a
   board on a personal account, so they keep issue state, labels, parents and milestones right,
@@ -84,6 +84,7 @@ An issue is **Ready** when it has:
 - acceptance criteria someone else could check
 - a parent epic, labels (type, area, priority) and a size
 - no open blocker: nothing it's **blocked by** is still open
+- no `needs owner` label: that work waits for the owner, not for a sprint
 
 ## Definition of Done
 
@@ -91,8 +92,8 @@ An issue is **Done** when:
 
 - its PR has passed every required check and its independent review, and is merged
   ([`AGENTS.md`](../../AGENTS.md))
-- the deploy succeeded and the changed behavior was checked on the live site (the
-  [`wrapped`](../../.agents/skills/wrapped/SKILL.md) skill)
+- if the merge started a deploy, the deploy succeeded and the changed behavior was checked on
+  the live site (the [`wrapped`](../../.agents/skills/wrapped/SKILL.md) skill)
 - the issue is closed with a summary of what changed. Server changes are recorded on the
   issue, without secrets.
 
