@@ -41,13 +41,7 @@ const ALLOWED: Record<string, Partial<Record<Operation, Audience[]>>> = {
     update: RESIDENT_ONLY,
     delete: RESIDENT_ONLY,
   },
-  // Payload's own, not configurable: edit locks for the admin screens (#140)
-  'payload-locked-documents': {
-    read: RESIDENT_ONLY,
-    create: RESIDENT_ONLY,
-    update: RESIDENT_ONLY,
-    delete: RESIDENT_ONLY,
-  },
+  // Payload's own edit locks are staff-only (`restrictEditLocks`, #147), so not listed here
   // Payload's own, with no REST or GraphQL endpoints (`endpoints: false`)
   'payload-migrations': {
     read: RESIDENT_ONLY,
