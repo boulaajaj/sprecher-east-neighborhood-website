@@ -7,20 +7,7 @@ import boundaries from 'eslint-plugin-boundaries'
 const ENTRY_FILES = '{index,server,actions,cms}.ts'
 
 // The Payload website template's folders, until their code moves to src/modules/ and src/platform/
-const TEMPLATE_FOLDERS = [
-  'blocks',
-  'collections',
-  'components',
-  'endpoints',
-  'fields',
-  'Footer',
-  'Header',
-  'heros',
-  'hooks',
-  'plugins',
-  'providers',
-  'utilities',
-]
+const TEMPLATE_FOLDERS = ['collections', 'endpoints', 'fields', 'hooks', 'plugins', 'providers']
 
 // Runtime Payload: the framework, its packages and the config (rule 6). `import type` is fine.
 const PAYLOAD = [
@@ -31,10 +18,8 @@ const PAYLOAD = [
 // Pages and routes that still query Payload themselves. Each leaves this list when its area moves
 // to a module (#131 to #136); any other file in src/app/ that does it gets a warning.
 const STILL_QUERYING_PAYLOAD = [
-  '(frontend)/[slug]/page.tsx',
   '(frontend)/next/preview/route.ts',
   '(frontend)/next/seed/route.ts',
-  '(frontend)/(sitemaps)/pages-sitemap.xml/route.ts',
 ].map((file) => `src/app/${file}`.replace(/[\\()[\]{}*?!+@]/g, '\\$&')) // escape glob characters
 
 // Inside a module, what each part must not import from the same module (rules 1, 4 and 5).

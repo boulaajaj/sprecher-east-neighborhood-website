@@ -5,15 +5,14 @@ import { describe, expect, it, vi } from 'vitest'
 // fonts or styles at import are replaced with stand-ins.
 vi.mock('next/font/google', () => ({ Poppins: () => ({ variable: 'font-poppins' }) }))
 vi.mock('next/headers', () => ({ draftMode: async () => ({ isEnabled: false }) }))
-vi.mock('@/Header/Component', () => ({ Header: () => null }))
-vi.mock('@/Footer/Component', () => ({ Footer: () => null }))
+vi.mock('@/modules/site/server', () => ({ SiteHeader: () => null, SiteFooter: () => null }))
 vi.mock('@/platform/ui/AdminBar.client', () => ({ AdminBar: () => null }))
 vi.mock('@/modules/accounts/server', () => ({
   AccountMenu: () => null,
   AccountProvider: ({ children }: { children: ReactNode }) => children,
 }))
 
-import { Header } from '@/Header/Component'
+import { SiteHeader } from '@/modules/site/server'
 import { AccountMenu, AccountProvider } from '@/modules/accounts/server'
 
 import RootLayout from './layout'
@@ -32,7 +31,7 @@ describe('RootLayout', () => {
     const tree = elements(await RootLayout({ children: null }))
 
     const provider = tree.find((element) => element.type === AccountProvider)
-    const header = elements(provider?.props.children).find((element) => element.type === Header)
+    const header = elements(provider?.props.children).find((element) => element.type === SiteHeader)
     expect(header).toBeDefined()
 
     const { accountMenu, mobileAccountMenu } = header?.props ?? {}

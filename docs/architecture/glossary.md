@@ -58,6 +58,16 @@ which module owns it).
 | FAQ entry   | A question and answer, by category (`faq`).                                                   |
 | Team member | A board member or an AI agent listed on the site (`team-members`).                            |
 
+## Site
+
+| Term               | Meaning                                                                                                                  | Where the rule lives                                                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| Page               | A CMS page (`pages`) built from a hero and page-builder blocks, at `/<slug>`; the page `home` is the front page, at `/`. | `src/modules/site/cms/pages.ts`; the address in `documentHref` (`src/platform/payload/documentHref.ts`)                  |
+| Page-builder block | One section of a page's layout: call to action, content, media, archive (news) or form (contact).                        | the site's own in `SITE_LAYOUT_BLOCKS`; the components in the block registry, `src/app/(frontend)/[slug]/pageBlocks.tsx` |
+| Nav item           | A link in the header or footer (`header`, `footer` globals), up to six each.                                             | `src/modules/site/cms/navGlobal.ts`                                                                                      |
+| Current page link  | The header link for the page a visitor is on, or for the section that page is in.                                        | `isActivePath` in `src/modules/site/domain/nav.ts`                                                                       |
+| Redirect           | An old address that sends visitors to a URL, page or post. A redirect to a draft goes nowhere.                           | `getRedirectTarget` in `src/modules/site/use-cases/getRedirectTarget.ts`                                                 |
+
 ## Forms and email
 
 | Term                 | Meaning                                                                                                                                                 | Where the rule lives                                                                                                                    |

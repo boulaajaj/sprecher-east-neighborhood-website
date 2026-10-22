@@ -5,7 +5,7 @@ import React from 'react'
 
 import { Breadcrumbs } from '@/platform/ui/Breadcrumbs'
 import { JsonLd } from '@/platform/ui/JsonLd'
-import { PayloadRedirects } from '@/components/PayloadRedirects'
+import { PayloadRedirects } from '@/modules/site/server'
 import { RichText } from '@/platform/richtext/RichText'
 import { SidebarCTA } from '@/platform/ui/SidebarCTA'
 import {

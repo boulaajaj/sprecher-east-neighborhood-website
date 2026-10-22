@@ -67,7 +67,9 @@ The code is moving to that structure in small steps (#127). Events have moved to
 `src/modules/events/` (#131), FAQ, resources and team members to `src/modules/directory/`
 (#136), news posts, categories and search to `src/modules/news/` (#132), and the contact
 form's safeguards and form block to `src/modules/contact/` (#133), and accounts (who is signed in,
-sign-in and password flows, the users collection) to `src/modules/accounts/` (#134).
+sign-in and password flows, the users collection) to `src/modules/accounts/` (#134), and CMS
+pages, the page-builder blocks, heroes, header, footer and redirects to `src/modules/site/`
+(#135).
 `src/platform/lib/` holds the shared helpers (paging, roles, dates and the site timezone, URLs,
 `cn`), `src/platform/seo/` the page metadata, Open Graph and sitemap helpers,
 `src/platform/payload/` the role checks and access functions every collection uses and the admin
@@ -82,18 +84,13 @@ src/
   app/             Next.js App Router
     (frontend)/    Public routes (home, posts, events, faq, resources, search, login, account, sitemaps)
     (payload)/     Payload admin and API routes (generated; leave alone)
-  blocks/          Page-builder blocks: Payload config + React component each (rich-text blocks: platform)
-  collections/     Payload collections (Pages, Media)
-  components/      The logo and the redirects component, until the site module moves (#135)
+  collections/     Payload collections (Media)
   endpoints/seed/  Seed data and script
   fields/          Reusable Payload field groups (link, linkGroup, defaultLexical)
-  Header/, Footer/ Global configs and components
-  heros/           Hero components and config
-  hooks/           Payload hooks (publishedAt, redirects)
+  hooks/           Payload hooks (publishedAt)
   migrations/      Database migrations (generated)
   plugins/         Payload plugin setup (form builder, SEO, search, redirects, nested docs)
   providers/       React context providers (theme, header theme)
-  utilities/       Page and redirect data access, until the site module moves (#135)
   payload.config.ts
 ```
 
@@ -103,17 +100,15 @@ src/
 | ----------------------------------- | ------------------------------------------------- |
 | `src/payload.config.ts`             | Payload CMS config (SQLite, collections, plugins) |
 | `src/app/(frontend)/globals.css`    | Tailwind v4 `@theme` block — all design tokens    |
-| `src/collections/Pages/index.ts`    | Pages collection with layout builder blocks       |
+| `src/modules/site/cms/pages.ts`     | Pages collection with layout builder blocks       |
 | `src/modules/news/cms/posts.ts`     | News posts collection                             |
 | `src/modules/events/cms/events.ts`  | Events collection (custom)                        |
 | `src/modules/accounts/cms/users.ts` | Users collection with Payload native auth         |
 | `src/collections/Media.ts`          | Media uploads with size variants                  |
-| `src/blocks/`                       | Layout builder block configs + React components   |
-| `src/heros/`                        | Hero block configs + React components             |
+| `src/modules/site/cms/`             | Layout builder block and hero configs, globals    |
+| `src/modules/site/ui/`              | Blocks, heroes, header and footer components      |
 | `src/platform/payload/roles.ts`     | Role checks and access functions                  |
 | `src/fields/`                       | Reusable field groups (link, linkGroup, lexical)  |
-| `src/Header/`                       | Header global component                           |
-| `src/Footer/`                       | Footer global component                           |
 | `ecosystem.config.cjs`              | PM2 config for VPS (CommonJS: package is ESM)     |
 | `eslint.boundaries.config.mjs`      | Dependency rules as lint (warnings until #137)    |
 

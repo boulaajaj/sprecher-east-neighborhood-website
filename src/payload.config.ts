@@ -5,19 +5,21 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 
 import { Users } from '@/modules/accounts/cms'
+import { FormBlock } from '@/modules/contact/cms'
 import { FAQ, Resources, TeamMembers } from '@/modules/directory/cms'
 import { Events } from '@/modules/events/cms'
 import { Categories, Posts } from '@/modules/news/cms'
+import { createPagesCollection, Footer, Header, SITE_LAYOUT_BLOCKS } from '@/modules/site/cms'
 import { Media } from './collections/Media'
-import { Pages } from './collections/Pages'
-import { Footer } from './Footer/config'
-import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { isAdminBoolean, isAdminOrEditor, isAdminOrEditorBoolean } from '@/platform/payload/roles'
 import { getServerSideURL } from '@/platform/lib/getURL'
 import { emailAdapterFromEnv } from '@/platform/email/emailAdapter'
 import { restrictEditLocks } from '@/platform/payload/restrictEditLocks'
+
+// Modules meet here (0008): the contact form joins the site's own page-builder blocks
+const Pages = createPagesCollection({ layoutBlocks: [...SITE_LAYOUT_BLOCKS, FormBlock] })
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
