@@ -1,17 +1,11 @@
+import type { ResourceCategory } from '@/modules/directory'
+
 type ResourceItem = {
   title: string
   description?: string
   url?: string
   phone?: string
-  category:
-    | 'elected-officials'
-    | 'public-safety'
-    | 'childcare'
-    | 'renting'
-    | 'parks'
-    | 'community'
-    | 'utilities'
-    | 'other'
+  category: ResourceCategory
   order: number
 }
 

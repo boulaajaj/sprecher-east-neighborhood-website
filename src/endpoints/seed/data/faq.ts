@@ -1,9 +1,11 @@
+import type { FaqCategory } from '@/modules/directory'
+
 import { root, paragraph, text, linkNode, p } from '../helpers/lexical'
 
 type FAQItem = {
   question: string
   answer: ReturnType<typeof root>
-  category: 'general' | 'membership' | 'events' | 'neighborhood'
+  category: FaqCategory
   order: number
 }
 

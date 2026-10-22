@@ -1,0 +1,149 @@
+# Component set: shared components
+
+Part of the [UI inventory](inventory.md) (#170), for epic #163.
+
+> **Status: approved.** The owner approved this set on 2026-10-21, with the merges he asked for
+> that day (fewer components, each composed from the others, never a second button). Components
+> are built in the order below, each in its own issue under epic #163.
+
+The set comes from the [element tables](inventory.md#the-files): every element maps to exactly one
+component and variant ([coverage check](component-set-modules.md#coverage)). This page covers the
+shared components; [component-set-modules.md](component-set-modules.md) covers the components that
+belong to one business area, what isn't needed yet, and the coverage table.
+
+## Rules every component follows
+
+- **Where:** shared primitives in `src/platform/ui/`, the rich-text renderer in
+  `src/platform/richtext/`, area components in a module's `ui/`
+  ([architecture](../architecture/README.md#where-does-it-go)). One component per file, under 250
+  lines.
+- **Variants with `cva`**, named by purpose (`primary`, `muted`), never by colour. Colours come
+  from semantic tokens only ([rule 9](../architecture/README.md#dependency-rules)).
+- **Plain typed props.** No component imports Payload; it gets `ImageRef`, `RichTextValue` or the
+  module's own types. CMS links go through one `resolveLink()` mapper into `href`, `label` and
+  `external`.
+- **Proven libraries behind our API:** Radix for behaviour (select, checkbox, dialog),
+  react-hook-form with Zod for forms (epic #163).
+- **Composition over flags:** `Card` and `Field` are built from small parts; looks are variants,
+  not booleans.
+- **One implementation per element.** `Button` is the only thing that draws a button: a form's
+  submit, a card's action, "Load more", a toast's action and the copy button all place a `Button`.
+  `Link` only ever looks like text. A component that would differ from another only in a few
+  classes becomes a variant of it instead.
+- **Accessible by default:** focus ring, 44 px touch targets on phones, labels linked to controls,
+  errors announced, `aria-current` on the current page.
+
+In the tables, **Elements** lists the inventory IDs each component covers, and **Today** says
+what it replaces.
+
+## Actions
+
+| Component | Variants (`cva`)                                                                                                     | Props                                                                                                                                                                                                                   | Today                                                                                                                                                           | Elements                                                                         |
+| --------- | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `Button`  | `variant`: `primary`, `secondary`, `accent`, `ghost`, `inverse`, `inverse-outline`; `size`: `sm`, `md`, `lg`, `icon` | `href` (renders a link), `external` (new tab plus a hidden "opens in a new tab"), `loading` (spinner, `aria-busy`, ignores clicks, stays focusable), `fullWidth` (`true` or `'mobile'`), `iconStart`, `iconEnd`, `type` | `src/components/ui/button.tsx`, plus eight hand-built buttons ([D1](evidence.md#duplication)). Drops `destructive` (unused, unreadable) and `link` (now `Link`) | L1, N7–N9, H2, H3, C16, C18, B7, B12, B14, B15, F14, F15, F21, F24, S7, S10, S11 |
+| `Link`    | `variant`: `inline`, `nav`, `muted`, `action`; `size`: `sm`, `md` (for `nav`)                                        | `href`, `external`, `current` (sets `aria-current` and the active look), `icon`, `iconPosition`, `iconOnly` (the label stays as hidden text)                                                                            | `CMSLink` with `appearance="inline"` or `"link"`, raw `<a>` in four places, nav classes in `src/modules/site/ui/HeaderNav.client.tsx`                           | N1–N6, N11, N14, N17–N20                                                         |
+
+**The skip link (L1)** is `Button · primary` with `href="#main"`, hidden until it has focus: it
+looks like a button, so it is one.
+
+**`Button · {appearance}` (B12).** The CMS link field stores `appearance` as `default` or
+`outline` (`src/modules/site/cms/link.ts:10`, `:14`). `default` maps to `Button · primary` and `outline` to
+`Button · secondary`. The high-impact hero and the CTA block ignore the field today and style their
+buttons by position (H2, H3, B14, B15).
+
+## Form fields
+
+| Component | Variants (`cva`)                                       | Props                                                                                                                                                                       | Today                                                                                                                                                     | Elements                            |
+| --------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| `Field`   | `layout`: `stacked`, `inline`; `width`: `full`, `half` | `label`, `hideLabel`, `required` (mark plus hidden "required"), `hint`, `error` (`role="alert"`, linked by `aria-describedby`, sets `aria-invalid`); one control as a child | label, required mark, `Error` and `Width` copied into eight form-builder files; `Input`, `Label`, `textarea`, `checkbox` and Radix `Select` wired by hand | F1–F9, F11, F12, F19, F20, F23, F27 |
+| `Form`    | one look                                               | `schema` (Zod), `onSubmit`, `status` (`idle`, `submitting`, `success`, `error`), `successMessage`, `errorMessage`; two-column grid from `sm`, so `half` fields share a row  | three ways to hold form state and errors: `FormBlock`, `LoginForm`, `ChangePasswordForm`                                                                  | F13                                 |
+
+**`Field` controls.** A field holds exactly one control, a part of `Field` like `CardBody` is a part
+of `Card`: `Field.Input` (`type`: `text`, `email`, `number`, `password`, `search`; `size`: `md`,
+`lg`; `leadingIcon`), `Field.TextArea` (`rows`, `autoGrow`), `Field.Select` (`options`,
+`placeholder`; Radix) and `Field.Checkbox` (Radix; the field switches to `layout: inline`). The
+frame passes the control its `id`, `aria-describedby` and `aria-invalid`, so no control repeats
+that wiring. Each control works with a controlled value or react-hook-form's `register`. In the
+coverage table, `Field · email` means a field holding `Field.Input type="email"`.
+
+## Display
+
+| Component    | Variants (`cva`)                                                                                      | Props                                                                                                                                       | Today                                                                                                                                                      | Elements                  |
+| ------------ | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `Card`       | `variant`: `elevated`, `muted`, `tinted`, `outline`; `padding`: `sm`, `md`, `lg`                      | parts `CardMedia`, `CardBody`, `CardTitle` (`href` stretches the link over the card), `CardMeta`, `CardFooter`; `interactive` adds the lift | `src/components/ui/card.tsx` (unused; removed in #135) and fourteen hand-built card shells ([D3](evidence.md#duplication))                                 | C15, C17, C20, C21        |
+| `CardGrid`   | `columns`: `2`, `3`, `4`; `gap`: `sm`, `md`                                                           | `as` (a list by default)                                                                                                                    | five grid class sets; `ContentBlock` uses `2` and `4`                                                                                                      | C3, C4, C14               |
+| `Badge`      | `variant`: `category`, `on-image`                                                                     | `children`                                                                                                                                  | `categoryPillClassName` string; uppercase labels in heroes                                                                                                 | C12, H11                  |
+| `Media`      | `variant`: `cover`, `background`, `thumbnail`, `framed`, `video`; `aspect`: `video`, `square`, `auto` | `image` (`ImageRef`), `priority`, `sizes`, `fallback` (`brand`, `icon`, `none`), `caption` for `framed`                                     | `src/platform/ui/Media.tsx`, the media block, three different placeholders                                                                                 | M1–M7                     |
+| `DateTime`   | `format`: `short`, `long`                                                                             | `value` (ISO string); day-only values format in UTC, others in the site timezone                                                            | `formatDateShort` or `formatDateTime` plus a `<time>` built by hand in six places                                                                          | C24, C25                  |
+| `MetaList`   | `variant`: `inline`, `stacked`, `on-image`                                                            | `items` (`{ icon?, label?, value }[]`)                                                                                                      | icon-and-text rows in event cards and the footer; label-and-value pairs in two heroes and the account page                                                 | N12, H9, H10, C22, C23    |
+| `Text`       | `variant`: `section`, `subsection`, `overline`, `lead`, `muted`, `small`                              | `as` (`h2`–`h6`, `p`, `span`; headings default to `h2`), `clamp` (number of lines)                                                          | heading and paragraph classes written inline in about twenty places                                                                                        | L7, L8, H14–H16, C19, C26 |
+| `PageHeader` | `variant`: `default`, `compact`, `image`                                                              | `eyebrow` (text or a `Badge`), `title`, `description`, `facts` (`MetaList` items), `image` (for `image`), `backLink`                        | nine list-page copies with drift ([D5](evidence.md#duplication)), plus `PostHero` and `EventHero`, one a copy of the other ([D7](evidence.md#duplication)) | H6–H8, H12, H13           |
+| `EmptyState` | `variant`: `boxed`, `plain`, `page`                                                                   | `title`, `description`, `action`                                                                                                            | six copies, five looks ([D6](evidence.md#duplication))                                                                                                     | S1–S6                     |
+
+## Feedback and overlays
+
+| Component | Variants (`cva`)                              | Props                                                                                                     | Today                                                                          | Elements                    |
+| --------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | --------------------------- |
+| `Alert`   | `tone`: `info`, `success`, `warning`, `error` | `title`, `children` (text or rich text); `role` follows the tone (`alert` for errors, `status` otherwise) | `src/platform/ui/Alert.tsx` (two tones) and the banner block's own four styles | F16, F17, F22, F25, F26, B5 |
+| `Toast`   | `tone`: `info`                                | `message`, `action` (a `Button`), `onDismiss`                                                             | markup inside `VersionCheck`                                                   | S9                          |
+| `Dialog`  | `variant`: `sheet`                            | `open`, `onOpenChange`, `title`; Radix gives focus trap, Escape, scroll lock and focus return             | the mobile menu's hand-written behaviour                                       | N10                         |
+
+## Navigation
+
+| Component     | Variants (`cva`) | Props                                                                                                   | Today                                                                        | Elements |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | -------- |
+| `AdminBar`    | one look         | wraps Payload's admin bar (rule 6 allows that import in `platform/`); shown to staff only               | `src/platform/ui/AdminBar.client.tsx` (staff only since #203)                | L5       |
+| `Breadcrumbs` | one look         | `items` (`{ label, href? }[]`); keeps the JSON-LD                                                       | `src/platform/ui/Breadcrumbs.tsx`                                            | N13      |
+| `LoadMore`    | one look         | `status`, `shown`, `total`, `noun`, `onLoadMore`, `fallbackHref`; behaviour in a headless `useLoadMore` | `src/platform/ui/LoadMore.client.tsx`; its link becomes `Button · secondary` | N15      |
+
+## Layout
+
+| Component      | Variants (`cva`)                                                                                       | Props                                                        | Today                                                                                                             | Elements |
+| -------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- | -------- |
+| `Section`      | `width`: `page`, `prose`, `narrow`; `tone`: `plain`, `surface`, `brand`; `spacing`: `none`, `md`, `lg` | `as` (`div` where it only sets the width), `aria-labelledby` | `.container`, five reading-width caps, two form widths, and page wrappers and surface bands with six padding sets | L9–L13   |
+| `DetailLayout` | one look (`with-sidebar`)                                                                              | `aside`                                                      | the same grid in the post and event pages                                                                         | L14      |
+
+## Rich text (`src/platform/richtext/`)
+
+| Component   | Variants (`cva`)                         | Props                              | Today                                                                                              | Elements   |
+| ----------- | ---------------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------- | ---------- |
+| `RichText`  | `variant`: `prose`, `compact`, `inverse` | `data` (`RichTextValue`), `gutter` | `src/platform/richtext/RichText.tsx` restyled with `[&_h2]`-style selectors in five files          | B1–B4, F10 |
+| `CodeBlock` | one look                                 | `code`, `language`                 | `src/platform/richtext/CodeBlock.tsx`; copy button becomes `Button · secondary` with a Lucide icon | B6         |
+
+## How many, and what to build first
+
+- **23 shared components** (21 in `platform/ui/`, 2 in `platform/richtext/`). The owner's review
+  on 2026-10-21 cut nine of the first proposal's 32. Seven were merged: the four input components
+  became parts of `Field`, `Heading` became variants of `Text`, `DetailHero` became
+  `PageHeader · image`, and `Container` became `Section`'s `width`. Two moved into the one area
+  that uses them (next point).
+- **Kept in the one place that uses them,** under the rule "add a component when a second screen
+  needs it" (#163): the loading placeholder is a style inside `SiteHeader`, and the FAQ accordion is
+  `FaqList` in `directory/ui` (native `<details>`). Either moves to `platform/ui/` when a second
+  screen needs it.
+- **Build order:** `Button` and `Link` (19 and 12 elements), then `Field` and `Form`, then `Card`,
+  `Media`, `PageHeader` and `EmptyState`.
+
+## Choices for the owner
+
+Two parts of the set differ from rules already written down. Each still needs the owner's decision;
+neither blocks `Button`, `Link`, `Field` or `Form`.
+
+1. **Card looks against the card rules in [`ui-ux-design.md`](../guidelines/ui-ux-design.md#card-design)**
+   (`bg-background`, never `bg-surface`; a border or a shadow, never both; `p-6` at least).
+   - `elevated`: `bg-card`, `rounded-2xl`, `shadow-sm` and no border; `shadow-md` on hover when
+     interactive. Follows "border or shadow"; uses `bg-card`, as every card does today, where the
+     guideline says `bg-background`.
+   - `outline`: `bg-background` with a border and no shadow (the form box). Follows the guideline.
+   - `muted`: `bg-surface`, no border or shadow (account panels, the event location panel, boxed
+     empty states). Breaks "never `bg-surface`": these are panels inside a page, not content cards.
+     The alternative is to draw them as `outline`.
+   - `tinted`: `bg-primary/10`, no border or shadow (the sidebar box). The guideline doesn't cover it.
+   - `padding: sm` (`p-4`, for the compact event card and the stats cards) is below the `p-6` minimum.
+2. **Plain props for blocks and heroes against
+   [architecture rule 8](../architecture/README.md#dependency-rules).** Rule 8 says code that
+   renders CMS content as authored (blocks, heroes) takes the generated Payload types. This set
+   gives `PageHero`, `ContentBlock` and the other blocks plain typed props, mapped from the CMS by
+   one function each, as the owner's plan on #163 (2026-10-20) asks: "Components receive plain
+   typed data and never import Payload directly." If the owner agrees, rule 8 is updated in a
+   follow-up change.

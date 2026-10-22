@@ -1,49 +1,15 @@
 import type { Metadata } from 'next/types'
 
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 import React from 'react'
-import { ExternalLink, Phone } from 'lucide-react'
-import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+import { toResourceSections } from '@/modules/directory'
+import { ResourceCard, findResources } from '@/modules/directory/server'
+import { mergeOpenGraph } from '@/platform/seo/mergeOpenGraph'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
 
-const categoryLabels: Record<string, string> = {
-  'elected-officials': 'Elected Officials',
-  'public-safety': 'Public Safety',
-  childcare: 'Childcare & Education',
-  renting: 'Renting & Housing',
-  parks: 'Parks & Recreation',
-  community: 'Community Organizations',
-  utilities: 'Utilities & Services',
-  other: 'Other',
-}
-
 export default async function ResourcesPage() {
-  const payload = await getPayload({ config: configPromise })
-
-  const resources = await payload.find({
-    collection: 'resources',
-    depth: 0,
-    limit: 200,
-    sort: 'order',
-    overrideAccess: false,
-  })
-
-  // Group resources by category
-  const grouped = resources.docs.reduce(
-    (acc, resource) => {
-      const rawCat = resource.category || 'other'
-      const cat = rawCat in categoryLabels ? rawCat : 'other'
-      if (!acc[cat]) acc[cat] = []
-      acc[cat].push(resource)
-      return acc
-    },
-    {} as Record<string, typeof resources.docs>,
-  )
-
-  const categoryOrder = Object.keys(categoryLabels)
+  const sections = toResourceSections(await findResources())
 
   return (
     <div className="pt-24 pb-24">
@@ -58,54 +24,20 @@ export default async function ResourcesPage() {
       </div>
 
       <div className="container space-y-16">
-        {categoryOrder
-          .filter((cat) => grouped[cat]?.length)
-          .map((cat) => (
-            <section key={cat}>
-              <h2 className="mb-6 border-b border-border pb-3 text-xl font-semibold text-foreground">
-                {categoryLabels[cat]}
-              </h2>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {grouped[cat].map((resource) => (
-                  <div
-                    key={resource.id}
-                    className="group rounded-2xl border border-border bg-card p-5 shadow-sm transition-all duration-200 hover:shadow-md motion-safe:hover:-translate-y-0.5"
-                  >
-                    <h3 className="mb-1.5 font-semibold text-foreground">{resource.title}</h3>
-                    {resource.description && (
-                      <p className="mb-3 text-sm leading-relaxed text-muted-foreground">
-                        {resource.description}
-                      </p>
-                    )}
-                    <div className="flex flex-wrap gap-3">
-                      {resource.url && (
-                        <a
-                          href={resource.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
-                        >
-                          <ExternalLink className="h-3.5 w-3.5" />
-                          Visit Website
-                        </a>
-                      )}
-                      {resource.phone && (
-                        <a
-                          href={`tel:${resource.phone}`}
-                          className="inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
-                        >
-                          <Phone className="h-3.5 w-3.5" />
-                          {resource.phone}
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          ))}
+        {sections.map(({ category, label, items }) => (
+          <section key={category}>
+            <h2 className="mb-6 border-b border-border pb-3 text-xl font-semibold text-foreground">
+              {label}
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {items.map((resource) => (
+                <ResourceCard key={resource.id} resource={resource} />
+              ))}
+            </div>
+          </section>
+        ))}
 
-        {Object.keys(grouped).length === 0 && (
+        {sections.length === 0 && (
           <div className="rounded-2xl border border-border bg-surface p-12 text-center">
             <p className="text-muted-foreground">Resources are being added. Check back soon!</p>
           </div>

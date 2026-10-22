@@ -120,7 +120,8 @@
   --destructive: #dc2626;
   --destructive-foreground: #dc2626;
   --border: #e2ddd6;
-  --input: #e2ddd6;
+  /* Form control borders: 3.4:1 on --surface, 3.8:1 on --background, 4.0:1 on --card (WCAG 1.4.11) */
+  --input: #857e74;
   --ring: #3d7a5e;
   --chart-1: #3d7a5e;
   --chart-2: #e8923a;
@@ -135,6 +136,14 @@
   --primary-dark: #2e5e47;
   --primary-light: #4f9974;
   --accent-dark: #c97830;
+  /* Fill for primary buttons: white text on it is 5.1:1 (#121), 7.5:1 on hover. */
+  --primary-fill: #3d7a5e;
+  --primary-fill-hover: #2e5e47;
+  /* Link text that passes on surface panels too: 6.4:1 on --surface, 7.0:1 on --background */
+  --primary-strong: #2e5e47;
+  /* Error text: --destructive is 4.1:1 on --surface and 3.9:1 on its own tint; this is 5.5:1 on
+     --surface, 6.1:1 on --background and 4.8:1 or more on the error tint */
+  --destructive-strong: #b91c1c;
 }
 
 /* Sprecher East brand tokens — dark theme */
@@ -156,7 +165,8 @@
   --destructive: #ef4444;
   --destructive-foreground: #ef4444;
   --border: #2d3040;
-  --input: #2d3040;
+  /* 3.3:1 on --surface, 3.9:1 on --background, 3.5:1 on --card */
+  --input: #6b7186;
   --ring: #4e9b76;
   --chart-1: #4e9b76;
   --chart-2: #f0a04b;
@@ -170,6 +180,13 @@
   --primary-dark: #3d7a5e;
   --primary-light: #5fb88e;
   --accent-dark: #d48a38;
+  /* Dark --primary (#4e9b76) gives white text only 3.35:1, so buttons keep the brand fill (#121) */
+  --primary-fill: #3d7a5e;
+  --primary-fill-hover: #2e5e47;
+  /* 6.6:1 on --surface, 7.9:1 on --background */
+  --primary-strong: #5fb88e;
+  /* 5.8:1 on --surface, 6.1:1 on --card, 6.8:1 on --background */
+  --destructive-strong: #f87171;
 }
 
 @theme inline {
@@ -208,6 +225,10 @@
   --color-primary-dark: var(--primary-dark);
   --color-primary-light: var(--primary-light);
   --color-accent-dark: var(--accent-dark);
+  --color-primary-fill: var(--primary-fill);
+  --color-primary-fill-hover: var(--primary-fill-hover);
+  --color-primary-strong: var(--primary-strong);
+  --color-destructive-strong: var(--destructive-strong);
 }
 
 @layer base {

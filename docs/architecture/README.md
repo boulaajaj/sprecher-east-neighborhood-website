@@ -4,9 +4,9 @@ How the Sprecher East website's code is organized, and where new code goes. This
 people and AI agents alike. The rules for _how_ changes are made (issue, PR, review, merge) are in
 [`AGENTS.md`](../../AGENTS.md).
 
-> **Status (2026-10-20):** this page describes the **target** structure. The code is moving there
-> in small steps, tracked in #127. Until a business area has moved, its code is still in the
-> template folders listed in [Where things are today](#where-things-are-today).
+> **Status (2026-10-22):** every business area has moved to this structure (#127), and lint fails
+> on an import that breaks the rules below (#137). What is still outside it is listed in
+> [Exceptions](#exceptions).
 
 ## The shape: a modular monolith
 
@@ -16,7 +16,7 @@ data means and how it's shown.
 
 ```mermaid
 flowchart TD
-  app["src/app — routes only<br/>thin pages, route handlers, layouts"]
+  app["src/app — routes and composition only<br/>thin pages, route handlers, layouts"]
   config["payload.config.ts"]
   subgraph modules["src/modules — one folder per business area"]
     events[events]
@@ -29,13 +29,9 @@ flowchart TD
   platform["src/platform — cross-cutting<br/>Payload setup, role checks, email, UI kit, rich text, dates, URLs, SEO"]
   payload[("Payload CMS<br/>Local API · admin · SQLite")]
 
-  app -->|"entry files only"| modules
+  app -->|"composes modules through their entry files"| modules
   app -->|"layouts, providers, UI kit"| platform
-  config -->|"cms.ts only"| modules
-  site -->|"composes pages from their entry files"| news
-  site --> events
-  site --> contact
-  site --> accounts
+  config -->|"composes each cms.ts"| modules
   modules --> platform
   modules -->|"data/ and cms/ only"| payload
   platform --> payload
@@ -63,13 +59,16 @@ grows should split its top level "into domain oriented modules which are interna
 
 - `lib/`: pure helpers for dates, text, URLs and shared content types; no framework, so the domain
   may use them.
-- `payload/`: role checks and access functions (every module uses them), reusable fields, and
-  plugins no single module owns (SEO).
+- `payload/`: role checks and access functions (every module uses them), the `media` uploads
+  collection, the default rich-text editor (`defaultLexical`), the `populatePublishedAt` hook and
+  the admin dashboard components. Plugin setup is composed in `payload.config.ts`, because each
+  module brings its own options.
 - `ui/`: primitives (`Button`, `Input`, `Media`, `Link`) with their variants.
-- `theme/`: the token contract (`tokens.ts`) and the Tailwind mapping.
-- `richtext/`: the `RichText` renderer and the blocks that can sit inside rich text (banner, code,
-  media, call to action). Pages reuse them from here.
-- `email/`, `seo/`, and `media` (uploads).
+- `theme/`: light and dark mode (the theme providers, `InitTheme`, `ThemeSelector`); the token
+  contract (`tokens.ts`) and the Tailwind mapping join them with #146.
+- `richtext/`: the `RichText` renderer and the blocks that can sit inside rich text (banner, code
+  and media; only a post's content offers them). Pages reuse the media block from here.
+- `email/` and `seo/`.
 
 Routes that serve no single area (`/api/version`, draft preview under `/next/`, the seed route)
 belong to `platform`; `app/(payload)/` is Payload's generated admin and API.
@@ -78,12 +77,12 @@ belong to `platform`; `app/(payload)/` is Payload's generated admin and API.
 
 ```text
 src/modules/events/
-  index.ts      client-safe entry: types, pure helpers, components that load no data, browser clients
-  server.ts     server-only entry: re-exports use cases, components that load data or use actions.ts
+  index.ts      types and pure rules only: safe for the proxy, client components and scripts
+  server.ts     server-only entry: re-exports use cases and the components pages render
   actions.ts    server actions ("Load more"); each validates its input and calls a use case
   cms.ts        Payload entry: collection and global configs, blocks, plugin setup for this area
   domain/       types (DTOs included) and rules in plain TypeScript; unit-tested
-  use-cases/    listUpcomingEvents: check who is asking, load through data/, apply rules, return DTOs
+  use-cases/    findUpcomingEvents: check who is asking, load through data/, apply rules, return DTOs
   data/         Local API queries; map documents to the domain's types
   cms/          collection config, fields, hooks, plugin options, admin components (RowLabel)
   ui/           React components, headless hooks (useEventFilters), and a browser client for
@@ -93,15 +92,16 @@ src/modules/events/
 Entry files are for code outside the module. Inside it, import the folder you need directly, so
 the entry files never import each other. The one exception: `ui/` may import its own module's
 `actions.ts`, because server actions must live in a `'use server'` file (the "Load more" feeds).
-Any component that imports an `actions.ts` (its own module's or another's, directly or through
-another component) is exported from
-`server.ts`, not `index.ts`, so `index.ts` never reaches server-only code.
+`index.ts` exports only types and pure rules from `domain/`, so importing it never pulls in React,
+Payload or server-only code; lint forbids it from re-exporting `ui/`. The components pages render
+are exported from `server.ts`. If a client component outside the module ever needs one of the
+module's components, add a client-safe entry for them then.
 
-A module only has the folders it needs. Tests sit next to the file they test (`isUpcoming.test.ts`).
+A module only has the folders it needs. Tests sit next to the file they test (`categories.test.ts`).
 
 ## Layers: the core stays still, the edges can change
 
-The site's core idea (what an event is, what counts as upcoming, who may see a draft) is plain
+The site's core idea (what an event is, which categories it can have, who may see a draft) is plain
 TypeScript in the middle. Payload, Next.js, outside services and the look sit around it, so each
 can be upgraded or replaced without rewriting the core.
 
@@ -135,23 +135,24 @@ What this buys:
 1. **Inward only.** Presentation (`ui/`, `app/`) → application (`use-cases/`, `actions.ts`) →
    domain, and adapters (`data/`, `cms/`) → domain. `domain/` imports no framework and nothing
    from `data/`, `cms/` or `ui/`; it may use `platform/lib/`.
-2. **Entry files only.** Outside a module, import it only through its entry files: `index.ts` and
-   `actions.ts` from anywhere, `server.ts` from server code, `cms.ts` from `payload.config.ts` and
-   from another module's `cms/` where rule 3 allows; `cms/` reaches other modules only through
-   their `cms.ts` or `import type`. `app/` may also import `platform/` directly.
-3. **Module to module.** `site` composes pages, the header and the page builder from the other
-   modules, so it may import any module's entry files (the form block from `contact`, sign-in
-   state from `accounts`, listing blocks from `news` and `events`). No module imports `site`.
-   Other pairs need a line here: later `comments → accounts`. Otherwise the page in `app/`
-   combines them, as the post page does with upcoming events. `platform/` imports no module.
+2. **Entry files only.** Outside a module, import it only through its entry files: `index.ts`
+   (types and pure rules) from anywhere, including `src/proxy.ts` and client components;
+   `actions.ts` from `app/`; `server.ts` from server code in `app/`; and `cms.ts` from
+   `payload.config.ts`. `app/` may also import `platform/` directly.
+3. **No module imports another.** Modules meet only in the composition roots: pages, layouts
+   and the block registry in `app/`, and `payload.config.ts`
+   ([0008](decisions/0008-compose-modules-at-the-app-level.md)). For example, the post page calls
+   `news` and `events` and passes both results to its components, and `payload.config.ts` hands
+   the form block from `contact` to `site`'s Pages collection factory. `platform/` imports no
+   module.
 4. **Server-only code stays out of the CMS config.** `data/`, `use-cases/` and `server.ts` start
    with `import 'server-only'`, and only `use-cases/` and `actions.ts` import `data/`. `cms/` and
    `cms.ts` never reach anything server-only: the Payload CLI (migrations, seed) loads every hook
    outside Next.js, where `server-only` throws. Hooks use the `req.payload` they are given.
 5. **Client components** get DTOs as props and never import `data/`, `use-cases/` or `server.ts`.
-   To change something they call a server action, or one of Payload's own REST endpoints through
-   the owning module's browser client (`ui/api.ts`: sign-in and passwords in `accounts`, form
-   submissions in `contact`, where the robot check runs).
+   To change something they call a server action (sign-in, sign-out and passwords in `accounts`),
+   or one of Payload's own REST endpoints through the owning module's browser client (`ui/api.ts`:
+   form submissions in `contact`, where the robot check runs).
 6. **Payload at the edges.** Runtime imports of `payload`, `@payloadcms/*` or `@payload-config`
    are allowed only in `data/`, `cms/`, `platform/` and `payload.config.ts`. `import type` is
    allowed anywhere. The generated `app/(payload)/` (including the admin import map, which loads
@@ -159,10 +160,13 @@ What this buys:
 7. **Access is explicit.** Every Local API call passes `overrideAccess`: the Local API skips
    access control by default ([Payload access control](https://payloadcms.com/docs/access-control/overview)).
 8. **DTOs out.** Use cases return the module's own types (`EventSummary`, `EventDetail`), never
-   raw Payload documents. A read-only list that needs no reshaping (FAQ, resources) may define its
-   type as a named `Pick<>` of the generated type, loaded with `select`, instead of a mapper. Code
-   that renders CMS content as authored (page-builder blocks, heroes, `RichText`, `Media`) takes
-   the generated types, because its shape is the CMS's.
+   raw Payload documents. A read-only list that needs no reshaping (FAQ, resources) may skip the
+   mapper: its query loads the fields with `select` and returns the result as it is. Its type is
+   either a named `Pick<>` of the generated type or a hand-written type in `domain/` that mirrors
+   those fields; prefer the hand-written one. It keeps `@/payload-types` out of the domain and is
+   still checked, because the `select`-narrowed result must be assignable to it, so a field that
+   drifts fails `tsc`. Code that renders CMS content as authored (page-builder blocks, heroes,
+   `RichText`, `Media`) takes the generated types, because its shape is the CMS's.
 9. **No colors in components.** Semantic token classes only: `text-primary-foreground` on
    `bg-primary`, never `text-white`; no palette classes, hex values or inline styles. Text and
    overlays on photos will use `on-image` and `scrim` tokens (#146); until then `white` and `black`
@@ -171,17 +175,20 @@ What this buys:
    [frontend patterns](../guidelines/frontend-patterns/README.md) use raw `white` or `black`
    anywhere but text and overlays on photos, this rule wins until #146 updates them.
 
-How they are checked, from #130 on (warnings until #137): rules 1–3, 5 and 6 and the type part of
-8 by ESLint (`eslint-plugin-boundaries`, `no-restricted-imports`); rule 4 by `server-only` at
-build time plus a boundaries rule for `cms/`; rule 7 by a lint check for Local API calls
-without `overrideAccess` (#145) and review; rule 9 by lint and the theme test (#146). Vitest
-aliases `server-only` to an empty module so `data/` mappers can be unit-tested.
+How they are checked: [`eslint.boundaries.config.mjs`](../../eslint.boundaries.config.mjs)
+checks the imports in rules 1–3 and 6 and the `cms/` part of rule 4, as errors (#137). It also
+fails on a file under `src/` that belongs to no known part (`app/`, a module, `platform/`, the seed
+or a root file), so a new top-level folder can't appear unnoticed. For the rest of rule 4,
+`server-only` fails the build when browser code imports server code, and CI's `payload migrate`
+fails when the CMS config reaches it. Review covers rules 5, 7 and 8; rule 9 comes with lint and
+the theme test (#146). Vitest aliases
+`server-only` to an empty module so `data/` mappers can be unit-tested.
 
 ## Where does it go?
 
 | You are adding…                                                | Put it in                                                                                                |
 | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| A business rule ("what counts as upcoming")                    | the module's `domain/`, with a unit test                                                                 |
+| A business rule (the event categories, `isEventScope`)         | the module's `domain/`, with a unit test                                                                 |
 | A use case other code calls (list, submit, publish)            | the module's `use-cases/`, exported from `server.ts`; a server action in `actions.ts` calls it           |
 | A database read or write                                       | the module's `data/`, called only from `use-cases/` or `actions.ts`; in a hook, `req.payload`            |
 | A color, font, corner radius or shadow                         | a token in `platform/theme/tokens.ts`, with its value in `src/themes/default/`                           |
@@ -190,20 +197,32 @@ aliases `server-only` to an empty module so `data/` mappers can be unit-tested.
 | A component used by one module                                 | the module's `ui/`                                                                                       |
 | A component or helper used by two or more modules              | `src/platform/` (move it there on the second use)                                                        |
 | A page or URL                                                  | `src/app/`, as a thin file that calls a module                                                           |
+| Code where two modules meet                                    | `src/app/` (a page, layout or the block registry) or `payload.config.ts`, never inside a module          |
 | An outside service (Cloudflare, Mailgun, a city calendar feed) | an interface in the module, an adapter beside it ([conventions](conventions.md#interfaces-and-adapters)) |
 
-## Where things are today
+A rule the site only ever applies as a query filter, like the events upcoming rule (`inScope` in
+`src/modules/events/data/scope.ts`), may live only in `data/`, as the function that builds the
+`Where`, with its own unit test. Don't also write it as a pure function in `domain/`: two copies
+drift, and the tested one may not be the one that runs.
 
-Until each step of #127 lands, code lives in the Payload website template's folders, sorted by
-technical type: `src/collections/`, `src/components/`, `src/blocks/`, `src/heros/`, `src/hooks/`,
-`src/utilities/`, `src/access/`, `src/fields/`, `src/Header/`, `src/Footer/`, `src/search/`,
-`src/plugins/`, `src/providers/`, `src/endpoints/` (seed). When you touch code there, don't add
-new duplication; if your change needs a rule that already exists elsewhere, reuse it.
+## Exceptions
 
-New code for an area that hasn't moved yet goes in its future module, with only the folders it
-needs (for example `src/modules/events/domain/isUpcoming.ts` plus an `index.ts` that exports it),
-and the old code imports it through that entry file. Where [`docs/guidelines/payload-cms.md`](../guidelines/payload-cms.md)
-names a template folder, it describes today's code; new code follows this page.
+The Payload website template's folders are gone (#137). These stay outside the structure above,
+on purpose:
+
+| Path                    | Why                                                                    |
+| ----------------------- | ---------------------------------------------------------------------- |
+| `src/endpoints/seed/`   | Demo data and the seed script; only `app/` may import it (lint)        |
+| `src/migrations/`       | Generated by `payload migrate:create`                                  |
+| `src/app/(payload)/`    | Payload's generated admin and API routes, with the admin import map    |
+| `src/payload-types.ts`  | Generated by `npm run generate:types`                                  |
+| `src/*.ts` (root files) | `payload.config.ts` (CMS composition, plugins included) and `proxy.ts` |
+
+ESLint skips the seed and the generated files, so they are also exempt from the 250-line limit.
+The seed script (`src/endpoints/seed/index.ts`) is the one hand-written file above it.
+
+Where [`docs/guidelines/payload-cms.md`](../guidelines/payload-cms.md) still names a template
+folder (`src/collections/`, `src/hooks/`, `src/fields/`), follow this page.
 
 ## More
 

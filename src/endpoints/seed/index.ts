@@ -4,7 +4,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-import { ROLES } from '../../access/roles'
+import { ROLES } from '@/platform/lib'
 import { contactForm as contactFormData } from './contact-form'
 import { contact as contactPageData } from './contact-page'
 import { home } from './home'
@@ -419,7 +419,7 @@ async function loadLocalImage(filename: string, mimetype: string): Promise<File>
 
   for (const filePath of possiblePaths) {
     try {
-      const data = await fs.readFile(filePath)
+      const data = await fs.readFile(/*turbopackIgnore: true*/ filePath)
       return {
         name: filename,
         data: Buffer.from(data),

@@ -10,14 +10,11 @@ PR. Where things go is in the [architecture map](README.md).
 | Module and layer folders | lowercase, kebab-case                              | `src/modules/events/data/`          |
 | React component file     | PascalCase, named after its one exported component | `EventCard.tsx`                     |
 | Client component file    | `.client.tsx` suffix, starts with `'use client'`   | `EventsFeed.client.tsx`             |
-| Other TypeScript file    | camelCase, named after what it holds               | `categories.ts`, `upcoming.ts`      |
-| Test file                | same name plus `.test.ts`, next to the file        | `upcoming.test.ts`                  |
+| Other TypeScript file    | camelCase, named after what it holds               | `categories.ts`, `scope.ts`         |
+| Test file                | same name plus `.test.ts`, next to the file        | `scope.test.ts`                     |
 | Type or interface        | PascalCase noun, no `I` prefix                     | `EventSummary`, `HumanVerifier`     |
 | Constant value           | UPPER_SNAKE_CASE                                   | `UPCOMING_EVENTS_PAGE_SIZE`         |
 | Fixed list of options    | `as const` array plus a derived union type         | `EVENT_CATEGORIES`, `EventCategory` |
-
-Folders that came from the template (`src/components/EventCard/index.tsx`) keep their names until
-their module moves (#127).
 
 ### Function names say what they do
 
@@ -27,8 +24,9 @@ their module moves (#127).
 | `get…`                | One item by key, or `null`                                  | `getEventBySlug(slug)`       |
 | `require…`            | Like `get…`, but throws or redirects when missing           | `requireUser()`              |
 | `list…`               | A light list of keys for routing or sitemaps                | `listEventSlugs()`           |
-| `is…`, `has…`, `can…` | Returns a boolean                                           | `isUpcoming(date, today)`    |
+| `is…`, `has…`, `can…` | Returns a boolean                                           | `isEventScope(value)`        |
 | `parse…`              | Untrusted input to a typed value, or `null` when invalid    | `parsePageNumber(value)`     |
+| `check…`              | Untrusted input to a named verdict (`'ok'` or what's wrong) | `checkSubmissionSize(rows)`  |
 | `to…`                 | Converts one shape into another                             | `toEventSummary(doc)`        |
 | `format…`             | Builds text for display                                     | `formatDateShort(timestamp)` |
 
@@ -45,10 +43,11 @@ A `to…` mapper in `data/` builds them from Payload documents. When generated P
 
 ## Entry files
 
-- `index.ts` exports what any code, including client components, may import: types, pure
-  helpers, components that load no data. It never imports server-only code.
+- `index.ts` exports types and pure rules from `domain/`, nothing else. Any code may import it:
+  the proxy (`src/proxy.ts`), client components and scripts get no React, Payload or server-only
+  code with it.
 - `server.ts` starts with `import 'server-only'` and re-exports the module's use cases (from
-  `use-cases/`) and the components that load data or use `actions.ts` (from `ui/`).
+  `use-cases/`) and the components pages render (from `ui/`).
 - `actions.ts` starts with `'use server'` and exports server actions; each one validates its
   input and calls a use case.
 - `cms.ts` exports the area's collection and global configs, blocks and plugin options for
@@ -68,8 +67,12 @@ Add an interface only where it pays:
 - a test needs to replace a real dependency.
 
 Name the interface after the capability and the adapter after the provider: `HumanVerifier`,
-`TurnstileVerifier`. Don't wrap Payload collections in repository interfaces; the typed Local API
-plus a module's `data/` functions is the boundary ([decision 0002](decisions/0002-no-repository-layer.md)).
+`TurnstileVerifier`. The interface goes in the module's `domain/`; the adapter goes in the layer
+that calls it. A Payload hook's adapter sits in `cms/`, because the Payload CLI loads hooks
+outside Next.js, where `server-only` code can't run (`contact`'s `TurnstileVerifier`).
+
+Don't wrap Payload collections in repository interfaces; the typed Local API plus a module's
+`data/` functions is the boundary ([decision 0002](decisions/0002-no-repository-layer.md)).
 Values that change between environments come from env vars read in one place, never literals in
 code.
 

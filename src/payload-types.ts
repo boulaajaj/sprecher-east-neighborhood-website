@@ -214,6 +214,10 @@ export interface Page {
   layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[]
   meta?: {
     title?: string | null
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media
     description?: string | null
   }
   publishedAt?: string | null
@@ -253,6 +257,10 @@ export interface Post {
   categories?: (number | Category)[] | null
   meta?: {
     title?: string | null
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media
     description?: string | null
   }
   publishedAt?: string | null
@@ -823,6 +831,10 @@ export interface Event {
   } | null
   meta?: {
     title?: string | null
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media
     description?: string | null
   }
   publishedAt?: string | null
@@ -1251,6 +1263,7 @@ export interface PagesSelect<T extends boolean = true> {
     | T
     | {
         title?: T
+        image?: T
         description?: T
       }
   publishedAt?: T
@@ -1358,6 +1371,7 @@ export interface PostsSelect<T extends boolean = true> {
     | T
     | {
         title?: T
+        image?: T
         description?: T
       }
   publishedAt?: T
@@ -1397,6 +1411,7 @@ export interface EventsSelect<T extends boolean = true> {
     | T
     | {
         title?: T
+        image?: T
         description?: T
       }
   publishedAt?: T

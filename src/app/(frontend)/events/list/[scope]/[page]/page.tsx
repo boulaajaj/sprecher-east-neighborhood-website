@@ -1,11 +1,13 @@
 import type { Metadata } from 'next/types'
 
-import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
-import { EventsFeed } from '@/components/EventsFeed'
-import { findPublishedEvents, isEventScope, parsePageNumber } from '@/utilities/feeds'
+import { isEventScope } from '@/modules/events'
+import { EventsFeed, findEventPage } from '@/modules/events/server'
+import { parsePageNumber } from '@/platform/lib'
+import { Link } from '@/platform/ui'
 
 export const revalidate = 600
 
@@ -29,7 +31,7 @@ export default async function EventsListPage({ params: paramsPromise }: Args) {
   const page = parsePageNumber(pageParam)
   if (!isEventScope(scope) || page === null) notFound()
 
-  const events = await findPublishedEvents(scope, page)
+  const events = await findEventPage(scope, page)
   if (page > 1 && page > events.totalPages) notFound()
 
   return (
@@ -43,9 +45,11 @@ export default async function EventsListPage({ params: paramsPromise }: Args) {
         </h1>
         <Link
           href="/events"
-          className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-primary hover:underline"
+          variant="action"
+          icon={<ArrowLeft aria-hidden="true" />}
+          className="mt-4"
         >
-          ← Back to all events
+          Back to all events
         </Link>
       </div>
       <section className="container">

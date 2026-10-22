@@ -1,64 +1,21 @@
 import type { Metadata } from 'next/types'
 
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 import React from 'react'
-import RichText from '@/components/RichText'
-import { JsonLd } from '@/components/JsonLd'
-import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
-import { lexicalToPlainText } from '@/utilities/lexicalToPlainText'
-import { ChevronDown } from 'lucide-react'
+import { JsonLd } from '@/platform/ui/JsonLd'
+import { toFaqSections } from '@/modules/directory'
+import { FaqList, faqJsonLd, findFaqEntries } from '@/modules/directory/server'
+import { mergeOpenGraph } from '@/platform/seo/mergeOpenGraph'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
 
-const categoryLabels: Record<string, string> = {
-  general: 'General',
-  membership: 'Membership',
-  events: 'Events',
-  neighborhood: 'Neighborhood',
-}
-
 export default async function FAQPage() {
-  const payload = await getPayload({ config: configPromise })
-
-  const faqs = await payload.find({
-    collection: 'faq',
-    depth: 0,
-    limit: 200,
-    sort: 'order',
-    overrideAccess: false,
-  })
-
-  // Group by category
-  const grouped = faqs.docs.reduce(
-    (acc, faq) => {
-      const cat = faq.category || 'general'
-      if (!acc[cat]) acc[cat] = []
-      acc[cat].push(faq)
-      return acc
-    },
-    {} as Record<string, typeof faqs.docs>,
-  )
-
-  const categoryOrder = Object.keys(categoryLabels)
-
-  const faqJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faqs.docs.map((faq) => ({
-      '@type': 'Question',
-      name: faq.question,
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: lexicalToPlainText(faq.answer),
-      },
-    })),
-  }
+  const entries = await findFaqEntries()
+  const sections = toFaqSections(entries)
 
   return (
     <div className="pt-24 pb-24">
-      <JsonLd data={faqJsonLd} />
+      <JsonLd data={faqJsonLd(entries)} />
       <div className="container mb-12 md:mb-16">
         <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">FAQ</p>
         <h1 className="mb-4 text-4xl font-bold tracking-tight text-balance text-foreground md:text-5xl">
@@ -70,33 +27,14 @@ export default async function FAQPage() {
       </div>
 
       <div className="container max-w-3xl space-y-12">
-        {categoryOrder
-          .filter((cat) => grouped[cat]?.length)
-          .map((cat) => (
-            <section key={cat}>
-              <h2 className="mb-6 text-xl font-semibold">{categoryLabels[cat]}</h2>
-              <div className="space-y-4">
-                {grouped[cat].map((faq) => (
-                  <details
-                    key={faq.id}
-                    className="group rounded-lg border border-border bg-card p-4"
-                  >
-                    <summary className="cursor-pointer list-none font-medium">
-                      <span className="flex items-center justify-between">
-                        {faq.question}
-                        <ChevronDown className="ml-2 h-4 w-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
-                      </span>
-                    </summary>
-                    <div className="mt-4 border-t border-border pt-4">
-                      <RichText data={faq.answer} enableGutter={false} />
-                    </div>
-                  </details>
-                ))}
-              </div>
-            </section>
-          ))}
+        {sections.map(({ category, label, items }) => (
+          <section key={category}>
+            <h2 className="mb-6 text-xl font-semibold">{label}</h2>
+            <FaqList items={items} />
+          </section>
+        ))}
 
-        {Object.keys(grouped).length === 0 && (
+        {sections.length === 0 && (
           <div className="text-center">
             <p className="text-muted-foreground">FAQ items are being added. Check back soon!</p>
           </div>
