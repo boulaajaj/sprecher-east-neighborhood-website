@@ -6,7 +6,11 @@ import { useRouter } from 'next/navigation'
 
 import { Field } from '@/platform/ui'
 
-const toSearchURL = (query: string) => `/search${query ? `?q=${encodeURIComponent(query)}` : ''}`
+// Spaces around the query don't change the results; a query of only spaces is no query
+const toSearchURL = (query: string) => {
+  const trimmed = query.trim()
+  return `/search${trimmed ? `?q=${encodeURIComponent(trimmed)}` : ''}`
+}
 
 /** The search box: results follow what's typed, after a short pause. */
 export const Search: React.FC<{ initialQuery?: string }> = ({ initialQuery = '' }) => {

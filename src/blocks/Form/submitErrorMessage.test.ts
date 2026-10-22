@@ -6,7 +6,7 @@ describe('toSubmitErrorMessage', () => {
   it('says why when the visitor can act on it', () => {
     expect(toSubmitErrorMessage(429)).toMatch(/Too many messages/)
     expect(toSubmitErrorMessage(413)).toMatch(/too long/)
-    expect(toSubmitErrorMessage(400)).toMatch(/check it and try again/)
+    expect(toSubmitErrorMessage(400)).toMatch(/reload the page/)
     expect(toSubmitErrorMessage(null)).toMatch(/connection/)
   })
 

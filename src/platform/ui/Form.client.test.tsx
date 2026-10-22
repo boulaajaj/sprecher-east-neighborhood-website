@@ -1,7 +1,9 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
+import { hydrateRoot } from 'react-dom/client'
+import { renderToString } from 'react-dom/server'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
@@ -60,6 +62,46 @@ const fill = async () => {
 }
 
 describe('Form', () => {
+  it('keeps what was typed before the page loaded, and submits it', async () => {
+    const onSubmit = vi.fn()
+    const early = (
+      <Form aria-label="Early" schema={schema} status="idle" onSubmit={onSubmit}>
+        {({ register }) => (
+          <>
+            <Field label="Name">
+              <Field.Input {...register('name')} />
+            </Field>
+            <Field label="Email">
+              <Field.Input type="email" {...register('email')} />
+            </Field>
+            <div>
+              <Button type="submit">Send</Button>
+            </div>
+          </>
+        )}
+      </Form>
+    )
+    // The server's HTML is on screen and the visitor types before React takes over
+    const container = document.body.appendChild(document.createElement('div'))
+    container.innerHTML = renderToString(early)
+    const name = screen.getByRole<HTMLInputElement>('textbox', { name: 'Name' })
+    const email = screen.getByRole<HTMLInputElement>('textbox', { name: 'Email' })
+    name.value = 'Ada'
+    email.value = 'ada@example.com'
+
+    const root = await act(async () => hydrateRoot(container, early))
+
+    expect(name.value).toBe('Ada')
+    await userEvent.click(screen.getByRole('button', { name: 'Send' }))
+    expect(onSubmit).toHaveBeenCalledWith(
+      { name: 'Ada', email: 'ada@example.com' },
+      expect.anything(),
+    )
+
+    act(() => root.unmount())
+    container.remove()
+  })
+
   it('shows each field’s error and does not submit when the schema fails', async () => {
     const send = vi.fn()
     render(<ContactForm send={send} />)

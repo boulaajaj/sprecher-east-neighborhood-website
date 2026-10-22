@@ -56,7 +56,7 @@ export function ChangePasswordForm({ userId }: { userId: number }) {
     <Form
       aria-label="Change password"
       schema={passwordSchema}
-      defaultValues={{ newPassword: '', confirmPassword: '' }}
+      defaultValues={{}} // keeps what was typed before the page loaded
       onSubmit={changePassword}
       status={status}
       successMessage="Password updated."

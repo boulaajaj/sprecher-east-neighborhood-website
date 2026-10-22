@@ -40,12 +40,18 @@ const VALUE_FIELD_TYPES = new Set<string>([
 export const isValueField = (field: FormField): field is ValueField =>
   VALUE_FIELD_TYPES.has(field.blockType)
 
+type ChoiceField = Extract<ValueField, { blockType: 'select' | 'state' | 'country' }>
+
+/** Fields drawn as a select, through a Controller rather than a registered input */
+const isChoiceField = (field: ValueField): field is ChoiceField =>
+  field.blockType === 'select' || field.blockType === 'state' || field.blockType === 'country'
+
 function toFieldSchema(field: ValueField): z.ZodType {
   if (field.blockType === 'checkbox') {
     return field.required ? z.boolean().refine((ticked) => ticked, TICK) : z.boolean()
   }
   const text = z.string().trim()
-  const choice = ['select', 'state', 'country'].includes(field.blockType)
+  const choice = isChoiceField(field)
   const filled = field.required ? text.min(1, choice ? CHOOSE : REQUIRED) : text
   if (field.blockType !== 'email') return filled
   return filled.refine((value) => value === '' || EMAIL_PATTERN.test(value), EMAIL)
@@ -64,16 +70,23 @@ export function toFormSchema(fields: readonly FormField[]) {
   return z.object(shape)
 }
 
-/** Every field starts empty or unticked, unless the form gives it a default. */
+/**
+ * Starting values: checkboxes start unticked and selects empty, unless the form gives them a
+ * default. A text field gets one only when the form sets it: with none, its input keeps what the
+ * visitor typed or the browser autofilled before the page loaded.
+ */
 export function toDefaultValues(fields: readonly FormField[]) {
   const values: Record<string, string | boolean> = {}
   for (const field of fields) {
     if (!isValueField(field)) continue
-    // A number field's default is a number; its input holds text
-    values[field.name] =
-      field.blockType === 'checkbox'
-        ? (field.defaultValue ?? false)
-        : String(field.defaultValue ?? '')
+    if (field.blockType === 'checkbox') {
+      values[field.name] = field.defaultValue ?? false
+    } else if (isChoiceField(field)) {
+      values[field.name] = field.defaultValue ?? ''
+    } else if (field.defaultValue !== undefined && field.defaultValue !== null) {
+      // A number field's default is a number; its input holds text
+      values[field.name] = String(field.defaultValue)
+    }
   }
   return values
 }

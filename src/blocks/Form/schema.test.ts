@@ -67,11 +67,9 @@ describe('toFormSchema', () => {
 })
 
 describe('toDefaultValues', () => {
-  it('starts every field empty or unticked unless the form sets a default', () => {
+  it('starts checkboxes unticked and selects empty, and text fields only with a set default', () => {
+    // A text field left out keeps what was typed or autofilled before the page loaded
     expect(toDefaultValues(fields)).toEqual({
-      name: '',
-      email: '',
-      altEmail: '',
       message: 'Hi',
       agree: false,
       news: false,

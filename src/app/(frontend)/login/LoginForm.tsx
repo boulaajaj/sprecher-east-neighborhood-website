@@ -48,7 +48,7 @@ export function LoginForm() {
     <Form
       aria-label="Log in"
       schema={loginSchema}
-      defaultValues={{ email: '', password: '' }}
+      defaultValues={{}} // keeps an email typed or autofilled before the page loaded
       onSubmit={logIn}
       status={status}
       errorMessage={errorMessage}

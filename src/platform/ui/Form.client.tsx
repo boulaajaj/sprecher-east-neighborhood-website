@@ -1,5 +1,6 @@
 'use client'
 
+// Template folder until Alert moves into platform/ui (#226)
 import { Alert } from '@/components/ui/alert'
 import { cn } from '@/utilities/ui'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -16,7 +17,11 @@ export type FormApi<Input extends FieldValues, Output> = UseFormReturn<Input, un
 export type FormProps<Input extends FieldValues, Output> = {
   /** Checked on submit, then on every change to a field that has failed */
   schema: z.ZodType<Output, Input>
-  defaultValues: DefaultValues<Input>
+  /**
+   * Starting values. Leave text inputs out unless they have a real default: an input with no
+   * default keeps what the browser already holds (typed or autofilled before the page loaded).
+   */
+  defaultValues?: DefaultValues<Input>
   /** Gets the parsed values. A second submit while this runs is ignored */
   onSubmit: (values: Output, form: FormApi<Input, Output>) => void | Promise<void>
   /** Set by the caller, so it decides what success and failure mean */
