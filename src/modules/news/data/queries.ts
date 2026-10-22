@@ -7,7 +7,13 @@ import type { FeedPage } from '@/platform/lib'
 import { PUBLISHED } from '@/platform/payload/published'
 
 import type { PostDetail, PostSitemapEntry, PostSummary } from '../domain/types'
-import { SUMMARY_FIELDS, toPostDetail, toPostSummary } from './mappers'
+import {
+  SEARCH_RESULT_FIELDS,
+  SUMMARY_FIELDS,
+  toPostDetail,
+  toPostSummary,
+  toSearchResult,
+} from './mappers'
 
 /** Posts per page on /posts, its numbered pages and each "Load more". */
 export const POSTS_PAGE_SIZE = 12
@@ -122,4 +128,39 @@ export async function countPublishedPosts(): Promise<number> {
   })
 
   return totalDocs
+}
+
+/** How many results the search page shows. */
+const SEARCH_RESULTS_LIMIT = 12
+
+/**
+ * Search entries (posts and events) whose title, slug or search-engine title or description
+ * contains `query`; every entry when `query` is empty.
+ */
+export async function findSearchResults(query: string): Promise<PostSummary[]> {
+  const payload = await getPayload({ config: configPromise })
+
+  const result = await payload.find({
+    collection: 'search',
+    depth: 1,
+    limit: SEARCH_RESULTS_LIMIT,
+    // No page count needed: the page shows the first results only
+    pagination: false,
+    overrideAccess: false,
+    select: SEARCH_RESULT_FIELDS,
+    ...(query
+      ? {
+          where: {
+            or: [
+              { title: { like: query } },
+              { 'meta.description': { like: query } },
+              { 'meta.title': { like: query } },
+              { slug: { like: query } },
+            ],
+          },
+        }
+      : {}),
+  })
+
+  return result.docs.map(toSearchResult)
 }

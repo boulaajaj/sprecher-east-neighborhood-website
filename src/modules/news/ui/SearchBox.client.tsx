@@ -1,19 +1,16 @@
 'use client'
+
 import { Search as SearchIcon } from 'lucide-react'
-import React, { useEffect, useRef, useState } from 'react'
-import { useDebounce } from '@/utilities/useDebounce'
 import { useRouter } from 'next/navigation'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { Field } from '@/platform/ui'
+import { useDebounce } from '@/utilities/useDebounce'
 
-// Spaces around the query don't change the results; a query of only spaces is no query
-const toSearchURL = (query: string) => {
-  const trimmed = query.trim()
-  return `/search${trimmed ? `?q=${encodeURIComponent(trimmed)}` : ''}`
-}
+import { toSearchHref } from '../domain/search'
 
 /** The search box: results follow what's typed, after a short pause. */
-export const Search: React.FC<{ initialQuery?: string }> = ({ initialQuery = '' }) => {
+export const SearchBox: React.FC<{ initialQuery?: string }> = ({ initialQuery = '' }) => {
   const [value, setValue] = useState(initialQuery)
   const router = useRouter()
   // The query the URL already shows, so arriving at /search?q=… doesn't navigate again
@@ -24,7 +21,7 @@ export const Search: React.FC<{ initialQuery?: string }> = ({ initialQuery = '' 
   useEffect(() => {
     if (debouncedValue === shownQuery.current) return
     shownQuery.current = debouncedValue
-    router.push(toSearchURL(debouncedValue))
+    router.push(toSearchHref(debouncedValue))
   }, [debouncedValue, router])
 
   return (
@@ -34,7 +31,7 @@ export const Search: React.FC<{ initialQuery?: string }> = ({ initialQuery = '' 
         event.preventDefault()
         // Enter searches right away, without waiting for the pause
         shownQuery.current = value
-        router.push(toSearchURL(value))
+        router.push(toSearchHref(value))
       }}
     >
       <Field label="Search" hideLabel>

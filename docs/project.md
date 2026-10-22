@@ -65,7 +65,7 @@ the [data model](architecture/data-model.md) and [decision records](architecture
 
 The code is moving to that structure in small steps (#127). Events have moved to
 `src/modules/events/` (#131), FAQ, resources and team members to `src/modules/directory/`
-(#136), news posts and categories to `src/modules/news/` (#132; the search page and box follow),
+(#136), news posts, categories and search to `src/modules/news/` (#132),
 and `src/platform/lib/` holds the shared paging helpers. Until an area has moved, it is still in
 the Payload website template's folders, sorted by technical type:
 
@@ -86,7 +86,6 @@ src/
   migrations/      Database migrations (generated)
   plugins/         Payload plugin setup (form builder, SEO, search, redirects, nested docs)
   providers/       React context providers (theme, header theme)
-  search/          Search box component (moves to src/modules/news/, #132)
   utilities/       Helpers: dates, URLs, SEO, data access, Turnstile, email
   payload.config.ts
 ```

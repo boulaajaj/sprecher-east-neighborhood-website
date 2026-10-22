@@ -31,13 +31,15 @@ Each one is visible in the linked screenshot or was checked in the browser. Wort
 none is fixed here.
 
 1. **Search sends event results to a 404.** The search index holds posts and events
-   (`src/plugins/index.ts:136`), but every result is drawn as a post card linking to
+   (`src/plugins/index.ts:137`), but every result is drawn as a post card linking to
    `/posts/<slug>` (`src/modules/news/ui/PostCard.client.tsx:77`). All four "council" results
    are events and all four links return 404. [Screenshot](screenshots/search-results-1280-light.webp).
 2. **A search link loses its query.** Opening `/search?q=council` shows results, then the empty
-   box rewrites the address to `/search` after 200 ms (`src/search/Component.tsx:9–16`).
+   box rewrites the address to `/search` after 200 ms (was `src/search/Component.tsx:9–16`; fixed
+   in #223).
 3. **The search query isn't encoded.** Typing `a&b` produces `?q=a&b`, so the server searches for
-   `a` (`src/search/Component.tsx:15`; the security guideline asks for `encodeURIComponent`).
+   `a` (was `src/search/Component.tsx:15`; the security guideline asks for `encodeURIComponent`;
+   fixed in #223).
 4. **The header ignores the visitor's theme.** Five pages force a theme on the header, and a sixth
    does when the event has a photo:
    - light: CMS pages (`[slug]/page.client.tsx:10`), `/posts` (`posts/page.client.tsx:10`),

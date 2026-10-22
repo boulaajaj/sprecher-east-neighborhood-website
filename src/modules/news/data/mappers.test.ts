@@ -1,8 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
-import type { Category, Media, Post } from '@/payload-types'
+import type { Category, Media, Post, Search } from '@/payload-types'
 
-import { toCategoryIds, toPickedPosts, toPostDetail, toPostSummary } from './mappers'
+import {
+  toCategoryIds,
+  toPickedPosts,
+  toPostDetail,
+  toPostSummary,
+  toSearchResult,
+} from './mappers'
 
 const image = { id: 4, alt: 'Park shelter', url: '/api/media/file/park.jpg' } as Media
 const hero = { id: 5, alt: 'Street', url: '/api/media/file/street.jpg' } as Media
@@ -137,5 +143,45 @@ describe('toPickedPosts', () => {
   it('returns an empty list when nothing is picked', () => {
     expect(toPickedPosts(null)).toEqual([])
     expect(toPickedPosts(undefined)).toEqual([])
+  })
+})
+
+describe('toSearchResult', () => {
+  const hit: Pick<Search, 'id' | 'title' | 'slug' | 'categories' | 'meta'> = {
+    id: 12,
+    title: 'Road study hearings',
+    slug: 'road-study',
+    categories: [
+      { relationTo: 'categories', categoryID: '1', title: 'Neighborhood News' },
+      { relationTo: 'categories', categoryID: '2', title: '' },
+    ],
+    meta: { title: 'Hearings', description: 'Public hearings.', image },
+  }
+
+  it('shows a search entry as a post card, with the categories it copied', () => {
+    expect(toSearchResult(hit)).toEqual({
+      id: 12,
+      slug: 'road-study',
+      title: 'Road study hearings',
+      publishedAt: null,
+      categories: [
+        { id: 1, title: 'Neighborhood News' },
+        { id: 2, title: 'Untitled category' },
+      ],
+      description: 'Public hearings.',
+      image,
+    })
+  })
+
+  it('turns missing fields into empty text, null and an empty category list', () => {
+    expect(toSearchResult({ id: 13 })).toEqual({
+      id: 13,
+      slug: '',
+      title: '',
+      publishedAt: null,
+      categories: [],
+      description: null,
+      image: null,
+    })
   })
 })

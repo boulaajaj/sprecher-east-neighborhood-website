@@ -20,7 +20,6 @@ const TEMPLATE_FOLDERS = [
   'hooks',
   'plugins',
   'providers',
-  'search',
   'utilities',
 ]
 
@@ -36,7 +35,6 @@ const STILL_QUERYING_PAYLOAD = [
   '(frontend)/[slug]/page.tsx',
   '(frontend)/next/preview/route.ts',
   '(frontend)/next/seed/route.ts',
-  '(frontend)/search/page.tsx',
   '(frontend)/(sitemaps)/pages-sitemap.xml/route.ts',
 ].map((file) => `src/app/${file}`.replace(/[\\()[\]{}*?!+@]/g, '\\$&')) // escape glob characters
 

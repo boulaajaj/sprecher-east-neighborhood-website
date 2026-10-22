@@ -1,6 +1,6 @@
 import 'server-only'
 
-import type { ArchiveBlock, Post } from '@/payload-types'
+import type { ArchiveBlock, Post, Search } from '@/payload-types'
 import { toImageRef } from '@/platform/payload/imageRef'
 
 import type { PostCategory, PostDetail, PostSummary } from '../domain/types'
@@ -17,12 +17,15 @@ export const SUMMARY_FIELDS = {
 type SummaryDoc = Pick<Post, 'id' | keyof typeof SUMMARY_FIELDS>
 
 
+const toCategory = (id: number, title: string | null | undefined): PostCategory => ({
+  id,
+  title: title || 'Untitled category',
+})
+
 /** The loaded categories; a category that is only an id (not loaded) is left out. */
 function toCategories(values: Post['categories']): PostCategory[] {
   return (values ?? []).flatMap((category) =>
-    typeof category === 'object'
-      ? [{ id: category.id, title: category.title || 'Untitled category' }]
-      : [],
+    typeof category === 'object' ? [toCategory(category.id, category.title)] : [],
   )
 }
 
@@ -72,4 +75,32 @@ export function toPickedPosts(selected: ArchiveBlock['selectedDocs'] | undefined
   return (selected ?? []).flatMap(({ value }) =>
     typeof value === 'object' ? [toPostSummary(value)] : [],
   )
+}
+
+/** The fields `toSearchResult` reads; the search query selects exactly these. */
+export const SEARCH_RESULT_FIELDS = {
+  title: true,
+  slug: true,
+  categories: true,
+  meta: true,
+} as const
+
+/**
+ * A search entry (a post or an event, as the search plugin copied it) as a post card shows it.
+ * The entry keeps no date, and its categories are copies with the category's id as text.
+ */
+export function toSearchResult(
+  doc: Pick<Search, 'id' | keyof typeof SEARCH_RESULT_FIELDS>,
+): PostSummary {
+  return {
+    id: doc.id,
+    slug: doc.slug ?? '',
+    title: doc.title ?? '',
+    publishedAt: null,
+    categories: (doc.categories ?? []).map(({ categoryID, title }) =>
+      toCategory(Number(categoryID), title),
+    ),
+    description: doc.meta?.description ?? null,
+    image: toImageRef(doc.meta?.image),
+  }
 }
