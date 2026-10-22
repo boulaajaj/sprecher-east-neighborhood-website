@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import type { Header } from '@/payload-types'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/platform/ui'
 import { Menu, X } from 'lucide-react'
 import { Logo } from '@/components/Logo/Logo'
 import { HeaderNav } from './Nav'
@@ -119,31 +119,29 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
               Log In
             </Link>
           )}
-          <Link
+          <Button
             href="/contact"
+            size="sm"
             aria-current={pathname === '/contact' ? 'page' : undefined}
-            className="ml-3 inline-flex min-h-10 items-center rounded-md bg-primary px-4 py-2 text-sm font-medium whitespace-nowrap text-primary-foreground transition-colors hover:bg-primary/90"
+            className="ml-3"
           >
             Contact
-          </Link>
+          </Button>
         </div>
 
         {/* Mobile hamburger */}
-        <button
+        <Button
           ref={toggleRef}
-          type="button"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-md text-foreground transition-colors hover:bg-secondary lg:hidden"
+          variant="ghost"
+          size="icon"
+          className="lg:hidden"
           onClick={() => setMobileOpen((prev) => !prev)}
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={mobileOpen}
           aria-controls="mobile-menu"
         >
-          {mobileOpen ? (
-            <X aria-hidden="true" className="h-6 w-6" />
-          ) : (
-            <Menu aria-hidden="true" className="h-6 w-6" />
-          )}
-        </button>
+          {mobileOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+        </Button>
       </div>
 
       {/* Mobile menu overlay */}
@@ -172,12 +170,12 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
                     </Link>
                     <Button
                       variant="ghost"
-                      size="clear"
+                      fullWidth
                       onClick={() => {
                         closeMobileMenu()
                         logout()
                       }}
-                      className="w-full justify-start rounded-md px-3 py-2.5 text-base font-medium text-muted-foreground"
+                      className="justify-start px-3"
                     >
                       Sign Out
                     </Button>
@@ -193,14 +191,15 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
                 )}
               </>
             )}
-            <Link
+            <Button
               href="/contact"
+              fullWidth
               onClick={() => closeMobileMenu()}
               aria-current={pathname === '/contact' ? 'page' : undefined}
-              className="mt-2 inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              className="mt-2"
             >
               Contact
-            </Link>
+            </Button>
           </div>
         </div>
       )}

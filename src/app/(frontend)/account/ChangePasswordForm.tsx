@@ -3,7 +3,7 @@
 import React, { useCallback, useState } from 'react'
 
 import { Alert } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/platform/ui'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
@@ -95,8 +95,8 @@ export function ChangePasswordForm({ userId }: { userId: number }) {
         />
       </div>
 
-      <Button type="submit" disabled={loading}>
-        {loading ? 'Updating...' : 'Update Password'}
+      <Button type="submit" loading={loading}>
+        {loading ? 'Updating' : 'Update Password'}
       </Button>
     </form>
   )

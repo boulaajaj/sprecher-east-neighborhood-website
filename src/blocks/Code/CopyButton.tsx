@@ -1,6 +1,6 @@
 'use client'
-import { Button } from '@/components/ui/button'
-import { CopyIcon } from '@payloadcms/ui/icons/Copy'
+import { Button } from '@/platform/ui'
+import { Copy } from 'lucide-react'
 import { useState } from 'react'
 
 export function CopyButton({ code }: { code: string }) {
@@ -16,17 +16,18 @@ export function CopyButton({ code }: { code: string }) {
   }
 
   return (
-    <div className="flex justify-end align-middle">
+    <div className="flex justify-end">
       <Button
-        className="flex gap-1"
         variant="secondary"
+        size="sm"
+        iconStart={<Copy aria-hidden="true" />}
+        aria-live="polite"
         onClick={async () => {
           await navigator.clipboard.writeText(code)
           updateCopyStatus()
         }}
       >
-        <p>{text}</p>
-        <CopyIcon />
+        {text}
       </Button>
     </div>
   )

@@ -17,6 +17,7 @@ import { draftMode } from 'next/headers'
 
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
+import { Button } from '@/platform/ui'
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -39,12 +40,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body>
         <Providers>
-          <a
+          <Button
             href="#main-content"
-            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-white focus:outline-none"
+            size="sm"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-60"
           >
             Skip to content
-          </a>
+          </Button>
           <AdminBar
             adminBarProps={{
               preview: isEnabled,

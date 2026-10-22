@@ -14,6 +14,8 @@ import { generateMeta } from '@/utilities/generateMeta'
 import { JsonLd } from '@/components/JsonLd'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { EventHero } from '@/heros/EventHero'
+import { Button } from '@/platform/ui'
+import { ArrowRight } from 'lucide-react'
 import PageClient from './page.client'
 
 export async function generateStaticParams() {
@@ -101,15 +103,13 @@ export default async function EventPage({ params: paramsPromise }: Args) {
 
             {event.registrationUrl && (
               <div className="mb-8">
-                <a
+                <Button
                   href={event.registrationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex min-h-11 items-center rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground hover:bg-primary/90"
+                  external
+                  iconEnd={<ArrowRight aria-hidden="true" />}
                 >
                   Register for This Event
-                  <span className="sr-only"> (opens in a new tab)</span> →
-                </a>
+                </Button>
               </div>
             )}
 

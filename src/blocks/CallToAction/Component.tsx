@@ -3,8 +3,8 @@ import React from 'react'
 import type { CallToActionBlock as CTABlockProps } from '@/payload-types'
 
 import RichText from '@/components/RichText'
-import { CMSLink } from '@/components/Link'
-import { cn } from '@/utilities/ui'
+import { resolveLink } from '@/platform/payload/resolveLink'
+import { Button } from '@/platform/ui'
 
 export const CallToActionBlock: React.FC<CTABlockProps> = ({ links, richText }) => {
   return (
@@ -25,20 +25,19 @@ export const CallToActionBlock: React.FC<CTABlockProps> = ({ links, richText }) 
           </div>
           <div className="flex shrink-0 flex-col gap-4 sm:flex-row">
             {(links || []).map(({ link }, i) => {
+              const resolved = resolveLink(link)
+              if (!resolved) return null
+              // This block is a brand band: white fill first, then a white outline
               return (
-                <CMSLink
+                <Button
                   key={i}
-                  {...link}
-                  size="clear"
-                  className={cn(
-                    'inline-flex h-auto min-h-11 items-center justify-center rounded-lg px-8 py-3 text-base font-semibold whitespace-normal transition-all motion-safe:hover:-translate-y-0.5',
-                    // This block is a data-theme="dark" scope: --primary-dark is the brand
-                    // #3d7a5e there (5.1:1 on white); --primary would be #4e9b76 (3.4:1).
-                    i === 0
-                      ? 'bg-white text-primary-dark shadow-lg hover:bg-white/95 hover:shadow-xl'
-                      : 'border-2 border-white bg-transparent text-white shadow-none hover:bg-white/10',
-                  )}
-                />
+                  href={resolved.href}
+                  external={resolved.external}
+                  size="lg"
+                  variant={i === 0 ? 'inverse' : 'inverse-outline'}
+                >
+                  {resolved.label}
+                </Button>
               )
             })}
           </div>

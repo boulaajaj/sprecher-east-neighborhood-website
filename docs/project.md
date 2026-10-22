@@ -23,7 +23,7 @@ It is an unofficial, AI-assisted initiative (ground rules in [`AGENTS.md`](../AG
 - **Auth**: Payload native auth (Users collection with `auth: true`); roles `admin`, `editor`, `resident`
 - **Email**: `@payloadcms/email-nodemailer` over SMTP (Mailgun in production); logs to the console when `SMTP_HOST` is unset
 - **Spam protection**: Cloudflare Turnstile on public forms, plus size and rate limits (decision records in `docs/architecture/decisions/`)
-- **Tests**: Vitest unit tests next to the code (`*.test.ts`), run with `npm test` and in CI (#139)
+- **Tests**: Vitest unit tests next to the code (`*.test.ts`), run with `npm test` and in CI (#139). Component tests (`*.test.tsx`) run in jsdom with Testing Library and axe (`expectAccessible` in `src/platform/ui/testing/`)
 - **Rich Text**: Lexical editor with slash menu, toolbars, inline images, and custom blocks
 - **Icons**: Lucide React
 - **Payload docs for agents**: https://payloadcms.com/llms-full.txt (the whole Payload documentation in one file)

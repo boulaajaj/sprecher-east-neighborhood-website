@@ -2,14 +2,11 @@ import React from 'react'
 
 import type { Page } from '@/payload-types'
 
-import { CMSLink } from '@/components/Link'
 import { Media } from '@/components/Media'
 import RichText from '@/components/RichText'
 import { splitHeadingFromBody } from '@/utilities/splitRichText'
-import { cn } from '@/utilities/ui'
-
-const ctaBaseClassName =
-  'inline-flex h-auto min-h-11 w-full items-center justify-center rounded-xl px-8 py-3.5 text-center text-base font-semibold whitespace-normal shadow-lg transition-all motion-safe:hover:-translate-y-0.5 hover:shadow-xl sm:w-auto md:w-full'
+import { resolveLink } from '@/platform/payload/resolveLink'
+import { Button } from '@/platform/ui'
 
 export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText }) => {
   // Render the heading and the description from the same rich text without duplicating
@@ -63,20 +60,20 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
           {Array.isArray(links) && links.length > 0 && (
             <ul className="flex shrink-0 flex-col gap-3 sm:flex-row md:w-60 md:flex-col md:pb-2">
               {links.map(({ link }, i) => {
+                const resolved = resolveLink(link)
+                if (!resolved) return null
+                // By position, as the design asks: the first is the main action
                 return (
                   <li key={i}>
-                    <CMSLink
-                      {...link}
-                      size="clear"
-                      className={cn(
-                        ctaBaseClassName,
-                        // The hero is a data-theme="dark" scope, where --primary is the lighter
-                        // #4e9b76 (white text 3.4:1). --primary-dark there is the brand #3d7a5e (5.1:1).
-                        i === 0
-                          ? 'bg-primary-dark text-primary-foreground hover:bg-primary-dark/90'
-                          : 'bg-accent text-accent-foreground hover:bg-accent/90',
-                      )}
-                    />
+                    <Button
+                      href={resolved.href}
+                      external={resolved.external}
+                      size="lg"
+                      variant={i === 0 ? 'primary' : 'accent'}
+                      className="w-full sm:w-auto md:w-full"
+                    >
+                      {resolved.label}
+                    </Button>
                   </li>
                 )
               })}
