@@ -10,7 +10,7 @@ Every collection also has `id` (number), `createdAt` and `updatedAt`. Draft-enab
 | ------------------ | --------------------------------------- | -------------------------------------- | ----------------------------- | ------------------------------------------------------------------ | --------------------------- | ------------------------------------------- |
 | `pages`            | Pages built from hero and blocks        | Yes (autosave, scheduled, 50 versions) | `authenticatedOrPublished`    | `isAdminOrEditor`                                                  | `isAdmin`                   | `src/collections/Pages/index.ts`            |
 | `posts`            | News articles with rich text            | Yes (autosave, scheduled, 50 versions) | `authenticatedOrPublished`    | `isAdminOrEditor`                                                  | `isAdmin`                   | `src/collections/Posts/index.ts`            |
-| `events`           | Neighborhood events with date and place | Yes (autosave, scheduled, 25 versions) | `authenticatedOrPublished`    | `isAdminOrEditor`                                                  | `isAdmin`                   | `src/collections/Events/index.ts`           |
+| `events`           | Neighborhood events with date and place | Yes (autosave, scheduled, 25 versions) | `authenticatedOrPublished`    | `isAdminOrEditor`                                                  | `isAdmin`                   | `src/modules/events/cms/events.ts`          |
 | `faq`              | Questions and answers by category       | Yes (plain)                            | `authenticatedOrPublished`    | `isAdminOrEditor`                                                  | `isAdmin`                   | `src/collections/FAQ/index.ts`              |
 | `resources`        | Local links and contacts by category    | Yes (plain)                            | `authenticatedOrPublished`    | `isAdminOrEditor`                                                  | `isAdmin`                   | `src/collections/Resources/index.ts`        |
 | `team-members`     | Board members and AI agents             | No                                     | `anyone`                      | `isAdminOrEditor`                                                  | `isAdmin`                   | `src/collections/TeamMembers/index.ts`      |
@@ -33,7 +33,7 @@ What the access functions mean (`src/access/`):
 - `users` also sets `access.admin: isAdminOrEditorBoolean` (who may open `/admin`: admin and editor).
 - "Payload default" means no access function is set, so Payload uses `Boolean(req.user)`: any logged-in user, including `resident`.
 
-Also present, not configured in this repo: `payload-folders` (from `media.folders: true`, Payload default access: any signed-in user, a gap fixed in #143), `payload-jobs`, `payload-kv`, `payload-locked-documents`, `payload-preferences`, `payload-migrations`. `payload.config.ts` has no `jobs` config or runner, so scheduled publishing may never fire (#141).
+Also present, added by Payload or its plugins rather than defined here: `payload-folders` (from `media.folders: true`; staff-only through `folders.collectionOverrides` in `payload.config.ts`, #143), `payload-jobs` (access set by `jobs.access` in `payload.config.ts`; nothing runs the queue yet, so scheduled publishing may never fire, #141), `payload-locked-documents` (edit locks; staff-only since #147, set on the built config by `src/access/restrictEditLocks.ts`), `payload-kv`, `payload-preferences` and `payload-migrations`.
 
 ## Fields by collection
 

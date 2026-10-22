@@ -10,6 +10,7 @@ import {
   isAdminOrEditorBoolean,
   isAdminOrEditorFieldAccess,
   isAdminOrSelf,
+  isStaffRole,
 } from './roles'
 
 /** A user with only the fields the role checks read. */
@@ -24,6 +25,16 @@ const admin = user('admin')
 const editor = user('editor')
 const resident = user('resident')
 const noRole = user(undefined)
+
+describe('isStaffRole', () => {
+  it('is true for admin and editor only', () => {
+    expect(isStaffRole('admin')).toBe(true)
+    expect(isStaffRole('editor')).toBe(true)
+    expect(isStaffRole('resident')).toBe(false)
+    expect(isStaffRole(undefined)).toBe(false)
+    expect(isStaffRole('Admin')).toBe(false)
+  })
+})
 
 describe('hasAdminOrEditor', () => {
   it('is true for admins and editors only', () => {

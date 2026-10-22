@@ -74,12 +74,12 @@ belong to `platform`; `app/(payload)/` is Payload's generated admin and API.
 
 ```text
 src/modules/events/
-  index.ts      client-safe entry: types, pure helpers, components that load no data, browser clients
-  server.ts     server-only entry: re-exports use cases, components that load data or use actions.ts
+  index.ts      types and pure rules only: safe for the proxy, client components and scripts
+  server.ts     server-only entry: re-exports use cases and the components pages render
   actions.ts    server actions ("Load more"); each validates its input and calls a use case
   cms.ts        Payload entry: collection and global configs, blocks, plugin setup for this area
   domain/       types (DTOs included) and rules in plain TypeScript; unit-tested
-  use-cases/    listUpcomingEvents: check who is asking, load through data/, apply rules, return DTOs
+  use-cases/    findUpcomingEvents: check who is asking, load through data/, apply rules, return DTOs
   data/         Local API queries; map documents to the domain's types
   cms/          collection config, fields, hooks, plugin options, admin components (RowLabel)
   ui/           React components, headless hooks (useEventFilters), and a browser client for
@@ -89,15 +89,16 @@ src/modules/events/
 Entry files are for code outside the module. Inside it, import the folder you need directly, so
 the entry files never import each other. The one exception: `ui/` may import its own module's
 `actions.ts`, because server actions must live in a `'use server'` file (the "Load more" feeds).
-Any component that imports its module's `actions.ts` (directly or through another component) is
-exported from
-`server.ts`, not `index.ts`, so `index.ts` never reaches server-only code.
+`index.ts` exports only types and pure rules from `domain/`, so importing it never pulls in React,
+Payload or server-only code; lint forbids it from re-exporting `ui/`. The components pages render
+are exported from `server.ts`. If a client component outside the module ever needs one of the
+module's components, add a client-safe entry for them then.
 
-A module only has the folders it needs. Tests sit next to the file they test (`isUpcoming.test.ts`).
+A module only has the folders it needs. Tests sit next to the file they test (`categories.test.ts`).
 
 ## Layers: the core stays still, the edges can change
 
-The site's core idea (what an event is, what counts as upcoming, who may see a draft) is plain
+The site's core idea (what an event is, which categories it can have, who may see a draft) is plain
 TypeScript in the middle. Payload, Next.js, outside services and the look sit around it, so each
 can be upgraded or replaced without rewriting the core.
 
@@ -131,8 +132,9 @@ What this buys:
 1. **Inward only.** Presentation (`ui/`, `app/`) → application (`use-cases/`, `actions.ts`) →
    domain, and adapters (`data/`, `cms/`) → domain. `domain/` imports no framework and nothing
    from `data/`, `cms/` or `ui/`; it may use `platform/lib/`.
-2. **Entry files only.** Outside a module, import it only through its entry files: `index.ts` and
-   `actions.ts` from `app/`, `server.ts` from server code in `app/`, and `cms.ts` from
+2. **Entry files only.** Outside a module, import it only through its entry files: `index.ts`
+   (types and pure rules) from anywhere, including `src/proxy.ts` and client components;
+   `actions.ts` from `app/`; `server.ts` from server code in `app/`; and `cms.ts` from
    `payload.config.ts`. `app/` may also import `platform/` directly. Until an area moves (#127),
    the template folders may import a module's entry files too.
 3. **No module imports another.** Modules meet only in the composition roots: pages, layouts
@@ -179,7 +181,7 @@ fails when the CMS config reaches it. Review covers rules 5, 7 and 8 (#137 adds 
 
 | You are adding…                                                | Put it in                                                                                                |
 | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| A business rule ("what counts as upcoming")                    | the module's `domain/`, with a unit test                                                                 |
+| A business rule (the event categories, `isEventScope`)         | the module's `domain/`, with a unit test                                                                 |
 | A use case other code calls (list, submit, publish)            | the module's `use-cases/`, exported from `server.ts`; a server action in `actions.ts` calls it           |
 | A database read or write                                       | the module's `data/`, called only from `use-cases/` or `actions.ts`; in a hook, `req.payload`            |
 | A color, font, corner radius or shadow                         | a token in `platform/theme/tokens.ts`, with its value in `src/themes/default/`                           |
@@ -200,7 +202,7 @@ technical type: `src/collections/`, `src/components/`, `src/blocks/`, `src/heros
 new duplication; if your change needs a rule that already exists elsewhere, reuse it.
 
 New code for an area that hasn't moved yet goes in its future module, with only the folders it
-needs (for example `src/modules/events/domain/isUpcoming.ts` plus an `index.ts` that exports it),
+needs (for example `src/modules/events/domain/categories.ts` plus an `index.ts` that exports it),
 and the old code imports it through that entry file. Where [`docs/guidelines/payload-cms.md`](../guidelines/payload-cms.md)
 names a template folder, it describes today's code; new code follows this page.
 

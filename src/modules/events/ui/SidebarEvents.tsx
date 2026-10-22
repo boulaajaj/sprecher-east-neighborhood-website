@@ -1,14 +1,13 @@
 import Link from 'next/link'
 import React from 'react'
 
-import type { Event } from '@/payload-types'
 import { formatDateBadge } from '@/utilities/formatDateTime'
-import { getCategoryLabel } from '@/utilities/eventCategories'
 
-export type SidebarEventData = Pick<Event, 'slug' | 'title' | 'date' | 'category'>
+import { formatEventCategory } from '../domain/categories'
+import type { EventSummary } from '../domain/types'
 
 export const SidebarEvents: React.FC<{
-  events: SidebarEventData[]
+  events: EventSummary[]
   title?: string
 }> = ({ events, title = 'Upcoming Events' }) => {
   if (!events || events.length === 0) return null
@@ -35,7 +34,7 @@ export const SidebarEvents: React.FC<{
                   </span>
                   {event.category && (
                     <span className="text-xs text-muted-foreground">
-                      {getCategoryLabel(event.category)}
+                      {formatEventCategory(event.category)}
                     </span>
                   )}
                 </div>

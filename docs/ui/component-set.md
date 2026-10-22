@@ -92,7 +92,7 @@ coverage table, `Field · email` means a field holding `Field.Input type="email"
 
 | Component     | Variants (`cva`) | Props                                                                                                   | Today                                                            | Elements |
 | ------------- | ---------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | -------- |
-| `AdminBar`    | one look         | wraps Payload's admin bar (rule 6 allows that import in `platform/`); shown to staff only               | `src/components/AdminBar` (shown to residents too)               | L5       |
+| `AdminBar`    | one look         | wraps Payload's admin bar (rule 6 allows that import in `platform/`); shown to staff only               | `src/components/AdminBar` (staff only since #203)                | L5       |
 | `Breadcrumbs` | one look         | `items` (`{ label, href? }[]`); keeps the JSON-LD                                                       | `src/components/Breadcrumbs`                                     | N13      |
 | `LoadMore`    | one look         | `status`, `shown`, `total`, `noun`, `onLoadMore`, `fallbackHref`; behaviour in a headless `useLoadMore` | `src/components/LoadMore`; its link becomes `Button · secondary` | N15      |
 

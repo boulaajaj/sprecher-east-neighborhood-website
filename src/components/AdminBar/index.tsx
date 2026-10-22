@@ -3,13 +3,13 @@
 import type { PayloadAdminBarProps, PayloadMeUser } from '@payloadcms/admin-bar'
 
 import { cn } from '@/utilities/ui'
-import { useSelectedLayoutSegments } from 'next/navigation'
 import { PayloadAdminBar } from '@payloadcms/admin-bar'
 import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSelectedLayoutSegments } from 'next/navigation'
 
 import './index.scss'
 
+import { isStaffRole } from '@/access/roles'
 import { getClientSideURL } from '@/utilities/getURL'
 
 const baseClass = 'admin-bar'
@@ -25,6 +25,12 @@ const collectionLabels = {
   },
 }
 
+type LabelledCollection = keyof typeof collectionLabels
+
+/** Own keys only, so a segment like `constructor` doesn't count as a collection */
+const isLabelled = (segment: string | undefined): segment is LabelledCollection =>
+  segment !== undefined && Object.hasOwn(collectionLabels, segment)
+
 const Title: React.FC = () => <span>Dashboard</span>
 
 export const AdminBar: React.FC<{
@@ -33,13 +39,14 @@ export const AdminBar: React.FC<{
   const { adminBarProps } = props || {}
   const segments = useSelectedLayoutSegments()
   const [show, setShow] = useState(false)
-  const collection = (
-    collectionLabels[segments?.[1] as keyof typeof collectionLabels] ? segments[1] : 'pages'
-  ) as keyof typeof collectionLabels
+  const segment = segments?.[1]
+  const collection: LabelledCollection = isLabelled(segment) ? segment : 'pages'
   const router = useRouter()
 
+  // Staff only (#203): residents are signed in too, but can't use the admin. The bar's user type
+  // leaves out `role`, though /api/users/me returns it
   const onAuthChange = React.useCallback((user: PayloadMeUser) => {
-    setShow(Boolean(user?.id))
+    setShow(isStaffRole(user && 'role' in user ? user.role : null))
   }, [])
 
   return (

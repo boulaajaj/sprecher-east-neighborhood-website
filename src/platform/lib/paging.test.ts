@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { isEventScope, MAX_PAGE, parsePageNumber } from './feedParams'
+import { MAX_PAGE, parsePageNumber } from './paging'
 
 describe('parsePageNumber', () => {
   it.each([
@@ -30,15 +30,5 @@ describe('parsePageNumber', () => {
     ['undefined', undefined],
   ])('rejects %s', (_label, input) => {
     expect(parsePageNumber(input)).toBeNull()
-  })
-})
-
-describe('isEventScope', () => {
-  it('accepts only "upcoming" and "past"', () => {
-    expect(isEventScope('upcoming')).toBe(true)
-    expect(isEventScope('past')).toBe(true)
-    expect(isEventScope('Upcoming')).toBe(false)
-    expect(isEventScope('all')).toBe(false)
-    expect(isEventScope(undefined)).toBe(false)
   })
 })

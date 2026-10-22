@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url'
 
 import { TeamMembers } from './collections/TeamMembers'
 import { Categories } from './collections/Categories'
-import { Events } from './collections/Events'
+import { Events } from '@/modules/events/cms'
 import { FAQ } from './collections/FAQ'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
@@ -20,10 +20,12 @@ import { defaultLexical } from '@/fields/defaultLexical'
 import { isAdminBoolean, isAdminOrEditor, isAdminOrEditorBoolean } from './access/roles'
 import { getServerSideURL } from './utilities/getURL'
 import { emailAdapterFromEnv } from './utilities/email'
+import { restrictEditLocks } from './access/restrictEditLocks'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+// Edit locks get staff-only access after Payload has added them (#147)
 export default buildConfig({
   admin: {
     components: {
@@ -105,4 +107,4 @@ export default buildConfig({
     autoGenerate: process.env.NODE_ENV === 'development',
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-})
+}).then(restrictEditLocks)

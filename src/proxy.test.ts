@@ -2,7 +2,7 @@ import { unstable_doesMiddlewareMatch } from 'next/experimental/testing/server'
 import { NextRequest } from 'next/server'
 import { describe, expect, it } from 'vitest'
 
-import { MAX_PAGE } from '@/utilities/feedParams'
+import { MAX_PAGE } from '@/platform/lib'
 
 import { config, isValidPagingPath, proxy } from './proxy'
 
