@@ -1,7 +1,7 @@
 import 'server-only'
 
 import type { FeedPage } from '@/platform/lib'
-import { startOfToday } from '@/utilities/timezone'
+import { startOfToday } from '@/platform/lib/timezone'
 
 import type { EventScope } from '../domain/scope'
 import type { EventSummary } from '../domain/types'

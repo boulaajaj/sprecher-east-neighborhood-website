@@ -20,7 +20,7 @@ describe('inScope', () => {
       vi.stubEnv('SITE_TIMEZONE', 'America/Chicago')
       vi.useFakeTimers({ toFake: ['Date'] })
       vi.setSystemTime(new Date(instant))
-      const { startOfToday } = await import('@/utilities/timezone')
+      const { startOfToday } = await import('@/platform/lib/timezone')
       return startOfToday()
     }
 

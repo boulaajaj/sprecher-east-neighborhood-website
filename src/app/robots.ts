@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { getServerSideURL } from '@/utilities/getURL'
+import { getServerSideURL } from '@/platform/lib/getURL'
 
 export default function robots(): MetadataRoute.Robots {
   const siteUrl = getServerSideURL()

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { JsonLd } from '@/components/JsonLd'
-import { getServerSideURL } from '@/utilities/getURL'
+import { getServerSideURL } from '@/platform/lib/getURL'
 
 export type BreadcrumbItem = {
   label: string

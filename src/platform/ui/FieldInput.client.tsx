@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@/utilities/ui'
+import { cn } from '@/platform/lib/cn'
 import type { VariantProps } from 'class-variance-authority'
 import type { ComponentProps, ReactNode } from 'react'
 

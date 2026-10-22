@@ -1,4 +1,4 @@
-import { cn } from '@/utilities/ui'
+import { cn } from '@/platform/lib/cn'
 import * as React from 'react'
 
 const Card: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className, ...props }) => {

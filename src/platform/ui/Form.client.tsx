@@ -2,7 +2,7 @@
 
 // Template folder until Alert moves into platform/ui (#226)
 import { Alert } from '@/components/ui/alert'
-import { cn } from '@/utilities/ui'
+import { cn } from '@/platform/lib/cn'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { type ReactNode, type RefObject, useEffect, useRef, useState } from 'react'
 import { type DefaultValues, type FieldValues, type UseFormReturn, useForm } from 'react-hook-form'

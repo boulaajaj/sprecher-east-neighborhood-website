@@ -1,4 +1,4 @@
-import { lexicalToPlainText } from '@/utilities/lexicalToPlainText'
+import { lexicalToPlainText } from '@/platform/lib/lexicalToPlainText'
 
 import type { FaqEntry } from '../domain/types'
 

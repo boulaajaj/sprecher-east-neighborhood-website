@@ -89,7 +89,7 @@ src/
   migrations/      Database migrations (generated)
   plugins/         Payload plugin setup (form builder, SEO, search, redirects, nested docs)
   providers/       React context providers (theme, header theme)
-  utilities/       Helpers: dates, URLs, SEO, data access
+  utilities/       Page and redirect data access, until the site module moves (#135)
   payload.config.ts
 ```
 
@@ -173,7 +173,7 @@ System-level env vars (not in .env.local):
 - **Upload URLs stay relative**: `getMediaUrl()` turns Payload's upload URLs (prefixed with `serverURL`) back into `/api/media/file/...`, so next/image treats them as local; since Next 16 it refuses remote URLs on private IPs such as localhost
 - **Live Preview**: Uses `window.postMessage` — component must use `useLivePreview()` hook
 - **Draft Preview**: Requires `PREVIEW_SECRET` env var for signed preview URLs
-- **Timezone**: Configured via `SITE_TIMEZONE` env var (default: `America/Chicago`). Use `startOfToday()` and `SITE_TIMEZONE` from `src/utilities/timezone.ts`. Never hardcode timezone strings or use bare `new Date().setHours(0,0,0,0)`. Day-only dates (midnight UTC) must be formatted with `timeZone: 'UTC'` to avoid off-by-one; `formatDateTime()` handles this automatically.
+- **Timezone**: Configured via `SITE_TIMEZONE` env var (default: `America/Chicago`). Use `startOfToday()` and `SITE_TIMEZONE` from `src/platform/lib/timezone.ts`. Never hardcode timezone strings or use bare `new Date().setHours(0,0,0,0)`. Day-only dates (midnight UTC) must be formatted with `timeZone: 'UTC'` to avoid off-by-one; `formatDateTime()` handles this automatically.
 
 ## Connected Tools
 

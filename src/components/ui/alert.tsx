@@ -1,4 +1,4 @@
-import { cn } from '@/utilities/ui'
+import { cn } from '@/platform/lib/cn'
 import React from 'react'
 
 // The -strong text tokens: plain destructive and primary are under 4.5:1 on their own tints

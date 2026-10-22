@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Button } from '@/platform/ui'
 
 import type { FeedPage } from '@/platform/lib'
-import { cn } from '@/utilities/ui'
+import { cn } from '@/platform/lib/cn'
 
 /**
  * Pages loaded automatically while scrolling, counting the first page. After that the

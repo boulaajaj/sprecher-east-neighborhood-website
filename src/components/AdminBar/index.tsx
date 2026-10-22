@@ -2,7 +2,7 @@
 
 import type { PayloadAdminBarProps, PayloadMeUser } from '@payloadcms/admin-bar'
 
-import { cn } from '@/utilities/ui'
+import { cn } from '@/platform/lib/cn'
 import { PayloadAdminBar } from '@payloadcms/admin-bar'
 import React, { useState } from 'react'
 import { useRouter, useSelectedLayoutSegments } from 'next/navigation'
@@ -10,7 +10,7 @@ import { useRouter, useSelectedLayoutSegments } from 'next/navigation'
 import './index.scss'
 
 import { isStaffRole } from '@/platform/payload/roles'
-import { getClientSideURL } from '@/utilities/getURL'
+import { getClientSideURL } from '@/platform/lib/getURL'
 
 const baseClass = 'admin-bar'
 

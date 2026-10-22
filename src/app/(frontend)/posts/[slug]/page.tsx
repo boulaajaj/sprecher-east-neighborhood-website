@@ -18,7 +18,7 @@ import {
   postJsonLd,
   SidebarPosts,
 } from '@/modules/news/server'
-import { generateMeta } from '@/utilities/generateMeta'
+import { generateMeta } from '@/platform/seo/generateMeta'
 import PageClient from './page.client'
 
 export async function generateStaticParams() {

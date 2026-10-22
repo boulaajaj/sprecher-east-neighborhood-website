@@ -11,7 +11,7 @@ import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { searchOptions } from '@/modules/news/cms'
 
 import type { Page, Post, Event } from '@/payload-types'
-import { getServerSideURL } from '@/utilities/getURL'
+import { getServerSideURL } from '@/platform/lib/getURL'
 
 const generateTitle: GenerateTitle<Post | Page | Event> = ({ doc }) => {
   return doc?.title || 'Sprecher East'

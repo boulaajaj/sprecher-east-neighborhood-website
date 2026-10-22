@@ -28,15 +28,15 @@ which module owns it).
 
 ## Events
 
-| Term             | Meaning                                                                                                                       | Where the rule lives                                                                                             |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Event date       | A calendar day with no time (Payload "day only"), stored as midnight UTC, for example `2026-03-03T00:00:00.000Z` for March 3. | `src/modules/events/cms/events.ts`                                                                               |
-| Event time       | Free text in site time, for example "6:00 PM". Not used for sorting.                                                          | same                                                                                                             |
-| Upcoming event   | A published event whose date is today or later, where "today" is the date in the site timezone.                               | `inScope` in `src/modules/events/data/scope.ts`, with today from `startOfToday()` in `src/utilities/timezone.ts` |
-| Past event       | A published event whose date is before today in the site timezone.                                                            | same                                                                                                             |
-| Event category   | One of: Meeting, Social, Volunteer, Workshop, Sports & Recreation, Community, Other. Phase 2 will revise the list (#122).     | `EVENT_CATEGORIES` in `src/modules/events/domain/categories.ts`, also the collection's options                   |
-| Cancelled event  | Planned (#122): still listed, clearly marked as cancelled, never silently removed.                                            | not built yet                                                                                                    |
-| Official meeting | Planned (#122): a city or county meeting, shown with a link to the official agenda.                                           | not built yet                                                                                                    |
+| Term             | Meaning                                                                                                                       | Where the rule lives                                                                                                |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Event date       | A calendar day with no time (Payload "day only"), stored as midnight UTC, for example `2026-03-03T00:00:00.000Z` for March 3. | `src/modules/events/cms/events.ts`                                                                                  |
+| Event time       | Free text in site time, for example "6:00 PM". Not used for sorting.                                                          | same                                                                                                                |
+| Upcoming event   | A published event whose date is today or later, where "today" is the date in the site timezone.                               | `inScope` in `src/modules/events/data/scope.ts`, with today from `startOfToday()` in `src/platform/lib/timezone.ts` |
+| Past event       | A published event whose date is before today in the site timezone.                                                            | same                                                                                                                |
+| Event category   | One of: Meeting, Social, Volunteer, Workshop, Sports & Recreation, Community, Other. Phase 2 will revise the list (#122).     | `EVENT_CATEGORIES` in `src/modules/events/domain/categories.ts`, also the collection's options                      |
+| Cancelled event  | Planned (#122): still listed, clearly marked as cancelled, never silently removed.                                            | not built yet                                                                                                       |
+| Official meeting | Planned (#122): a city or county meeting, shown with a link to the official agenda.                                           | not built yet                                                                                                       |
 
 ## News
 
@@ -71,10 +71,10 @@ which module owns it).
 
 ## Time
 
-| Term          | Meaning                                                                                                | Where the rule lives                     |
-| ------------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------- |
-| Site timezone | `SITE_TIMEZONE`, default `America/Chicago`. "Today" and every displayed time use it.                   | `src/utilities/timezone.ts` → `platform` |
-| Today         | The current calendar date in the site timezone, as midnight UTC (to match how event dates are stored). | `startOfToday()`                         |
+| Term          | Meaning                                                                                                | Where the rule lives           |
+| ------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------ |
+| Site timezone | `SITE_TIMEZONE`, default `America/Chicago`. "Today" and every displayed time use it.                   | `src/platform/lib/timezone.ts` |
+| Today         | The current calendar date in the site timezone, as midnight UTC (to match how event dates are stored). | `startOfToday()`               |
 
 ## Code structure
 
