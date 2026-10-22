@@ -89,7 +89,7 @@ src/
   migrations/      Database migrations (generated)
   plugins/         Payload plugin setup (form builder, SEO, search, redirects, nested docs)
   providers/       React context providers (theme, header theme)
-  utilities/       Page and redirect data access, until the site module moves (#135)
+  utilities/       getDocument, getGlobals, getRedirects (site data) and splitRichText, until #135 moves them
   payload.config.ts
 ```
 
