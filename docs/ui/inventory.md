@@ -3,10 +3,8 @@
 Issue #170, part of epic #163. Every route and state of the public site, every UI element on it,
 the data each element shows, and the component set the elements point to.
 
-> **Owner review comes first.** The [proposed component set](component-set.md) is a proposal. The
-> owner (Amine) reviews it, changes it if he wants, and approves it before any component is built.
-> No issue under #163 starts building a component until then. The owner closes #170 once he
-> approves the set.
+> **Approved.** The owner approved the [component set](component-set.md) on 2026-10-21, with the
+> merges he asked for that day. Each component is built in its own issue under #163.
 
 ## The files
 
@@ -17,7 +15,7 @@ the data each element shows, and the component set the elements point to.
 | [`elements-content.md`](elements-content.md)                     | Cards and lists (C), media (M), blocks and rich text (B).            |
 | [`elements-forms-feedback.md`](elements-forms-feedback.md)       | Form fields and actions (F), feedback, empty states, overlays (S).   |
 | [`data-types.md`](data-types.md)                                 | Each data type and Payload field type, and the component for it.     |
-| [`component-set.md`](component-set.md)                           | The proposed shared components: variants, props, where they live.    |
+| [`component-set.md`](component-set.md)                           | The shared components: variants, props, where they live.             |
 | [`component-set-modules.md`](component-set-modules.md)           | Area components, what's not needed yet, and the coverage check.      |
 | [`evidence.md`](evidence.md)                                     | Duplication, inconsistencies and bugs found, with file references.   |
 | [`screenshots/`](screenshots/)                                   | 172 WebP screenshots (6.4 MB, 6,446,992 bytes).                      |
