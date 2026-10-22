@@ -16,7 +16,8 @@ export const linkVariants = cva(
     variants: {
       variant: {
         // In running text
-        inline: 'font-medium text-primary underline underline-offset-4 hover:text-primary-strong',
+        // primary-strong: plain primary is 4.33:1 when the text sits on a surface panel
+        inline: 'font-medium text-primary-strong underline underline-offset-4 hover:decoration-2',
         // Header and menu items
         // Hover and current use primary-strong: plain primary is 4.33:1 on the secondary fill
         nav: 'inline-flex items-center gap-2 rounded-md font-medium text-foreground hover:bg-secondary hover:text-primary-strong aria-[current=page]:text-primary-strong',

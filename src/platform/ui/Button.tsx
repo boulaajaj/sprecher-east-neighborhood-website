@@ -17,9 +17,9 @@ export const buttonVariants = cva(
       variant: {
         primary:
           'bg-primary-fill text-primary-foreground hover:bg-primary-fill-hover focus-visible:outline-ring',
-        // On hover the text turns primary-strong: plain primary on the tint is just under 4.5:1
+        // primary-strong text: plain primary is 4.33:1 on surface panels and on the hover tint
         secondary:
-          'border border-primary text-primary hover:bg-primary/5 hover:text-primary-strong focus-visible:outline-ring',
+          'border border-primary text-primary-strong hover:bg-primary/5 focus-visible:outline-ring',
         accent: 'bg-accent text-accent-foreground hover:bg-accent-dark focus-visible:outline-ring',
         ghost: 'text-foreground hover:bg-surface focus-visible:outline-ring',
         // On a brand band (a data-theme="dark" scope): white fill, or a white outline
