@@ -2,7 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 import { MapPin, Clock, Calendar } from 'lucide-react'
 
-import { Media } from '@/components/Media'
+import { Media } from '@/platform/ui/Media'
 import { cn } from '@/platform/lib/cn'
 import { categoryPillClassName } from '@/platform/ui/categoryPill'
 import { formatDateShort, formatDateBadge, toDateTimeAttr } from '@/platform/lib/formatDateTime'

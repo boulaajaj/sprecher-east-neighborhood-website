@@ -3,11 +3,11 @@ import type { Metadata } from 'next'
 import { ArrowRight } from 'lucide-react'
 import React from 'react'
 
-import { Breadcrumbs } from '@/components/Breadcrumbs'
-import { JsonLd } from '@/components/JsonLd'
+import { Breadcrumbs } from '@/platform/ui/Breadcrumbs'
+import { JsonLd } from '@/platform/ui/JsonLd'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
-import RichText from '@/components/RichText'
-import { SidebarCTA } from '@/components/SidebarCTA'
+import { RichText } from '@/platform/richtext/RichText'
+import { SidebarCTA } from '@/platform/ui/SidebarCTA'
 import {
   EventHero,
   EventLocation,

@@ -7,7 +7,7 @@ vi.mock('next/font/google', () => ({ Poppins: () => ({ variable: 'font-poppins' 
 vi.mock('next/headers', () => ({ draftMode: async () => ({ isEnabled: false }) }))
 vi.mock('@/Header/Component', () => ({ Header: () => null }))
 vi.mock('@/Footer/Component', () => ({ Footer: () => null }))
-vi.mock('@/components/AdminBar', () => ({ AdminBar: () => null }))
+vi.mock('@/platform/ui/AdminBar.client', () => ({ AdminBar: () => null }))
 vi.mock('@/modules/accounts/server', () => ({
   AccountMenu: () => null,
   AccountProvider: ({ children }: { children: ReactNode }) => children,

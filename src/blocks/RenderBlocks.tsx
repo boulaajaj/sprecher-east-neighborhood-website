@@ -6,7 +6,7 @@ import { ArchiveBlock } from '@/blocks/ArchiveBlock/Component'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { ContentBlock } from '@/blocks/Content/Component'
 import { FormBlock } from '@/modules/contact/server'
-import { MediaBlock } from '@/blocks/MediaBlock/Component'
+import { MediaBlock } from '@/platform/richtext/MediaBlock'
 
 const blockComponents = {
   archive: ArchiveBlock,
