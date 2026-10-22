@@ -1,103 +1,91 @@
 'use client'
 
-import React, { useCallback, useState } from 'react'
+import React, { useState } from 'react'
+import { z } from 'zod'
 
-import { Alert } from '@/components/ui/alert'
-import { Button } from '@/platform/ui'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Button, Field, Form, type FormApi, type FormStatus } from '@/platform/ui'
+
+import { toPasswordErrorMessage } from './passwordErrorMessage'
+
+const MIN_PASSWORD_LENGTH = 8
+
+const passwordSchema = z
+  .object({
+    newPassword: z
+      .string()
+      .min(MIN_PASSWORD_LENGTH, `Use at least ${MIN_PASSWORD_LENGTH} characters`),
+    confirmPassword: z.string().min(1, 'Type the new password again'),
+  })
+  .refine((values) => values.newPassword === values.confirmPassword, {
+    message: 'The passwords don’t match',
+    path: ['confirmPassword'],
+  })
+
+type Values = z.output<typeof passwordSchema>
 
 export function ChangePasswordForm({ userId }: { userId: number }) {
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [status, setStatus] = useState<FormStatus>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
 
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault()
-      setError('')
-      setSuccess(false)
+  // Never the server's text (#204); Payload logs the details
+  const fail = (httpStatus: number | null) => {
+    setErrorMessage(toPasswordErrorMessage(httpStatus))
+    setStatus('error')
+  }
 
-      if (newPassword.length < 8) {
-        setError('Password must be at least 8 characters.')
-        return
-      }
+  const changePassword = async (values: Values, form: FormApi<Values, Values>) => {
+    setStatus('submitting')
+    let res: Response
+    try {
+      res = await fetch(`/api/users/${userId}`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: values.newPassword }),
+      })
+    } catch {
+      return fail(null)
+    }
+    if (!res.ok) return fail(res.status)
 
-      if (newPassword !== confirmPassword) {
-        setError('Passwords do not match.')
-        return
-      }
-
-      setLoading(true)
-
-      try {
-        const res = await fetch(`/api/users/${userId}`, {
-          method: 'PATCH',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password: newPassword }),
-        })
-
-        if (res.ok) {
-          setSuccess(true)
-          setNewPassword('')
-          setConfirmPassword('')
-        } else {
-          const data = await res.json().catch(() => null)
-          setError(data?.errors?.[0]?.message || 'Failed to update password. Please try again.')
-        }
-      } catch {
-        setError('Something went wrong. Please try again.')
-      } finally {
-        setLoading(false)
-      }
-    },
-    [newPassword, confirmPassword, userId],
-  )
+    form.reset()
+    setStatus('success')
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {error && <Alert variant="error">{error}</Alert>}
-      {success && <Alert variant="success">Password updated successfully.</Alert>}
-
-      <div className="space-y-1">
-        <Label htmlFor="new-password">New Password</Label>
-        <Input
-          id="new-password"
-          type="password"
-          required
-          autoComplete="new-password"
-          value={newPassword}
-          onChange={(e) => {
-            setNewPassword(e.target.value)
-            if (error) setError('')
-            if (success) setSuccess(false)
-          }}
-          placeholder="Minimum 8 characters"
-        />
-      </div>
-
-      <div className="space-y-1">
-        <Label htmlFor="confirm-password">Confirm New Password</Label>
-        <Input
-          id="confirm-password"
-          type="password"
-          required
-          autoComplete="new-password"
-          value={confirmPassword}
-          onChange={(e) => {
-            setConfirmPassword(e.target.value)
-            if (error) setError('')
-            if (success) setSuccess(false)
-          }}
-        />
-      </div>
-
-      <Button type="submit" loading={loading}>
-        {loading ? 'Updating' : 'Update Password'}
-      </Button>
-    </form>
+    <Form
+      aria-label="Change password"
+      schema={passwordSchema}
+      defaultValues={{}} // keeps what was typed before the page loaded
+      onSubmit={changePassword}
+      status={status}
+      successMessage="Password updated."
+      errorMessage={errorMessage}
+    >
+      {({ register, formState: { errors } }) => (
+        <>
+          <Field
+            label="New password"
+            required
+            hint={`At least ${MIN_PASSWORD_LENGTH} characters.`}
+            error={errors.newPassword?.message}
+          >
+            <Field.Input type="password" autoComplete="new-password" {...register('newPassword')} />
+          </Field>
+          <Field label="Confirm new password" required error={errors.confirmPassword?.message}>
+            <Field.Input
+              type="password"
+              autoComplete="new-password"
+              {...register('confirmPassword')}
+            />
+          </Field>
+          <div>
+            <Button type="submit" loading={status === 'submitting'}>
+              {status === 'submitting' ? 'Updating' : 'Update Password'}
+            </Button>
+          </div>
+        </>
+      )}
+    </Form>
   )
 }

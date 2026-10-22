@@ -10,11 +10,13 @@ import type { CardPostData } from '@/components/Card'
 
 type Args = {
   searchParams: Promise<{
-    q: string
+    q?: string | string[]
   }>
 }
 export default async function Page({ searchParams: searchParamsPromise }: Args) {
-  const { q: query } = await searchParamsPromise
+  const { q } = await searchParamsPromise
+  // `?q=a&q=b` gives an array: use the first. A query of only spaces is no query
+  const query = (Array.isArray(q) ? q[0] : q)?.trim() ?? ''
   const payload = await getPayload({ config: configPromise })
 
   const posts = await payload.find({
@@ -68,7 +70,7 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
           Search
         </h1>
         <div className="max-w-[50rem]">
-          <Search />
+          <Search initialQuery={query} />
         </div>
       </div>
 
