@@ -1,7 +1,7 @@
 import type { ArchiveBlock as ArchiveBlockProps } from '@/payload-types'
 
 import React from 'react'
-import RichText from '@/components/RichText'
+import { RichText } from '@/platform/richtext/RichText'
 
 import { findArchivePosts, PostGrid } from '@/modules/news/server'
 

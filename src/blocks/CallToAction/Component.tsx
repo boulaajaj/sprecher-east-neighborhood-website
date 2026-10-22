@@ -2,7 +2,7 @@ import React from 'react'
 
 import type { CallToActionBlock as CTABlockProps } from '@/payload-types'
 
-import RichText from '@/components/RichText'
+import { RichText } from '@/platform/richtext/RichText'
 import { resolveLink } from '@/platform/payload/resolveLink'
 import { Button } from '@/platform/ui'
 

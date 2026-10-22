@@ -1,7 +1,7 @@
 'use client'
 
 // Template folder until Alert moves into platform/ui (#226)
-import { Alert } from '@/components/ui/alert'
+import { Alert } from './Alert'
 import { cn } from '@/platform/lib/cn'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { type ReactNode, type RefObject, useEffect, useRef, useState } from 'react'

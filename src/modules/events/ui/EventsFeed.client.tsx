@@ -2,7 +2,7 @@
 
 import React, { useCallback } from 'react'
 
-import { LoadMoreFooter, useLoadMore } from '@/components/LoadMore'
+import { LoadMoreFooter, useLoadMore } from '@/platform/ui/LoadMore.client'
 import type { FeedPage } from '@/platform/lib'
 import { cn } from '@/platform/lib/cn'
 

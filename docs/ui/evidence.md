@@ -15,7 +15,7 @@ form-builder field files under `src/blocks/Form/` (`Width/`, `Error/` and the re
 
 | ID  | What is repeated                                                                                                                                                                                                                                                      | Where                                                                                                                                                                                                                                                                                                                                                                                                                       | Shared component                        |
 | --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| D1  | Buttons built from raw classes instead of `Button`, eight times. Heights `h-9`, `min-h-10`, `min-h-11`; corners `rounded-md`, `rounded-lg`, `rounded-xl`; weight medium or semibold.                                                                                  | `src/Header/Component.client.tsx:125`, `:200`; `src/components/SidebarCTA/index.tsx:16`; `events/[slug]/page.tsx:108`; `src/heros/HighImpact/index.tsx:12`; `src/blocks/CallToAction/Component.tsx:34`; `src/components/LoadMore/index.tsx:150`; `src/components/VersionCheck/index.tsx:117`                                                                                                                                | `Button`                                |
+| D1  | Buttons built from raw classes instead of `Button`, eight times. Heights `h-9`, `min-h-10`, `min-h-11`; corners `rounded-md`, `rounded-lg`, `rounded-xl`; weight medium or semibold.                                                                                  | `src/Header/Component.client.tsx:125`, `:200`; `src/platform/ui/SidebarCTA.tsx:16`; `events/[slug]/page.tsx:108`; `src/heros/HighImpact/index.tsx:12`; `src/blocks/CallToAction/Component.tsx:34`; `src/platform/ui/LoadMore.client.tsx:150`; `src/platform/ui/VersionCheck.client.tsx:117`                                                                                                                                 | `Button`                                |
 | D2  | Text links built by hand: raw `<a>` in three places, two back links, and the same nav classes written for desktop and mobile.                                                                                                                                         | `src/modules/events/ui/EventLocation.tsx:20`; `src/modules/directory/ui/ResourceCard.tsx:18`, `:28`; `posts/page/[pageNumber]/page.tsx:43`; `events/list/[scope]/[page]/page.tsx:44`; `src/Header/Nav/index.tsx:64`, `:76`, `:101`, `:111`; `src/Header/Component.client.tsx:106`, `:117`, `:169`, `:189`                                                                                                                   | `Link`                                  |
 | D3  | Fourteen card shells, each with its own corner, shadow and padding (`rounded-lg`/`xl`/`2xl`/`[0.8rem]`; `shadow-sm`/`md`/none; `p-4` to `p-12`). Every elevated card has both a border and a shadow; the UI guideline says one or the other. `ui/card.tsx` is unused. | `src/modules/news/ui/PostCard.client.tsx:28`; `src/modules/events/ui/EventCard.tsx:61`, `:78`; `src/modules/directory/ui/ResourceCard.tsx:11`; `resources/page.tsx:41`; `src/modules/directory/ui/FaqList.tsx:13`; `account/page.tsx:19`, `:33`; `src/modules/events/ui/EventLocation.tsx:15`; `events/page.tsx:43`; `src/blocks/Content/Component.tsx:58`, `:63`, `:70`; `src/modules/contact/ui/FormBlock.client.tsx:111` | `Card`                                  |
 | D4  | Form-field scaffolding (label, required mark, error, width) copied into eight files. `Select`, `State` and `Country` are one component written three times. Login and account use a third pattern.                                                                    | `src/blocks/Form/{Text,Email,Number,Textarea,Select,State,Country,Checkbox}/index.tsx`; `login/LoginForm.tsx:51`; `account/ChangePasswordForm.tsx:65`                                                                                                                                                                                                                                                                       | `Field`                                 |
@@ -79,7 +79,7 @@ none is fixed here.
    would hide the symptom and leave every share image wrong.
 
 7. **Residents see the Payload admin bar** ("Dashboard", "New Page", "Logout") for an admin they
-   can't open; it shows for any signed-in user (`src/components/AdminBar/index.tsx:41`).
+   can't open; it shows for any signed-in user (`src/platform/ui/AdminBar.client.tsx:41`).
    [Screenshot](screenshots/account-1280-light.webp).
 8. **Server error text reaches visitors.** The contact form shows "Internal Server Error"
    (then `src/blocks/Form/Component.tsx:119`; fixed by #223, which shows fixed texts in
@@ -127,12 +127,12 @@ none is fixed here.
   in the toast (`VersionCheck/index.tsx:117`), `bg-black` in the code block
   (`Code/Component.client.tsx:17`), `text-white` in the post placeholder (`PostCard.client.tsx:39`),
   `focus:text-white` on the skip link (`src/app/(frontend)/layout.tsx:44`), and `bg-black` and
-  `text-white` on the admin bar (`src/components/AdminBar/index.tsx:47`, `:55–59`). Rule 9 allows
+  `text-white` on the admin bar (`src/platform/ui/AdminBar.client.tsx:47`, `:55–59`). Rule 9 allows
   white and black only on photos until #146.
 - **Inline style:** the form field width uses `style={{ maxWidth }}` (`Width/index.tsx:9`), and the
-  admin bar passes a `style` object to Payload's bar (`src/components/AdminBar/index.tsx:75`).
+  admin bar passes a `style` object to Payload's bar (`src/platform/ui/AdminBar.client.tsx:75`).
 - **Admin icon in public UI:** the code block's copy button imports Payload's admin icon
-  (`src/blocks/Code/CopyButton.tsx:3`) instead of Lucide.
+  (`src/platform/richtext/CopyButton.client.tsx:3`) instead of Lucide.
 - **Unthemed browser control:** the search box shows the browser's blue clear button.
 
 ## Code with no visible UI
@@ -140,5 +140,5 @@ none is fixed here.
 - `src/blocks/RelatedPosts/Component.tsx`: not used anywhere (removed in #132).
 - `src/providers/Theme/ThemeSelector`: built but never rendered, so visitors can't choose a theme;
   dark mode only follows the system setting.
-- `src/components/ui/card.tsx`: not used; every card is hand-built (D3).
+- `src/components/ui/card.tsx`: not used; every card is hand-built (D3). Removed in #135.
 - `team-members` and `events.featured`: stored, never shown ([data types](data-types.md#data-with-no-public-ui-today)).
