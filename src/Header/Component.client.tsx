@@ -175,7 +175,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
                         closeMobileMenu()
                         logout()
                       }}
-                      className="justify-start px-3"
+                      className="justify-start rounded-md px-3 font-medium hover:bg-secondary hover:text-primary"
                     >
                       Sign Out
                     </Button>

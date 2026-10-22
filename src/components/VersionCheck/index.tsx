@@ -120,7 +120,7 @@ export function VersionCheck() {
           onClick={handleDismiss}
           variant="ghost"
           size="icon"
-          className="shrink-0 text-muted-foreground"
+          className="shrink-0 text-muted-foreground hover:text-foreground"
           aria-label="Dismiss update notification"
         >
           <X aria-hidden="true" />

@@ -18,7 +18,8 @@ export function CopyButton({ code }: { code: string }) {
   return (
     <div className="flex justify-end">
       <Button
-        variant="secondary"
+        // The code block is black in both themes
+        variant="inverse-outline"
         size="sm"
         iconStart={<Copy aria-hidden="true" />}
         aria-live="polite"

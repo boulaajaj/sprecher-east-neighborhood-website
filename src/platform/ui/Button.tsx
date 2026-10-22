@@ -25,9 +25,9 @@ export const buttonVariants = cva(
         'inverse-outline':
           'border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 focus-visible:outline-primary-foreground',
       },
-      // Every size is at least 44 px tall on phones (WCAG 2.5.8); `sm` shrinks from md up
+      // Every size is at least 44 px tall on phones (WCAG 2.5.8); `sm` shrinks from lg up
       size: {
-        sm: 'min-h-11 px-4 text-sm md:min-h-9 md:px-3',
+        sm: 'min-h-11 px-4 text-sm lg:min-h-9 lg:px-3',
         md: 'min-h-11 px-5 text-base',
         lg: 'min-h-12 px-8 text-base',
         icon: 'size-11 [&_svg]:size-5',

@@ -70,7 +70,8 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
                       external={resolved.external}
                       size="lg"
                       variant={i === 0 ? 'primary' : 'accent'}
-                      className="w-full sm:w-auto md:w-full"
+                      // A white focus ring: the theme ring is green on a green photo
+                      className="w-full focus-visible:outline-primary-foreground sm:w-auto md:w-full"
                     >
                       {resolved.label}
                     </Button>
