@@ -63,8 +63,9 @@ target structure (one module per business area under `src/modules/`, shared code
 of code goes, naming [conventions](architecture/conventions.md), the [glossary](architecture/glossary.md),
 the [data model](architecture/data-model.md) and [decision records](architecture/decisions/README.md).
 
-The code is moving to that structure in small steps (#127). Until an area has moved, it is still in
-the Payload website template's folders, sorted by technical type:
+The code is moving to that structure in small steps (#127). Events have moved to
+`src/modules/events/` (#131), and `src/platform/lib/` holds the shared paging helpers. Until an
+area has moved, it is still in the Payload website template's folders, sorted by technical type:
 
 ```
 src/
@@ -73,7 +74,7 @@ src/
     (frontend)/    Public routes (home, posts, events, faq, resources, search, login, account, sitemaps)
     (payload)/     Payload admin and API routes (generated; leave alone)
   blocks/          Page-builder blocks: Payload config + React component each
-  collections/     Payload collections (Pages, Posts, Events, FAQ, Resources, TeamMembers, Users, Media, Categories)
+  collections/     Payload collections (Pages, Posts, FAQ, Resources, TeamMembers, Users, Media, Categories)
   components/      Shared React components; components/ui/ holds the shadcn/ui primitives
   endpoints/seed/  Seed data and script
   fields/          Reusable Payload field groups (link, linkGroup, defaultLexical)
@@ -90,23 +91,23 @@ src/
 
 ## Key Files
 
-| File                              | Purpose                                           |
-| --------------------------------- | ------------------------------------------------- |
-| `src/payload.config.ts`           | Payload CMS config (SQLite, collections, plugins) |
-| `src/app/(frontend)/globals.css`  | Tailwind v4 `@theme` block — all design tokens    |
-| `src/collections/Pages/index.ts`  | Pages collection with layout builder blocks       |
-| `src/collections/Posts/index.ts`  | Blog posts collection                             |
-| `src/collections/Events/index.ts` | Events collection (custom)                        |
-| `src/collections/Users/index.ts`  | Users collection with Payload native auth         |
-| `src/collections/Media.ts`        | Media uploads with size variants                  |
-| `src/blocks/`                     | Layout builder block configs + React components   |
-| `src/heros/`                      | Hero block configs + React components             |
-| `src/access/`                     | Access control helpers                            |
-| `src/fields/`                     | Reusable field groups (link, linkGroup, lexical)  |
-| `src/Header/`                     | Header global component                           |
-| `src/Footer/`                     | Footer global component                           |
-| `ecosystem.config.cjs`            | PM2 config for VPS (CommonJS: package is ESM)     |
-| `eslint.boundaries.config.mjs`    | Dependency rules as lint (warnings until #137)    |
+| File                               | Purpose                                           |
+| ---------------------------------- | ------------------------------------------------- |
+| `src/payload.config.ts`            | Payload CMS config (SQLite, collections, plugins) |
+| `src/app/(frontend)/globals.css`   | Tailwind v4 `@theme` block — all design tokens    |
+| `src/collections/Pages/index.ts`   | Pages collection with layout builder blocks       |
+| `src/collections/Posts/index.ts`   | Blog posts collection                             |
+| `src/modules/events/cms/Events.ts` | Events collection (custom)                        |
+| `src/collections/Users/index.ts`   | Users collection with Payload native auth         |
+| `src/collections/Media.ts`         | Media uploads with size variants                  |
+| `src/blocks/`                      | Layout builder block configs + React components   |
+| `src/heros/`                       | Hero block configs + React components             |
+| `src/access/`                      | Access control helpers                            |
+| `src/fields/`                      | Reusable field groups (link, linkGroup, lexical)  |
+| `src/Header/`                      | Header global component                           |
+| `src/Footer/`                      | Footer global component                           |
+| `ecosystem.config.cjs`             | PM2 config for VPS (CommonJS: package is ESM)     |
+| `eslint.boundaries.config.mjs`     | Dependency rules as lint (warnings until #137)    |
 
 ## Design Tokens
 

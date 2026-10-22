@@ -25,4 +25,5 @@ search engines and for screen-reader and keyboard users.
 
 ## Links
 
-- Code: `src/utilities/feeds.ts`, `src/components/LoadMore`
+- Code: `src/platform/lib/paging.ts`, `src/components/LoadMore`, `src/modules/events/data/queries.ts`,
+  `src/utilities/feeds.ts` (posts)
