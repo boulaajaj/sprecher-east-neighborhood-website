@@ -1,8 +1,7 @@
-import type { CollectionConfig } from 'payload'
+import { slugField, type CollectionConfig } from 'payload'
 
-import { anyone } from '../access/anyone'
-import { isAdmin, isAdminOrEditor } from '../access/roles'
-import { slugField } from 'payload'
+import { anyone } from '@/access/anyone'
+import { isAdmin, isAdminOrEditor } from '@/access/roles'
 
 export const Categories: CollectionConfig = {
   slug: 'categories',

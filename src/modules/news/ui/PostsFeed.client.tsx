@@ -2,14 +2,15 @@
 
 import React from 'react'
 
-import { loadPostsPage } from '@/app/(frontend)/posts/actions'
-import { CollectionArchive } from '@/components/CollectionArchive'
 import { LoadMoreFooter, useLoadMore } from '@/components/LoadMore'
 import type { FeedPage } from '@/platform/lib'
-import type { PostFeedItem } from '@/utilities/feeds'
+
+import { loadPostsPage } from '../actions'
+import type { PostSummary } from '../domain/types'
+import { PostGrid } from './PostGrid'
 
 /** News listing that loads more posts as the reader scrolls. */
-export const PostsFeed: React.FC<{ initial: FeedPage<PostFeedItem> }> = ({ initial }) => {
+export const PostsFeed: React.FC<{ initial: FeedPage<PostSummary> }> = ({ initial }) => {
   const feed = useLoadMore(initial, loadPostsPage)
 
   if (feed.totalDocs === 0) {
@@ -24,7 +25,7 @@ export const PostsFeed: React.FC<{ initial: FeedPage<PostFeedItem> }> = ({ initi
 
   return (
     <>
-      <CollectionArchive posts={feed.items} />
+      <PostGrid posts={feed.items} />
       <div className="container">
         <LoadMoreFooter
           noun="posts"

@@ -1,33 +1,33 @@
-import { cn } from '@/utilities/ui'
 import React from 'react'
 
-import { Card } from '@/components/Card'
-import type { CardPostData } from '@/components/Card'
+import type { PostSummary } from '@/modules/news'
+import { PostGrid } from '@/modules/news/server'
+import type { Post } from '@/payload-types'
 
-export type Props = {
-  posts: CardPostData[]
+/**
+ * Temporary bridge for the search page only (#132). It still queries the search collection
+ * itself and passes the results as card-shaped documents; the post grid now lives in
+ * `src/modules/news`. Search moves into the news module once #223 (which edits the search page)
+ * has merged, and this file and `components/Card` go then.
+ */
+export type CardPostData = Pick<Post, 'slug' | 'categories' | 'meta' | 'title' | 'publishedAt'>
+
+function toPostSummary(doc: CardPostData, index: number): PostSummary {
+  return {
+    id: index,
+    slug: doc.slug,
+    title: doc.title,
+    publishedAt: doc.publishedAt ?? null,
+    categories: (doc.categories ?? []).flatMap((category) =>
+      typeof category === 'object'
+        ? [{ id: category.id, title: category.title || 'Untitled category' }]
+        : [],
+    ),
+    description: doc.meta?.description ?? null,
+    image: typeof doc.meta?.image === 'object' ? doc.meta.image : null,
+  }
 }
 
-export const CollectionArchive: React.FC<Props> = (props) => {
-  const { posts } = props
-
-  return (
-    <div className={cn('container')}>
-      <div>
-        <div className="grid grid-cols-4 gap-x-4 gap-y-4 sm:grid-cols-8 lg:grid-cols-12 lg:gap-x-8 lg:gap-y-8 xl:gap-x-8">
-          {posts?.map((result, index) => {
-            if (typeof result === 'object' && result !== null) {
-              return (
-                <div className="col-span-4" key={index}>
-                  <Card className="h-full" doc={result} relationTo="posts" showCategories />
-                </div>
-              )
-            }
-
-            return null
-          })}
-        </div>
-      </div>
-    </div>
-  )
-}
+export const CollectionArchive: React.FC<{ posts: CardPostData[] }> = ({ posts }) => (
+  <PostGrid posts={posts.map(toPostSummary)} />
+)

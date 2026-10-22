@@ -1,42 +1,25 @@
 'use client'
-import { cn, categoryPillClassName } from '@/utilities/ui'
-import useClickableCard from '@/utilities/useClickableCard'
+
 import Link from 'next/link'
 import React from 'react'
-import type { Post } from '@/payload-types'
 
 import { Media } from '@/components/Media'
 import { formatDateShort } from '@/utilities/formatDateTime'
+import { categoryPillClassName, cn } from '@/utilities/ui'
+import useClickableCard from '@/utilities/useClickableCard'
 
-export type CardPostData = Pick<Post, 'slug' | 'categories' | 'meta' | 'title' | 'publishedAt'>
+import type { PostSummary } from '../domain/types'
 
-export const Card: React.FC<{
-  alignItems?: 'center'
+/** A post in a grid: share image or a branded placeholder, date, categories, title, summary. */
+export const PostCard: React.FC<{
+  post: PostSummary
   className?: string
-  doc?: CardPostData
-  relationTo?: 'posts'
-  showCategories?: boolean
-  title?: string
-}> = (props) => {
+}> = ({ post, className }) => {
   const { card, link } = useClickableCard({})
-  const { className, doc, relationTo, showCategories, title: titleFromProps } = props
+  const { slug, categories, description, image, publishedAt, title } = post
 
-  const { slug, categories, meta, publishedAt, title } = doc || {}
-  const { description, image } = meta || {}
-  // An unpopulated image is just an ID: show the placeholder rather than a broken image
-  const metaImage = image && typeof image === 'object' ? image : null
-
-  const renderableCategories =
-    showCategories && Array.isArray(categories)
-      ? categories.filter(
-          (category): category is Exclude<typeof category, number | string> =>
-            typeof category === 'object' && category !== null,
-        )
-      : []
-  const hasCategories = renderableCategories.length > 0
-  const titleToUse = titleFromProps || title
-  const sanitizedDescription = description?.replace(/\u00A0/g, ' ') // replace non-breaking space with regular space
-  const href = `/${relationTo}/${slug}`
+  const hasCategories = categories.length > 0
+  const sanitizedDescription = description?.replace(/ /g, ' ') // non-breaking spaces to spaces
 
   return (
     <article
@@ -47,7 +30,7 @@ export const Card: React.FC<{
       ref={card.ref}
     >
       <div className="relative w-full overflow-hidden">
-        {!metaImage && (
+        {!image && (
           <div className="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-primary-dark via-primary to-primary-light">
             <div className="flex flex-col items-center gap-1 opacity-20" aria-hidden="true">
               <span className="text-lg font-bold tracking-tight text-white italic">Sprecher</span>
@@ -57,10 +40,10 @@ export const Card: React.FC<{
             </div>
           </div>
         )}
-        {metaImage && (
+        {image && (
           <div className="aspect-video overflow-hidden">
             <Media
-              resource={metaImage}
+              resource={image}
               size="33vw"
               imgClassName="h-full w-full object-cover transition-transform duration-300 motion-safe:group-hover:scale-105"
             />
@@ -68,7 +51,7 @@ export const Card: React.FC<{
         )}
       </div>
       <div className="p-5 md:p-6">
-        {(publishedAt || (showCategories && hasCategories)) && (
+        {(publishedAt || hasCategories) && (
           <div className="mb-3 flex flex-wrap items-center gap-2">
             {publishedAt && (
               <time className="text-xs font-medium text-muted-foreground" dateTime={publishedAt}>
@@ -80,21 +63,21 @@ export const Card: React.FC<{
                 &middot;
               </span>
             )}
-            {hasCategories &&
-              renderableCategories.map((category, index) => {
-                const categoryTitle = category.title || 'Untitled category'
-                return (
-                  <span key={index} className={categoryPillClassName}>
-                    {categoryTitle}
-                  </span>
-                )
-              })}
+            {categories.map((category) => (
+              <span key={category.id} className={categoryPillClassName}>
+                {category.title}
+              </span>
+            ))}
           </div>
         )}
-        {titleToUse && (
+        {title && (
           <h3 className="text-lg leading-snug font-semibold text-foreground">
-            <Link className="transition-colors hover:text-primary" href={href} ref={link.ref}>
-              {titleToUse}
+            <Link
+              className="transition-colors hover:text-primary"
+              href={`/posts/${slug}`}
+              ref={link.ref}
+            >
+              {title}
             </Link>
           </h3>
         )}

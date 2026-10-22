@@ -1,5 +1,4 @@
-import type { CollectionConfig } from 'payload'
-
+import { slugField, type CollectionConfig } from 'payload'
 import {
   BlocksFeature,
   FixedToolbarFeature,
@@ -8,15 +7,6 @@ import {
   InlineToolbarFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
-
-import { draftContentAccess } from '../../access/draftContentAccess'
-import { Banner } from '../../blocks/Banner/config'
-import { Code } from '../../blocks/Code/config'
-import { MediaBlock } from '../../blocks/MediaBlock/config'
-import { generatePreviewPath } from '../../utilities/generatePreviewPath'
-import { populateAuthors } from './hooks/populateAuthors'
-import { revalidateDelete, revalidatePost } from './hooks/revalidatePost'
-
 import {
   MetaDescriptionField,
   MetaImageField,
@@ -24,7 +14,15 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
-import { slugField } from 'payload'
+
+import { draftContentAccess } from '@/access/draftContentAccess'
+import { Banner } from '@/blocks/Banner/config'
+import { Code } from '@/blocks/Code/config'
+import { MediaBlock } from '@/blocks/MediaBlock/config'
+import { generatePreviewPath } from '@/utilities/generatePreviewPath'
+
+import { populateAuthors } from './populateAuthors'
+import { revalidateDelete, revalidatePost } from './revalidatePost'
 
 export const Posts: CollectionConfig<'posts'> = {
   slug: 'posts',

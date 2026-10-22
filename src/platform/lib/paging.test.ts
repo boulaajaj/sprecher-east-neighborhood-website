@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { MAX_PAGE, parsePageNumber } from './paging'
+import { MAX_PAGE, parsePageNumber, toPageNumbers } from './paging'
 
 describe('parsePageNumber', () => {
   it.each([
@@ -30,5 +30,17 @@ describe('parsePageNumber', () => {
     ['undefined', undefined],
   ])('rejects %s', (_label, input) => {
     expect(parsePageNumber(input)).toBeNull()
+  })
+})
+
+describe('toPageNumbers', () => {
+  it('numbers every page a listing needs, from 1', () => {
+    expect(toPageNumbers(18, 12)).toEqual([1, 2])
+    expect(toPageNumbers(24, 12)).toEqual([1, 2])
+    expect(toPageNumbers(25, 12)).toEqual([1, 2, 3])
+  })
+
+  it('has no pages when there is nothing to list', () => {
+    expect(toPageNumbers(0, 12)).toEqual([])
   })
 })
