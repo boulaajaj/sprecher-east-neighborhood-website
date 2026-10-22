@@ -1,14 +1,9 @@
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 
-/**
- * One bare address (no display name, list or whitespace). Deliberately simple: it rejects
- * lists and header tricks; the mail server does the real validation.
- */
-export const isSingleAddress = (value: string): boolean =>
-  /^[^\s@,;<>"()]+@[^\s@,;<>"()]+\.[^\s@,;<>"()]+$/.test(value)
+import { isSingleAddress } from '../lib/emailAddress'
 
 /**
- * Payload email adapter (password resets, form-builder emails) built from SMTP_* env vars.
+ * Payload email adapter (password resets, form emails) built from SMTP_* env vars.
  * Production sends through Mailgun SMTP. With no SMTP_HOST (local dev, CI builds) this
  * returns undefined and Payload keeps its default: emails are written to the server log.
  *

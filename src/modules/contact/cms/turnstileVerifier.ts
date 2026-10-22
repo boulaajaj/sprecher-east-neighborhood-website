@@ -1,11 +1,15 @@
 /**
- * Cloudflare Turnstile server-side verification (spam protection for public forms).
- * Server-only: reads TURNSTILE_SECRET_KEY, which must never reach the browser.
+ * Cloudflare Turnstile server-side verification (spam protection for public forms): the
+ * production `HumanVerifier`. Server code only: it reads TURNSTILE_SECRET_KEY, which must never
+ * reach the browser. It has no `server-only` import because a Payload hook uses it, and the
+ * Payload CLI loads hooks outside Next.js.
  * Docs: https://developers.cloudflare.com/turnstile/get-started/server-side-validation/
  */
 
-import { getServerSideURL } from './getURL'
-import { TURNSTILE_ACTION } from './turnstileHeader'
+import { getServerSideURL } from '@/utilities/getURL'
+
+import type { HumanCheck, HumanVerifier } from '../domain/humanVerifier'
+import { TURNSTILE_ACTION } from '../domain/turnstile'
 
 const SITEVERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
 
@@ -32,7 +36,7 @@ let warnedTestSecret = false
  * adding keys to .env.local without a rebuild leaves the check off instead of rejecting every
  * visitor who has no widget to solve. (Outside Next, e.g. `payload migrate`, it's read live.)
  */
-export function isTurnstileEnabled(): boolean {
+function isTurnstileEnabled(): boolean {
   const secret = Boolean(process.env.TURNSTILE_SECRET_KEY)
   const siteKey = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY)
   if (secret !== siteKey && !warnedHalfConfigured) {
@@ -72,7 +76,7 @@ function toHostname(entry: string): string | null {
  * TURNSTILE_ALLOWED_HOSTNAMES (comma-separated). A token solved on another hostname that uses
  * the same widget (e.g. a dev host) is rejected.
  */
-export function turnstileAllowedHostnames(): Set<string> {
+export function listAllowedHostnames(): Set<string> {
   const hosts = new Set<string>()
   try {
     hosts.add(new URL(getServerSideURL()).hostname.toLowerCase())
@@ -93,8 +97,6 @@ type SiteverifyResponse = {
   action?: string
 }
 
-export type TurnstileResult = { ok: true } | { ok: false; reason: string }
-
 /**
  * Verifies a Turnstile token. Any failure — including a network error reaching Cloudflare —
  * returns ok: false, so a public form fails closed rather than accepting unverified posts.
@@ -104,9 +106,7 @@ export type TurnstileResult = { ok: true } | { ok: false; reason: string }
  * No `remoteip` is sent: it's optional, and the only source here would be X-Forwarded-For,
  * which a client can set itself if it ever reaches the app without going through Caddy (#118).
  */
-export async function verifyTurnstileToken(
-  token: string | null | undefined,
-): Promise<TurnstileResult> {
+async function verifyTurnstileToken(token: string | null | undefined): Promise<HumanCheck> {
   const secret = process.env.TURNSTILE_SECRET_KEY
   if (!secret) return { ok: false, reason: 'no-secret' }
   if (!token) return { ok: false, reason: 'missing-token' }
@@ -132,12 +132,23 @@ export async function verifyTurnstileToken(
         return { ok: false, reason: `unexpected-action:${result.action ?? 'none'}` }
       }
       const hostname = result.hostname?.toLowerCase()
-      if (!hostname || !turnstileAllowedHostnames().has(hostname)) {
+      if (!hostname || !listAllowedHostnames().has(hostname)) {
         return { ok: false, reason: `unexpected-hostname:${hostname ?? 'none'}` }
       }
     }
     return { ok: true }
   } catch (err) {
     return { ok: false, reason: `network-error:${err instanceof Error ? err.name : 'unknown'}` }
+  }
+}
+
+/** The robot check through Cloudflare Turnstile. */
+export class TurnstileVerifier implements HumanVerifier {
+  isEnabled(): boolean {
+    return isTurnstileEnabled()
+  }
+
+  verify(token: string | null | undefined): Promise<HumanCheck> {
+    return verifyTurnstileToken(token)
   }
 }

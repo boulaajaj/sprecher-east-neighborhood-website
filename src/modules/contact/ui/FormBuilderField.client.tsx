@@ -6,7 +6,7 @@ import { Field, type FormApi, type SelectOption } from '@/platform/ui'
 
 import { Message } from './Message'
 import { countryOptions } from './countryOptions'
-import { type FormField, type ValueField, isValueField } from './schema'
+import { type FormField, type ValueField, isValueField } from './formSchema'
 import { stateOptions } from './stateOptions'
 
 export type FormValues = Record<string, unknown>

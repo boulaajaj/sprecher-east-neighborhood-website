@@ -2,7 +2,7 @@ import type { FormFieldBlock } from '@payloadcms/plugin-form-builder/types'
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 
-import { toDefaultValues, toFormSchema } from './schema'
+import { toDefaultValues, toFormSchema } from './formSchema'
 
 const fields = [
   { blockType: 'text', name: 'name', label: 'Name', required: true },

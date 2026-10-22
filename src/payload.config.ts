@@ -16,7 +16,7 @@ import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { isAdminBoolean, isAdminOrEditor, isAdminOrEditorBoolean } from './access/roles'
 import { getServerSideURL } from './utilities/getURL'
-import { emailAdapterFromEnv } from './utilities/email'
+import { emailAdapterFromEnv } from '@/platform/email/emailAdapter'
 import { restrictEditLocks } from './access/restrictEditLocks'
 
 const filename = fileURLToPath(import.meta.url)

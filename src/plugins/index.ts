@@ -4,14 +4,10 @@ import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
 import type { Plugin } from 'payload'
-import { anyone } from '@/access/anyone'
-import { isAdmin, isAdminOrEditor, isAdminOrEditorFieldAccess } from '@/access/roles'
+import { isAdmin } from '@/access/roles'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
-import { dropEmailsToSubmittedAddresses, rateLimitSubmissions } from '@/hooks/formSubmissionGuards'
-import { limitSubmissionSize } from '@/hooks/limitSubmissionSize'
-import { verifyHumanSubmission } from '@/hooks/verifyHumanSubmission'
+import { formBuilderOptions } from '@/modules/contact/cms'
 import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
-import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { searchOptions } from '@/modules/news/cms'
 
 import type { Page, Post, Event } from '@/payload-types'
@@ -77,62 +73,8 @@ export const plugins: Plugin[] = [
     generateTitle,
     generateURL,
   }),
-  formBuilderPlugin({
-    beforeEmail: dropEmailsToSubmittedAddresses,
-    fields: {
-      payment: false,
-    },
-    formOverrides: {
-      access: {
-        create: isAdminOrEditor,
-        // Visitors must read a form's definition (fields, labels, submit button) to fill it
-        // in. With admin/editor-only read, the public contact page rendered an empty form.
-        read: anyone,
-        update: isAdminOrEditor,
-        delete: isAdmin,
-      },
-      fields: ({ defaultFields }) => {
-        return defaultFields.map((field) => {
-          // Email routing (recipients, reply-to, templates) stays private.
-          if ('name' in field && field.name === 'emails' && field.type === 'array') {
-            return {
-              ...field,
-              access: { ...field.access, read: isAdminOrEditorFieldAccess },
-            }
-          }
-          if ('name' in field && field.name === 'confirmationMessage') {
-            return {
-              ...field,
-              editor: lexicalEditor({
-                features: ({ rootFeatures }) => {
-                  return [
-                    ...rootFeatures,
-                    FixedToolbarFeature(),
-                    HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
-                  ]
-                },
-              }),
-            }
-          }
-          return field
-        })
-      },
-    },
-    formSubmissionOverrides: {
-      hooks: {
-        // Cheapest check first: oversized submissions never reach Turnstile or the database
-        beforeValidate: [limitSubmissionSize],
-        // Rate limit before Turnstile, so a rate-limited client never triggers a Siteverify call
-        beforeChange: [rateLimitSubmissions, verifyHumanSubmission],
-      },
-      access: {
-        create: () => true,
-        read: isAdmin,
-        update: isAdmin,
-        delete: isAdmin,
-      },
-    },
-  }),
+  // Forms, submissions and their safeguards belong to the contact module
+  formBuilderPlugin(formBuilderOptions),
   // Search belongs to news; it also indexes events, which the module doesn't name (0008)
   searchPlugin({ ...searchOptions, collections: ['posts', 'events'] }),
 ]

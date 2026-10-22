@@ -1,14 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { TURNSTILE_ACTION } from './turnstileHeader'
+import { TURNSTILE_ACTION } from '../domain/turnstile'
 
 const REAL_SECRET = '0x4AAAAAAAexampleexampleexampleexample'
 const PASS_SECRET = '1x0000000000000000000000000000000AA' // Cloudflare test secret: always passes
 
-/** Fresh module per test: isTurnstileEnabled() remembers that it has already warned. */
+/** Fresh module per test: isEnabled() remembers that it has already warned. */
 async function loadTurnstile() {
   vi.resetModules()
-  return import('./turnstile')
+  const { TurnstileVerifier, listAllowedHostnames } = await import('./turnstileVerifier')
+  const verifier = new TurnstileVerifier()
+  return {
+    verify: (token: string | null | undefined) => verifier.verify(token),
+    isEnabled: () => verifier.isEnabled(),
+    listAllowedHostnames,
+  }
 }
 
 /** Stubs Cloudflare's Siteverify endpoint with one JSON response and returns the mock. */
@@ -26,25 +32,25 @@ beforeEach(() => {
   vi.stubEnv('TURNSTILE_SECRET_KEY', REAL_SECRET)
 })
 
-describe('verifyTurnstileToken: inputs', () => {
+describe('TurnstileVerifier.verify: inputs', () => {
   it('fails without a secret, and never calls Cloudflare', async () => {
     vi.stubEnv('TURNSTILE_SECRET_KEY', '')
     const fetchMock = stubSiteverify(goodResponse)
-    const { verifyTurnstileToken } = await loadTurnstile()
-    expect(await verifyTurnstileToken('token')).toEqual({ ok: false, reason: 'no-secret' })
+    const { verify } = await loadTurnstile()
+    expect(await verify('token')).toEqual({ ok: false, reason: 'no-secret' })
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
   it('fails without a token', async () => {
-    const { verifyTurnstileToken } = await loadTurnstile()
-    expect(await verifyTurnstileToken(undefined)).toEqual({ ok: false, reason: 'missing-token' })
-    expect(await verifyTurnstileToken('')).toEqual({ ok: false, reason: 'missing-token' })
+    const { verify } = await loadTurnstile()
+    expect(await verify(undefined)).toEqual({ ok: false, reason: 'missing-token' })
+    expect(await verify('')).toEqual({ ok: false, reason: 'missing-token' })
   })
 
   it('rejects a token longer than 2048 characters without calling Cloudflare', async () => {
     const fetchMock = stubSiteverify(goodResponse)
-    const { verifyTurnstileToken } = await loadTurnstile()
-    expect(await verifyTurnstileToken('x'.repeat(2049))).toEqual({
+    const { verify } = await loadTurnstile()
+    expect(await verify('x'.repeat(2049))).toEqual({
       ok: false,
       reason: 'token-too-long',
     })
@@ -53,8 +59,8 @@ describe('verifyTurnstileToken: inputs', () => {
 
   it('sends the secret and token, and no client IP', async () => {
     const fetchMock = stubSiteverify(goodResponse)
-    const { verifyTurnstileToken } = await loadTurnstile()
-    await verifyTurnstileToken('the-token')
+    const { verify } = await loadTurnstile()
+    await verify('the-token')
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit]
     expect(url).toBe('https://challenges.cloudflare.com/turnstile/v0/siteverify')
     const sent = init.body as URLSearchParams
@@ -66,23 +72,23 @@ describe('verifyTurnstileToken: inputs', () => {
   })
 })
 
-describe('verifyTurnstileToken: Cloudflare answers', () => {
+describe('TurnstileVerifier.verify: Cloudflare answers', () => {
   it('passes a successful token with our action and hostname', async () => {
     stubSiteverify(goodResponse)
-    const { verifyTurnstileToken } = await loadTurnstile()
-    expect(await verifyTurnstileToken('t')).toEqual({ ok: true })
+    const { verify } = await loadTurnstile()
+    expect(await verify('t')).toEqual({ ok: true })
   })
 
   it('compares hostnames case-insensitively', async () => {
     stubSiteverify({ ...goodResponse, hostname: 'SprecherEast.Example' })
-    const { verifyTurnstileToken } = await loadTurnstile()
-    expect(await verifyTurnstileToken('t')).toEqual({ ok: true })
+    const { verify } = await loadTurnstile()
+    expect(await verify('t')).toEqual({ ok: true })
   })
 
   it('reports Cloudflare error codes on failure (e.g. a reused or expired token)', async () => {
     stubSiteverify({ success: false, 'error-codes': ['timeout-or-duplicate'] })
-    const { verifyTurnstileToken } = await loadTurnstile()
-    expect(await verifyTurnstileToken('t')).toEqual({
+    const { verify } = await loadTurnstile()
+    expect(await verify('t')).toEqual({
       ok: false,
       reason: 'timeout-or-duplicate',
     })
@@ -90,15 +96,15 @@ describe('verifyTurnstileToken: Cloudflare answers', () => {
 
   it('fails on a missing or different action', async () => {
     stubSiteverify({ ...goodResponse, action: undefined })
-    let { verifyTurnstileToken } = await loadTurnstile()
-    expect(await verifyTurnstileToken('t')).toEqual({
+    let { verify } = await loadTurnstile()
+    expect(await verify('t')).toEqual({
       ok: false,
       reason: 'unexpected-action:none',
     })
 
     stubSiteverify({ ...goodResponse, action: 'login' })
-    ;({ verifyTurnstileToken } = await loadTurnstile())
-    expect(await verifyTurnstileToken('t')).toEqual({
+    ;({ verify } = await loadTurnstile())
+    expect(await verify('t')).toEqual({
       ok: false,
       reason: 'unexpected-action:login',
     })
@@ -112,8 +118,8 @@ describe('verifyTurnstileToken: Cloudflare answers', () => {
       ['www.sprechereast.example', 'unexpected-hostname:www.sprechereast.example'],
     ] as const) {
       stubSiteverify({ ...goodResponse, hostname })
-      const { verifyTurnstileToken } = await loadTurnstile()
-      expect(await verifyTurnstileToken('t')).toEqual({ ok: false, reason })
+      const { verify } = await loadTurnstile()
+      expect(await verify('t')).toEqual({ ok: false, reason })
     }
   })
 
@@ -124,24 +130,24 @@ describe('verifyTurnstileToken: Cloudflare answers', () => {
     )
     for (const hostname of ['www.sprechereast.example', 'staging.sprechereast.example']) {
       stubSiteverify({ ...goodResponse, hostname })
-      const { verifyTurnstileToken } = await loadTurnstile()
-      expect(await verifyTurnstileToken('t')).toEqual({ ok: true })
+      const { verify } = await loadTurnstile()
+      expect(await verify('t')).toEqual({ ok: true })
     }
   })
 
   it('skips the action and hostname checks for Cloudflare test secrets', async () => {
     vi.stubEnv('TURNSTILE_SECRET_KEY', PASS_SECRET)
     stubSiteverify({ success: true })
-    const { verifyTurnstileToken } = await loadTurnstile()
-    expect(await verifyTurnstileToken('t')).toEqual({ ok: true })
+    const { verify } = await loadTurnstile()
+    expect(await verify('t')).toEqual({ ok: true })
   })
 })
 
-describe('verifyTurnstileToken: fails closed', () => {
+describe('TurnstileVerifier.verify: fails closed', () => {
   it('on an HTTP error from Cloudflare', async () => {
     stubSiteverify({}, { status: 503 })
-    const { verifyTurnstileToken } = await loadTurnstile()
-    expect(await verifyTurnstileToken('t')).toEqual({ ok: false, reason: 'siteverify-http-503' })
+    const { verify } = await loadTurnstile()
+    expect(await verify('t')).toEqual({ ok: false, reason: 'siteverify-http-503' })
   })
 
   it('when Cloudflare cannot be reached or times out', async () => {
@@ -151,19 +157,19 @@ describe('verifyTurnstileToken: fails closed', () => {
         throw new DOMException('The operation timed out.', 'TimeoutError')
       }),
     )
-    const { verifyTurnstileToken } = await loadTurnstile()
-    expect(await verifyTurnstileToken('t')).toEqual({
+    const { verify } = await loadTurnstile()
+    expect(await verify('t')).toEqual({
       ok: false,
       reason: 'network-error:TimeoutError',
     })
   })
 })
 
-describe('turnstileAllowedHostnames', () => {
+describe('listAllowedHostnames', () => {
   it('contains the site host plus valid listed entries, lower-cased', async () => {
     vi.stubEnv('TURNSTILE_ALLOWED_HOSTNAMES', 'Alias.Example:443, not a host, ,https://b.example/x')
-    const { turnstileAllowedHostnames } = await loadTurnstile()
-    expect([...turnstileAllowedHostnames()].sort()).toEqual([
+    const { listAllowedHostnames } = await loadTurnstile()
+    expect([...listAllowedHostnames()].sort()).toEqual([
       'alias.example',
       'b.example',
       'sprechereast.example',
@@ -171,28 +177,28 @@ describe('turnstileAllowedHostnames', () => {
   })
 })
 
-describe('isTurnstileEnabled', () => {
+describe('TurnstileVerifier.isEnabled', () => {
   it('is on only when both keys are set', async () => {
     vi.stubEnv('NEXT_PUBLIC_TURNSTILE_SITE_KEY', '0x4AAAAAAAsitekey')
-    const { isTurnstileEnabled } = await loadTurnstile()
-    expect(isTurnstileEnabled()).toBe(true)
+    const { isEnabled } = await loadTurnstile()
+    expect(isEnabled()).toBe(true)
   })
 
   it('is off with neither key, without logging', async () => {
     vi.stubEnv('TURNSTILE_SECRET_KEY', '')
     vi.stubEnv('NEXT_PUBLIC_TURNSTILE_SITE_KEY', '')
     const error = vi.spyOn(console, 'error').mockImplementation(() => {})
-    const { isTurnstileEnabled } = await loadTurnstile()
-    expect(isTurnstileEnabled()).toBe(false)
+    const { isEnabled } = await loadTurnstile()
+    expect(isEnabled()).toBe(false)
     expect(error).not.toHaveBeenCalled()
   })
 
   it('is off with only one key, and logs that once', async () => {
     vi.stubEnv('NEXT_PUBLIC_TURNSTILE_SITE_KEY', '')
     const error = vi.spyOn(console, 'error').mockImplementation(() => {})
-    const { isTurnstileEnabled } = await loadTurnstile()
-    expect(isTurnstileEnabled()).toBe(false)
-    expect(isTurnstileEnabled()).toBe(false)
+    const { isEnabled } = await loadTurnstile()
+    expect(isEnabled()).toBe(false)
+    expect(isEnabled()).toBe(false)
     expect(error).toHaveBeenCalledTimes(1)
     expect(error.mock.calls[0]?.[0]).toContain('Spam check is OFF')
   })
@@ -202,9 +208,9 @@ describe('isTurnstileEnabled', () => {
     vi.stubEnv('TURNSTILE_SECRET_KEY', PASS_SECRET)
     vi.stubEnv('NEXT_PUBLIC_TURNSTILE_SITE_KEY', '1x00000000000000000000AA')
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
-    const { isTurnstileEnabled } = await loadTurnstile()
-    expect(isTurnstileEnabled()).toBe(true)
-    isTurnstileEnabled()
+    const { isEnabled } = await loadTurnstile()
+    expect(isEnabled()).toBe(true)
+    isEnabled()
     expect(warn).toHaveBeenCalledTimes(1)
   })
 })

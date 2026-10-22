@@ -7,12 +7,11 @@ import RichText from '@/components/RichText'
 import { Button, Form, type FormStatus } from '@/platform/ui'
 import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 
-import { FormBuilderField, type FormValues } from './fields'
-import { toDefaultValues, toFormSchema } from './schema'
+import { postFormSubmission } from './api'
+import { FormBuilderField, type FormValues } from './FormBuilderField.client'
+import { toDefaultValues, toFormSchema } from './formSchema'
 import { toSubmitErrorMessage } from './submitErrorMessage'
-import { getClientSideURL } from '@/utilities/getURL'
-import { TURNSTILE_SITE_KEY, TurnstileWidget } from '@/components/TurnstileWidget'
-import { TURNSTILE_TOKEN_HEADER } from '@/utilities/turnstileHeader'
+import { TURNSTILE_SITE_KEY, TurnstileWidget } from './TurnstileWidget.client'
 
 export type FormBlockType = {
   blockName?: string
@@ -85,17 +84,7 @@ export const FormBlock: React.FC<
     setStatus('submitting')
     let succeeded = false
     try {
-      const response = await fetch(`${getClientSideURL()}/api/form-submissions`, {
-        body: JSON.stringify({
-          form: formID,
-          submissionData: Object.entries(values).map(([field, value]) => ({ field, value })),
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-          ...(turnstileToken ? { [TURNSTILE_TOKEN_HEADER]: turnstileToken } : {}),
-        },
-        method: 'POST',
-      })
+      const response = await postFormSubmission(formID, values, turnstileToken)
       // The server's own message stays out of the page (#204); the server logs it
       if (!response.ok) {
         fail(toSubmitErrorMessage(response.status))
