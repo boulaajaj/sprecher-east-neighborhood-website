@@ -16,3 +16,11 @@ export interface EmailConfirmer {
   /** Sends a confirmation link to the address, within the limits; does nothing once it is confirmed. */
   request(email: string, req: PayloadRequest): Promise<void>
 }
+
+/**
+ * Runs once when an address is confirmed, in the confirming request: a module that asked for the
+ * confirmation marks its own records (a contact message becomes confirmed, for example).
+ * `payload.config.ts` hands these to the verification module. The address is normalized
+ * (trimmed, lowercase).
+ */
+export type EmailConfirmedListener = (email: string, req: PayloadRequest) => Promise<void>

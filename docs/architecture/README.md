@@ -54,7 +54,7 @@ grows should split its top level "into domain oriented modules which are interna
 | `accounts`     | Who is signed in, sign-in and password flows, the role field               | `users`                                          | `/login`, `/account`                                |
 | `directory`    | FAQ, local resources, team members                                         | `faq`, `resources`, `team-members`               | `/faq`, `/resources`                                |
 | `site`         | CMS pages, page-builder blocks, heroes, header, footer, redirects          | `pages`, `redirects`, globals `header`, `footer` | `/[slug]`, home, pages sitemap                      |
-| `verification` | Confirming an email by link: the token, its expiry, the limits, the emails | `email-confirmations`                            | (the confirm page, #183)                            |
+| `verification` | Confirming an email by link: the token, its expiry, the limits, the emails | `email-confirmations`                            | `/confirm-email`                                    |
 | `comments`     | Resident comments (future)                                                 | (future)                                         | (future)                                            |
 
 `src/platform/` holds what every module uses, and imports no module:

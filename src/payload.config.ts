@@ -23,7 +23,7 @@ import {
   revalidateRedirects,
   SITE_LAYOUT_BLOCKS,
 } from '@/modules/site/cms'
-import { EmailConfirmations } from '@/modules/verification/cms'
+import { createEmailConfirmations } from '@/modules/verification/cms'
 import { Media } from '@/platform/payload/media'
 import { defaultLexical } from '@/platform/payload/defaultLexical'
 import {
@@ -38,6 +38,8 @@ import { restrictEditLocks } from '@/platform/payload/restrictEditLocks'
 
 // Modules meet here (0008): the contact form joins the site's own page-builder blocks
 const Pages = createPagesCollection({ layoutBlocks: [...SITE_LAYOUT_BLOCKS, FormBlock] })
+// Email confirmation by link (#183): what other modules do once an address is confirmed
+const EmailConfirmations = createEmailConfirmations({ onConfirmed: [] })
 
 const generateTitle: GenerateTitle<Post | Page | Event> = ({ doc }) => {
   return doc?.title || 'Sprecher East'

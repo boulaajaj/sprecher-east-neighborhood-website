@@ -1,9 +1,10 @@
 import type { CollectionConfig } from 'payload'
 
+import type { EmailConfirmedListener } from '@/platform/payload/emailConfirmer'
 import { isAdmin } from '@/platform/payload/roles'
 
-/** The collection's slug, for the Local API calls in this folder. */
-export const EMAIL_CONFIRMATIONS = 'email-confirmations'
+import { EMAIL_CONFIRMATIONS } from '../domain/paths'
+import { confirmEndpoint } from './confirmEndpoint'
 
 /** Set by the server only: shown in Admin, never edited there. */
 const readOnly = { readOnly: true, position: 'sidebar' } as const
@@ -11,10 +12,14 @@ const readOnly = { readOnly: true, position: 'sidebar' } as const
 /**
  * Email addresses people typed into a public form, and whether they confirmed them by link
  * (#183). Kept apart from accounts (`users`). Only admins can see or change it: it is personal
- * data, and the server writes it with access bypassed.
+ * data, and the server writes it with access bypassed. `onConfirmed` runs once per address when
+ * its link is clicked; `payload.config.ts` passes in what other modules need (decision 0008).
  */
-export const EmailConfirmations: CollectionConfig = {
+export const createEmailConfirmations = ({
+  onConfirmed = [],
+}: { onConfirmed?: readonly EmailConfirmedListener[] } = {}): CollectionConfig => ({
   slug: EMAIL_CONFIRMATIONS,
+  endpoints: [confirmEndpoint(onConfirmed)],
   access: {
     read: isAdmin,
     create: isAdmin,
@@ -58,4 +63,4 @@ export const EmailConfirmations: CollectionConfig = {
     { name: 'sendWindowStart', type: 'date', hidden: true },
   ],
   timestamps: true,
-}
+})

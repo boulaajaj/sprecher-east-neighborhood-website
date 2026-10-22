@@ -118,14 +118,23 @@ only admins can see it.
 | ------------------------------ | ------------ | -------- | ------------------------------------------------------------------------------------------- |
 | `email`                        | email        | Yes      | Unique, indexed, stored trimmed and lowercase                                               |
 | `confirmedAt`                  | date         | No       | When the link was clicked; empty while unconfirmed                                          |
-| `welcomeSentAt`                | date         | No       | When the welcome email went out (once)                                                      |
+| `welcomeSentAt`                | date         | No       | When the welcome email was claimed (once), not that it was delivered                        |
 | `lastSentAt`                   | date         | No       | When the latest link was sent                                                               |
 | `tokenHash`                    | text         | No       | SHA-256 of the latest link's token, hidden from every API; the token itself is never stored |
 | `tokenExpiresAt`               | date         | No       | 24 hours after the link was sent                                                            |
 | `sendCount`, `sendWindowStart` | number, date | No       | Hidden: links sent to this address in the current 24-hour window                            |
 
+Endpoint: `POST /api/email-confirmations/confirm` with `{ token }`, public (the token is the proof),
+20 tries an hour per connection. It answers `{ outcome }`: `confirmed`, `already-confirmed`,
+`expired` or `invalid`. The first valid click sets `confirmedAt` and `welcomeSentAt` in one
+conditional update through the database adapter (`UPDATE … WHERE confirmed_at IS NULL`, so two
+clicks at once confirm once), runs the `onConfirmed` listeners `payload.config.ts` passes in, then
+sends the welcome email. The page `/confirm-email` calls it on a button click, never on load.
+`welcomeSentAt` means the welcome was claimed, not delivered: it is set before the send, so a
+failed send (or a failed listener) is logged and never retried.
+
 What is kept: an unconfirmed record is deleted 7 days after its last link (whenever a link is
-requested, until scheduled jobs run, #141). How long a confirmed record is kept is **not decided
+requested or confirmed, until scheduled jobs run, #141). How long a confirmed record is kept is **not decided
 yet: it waits for the owner (#183)**. The proposal is to keep the address and the dates above
 until the person asks for removal through the contact form, and an admin then deletes it in
 Admin. The site's privacy text should say the same once he decides. Until then nothing deletes

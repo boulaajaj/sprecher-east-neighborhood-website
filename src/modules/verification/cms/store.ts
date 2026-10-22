@@ -3,7 +3,7 @@ import type { PayloadRequest } from 'payload'
 import type { EmailConfirmation } from '@/payload-types'
 
 import type { ConfirmationRecord } from '../domain/types'
-import { EMAIL_CONFIRMATIONS } from './emailConfirmations'
+import { EMAIL_CONFIRMATIONS } from '../domain/paths'
 
 // Every call here runs for a visitor who may not read this collection (it is admin-only), so
 // access is bypassed on purpose: the server decides what to do, and the visitor never sees the
@@ -41,6 +41,44 @@ export async function getConfirmationByEmail(
     req,
   })
   return docs[0] ? toConfirmationRecord(docs[0]) : null
+}
+
+/** The record whose latest link has this token hash, or `null`. */
+export async function getConfirmationByTokenHash(
+  req: PayloadRequest,
+  tokenHash: string,
+): Promise<ConfirmationRecord | null> {
+  const { docs } = await req.payload.find({
+    collection: EMAIL_CONFIRMATIONS,
+    where: { tokenHash: { equals: tokenHash } },
+    limit: 1,
+    depth: 0,
+    pagination: false,
+    overrideAccess: true,
+    req,
+  })
+  return docs[0] ? toConfirmationRecord(docs[0]) : null
+}
+
+/**
+ * Marks the record confirmed, and its welcome email as claimed, unless it already was. True only
+ * for the request that changed it, so two clicks at once confirm, and welcome, once.
+ *
+ * This one write goes to the database adapter, not the Local API: Payload's `update` with a
+ * `where` reads the matching rows first and then updates each by id, so two clicks at once both
+ * win. The adapter's `updateOne` with a `where` puts the condition into the UPDATE itself, so
+ * only one request changes the row; the other gets `null`. Nothing is skipped by going around
+ * the Local API: this collection has no hooks, and access is bypassed here anyway. The adapter
+ * doesn't set `updatedAt`, so it is set here.
+ */
+export async function markConfirmed(req: PayloadRequest, id: number, at: string): Promise<boolean> {
+  const doc: unknown = await req.payload.db.updateOne({
+    collection: EMAIL_CONFIRMATIONS,
+    where: { and: [{ id: { equals: id } }, { confirmedAt: { exists: false } }] },
+    data: { confirmedAt: at, welcomeSentAt: at, updatedAt: at },
+    req,
+  })
+  return doc !== null && doc !== undefined
 }
 
 /** What a new link changes on a record. */
