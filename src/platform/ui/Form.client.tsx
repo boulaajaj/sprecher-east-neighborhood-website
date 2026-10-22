@@ -1,6 +1,5 @@
 'use client'
 
-// Template folder until Alert moves into platform/ui (#226)
 import { Alert } from './Alert'
 import { cn } from '@/platform/lib/cn'
 import { zodResolver } from '@hookform/resolvers/zod'
