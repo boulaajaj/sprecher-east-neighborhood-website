@@ -171,6 +171,7 @@ System-level env vars (not in .env.local):
 - **Cache tags**: Expire them with `expireCacheTag()` from `src/platform/payload/expireCacheTag.ts`. Since Next 16, `revalidateTag` needs a second argument; the helper passes `{ expire: 0 }`, so the next visitor gets fresh content
 - **Proxy**: `src/proxy.ts` (Next 16's name for middleware) answers 404 for junk paging URLs before they render (#119)
 - **Upload URLs stay relative**: `getMediaUrl()` turns Payload's upload URLs (prefixed with `serverURL`) back into `/api/media/file/...`, so next/image treats them as local; since Next 16 it refuses remote URLs on private IPs such as localhost
+- **Sign-in cookie is Secure in production**: the Users collection sets `auth.cookies.secure` when `NODE_ENV` is `production` (#234), so signing in (site and `/admin`) works over HTTPS only. Over plain http, such as the IP on port 80, the browser drops the cookie. `next dev` on `http://localhost` is unaffected
 - **Live Preview**: Uses `window.postMessage` — component must use `useLivePreview()` hook
 - **Draft Preview**: Requires `PREVIEW_SECRET` env var for signed preview URLs
 - **Timezone**: Configured via `SITE_TIMEZONE` env var (default: `America/Chicago`). Use `startOfToday()` and `SITE_TIMEZONE` from `src/utilities/timezone.ts`. Never hardcode timezone strings or use bare `new Date().setHours(0,0,0,0)`. Day-only dates (midnight UTC) must be formatted with `timeZone: 'UTC'` to avoid off-by-one; `formatDateTime()` handles this automatically.
