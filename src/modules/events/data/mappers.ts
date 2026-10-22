@@ -21,7 +21,6 @@ export const SUMMARY_FIELDS = {
 
 type SummaryDoc = Pick<Event, 'id' | keyof typeof SUMMARY_FIELDS>
 
-
 /** An event document as a card or list item shows it. */
 export function toEventSummary(doc: SummaryDoc): EventSummary {
   return {

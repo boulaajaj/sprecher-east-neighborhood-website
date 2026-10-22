@@ -16,7 +16,6 @@ export const SUMMARY_FIELDS = {
 
 type SummaryDoc = Pick<Post, 'id' | keyof typeof SUMMARY_FIELDS>
 
-
 const toCategory = (id: number, title: string | null | undefined): PostCategory => ({
   id,
   title: title || 'Untitled category',
@@ -93,6 +92,8 @@ export function toSearchResult(
   doc: Pick<Search, 'id' | keyof typeof SEARCH_RESULT_FIELDS>,
 ): PostSummary {
   return {
+    // The search entry's id, not a post's: the entry may be an event (#200). Don't use it to
+    // exclude or deduplicate posts.
     id: doc.id,
     slug: doc.slug ?? '',
     title: doc.title ?? '',

@@ -7,6 +7,7 @@ import type { FeedPage } from '@/platform/lib'
 import { PUBLISHED } from '@/platform/payload/published'
 
 import type { PostDetail, PostSitemapEntry, PostSummary } from '../domain/types'
+import { latestPostsWhere, searchMatch } from './filters'
 import {
   SEARCH_RESULT_FIELDS,
   SUMMARY_FIELDS,
@@ -48,8 +49,8 @@ export async function findPostPage(page: number): Promise<FeedPage<PostSummary>>
  */
 export async function findLatestPosts({
   limit,
-  excludeIds = [],
-  categoryIds = [],
+  excludeIds,
+  categoryIds,
 }: {
   limit: number
   excludeIds?: number[]
@@ -63,13 +64,7 @@ export async function findLatestPosts({
     limit,
     sort: '-publishedAt',
     overrideAccess: false,
-    where: {
-      and: [
-        PUBLISHED,
-        ...(excludeIds.length > 0 ? [{ id: { not_in: excludeIds } }] : []),
-        ...(categoryIds.length > 0 ? [{ categories: { in: categoryIds } }] : []),
-      ],
-    },
+    where: latestPostsWhere({ excludeIds, categoryIds }),
     select: SUMMARY_FIELDS,
   })
 
@@ -148,18 +143,7 @@ export async function findSearchResults(query: string): Promise<PostSummary[]> {
     pagination: false,
     overrideAccess: false,
     select: SEARCH_RESULT_FIELDS,
-    ...(query
-      ? {
-          where: {
-            or: [
-              { title: { like: query } },
-              { 'meta.description': { like: query } },
-              { 'meta.title': { like: query } },
-              { slug: { like: query } },
-            ],
-          },
-        }
-      : {}),
+    where: searchMatch(query),
   })
 
   return result.docs.map(toSearchResult)

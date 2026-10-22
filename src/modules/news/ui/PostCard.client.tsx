@@ -19,7 +19,7 @@ export const PostCard: React.FC<{
   const { slug, categories, description, image, publishedAt, title } = post
 
   const hasCategories = categories.length > 0
-  const sanitizedDescription = description?.replace(/ /g, ' ') // non-breaking spaces to spaces
+  const sanitizedDescription = description?.replace(/\u00A0/g, ' ') // non-breaking spaces to spaces
 
   return (
     <article
