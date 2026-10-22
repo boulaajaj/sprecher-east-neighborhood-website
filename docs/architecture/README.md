@@ -98,7 +98,7 @@ A module only has the folders it needs. Tests sit next to the file they test (`c
 
 ## Layers: the core stays still, the edges can change
 
-The site's core idea (what an event is, what counts as upcoming, who may see a draft) is plain
+The site's core idea (what an event is, which categories it can have, who may see a draft) is plain
 TypeScript in the middle. Payload, Next.js, outside services and the look sit around it, so each
 can be upgraded or replaced without rewriting the core.
 
@@ -181,7 +181,7 @@ fails when the CMS config reaches it. Review covers rules 5, 7 and 8 (#137 adds 
 
 | You are adding…                                                | Put it in                                                                                                |
 | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| A business rule ("what counts as upcoming")                    | the module's `domain/`, with a unit test                                                                 |
+| A business rule (the event categories, `isEventScope`)         | the module's `domain/`, with a unit test                                                                 |
 | A use case other code calls (list, submit, publish)            | the module's `use-cases/`, exported from `server.ts`; a server action in `actions.ts` calls it           |
 | A database read or write                                       | the module's `data/`, called only from `use-cases/` or `actions.ts`; in a hook, `req.payload`            |
 | A color, font, corner radius or shadow                         | a token in `platform/theme/tokens.ts`, with its value in `src/themes/default/`                           |
