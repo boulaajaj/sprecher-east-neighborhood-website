@@ -158,10 +158,13 @@ What this buys:
 7. **Access is explicit.** Every Local API call passes `overrideAccess`: the Local API skips
    access control by default ([Payload access control](https://payloadcms.com/docs/access-control/overview)).
 8. **DTOs out.** Use cases return the module's own types (`EventSummary`, `EventDetail`), never
-   raw Payload documents. A read-only list that needs no reshaping (FAQ, resources) may define its
-   type as a named `Pick<>` of the generated type, loaded with `select`, instead of a mapper. Code
-   that renders CMS content as authored (page-builder blocks, heroes, `RichText`, `Media`) takes
-   the generated types, because its shape is the CMS's.
+   raw Payload documents. A read-only list that needs no reshaping (FAQ, resources) may skip the
+   mapper: its query loads the fields with `select` and returns the result as it is. Its type is
+   either a named `Pick<>` of the generated type or a hand-written type in `domain/` that mirrors
+   those fields; prefer the hand-written one. It keeps `@/payload-types` out of the domain and is
+   still checked, because the `select`-narrowed result must be assignable to it, so a field that
+   drifts fails `tsc`. Code that renders CMS content as authored (page-builder blocks, heroes,
+   `RichText`, `Media`) takes the generated types, because its shape is the CMS's.
 9. **No colors in components.** Semantic token classes only: `text-primary-foreground` on
    `bg-primary`, never `text-white`; no palette classes, hex values or inline styles. Text and
    overlays on photos will use `on-image` and `scrim` tokens (#146); until then `white` and `black`
@@ -193,11 +196,16 @@ fails when the CMS config reaches it. Review covers rules 5, 7 and 8 (#137 adds 
 | Code where two modules meet                                    | `src/app/` (a page, layout or the block registry) or `payload.config.ts`, never inside a module          |
 | An outside service (Cloudflare, Mailgun, a city calendar feed) | an interface in the module, an adapter beside it ([conventions](conventions.md#interfaces-and-adapters)) |
 
+A rule the site only ever applies as a query filter, like the events upcoming rule (`inScope` in
+`src/modules/events/data/scope.ts`), may live only in `data/`, as the function that builds the
+`Where`, with its own unit test. Don't also write it as a pure function in `domain/`: two copies
+drift, and the tested one may not be the one that runs.
+
 ## Where things are today
 
 Until each step of #127 lands, code lives in the Payload website template's folders, sorted by
 technical type: `src/collections/`, `src/components/`, `src/blocks/`, `src/heros/`, `src/hooks/`,
-`src/utilities/`, `src/access/`, `src/fields/`, `src/Header/`, `src/Footer/`, `src/search/`,
+`src/utilities/`, `src/access/`, `src/fields/`, `src/Header/`, `src/Footer/`,
 `src/plugins/`, `src/providers/`, `src/endpoints/` (seed). When you touch code there, don't add
 new duplication; if your change needs a rule that already exists elsewhere, reuse it.
 

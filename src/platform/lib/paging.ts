@@ -27,3 +27,8 @@ export function parsePageNumber(value: unknown): number | null {
         : NaN
   return Number.isInteger(page) && page >= 1 && page <= MAX_PAGE ? page : null
 }
+
+/** The page numbers a listing of `totalDocs` items needs at `pageSize` per page: 1, 2, … */
+export function toPageNumbers(totalDocs: number, pageSize: number): number[] {
+  return Array.from({ length: Math.ceil(totalDocs / pageSize) }, (_, index) => index + 1)
+}

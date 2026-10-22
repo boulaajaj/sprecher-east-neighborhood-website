@@ -65,10 +65,11 @@ the [data model](architecture/data-model.md) and [decision records](architecture
 
 The code is moving to that structure in small steps (#127). Events have moved to
 `src/modules/events/` (#131), FAQ, resources and team members to `src/modules/directory/`
-(#136), and `src/platform/lib/` holds the shared paging helpers. The contact form's safeguards
-and form block are in `src/modules/contact/` (#133), and the SMTP settings that password-reset
-and form emails share are in `src/platform/email/`. Until an area has moved, it is
-still in the Payload website template's folders, sorted by technical type:
+(#136), news posts, categories and search to `src/modules/news/` (#132), and the contact
+form's safeguards and form block to `src/modules/contact/` (#133). `src/platform/lib/` holds the
+shared paging helpers, and `src/platform/email/` the SMTP settings that password-reset and form
+emails share. Until an area has moved, it is still in the Payload website template's folders,
+sorted by technical type:
 
 ```
 src/
@@ -77,7 +78,7 @@ src/
     (frontend)/    Public routes (home, posts, events, faq, resources, search, login, account, sitemaps)
     (payload)/     Payload admin and API routes (generated; leave alone)
   blocks/          Page-builder blocks: Payload config + React component each
-  collections/     Payload collections (Pages, Posts, Users, Media, Categories)
+  collections/     Payload collections (Pages, Users, Media)
   components/      Shared React components; components/ui/ holds the shadcn/ui primitives
   endpoints/seed/  Seed data and script
   fields/          Reusable Payload field groups (link, linkGroup, defaultLexical)
@@ -87,7 +88,6 @@ src/
   migrations/      Database migrations (generated)
   plugins/         Payload plugin setup (form builder, SEO, search, redirects, nested docs)
   providers/       React context providers (theme, header theme)
-  search/          Search plugin config and component
   utilities/       Helpers: dates, URLs, SEO, data access
   payload.config.ts
 ```
@@ -99,7 +99,7 @@ src/
 | `src/payload.config.ts`            | Payload CMS config (SQLite, collections, plugins) |
 | `src/app/(frontend)/globals.css`   | Tailwind v4 `@theme` block — all design tokens    |
 | `src/collections/Pages/index.ts`   | Pages collection with layout builder blocks       |
-| `src/collections/Posts/index.ts`   | Blog posts collection                             |
+| `src/modules/news/cms/posts.ts`    | News posts collection                             |
 | `src/modules/events/cms/events.ts` | Events collection (custom)                        |
 | `src/collections/Users/index.ts`   | Users collection with Payload native auth         |
 | `src/collections/Media.ts`         | Media uploads with size variants                  |

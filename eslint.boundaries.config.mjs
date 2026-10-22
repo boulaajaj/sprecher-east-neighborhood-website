@@ -20,7 +20,6 @@ const TEMPLATE_FOLDERS = [
   'hooks',
   'plugins',
   'providers',
-  'search',
   'utilities',
 ]
 
@@ -36,11 +35,7 @@ const STILL_QUERYING_PAYLOAD = [
   '(frontend)/[slug]/page.tsx',
   '(frontend)/next/preview/route.ts',
   '(frontend)/next/seed/route.ts',
-  '(frontend)/posts/[slug]/page.tsx',
-  '(frontend)/posts/page/[pageNumber]/page.tsx',
-  '(frontend)/search/page.tsx',
   '(frontend)/(sitemaps)/pages-sitemap.xml/route.ts',
-  '(frontend)/(sitemaps)/posts-sitemap.xml/route.ts',
 ].map((file) => `src/app/${file}`.replace(/[\\()[\]{}*?!+@]/g, '\\$&')) // escape glob characters
 
 // Inside a module, what each part must not import from the same module (rules 1, 4 and 5).

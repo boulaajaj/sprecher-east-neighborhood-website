@@ -4,12 +4,11 @@ import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
 import type { Plugin } from 'payload'
-import { isAdmin, isAdminOrEditor } from '@/access/roles'
+import { isAdmin } from '@/access/roles'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import { formBuilderOptions } from '@/modules/contact/cms'
 import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
-import { searchFields } from '@/search/fieldOverrides'
-import { beforeSyncWithSearch } from '@/search/beforeSync'
+import { searchOptions } from '@/modules/news/cms'
 
 import type { Page, Post, Event } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -76,16 +75,6 @@ export const plugins: Plugin[] = [
   }),
   // Forms, submissions and their safeguards belong to the contact module
   formBuilderPlugin(formBuilderOptions),
-  searchPlugin({
-    collections: ['posts', 'events'],
-    beforeSync: beforeSyncWithSearch,
-    searchOverrides: {
-      // The plugin sets only create (off) and read (public). Its own sync bypasses access, so
-      // these only gate the admin screens: staff may reindex (needs both) and set priority (#140).
-      access: { update: isAdminOrEditor, delete: isAdminOrEditor },
-      fields: ({ defaultFields }) => {
-        return [...defaultFields, ...searchFields]
-      },
-    },
-  }),
+  // Search belongs to news; it also indexes events, which the module doesn't name (0008)
+  searchPlugin({ ...searchOptions, collections: ['posts', 'events'] }),
 ]
