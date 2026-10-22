@@ -5,7 +5,8 @@ import React from 'react'
 import { loadPostsPage } from '@/app/(frontend)/posts/actions'
 import { CollectionArchive } from '@/components/CollectionArchive'
 import { LoadMoreFooter, useLoadMore } from '@/components/LoadMore'
-import type { FeedPage, PostFeedItem } from '@/utilities/feeds'
+import type { FeedPage } from '@/platform/lib'
+import type { PostFeedItem } from '@/utilities/feeds'
 
 /** News listing that loads more posts as the reader scrolls. */
 export const PostsFeed: React.FC<{ initial: FeedPage<PostFeedItem> }> = ({ initial }) => {

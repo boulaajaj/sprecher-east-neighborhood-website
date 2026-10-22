@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url'
 
 import { TeamMembers } from './collections/TeamMembers'
 import { Categories } from './collections/Categories'
-import { Events } from './collections/Events'
+import { Events } from '@/modules/events/cms'
 import { FAQ } from './collections/FAQ'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'

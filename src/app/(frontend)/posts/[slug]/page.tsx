@@ -2,9 +2,8 @@ import type { Metadata } from 'next'
 
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { SidebarPosts } from '@/components/SidebarPosts'
-import { SidebarEvents } from '@/components/SidebarEvents'
 import { SidebarCTA } from '@/components/SidebarCTA'
-import { startOfToday } from '@/utilities/timezone'
+import { findUpcomingEvents, SidebarEvents } from '@/modules/events/server'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
@@ -63,7 +62,7 @@ export default async function Post({ params: paramsPromise }: Args) {
   const recentPosts = await queryRecentPosts({
     excludeIds: [post.id, ...relatedPostIds],
   })
-  const upcomingEvents = await queryUpcomingEvents()
+  const upcomingEvents = await findUpcomingEvents()
 
   return (
     <article className="pt-16 pb-16">
@@ -164,29 +163,6 @@ const queryRecentPosts = cache(async ({ excludeIds }: { excludeIds: number[] }) 
       title: true,
       slug: true,
       meta: true,
-    },
-  })
-
-  return result.docs
-})
-
-const queryUpcomingEvents = cache(async () => {
-  const payload = await getPayload({ config: configPromise })
-
-  const result = await payload.find({
-    collection: 'events',
-    draft: false,
-    limit: 3,
-    overrideAccess: false,
-    sort: 'date',
-    where: {
-      date: { greater_than_equal: startOfToday() },
-    },
-    select: {
-      title: true,
-      slug: true,
-      date: true,
-      category: true,
     },
   })
 

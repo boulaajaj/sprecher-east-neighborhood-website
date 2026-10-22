@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Button } from '@/platform/ui'
 
-import type { FeedPage } from '@/utilities/feeds'
+import type { FeedPage } from '@/platform/lib'
 import { cn } from '@/utilities/ui'
 
 /**

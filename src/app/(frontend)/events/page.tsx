@@ -1,10 +1,10 @@
 import type { Metadata } from 'next/types'
 
 import React from 'react'
+
+import { EventsFeed, findEventPage } from '@/modules/events/server'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
-import { findPublishedEvents } from '@/utilities/feeds'
 import { siteTimeZoneLabel } from '@/utilities/timezone'
-import { EventsFeed } from '@/components/EventsFeed'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
@@ -12,8 +12,8 @@ export const revalidate = 600
 export default async function EventsPage() {
   // First page of each list is rendered on the server; the rest loads as the reader scrolls.
   const [upcoming, past] = await Promise.all([
-    findPublishedEvents('upcoming', 1),
-    findPublishedEvents('past', 1),
+    findEventPage('upcoming', 1),
+    findEventPage('past', 1),
   ])
 
   return (

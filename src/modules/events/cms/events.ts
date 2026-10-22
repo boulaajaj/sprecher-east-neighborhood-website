@@ -1,5 +1,4 @@
-import type { CollectionConfig } from 'payload'
-
+import { slugField, type CollectionConfig } from 'payload'
 import {
   FixedToolbarFeature,
   HeadingFeature,
@@ -7,11 +6,6 @@ import {
   InlineToolbarFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
-
-import { draftContentAccess } from '../../access/draftContentAccess'
-import { slugField } from 'payload'
-import { populatePublishedAt } from '../../hooks/populatePublishedAt'
-import { revalidateDelete, revalidateEvent } from './hooks/revalidateEvent'
 import {
   MetaDescriptionField,
   MetaImageField,
@@ -19,6 +13,13 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
+
+import { draftContentAccess } from '@/access/draftContentAccess'
+import { populatePublishedAt } from '@/hooks/populatePublishedAt'
+
+import { EVENT_CATEGORIES } from '../domain/categories'
+import { EVENT_LOCATION_TYPES } from '../domain/locationTypes'
+import { revalidateDelete, revalidateEvent } from './revalidateEvent'
 
 export const Events: CollectionConfig<'events'> = {
   slug: 'events',
@@ -81,15 +82,7 @@ export const Events: CollectionConfig<'events'> = {
             {
               name: 'category',
               type: 'select',
-              options: [
-                { label: 'Meeting', value: 'meeting' },
-                { label: 'Social', value: 'social' },
-                { label: 'Volunteer', value: 'volunteer' },
-                { label: 'Workshop', value: 'workshop' },
-                { label: 'Sports & Recreation', value: 'sports' },
-                { label: 'Community', value: 'community' },
-                { label: 'Other', value: 'other' },
-              ],
+              options: [...EVENT_CATEGORIES],
               defaultValue: 'community',
             },
             {
@@ -101,11 +94,7 @@ export const Events: CollectionConfig<'events'> = {
             {
               name: 'locationType',
               type: 'select',
-              options: [
-                { label: 'In Person', value: 'in-person' },
-                { label: 'Virtual', value: 'virtual' },
-                { label: 'Hybrid', value: 'hybrid' },
-              ],
+              options: [...EVENT_LOCATION_TYPES],
               defaultValue: 'in-person',
             },
             {

@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
-import { isEventScope, parsePageNumber } from '@/utilities/feedParams'
+import { isEventScope } from '@/modules/events'
+import { parsePageNumber } from '@/platform/lib'
 
 /**
  * Answers 404 for malformed paging URLs (`/posts/page/zz`, `/events/list/x/1`) before Next

@@ -1,5 +1,5 @@
-import { getServerSideURL, toAbsoluteURL } from './getURL'
-import type { Post, Event as PayloadEvent } from '@/payload-types'
+import { getServerSideURL } from './getURL'
+import type { Post } from '@/payload-types'
 
 type WithContext<T> = T & { '@context': string }
 
@@ -37,50 +37,4 @@ export function articleJsonLd(post: Post): WithContext<Record<string, unknown>> 
       url: siteUrl,
     },
   }
-}
-
-export function eventJsonLd(event: PayloadEvent): WithContext<Record<string, unknown>> {
-  const siteUrl = getServerSideURL()
-
-  const jsonLd: WithContext<Record<string, unknown>> = {
-    '@context': 'https://schema.org',
-    '@type': 'Event',
-    name: event.title,
-    url: `${siteUrl}/events/${event.slug}`,
-    startDate: event.date,
-    description: event.description || '',
-    eventStatus: 'https://schema.org/EventScheduled',
-    organizer: {
-      '@type': 'Organization',
-      name: 'Sprecher East',
-      url: siteUrl,
-    },
-  }
-
-  // Hero image for rich results
-  if (event.heroImage && typeof event.heroImage === 'object' && 'url' in event.heroImage) {
-    const img = event.heroImage
-    const imageUrl = img.url ? toAbsoluteURL(img.url) : null
-    if (imageUrl) {
-      jsonLd.image = imageUrl
-    }
-  }
-
-  if (event.locationName || event.locationAddress) {
-    jsonLd.location = {
-      '@type': 'Place',
-      name: event.locationName || '',
-      ...(event.locationAddress ? { address: event.locationAddress } : {}),
-    }
-  }
-
-  if (event.locationType === 'virtual') {
-    jsonLd.eventAttendanceMode = 'https://schema.org/OnlineEventAttendanceMode'
-  } else if (event.locationType === 'hybrid') {
-    jsonLd.eventAttendanceMode = 'https://schema.org/MixedEventAttendanceMode'
-  } else {
-    jsonLd.eventAttendanceMode = 'https://schema.org/OfflineEventAttendanceMode'
-  }
-
-  return jsonLd
 }

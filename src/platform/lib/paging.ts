@@ -1,12 +1,19 @@
 /**
- * Checks for the paging parameters in listing URLs and "Load more" requests. Kept free of
- * Payload and Next imports so the proxy (`src/proxy.ts`, #119), pages and server actions share one rule.
+ * Paging for the listings that load more as you scroll (/posts, /events). Kept free of Payload
+ * and Next imports so the proxy (`src/proxy.ts`, #119), pages and server actions share one rule.
  */
 
 /** Highest page a client may request — a sanity bound, far above real content. */
 export const MAX_PAGE = 500
 
-export type EventScope = 'upcoming' | 'past'
+/** One page of a listing: what a page renders first and what "Load more" fetches next. */
+export type FeedPage<T> = {
+  docs: T[]
+  page: number
+  totalPages: number
+  totalDocs: number
+  limit: number
+}
 
 /** Validates a page number coming from a URL or a client request. */
 export function parsePageNumber(value: unknown): number | null {
@@ -19,8 +26,4 @@ export function parsePageNumber(value: unknown): number | null {
         ? Number(value)
         : NaN
   return Number.isInteger(page) && page >= 1 && page <= MAX_PAGE ? page : null
-}
-
-export function isEventScope(value: unknown): value is EventScope {
-  return value === 'upcoming' || value === 'past'
 }
