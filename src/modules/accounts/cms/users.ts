@@ -23,7 +23,15 @@ export const Users: CollectionConfig = {
     defaultColumns: ['name', 'email', 'role'],
     useAsTitle: 'name',
   },
-  auth: true,
+  auth: {
+    cookies: {
+      // Secure in production, so browsers send the sign-in cookie over HTTPS only (#234). Decided
+      // by NODE_ENV rather than the server URL: a production build is secure even if the URL is
+      // misconfigured as http, while `next dev` on http://localhost still signs in. Signing in
+      // over plain http in production (the IP on port 80) stops working, on purpose.
+      secure: process.env.NODE_ENV === 'production',
+    },
+  },
   fields: [
     {
       name: 'name',
