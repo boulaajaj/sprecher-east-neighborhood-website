@@ -33,7 +33,7 @@ export type FormEmailDecision<E> =
   | { send: true; email: E; fromReplaced: boolean; replyToReplaced: boolean }
 
 /** True when a setting pulls in something the visitor submitted ("{{email}}"). */
-export const usesSubmittedValue = (setting: string | null | undefined): boolean =>
+export const hasSubmittedValue = (setting: string | null | undefined): boolean =>
   typeof setting === 'string' && setting.includes('{{')
 
 /**
@@ -47,18 +47,18 @@ export function toSafeFormEmail<E extends EmailHeaders>(
 ): FormEmailDecision<E> {
   if (
     !setting ||
-    usesSubmittedValue(setting.emailTo) ||
-    usesSubmittedValue(setting.cc) ||
-    usesSubmittedValue(setting.bcc)
+    hasSubmittedValue(setting.emailTo) ||
+    hasSubmittedValue(setting.cc) ||
+    hasSubmittedValue(setting.bcc)
   ) {
     return { send: false }
   }
   // A From built from submitted data would let a visitor pick the sender (and Mailgun/DMARC
   // would reject it): an empty From makes the email adapter use the SMTP default instead.
-  const fromReplaced = usesSubmittedValue(setting.emailFrom)
+  const fromReplaced = hasSubmittedValue(setting.emailFrom)
   const from = fromReplaced ? '' : email.from
   // With no Reply-To setting, the plugin copies the From setting into Reply-To
-  const replyToSubmitted = usesSubmittedValue(setting.replyTo) || (!setting.replyTo && fromReplaced)
+  const replyToSubmitted = hasSubmittedValue(setting.replyTo) || (!setting.replyTo && fromReplaced)
   const replyTo = typeof email.replyTo === 'string' ? email.replyTo.trim() : email.replyTo
   if (replyToSubmitted && !(replyTo && isSingleAddress(replyTo))) {
     // The plugin's own default when no Reply-To is configured: the From address

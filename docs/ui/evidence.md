@@ -5,6 +5,10 @@ duplication is the case for each shared component in the [component set](compone
 folders are under `src/app/(frontend)/`. Nothing here is fixed in this change; the fixes belong to
 the component work under #163 or to their own issues.
 
+File references are as they were when the inventory was taken. Since then #223 replaced the
+form-builder field files under `src/blocks/Form/` (`Width/`, `Error/` and the rest) with `Field`,
+and #133 moved the form block to `src/modules/contact/ui/FormBlock.client.tsx`.
+
 ## Duplication
 
 | ID  | What is repeated                                                                                                                                                                                                                                                      | Where                                                                                                                                                                                                                                                                                                                                                                                                             | Shared component                        |
@@ -74,7 +78,8 @@ none is fixed here.
    can't open; it shows for any signed-in user (`src/components/AdminBar/index.tsx:41`).
    [Screenshot](screenshots/account-1280-light.webp).
 8. **Server error text reaches visitors.** The contact form shows "Internal Server Error"
-   (`src/blocks/Form/Component.tsx:119`); the password form shows the server's message
+   (then `src/blocks/Form/Component.tsx:119`; fixed by #223, which shows fixed texts in
+   `src/modules/contact/ui/FormBlock.client.tsx` since #133); the password form shows the server's message
    (`account/ChangePasswordForm.tsx:49`). The conventions ask for fixed, friendly messages.
    [Screenshot](screenshots/contact-server-error-1280-light.webp).
 9. **Half-width form fields never share a row**, and stay half width on phones

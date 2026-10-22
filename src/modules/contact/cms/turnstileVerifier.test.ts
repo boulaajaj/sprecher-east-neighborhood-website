@@ -8,12 +8,12 @@ const PASS_SECRET = '1x0000000000000000000000000000000AA' // Cloudflare test sec
 /** Fresh module per test: isEnabled() remembers that it has already warned. */
 async function loadTurnstile() {
   vi.resetModules()
-  const { TurnstileVerifier, turnstileAllowedHostnames } = await import('./turnstileVerifier')
+  const { TurnstileVerifier, listAllowedHostnames } = await import('./turnstileVerifier')
   const verifier = new TurnstileVerifier()
   return {
     verify: (token: string | null | undefined) => verifier.verify(token),
     isEnabled: () => verifier.isEnabled(),
-    turnstileAllowedHostnames,
+    listAllowedHostnames,
   }
 }
 
@@ -165,11 +165,11 @@ describe('TurnstileVerifier.verify: fails closed', () => {
   })
 })
 
-describe('turnstileAllowedHostnames', () => {
+describe('listAllowedHostnames', () => {
   it('contains the site host plus valid listed entries, lower-cased', async () => {
     vi.stubEnv('TURNSTILE_ALLOWED_HOSTNAMES', 'Alias.Example:443, not a host, ,https://b.example/x')
-    const { turnstileAllowedHostnames } = await loadTurnstile()
-    expect([...turnstileAllowedHostnames()].sort()).toEqual([
+    const { listAllowedHostnames } = await loadTurnstile()
+    expect([...listAllowedHostnames()].sort()).toEqual([
       'alias.example',
       'b.example',
       'sprechereast.example',

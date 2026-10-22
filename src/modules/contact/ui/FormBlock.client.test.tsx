@@ -4,7 +4,7 @@ import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { TURNSTILE_TOKEN_HEADER } from '../domain/turnstile'
+import { HUMAN_CHECK_TOKEN_HEADER } from '../domain/humanVerifier'
 
 // The robot check, replaced by a widget that hands out a token for each reset
 const turnstile = vi.hoisted(() => ({
@@ -66,7 +66,7 @@ const sent = (call: number) => {
   const [url, init] = fetchMock.mock.calls[call] as [string, RequestInit]
   return {
     url,
-    token: (init.headers as Record<string, string>)[TURNSTILE_TOKEN_HEADER],
+    token: (init.headers as Record<string, string>)[HUMAN_CHECK_TOKEN_HEADER],
     body: JSON.parse(String(init.body)),
   }
 }

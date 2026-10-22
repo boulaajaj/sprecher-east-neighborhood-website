@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { type FormEmailSetting, toSafeFormEmail, usesSubmittedValue } from './formEmails'
+import { type FormEmailSetting, toSafeFormEmail, hasSubmittedValue } from './formEmails'
 
 const OWNER_FROM = 'Sprecher East <website@example.org>'
 
@@ -15,17 +15,17 @@ const email = (overrides: { from?: string; replyTo?: string; to?: string } = {})
 
 const owner: FormEmailSetting = { emailTo: 'info@example.org' }
 
-describe('usesSubmittedValue', () => {
+describe('hasSubmittedValue', () => {
   it('is true for a setting that pulls in a submitted value', () => {
-    expect(usesSubmittedValue('{{email}}')).toBe(true)
-    expect(usesSubmittedValue('x@example.org, {{email}}')).toBe(true)
+    expect(hasSubmittedValue('{{email}}')).toBe(true)
+    expect(hasSubmittedValue('x@example.org, {{email}}')).toBe(true)
   })
 
   it('is false for a fixed setting or none', () => {
-    expect(usesSubmittedValue('info@example.org')).toBe(false)
-    expect(usesSubmittedValue('')).toBe(false)
-    expect(usesSubmittedValue(null)).toBe(false)
-    expect(usesSubmittedValue(undefined)).toBe(false)
+    expect(hasSubmittedValue('info@example.org')).toBe(false)
+    expect(hasSubmittedValue('')).toBe(false)
+    expect(hasSubmittedValue(null)).toBe(false)
+    expect(hasSubmittedValue(undefined)).toBe(false)
   })
 })
 

@@ -2,8 +2,7 @@ import { APIError, type CollectionBeforeChangeHook } from 'payload'
 
 import { hasAdminOrEditor } from '@/access/roles'
 
-import type { HumanVerifier } from '../domain/humanVerifier'
-import { TURNSTILE_TOKEN_HEADER } from '../domain/turnstile'
+import { HUMAN_CHECK_TOKEN_HEADER, type HumanVerifier } from '../domain/humanVerifier'
 
 /**
  * A hook that rejects public form submissions the robot check doesn't pass. Off while the
@@ -18,12 +17,12 @@ export const verifyHumanSubmission =
     if (hasAdminOrEditor(req.user)) return data
     if (!verifier.isEnabled()) return data
 
-    const result = await verifier.verify(req.headers?.get(TURNSTILE_TOKEN_HEADER))
+    const result = await verifier.verify(req.headers?.get(HUMAN_CHECK_TOKEN_HEADER))
 
     if (!result.ok) {
       // Why it failed goes to the log (a wrong secret looks like a bot otherwise);
       // the visitor gets a fixed message.
-      req.payload.logger.warn(`Turnstile rejected a form submission: ${result.reason}`)
+      req.payload.logger.warn(`Robot check rejected a form submission: ${result.reason}`)
       throw new APIError(
         'We couldn’t confirm you’re not a robot. Please try again.',
         400,

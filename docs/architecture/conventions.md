@@ -29,6 +29,7 @@ their module moves (#127).
 | `list…`               | A light list of keys for routing or sitemaps                | `listEventSlugs()`           |
 | `is…`, `has…`, `can…` | Returns a boolean                                           | `isEventScope(value)`        |
 | `parse…`              | Untrusted input to a typed value, or `null` when invalid    | `parsePageNumber(value)`     |
+| `check…`              | Untrusted input to a named verdict (`'ok'` or what's wrong) | `checkSubmissionSize(rows)`  |
 | `to…`                 | Converts one shape into another                             | `toEventSummary(doc)`        |
 | `format…`             | Builds text for display                                     | `formatDateShort(timestamp)` |
 
@@ -71,8 +72,10 @@ Add an interface only where it pays:
 Name the interface after the capability and the adapter after the provider: `HumanVerifier`,
 `TurnstileVerifier`. The interface goes in the module's `domain/`; the adapter goes in the layer
 that calls it. A Payload hook's adapter sits in `cms/`, because the Payload CLI loads hooks
-outside Next.js, where `server-only` code can't run (`contact`'s `TurnstileVerifier`). Don't wrap Payload collections in repository interfaces; the typed Local API
-plus a module's `data/` functions is the boundary ([decision 0002](decisions/0002-no-repository-layer.md)).
+outside Next.js, where `server-only` code can't run (`contact`'s `TurnstileVerifier`).
+
+Don't wrap Payload collections in repository interfaces; the typed Local API plus a module's
+`data/` functions is the boundary ([decision 0002](decisions/0002-no-repository-layer.md)).
 Values that change between environments come from env vars read in one place, never literals in
 code.
 

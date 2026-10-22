@@ -1,8 +1,11 @@
 import { APIError } from 'payload'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { HumanCheck, HumanVerifier } from '../domain/humanVerifier'
-import { TURNSTILE_TOKEN_HEADER } from '../domain/turnstile'
+import {
+  HUMAN_CHECK_TOKEN_HEADER,
+  type HumanCheck,
+  type HumanVerifier,
+} from '../domain/humanVerifier'
 import { verifyHumanSubmission } from './verifyHumanSubmission'
 
 /** The test double: answers what the test says and records the tokens it was asked about. */
@@ -42,7 +45,7 @@ async function submit(
       operation,
       req: {
         user: role ? { id: 1, role } : null,
-        headers: new Headers(token ? { [TURNSTILE_TOKEN_HEADER]: token } : {}),
+        headers: new Headers(token ? { [HUMAN_CHECK_TOKEN_HEADER]: token } : {}),
         payload: { logger: { warn } },
       },
     } as unknown as HookArgs)
@@ -68,7 +71,7 @@ describe('verifyHumanSubmission', () => {
     expect(error?.status).toBe(400)
     expect(error?.message).toBe('We couldn’t confirm you’re not a robot. Please try again.')
     expect(warn).toHaveBeenCalledExactlyOnceWith(
-      'Turnstile rejected a form submission: timeout-or-duplicate',
+      'Robot check rejected a form submission: timeout-or-duplicate',
     )
   })
 

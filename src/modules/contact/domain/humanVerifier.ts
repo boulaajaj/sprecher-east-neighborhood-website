@@ -11,3 +11,9 @@ export interface HumanVerifier {
   /** Checks the token the browser sent. Any error answers `ok: false` (fail closed). */
   verify(token: string | null | undefined): Promise<HumanCheck>
 }
+
+/**
+ * Header the form block sends the robot-check token in, whatever the provider. The value is the
+ * one the site has always used.
+ */
+export const HUMAN_CHECK_TOKEN_HEADER = 'x-turnstile-token'

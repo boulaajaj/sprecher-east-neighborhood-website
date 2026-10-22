@@ -1,6 +1,6 @@
 import { getClientSideURL } from '@/utilities/getURL'
 
-import { TURNSTILE_TOKEN_HEADER } from '../domain/turnstile'
+import { HUMAN_CHECK_TOKEN_HEADER } from '../domain/humanVerifier'
 
 /**
  * Sends a form submission to Payload's REST endpoint, where the safeguards run. The body holds
@@ -19,7 +19,7 @@ export function postFormSubmission(
     }),
     headers: {
       'Content-Type': 'application/json',
-      ...(token ? { [TURNSTILE_TOKEN_HEADER]: token } : {}),
+      ...(token ? { [HUMAN_CHECK_TOKEN_HEADER]: token } : {}),
     },
     method: 'POST',
   })

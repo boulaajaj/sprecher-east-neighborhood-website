@@ -76,7 +76,7 @@ function toHostname(entry: string): string | null {
  * TURNSTILE_ALLOWED_HOSTNAMES (comma-separated). A token solved on another hostname that uses
  * the same widget (e.g. a dev host) is rejected.
  */
-export function turnstileAllowedHostnames(): Set<string> {
+export function listAllowedHostnames(): Set<string> {
   const hosts = new Set<string>()
   try {
     hosts.add(new URL(getServerSideURL()).hostname.toLowerCase())
@@ -132,7 +132,7 @@ async function verifyTurnstileToken(token: string | null | undefined): Promise<H
         return { ok: false, reason: `unexpected-action:${result.action ?? 'none'}` }
       }
       const hostname = result.hostname?.toLowerCase()
-      if (!hostname || !turnstileAllowedHostnames().has(hostname)) {
+      if (!hostname || !listAllowedHostnames().has(hostname)) {
         return { ok: false, reason: `unexpected-hostname:${hostname ?? 'none'}` }
       }
     }

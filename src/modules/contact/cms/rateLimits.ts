@@ -3,7 +3,7 @@ import { APIError, type CollectionBeforeChangeHook } from 'payload'
 import { hasAdminOrEditor } from '@/access/roles'
 
 import { RATE_LIMITS } from '../domain/rateLimits'
-import { clientIpFromHeaders } from './clientIp'
+import { parseClientIp } from './clientIp'
 
 // In memory: the site runs as one PM2 process.
 const recentByIp = new Map<string, number[]>()
@@ -21,7 +21,7 @@ export const rateLimitSubmissions: CollectionBeforeChangeHook = ({ data, operati
   if (operation !== 'create') return data
   if (hasAdminOrEditor(req.user)) return data
 
-  const ip = clientIpFromHeaders(req.headers)
+  const ip = parseClientIp(req.headers)
   if (!ip) return data
 
   const now = Date.now()

@@ -98,7 +98,10 @@ describe('guardFormEmails', () => {
   it('reads the form id from a populated form too', async () => {
     const { result, findByID } = await send([email()], [{ emailTo: 'info@example.org' }], { id: 1 })
     expect(result).toHaveLength(1)
-    expect(findByID).toHaveBeenCalledWith(expect.objectContaining({ collection: 'forms', id: 1 }))
+    // The email settings are staff-only, so the lookup must bypass access for a visitor's submission
+    expect(findByID).toHaveBeenCalledWith(
+      expect.objectContaining({ collection: 'forms', id: 1, overrideAccess: true }),
+    )
   })
 
   it('sends from the default address when From comes from the visitor', async () => {
