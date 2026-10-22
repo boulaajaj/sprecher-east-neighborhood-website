@@ -26,7 +26,7 @@ class FakeHumanVerifier implements HumanVerifier {
 
 type HookArgs = Parameters<ReturnType<typeof verifyHumanSubmission>>[0]
 
-/** Runs the hook as Payload would for a submission, and returns the logger to inspect. */
+/** Runs the hook as Payload would for a submission; returns its result or error, and the log. */
 async function submit(
   verifier: HumanVerifier,
   {
@@ -36,51 +36,45 @@ async function submit(
   } = {},
 ) {
   const warn = vi.fn()
-  const data = { form: 1 }
-  const result = await verifyHumanSubmission(verifier)({
-    data,
-    operation,
-    req: {
-      user: role ? { id: 1, role } : null,
-      headers: new Headers(token ? { [TURNSTILE_TOKEN_HEADER]: token } : {}),
-      payload: { logger: { warn } },
-    },
-  } as unknown as HookArgs)
-  return { result, warn }
+  try {
+    const result = await verifyHumanSubmission(verifier)({
+      data: { form: 1 },
+      operation,
+      req: {
+        user: role ? { id: 1, role } : null,
+        headers: new Headers(token ? { [TURNSTILE_TOKEN_HEADER]: token } : {}),
+        payload: { logger: { warn } },
+      },
+    } as unknown as HookArgs)
+    return { result, warn }
+  } catch (error) {
+    return { error: error as APIError, warn }
+  }
 }
 
 describe('verifyHumanSubmission', () => {
   it('lets a submission through when the robot check passes, sending it the header token', async () => {
     const verifier = new FakeHumanVerifier({ ok: true })
-    const { result } = await submit(verifier)
+    const { result, error } = await submit(verifier)
+    expect(error).toBeUndefined()
     expect(result).toEqual({ form: 1 })
     expect(verifier.tokens).toEqual(['the-token'])
   })
 
-  it('rejects a failed check with a fixed 400 message and logs only the reason', async () => {
+  it('rejects a failed check with a fixed 400 message, and logs only the reason', async () => {
     const verifier = new FakeHumanVerifier({ ok: false, reason: 'timeout-or-duplicate' })
-    const error = await submit(verifier).catch((caught: unknown) => caught)
+    const { error, warn } = await submit(verifier)
     expect(error).toBeInstanceOf(APIError)
-    expect((error as APIError).status).toBe(400)
-    expect((error as APIError).message).toBe(
-      'We couldn’t confirm you’re not a robot. Please try again.',
+    expect(error?.status).toBe(400)
+    expect(error?.message).toBe('We couldn’t confirm you’re not a robot. Please try again.')
+    expect(warn).toHaveBeenCalledExactlyOnceWith(
+      'Turnstile rejected a form submission: timeout-or-duplicate',
     )
   })
 
-  it('logs why the check failed, never the token', async () => {
+  it('asks the verifier with no token when the header is missing', async () => {
     const verifier = new FakeHumanVerifier({ ok: false, reason: 'missing-token' })
-    const warn = vi.fn()
-    await verifyHumanSubmission(verifier)({
-      data: {},
-      operation: 'create',
-      req: { user: null, headers: new Headers(), payload: { logger: { warn } } },
-    } as unknown as HookArgs).catch(() => undefined)
-    expect(warn).toHaveBeenCalledWith('Turnstile rejected a form submission: missing-token')
-  })
-
-  it('passes no token on to the verifier when the header is missing', async () => {
-    const verifier = new FakeHumanVerifier({ ok: false, reason: 'missing-token' })
-    await submit(verifier, { token: null }).catch(() => undefined)
+    expect((await submit(verifier, { token: null })).error?.status).toBe(400)
     expect(verifier.tokens).toEqual([null])
   })
 
@@ -98,7 +92,7 @@ describe('verifyHumanSubmission', () => {
 
   it('still checks a signed-in resident', async () => {
     const verifier = new FakeHumanVerifier({ ok: false, reason: 'missing-token' })
-    await expect(submit(verifier, { role: 'resident' })).rejects.toBeInstanceOf(APIError)
+    expect((await submit(verifier, { role: 'resident' })).error).toBeInstanceOf(APIError)
   })
 
   it('checks only new submissions, not updates', async () => {

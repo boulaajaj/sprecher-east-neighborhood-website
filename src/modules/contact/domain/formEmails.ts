@@ -27,6 +27,7 @@ export type FormEmailSetting = {
 /** The headers of a formatted form email that these rules read or change. */
 type EmailHeaders = { from: string; replyTo?: string }
 
+/** Whether an email may go out; if so, the email to send and which headers were replaced. */
 export type FormEmailDecision<E> =
   | { send: false }
   | { send: true; email: E; fromReplaced: boolean; replyToReplaced: boolean }
