@@ -8,6 +8,8 @@ import {
   isAdminOrSelf,
 } from '@/platform/payload/roles'
 
+import { requireCurrentPassword } from './requireCurrentPassword'
+
 export const Users: CollectionConfig = {
   slug: 'users',
   access: {
@@ -24,6 +26,10 @@ export const Users: CollectionConfig = {
     useAsTitle: 'name',
   },
   auth: true,
+  hooks: {
+    // Your own password changes only on /account, after your current one is checked (#233)
+    beforeChange: [requireCurrentPassword],
+  },
   fields: [
     {
       name: 'name',

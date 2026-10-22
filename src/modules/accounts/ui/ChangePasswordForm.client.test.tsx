@@ -69,7 +69,7 @@ describe('ChangePasswordForm', () => {
   })
 
   it.each([
-    ['wrong-password', 'Your current password isn’t right. Please try again.'],
+    ['wrong-password', 'Your current password isn’t right, or there were too many tries.'],
     ['signed-out', 'Your session has ended. Log in again, then change your password.'],
     ['rejected', 'That password can’t be used. Choose a different one and try again.'],
     ['server-error', 'We couldn’t update your password. Please try again in a few minutes.'],

@@ -13,6 +13,7 @@ import {
 } from 'payload'
 
 import type { PasswordChangeValues, SignInValues } from '../domain/credentials'
+import { CURRENT_PASSWORD_CONFIRMED } from '../domain/passwordConfirmation'
 import type { CurrentUser } from '../domain/types'
 import { toResponseCookie } from './cookies'
 import { isRefusal } from './failures'
@@ -110,6 +111,8 @@ export async function setOwnPassword({
     depth: 0,
     overrideAccess: false,
     user,
+    // Only now: the users collection refuses your own new password without it
+    context: { [CURRENT_PASSWORD_CONFIRMED]: true },
   })
   return 'changed'
 }
@@ -117,8 +120,9 @@ export async function setOwnPassword({
 /**
  * Checks a password against the session's own account with Payload's `login` operation, as
  * `POST /api/users/login` runs it, so a wrong one counts towards the lockout. The email is the
- * session's, never the caller's. Its token is dropped and no cookie is set; the session it
- * records ends when the password changes. Throws when Payload fails rather than refuses.
+ * session's, never the caller's. Its token is dropped and no cookie is set. The session it
+ * records ends when the password changes, or expires if the update then fails (nobody holds its
+ * token). Throws when Payload fails rather than refuses.
  */
 async function isOwnPassword(
   payload: Payload,

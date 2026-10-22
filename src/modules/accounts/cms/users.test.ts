@@ -7,6 +7,7 @@ import {
   isAdminOrSelf,
 } from '@/platform/payload/roles'
 
+import { requireCurrentPassword } from './requireCurrentPassword'
 import { Users } from './users'
 
 describe('Users', () => {
@@ -23,6 +24,10 @@ describe('Users', () => {
 
   it('signs in with email and password, Payload’s defaults', () => {
     expect(Users.auth).toBe(true)
+  })
+
+  it('asks for the current password before anyone changes their own (#233)', () => {
+    expect(Users.hooks).toEqual({ beforeChange: [requireCurrentPassword] })
   })
 
   it('makes new accounts residents, and only admins may set a role', () => {

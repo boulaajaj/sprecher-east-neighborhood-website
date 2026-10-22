@@ -9,9 +9,10 @@ describe('toPasswordErrorMessage', () => {
     )
   })
 
-  it('gives one message for a refused current password, so it never says the account is locked', () => {
+  it('gives one message for a refused current password that also covers the lockout', () => {
+    // The reader owns the account, so saying it may be locked reveals nothing to anyone else
     expect(toPasswordErrorMessage('wrong-password')).toBe(
-      'Your current password isn’t right. Please try again.',
+      'Your current password isn’t right, or there were too many tries. Check it, or wait a few minutes and try again.',
     )
   })
 
