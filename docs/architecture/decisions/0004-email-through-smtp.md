@@ -24,6 +24,8 @@ the visitor typed (`{{email}}`) would let anyone make the site send mail to any 
 - Owner notifications work; visitor confirmations don't, until a safe design exists (fixed text,
   one validated address, robot check on, possibly verification).
 - The contact form's recipient is set in Admin, not in code.
+- Amended by 0007: the site's own confirmation link may go to a typed address (see #186). Form
+  emails keep the rule above.
 
 ## Links
 

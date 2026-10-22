@@ -17,6 +17,13 @@ describe('findSenderEmail', () => {
     expect(findSenderEmail(FIELDS, rows)).toBe('ana@example.com')
   })
 
+  it.each(['josé@example.com', 'ana@example.c'])(
+    'keeps %s, which Payload’s stricter email check would refuse',
+    (address) => {
+      expect(findSenderEmail(FIELDS, [{ field: 'email', value: address }])).toBe(address)
+    },
+  )
+
   it('ignores an address typed into a field that is not an email field', () => {
     expect(findSenderEmail(FIELDS, [{ field: 'message', value: 'ana@example.com' }])).toBeNull()
   })

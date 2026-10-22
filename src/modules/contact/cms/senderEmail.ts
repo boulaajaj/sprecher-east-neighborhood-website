@@ -14,8 +14,11 @@ const FORM_SUBMISSIONS = 'form-submissions'
  */
 export const senderEmailFields: Field[] = [
   {
+    // Text, not `email`: Payload's email check is stricter than the form's (it refuses
+    // "josé@example.com" or "ana@example.c"), and a refused field would refuse the whole message,
+    // which must always reach the owner (#183). `findSenderEmail` already keeps it to one address.
     name: 'senderEmail',
-    type: 'email',
+    type: 'text',
     index: true,
     access: { read: isAdminFieldAccess },
     admin: { readOnly: true, position: 'sidebar', description: 'From the form’s email field.' },
@@ -50,6 +53,9 @@ export const recordSenderEmail =
           select: { fields: true },
           // A form's fields are public: visitors read them to fill the form in
           overrideAccess: false,
+          // An unknown form gives null here, so the field validation that follows answers with
+          // its usual 400 ("this form does not exist") instead of a 404 from this lookup
+          disableErrors: true,
           req,
         })
       : null

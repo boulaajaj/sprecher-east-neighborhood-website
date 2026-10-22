@@ -62,6 +62,24 @@ describe('recordSenderEmail', () => {
     expect(result).toMatchObject({ senderEmail: null, emailConfirmed: false })
   })
 
+  it('looks the form up without failing, so an unknown form gets the usual validation error', async () => {
+    const { findByID } = await record(fakeConfirmer(), {
+      submissionData: [{ field: 'email', value: 'ana@example.com' }],
+    })
+    expect(findByID).toHaveBeenCalledWith(expect.objectContaining({ disableErrors: true }))
+  })
+
+  it('records no sender when the form is gone', async () => {
+    const confirmer = fakeConfirmer(true)
+    const result = await recordSenderEmail(confirmer)({
+      data: { form: 99, submissionData: [{ field: 'email', value: 'ana@example.com' }] },
+      operation: 'create',
+      req: { payload: { findByID: vi.fn(async () => null) } },
+    } as unknown as BeforeArgs)
+    expect(result).toMatchObject({ senderEmail: null, emailConfirmed: false })
+    expect(confirmer.isConfirmed).not.toHaveBeenCalled()
+  })
+
   it('leaves updates alone', async () => {
     const confirmer = fakeConfirmer(true)
     const { result, findByID } = await record(confirmer, { emailConfirmed: true }, 'update')

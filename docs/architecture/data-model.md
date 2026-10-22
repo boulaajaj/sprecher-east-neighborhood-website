@@ -178,7 +178,7 @@ confirmed records.
 ### Plugin-created collections
 
 - `forms`: `title` (required), `fields` (blocks: `checkbox`, `country`, `email`, `message`, `number`, `select`, `state`, `text`, `textarea`; payment disabled), `submitButtonLabel`, `confirmationType` (`message` | `redirect`, default `message`), `confirmationMessage` (richText, required for message), `redirect.url`, `emails` (array: `emailTo`, `cc`, `bcc`, `replyTo`, `emailFrom`, `subject` required, `message` richText).
-- `form-submissions`: `form` → forms (required), `submissionData` (array of `field` text, `value` textarea, both required). Added by `src/modules/contact/cms/senderEmail.ts` (#183): `senderEmail` (email, indexed, from the form's first email field) and `emailConfirmed` (checkbox, default false); both set by the server only.
+- `form-submissions`: `form` → forms (required), `submissionData` (array of `field` text, `value` textarea, both required). Added by `src/modules/contact/cms/senderEmail.ts` (#183): `senderEmail` (text, indexed, from the form's first email field; text so Payload's stricter email check can never refuse a message) and `emailConfirmed` (checkbox, default false); both set by the server only.
 - `redirects`: `from` (text, required, unique, indexed), `to` (group: `type` reference | custom, `reference` → pages | posts, `url`). Plugin covers `pages` and `posts`.
 - `search`: `title`, `priority`, `doc` → posts | events (required), `slug`, `meta` (`title`, `description`, `image` → media), `categories` (array of `relationTo`, `categoryID`, `title`). Synced from `posts` and `events` only, drafts excluded.
 

@@ -149,7 +149,10 @@ describe('guardFormEmails', () => {
 
   it.each([
     [true, '<p>Hello</p><p>Sender’s email: confirmed.</p>'],
-    [false, /^<p>Hello<\/p><p>Sender’s email: not confirmed yet\./],
+    [
+      false,
+      '<p>Hello</p><p>Sender’s email: not confirmed yet (we ask them by email to confirm).</p>',
+    ],
   ])(
     'says in each email whether the sender’s address is confirmed (%s)',
     async (confirmed, html) => {

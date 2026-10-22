@@ -35,5 +35,5 @@ export function toSenderEmailNote(senderEmail: unknown, confirmed: unknown): str
   if (typeof senderEmail !== 'string' || !senderEmail) return null
   return confirmed === true
     ? 'Sender’s email: confirmed.'
-    : 'Sender’s email: not confirmed yet. Admin → Form Submissions shows it as confirmed once they click the link we email them.'
+    : 'Sender’s email: not confirmed yet (we ask them by email to confirm).'
 }
