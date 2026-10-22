@@ -7,7 +7,8 @@ const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {
 
 type Props = {
   collection: keyof typeof collectionPrefixMap
-  slug: string
+  /** Missing when the document has no slug yet; then there is no preview */
+  slug: string | null | undefined
   req: PayloadRequest
 }
 

@@ -1,66 +1,21 @@
 import type { Metadata } from 'next/types'
 
-import { CollectionArchive } from '@/components/CollectionArchive'
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 import React from 'react'
-import { Search } from '@/search/Component'
+
+import { parseSearchQuery } from '@/modules/news'
+import { findSearchResults, PostGrid, SearchBox } from '@/modules/news/server'
 import PageClient from './page.client'
-import type { CardPostData } from '@/components/Card'
 
 type Args = {
   searchParams: Promise<{
     q?: string | string[]
   }>
 }
+
 export default async function Page({ searchParams: searchParamsPromise }: Args) {
   const { q } = await searchParamsPromise
-  // `?q=a&q=b` gives an array: use the first. A query of only spaces is no query
-  const query = (Array.isArray(q) ? q[0] : q)?.trim() ?? ''
-  const payload = await getPayload({ config: configPromise })
-
-  const posts = await payload.find({
-    collection: 'search',
-    depth: 1,
-    limit: 12,
-    select: {
-      title: true,
-      slug: true,
-      categories: true,
-      meta: true,
-    },
-    // pagination: false reduces overhead if you don't need totalDocs
-    pagination: false,
-    overrideAccess: false,
-    ...(query
-      ? {
-          where: {
-            or: [
-              {
-                title: {
-                  like: query,
-                },
-              },
-              {
-                'meta.description': {
-                  like: query,
-                },
-              },
-              {
-                'meta.title': {
-                  like: query,
-                },
-              },
-              {
-                slug: {
-                  like: query,
-                },
-              },
-            ],
-          },
-        }
-      : {}),
-  })
+  const query = parseSearchQuery(q)
+  const results = await findSearchResults(query)
 
   return (
     <div className="pt-24 pb-24">
@@ -70,12 +25,12 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
           Search
         </h1>
         <div className="max-w-[50rem]">
-          <Search initialQuery={query} />
+          <SearchBox initialQuery={query} />
         </div>
       </div>
 
-      {posts.docs && posts.docs.length > 0 ? (
-        <CollectionArchive posts={posts.docs as CardPostData[]} />
+      {results.length > 0 ? (
+        <PostGrid posts={results} />
       ) : (
         <div className="container py-12 text-center">
           <p className="text-muted-foreground">No results found.</p>

@@ -1,59 +1,18 @@
-import 'server-only'
+import type { ArchiveBlock as ArchiveBlockProps } from '@/payload-types'
 
-import type { Post, ArchiveBlock as ArchiveBlockProps } from '@/payload-types'
-
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 import React from 'react'
 import RichText from '@/components/RichText'
 
-import { CollectionArchive } from '@/components/CollectionArchive'
+import { findArchivePosts, PostGrid } from '@/modules/news/server'
 
+/** Page-builder block that lists posts (the home page's "Recent News"); news loads them. */
 export const ArchiveBlock: React.FC<
   ArchiveBlockProps & {
     id?: string
   }
 > = async (props) => {
-  const { id, categories, introContent, limit: limitFromProps, populateBy, selectedDocs } = props
-
-  const limit = limitFromProps || 3
-
-  let posts: Post[] = []
-
-  if (populateBy === 'collection') {
-    const payload = await getPayload({ config: configPromise })
-
-    const flattenedCategories = categories?.map((category) => {
-      if (typeof category === 'object') return category.id
-      else return category
-    })
-
-    // Public block: never let the Local API's default overrideAccess surface drafts,
-    // and show the newest posts first.
-    const fetchedPosts = await payload.find({
-      collection: 'posts',
-      depth: 1,
-      limit,
-      overrideAccess: false,
-      sort: '-publishedAt',
-      where: {
-        _status: { equals: 'published' },
-        ...(flattenedCategories && flattenedCategories.length > 0
-          ? { categories: { in: flattenedCategories } }
-          : {}),
-      },
-    })
-
-    posts = fetchedPosts.docs
-  } else {
-    if (selectedDocs?.length) {
-      const filteredSelectedPosts = selectedDocs.map((post) => {
-        if (typeof post.value === 'object') return post.value
-      }) as Post[]
-
-      posts = filteredSelectedPosts
-    }
-  }
+  const { id, introContent } = props
+  const posts = await findArchivePosts(props)
 
   return (
     <div className="bg-surface py-8 md:py-10" id={`block-${id}`}>
@@ -66,7 +25,7 @@ export const ArchiveBlock: React.FC<
           />
         </div>
       )}
-      <CollectionArchive posts={posts} />
+      <PostGrid posts={posts} />
     </div>
   )
 }

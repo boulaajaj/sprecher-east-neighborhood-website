@@ -1,40 +1,30 @@
 import type { Metadata } from 'next'
 
-import { PayloadRedirects } from '@/components/PayloadRedirects'
-import { SidebarPosts } from '@/components/SidebarPosts'
-import { SidebarCTA } from '@/components/SidebarCTA'
-import { findUpcomingEvents, SidebarEvents } from '@/modules/events/server'
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
-import React, { cache } from 'react'
-import RichText from '@/components/RichText'
-
-import type { Post } from '@/payload-types'
+import React from 'react'
 
 import { Breadcrumbs } from '@/components/Breadcrumbs'
-import { PostHero } from '@/heros/PostHero'
-import { generateMeta } from '@/utilities/generateMeta'
-import { articleJsonLd } from '@/utilities/structuredData'
 import { JsonLd } from '@/components/JsonLd'
-import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
+import { PayloadRedirects } from '@/components/PayloadRedirects'
+import RichText from '@/components/RichText'
+import { SidebarCTA } from '@/components/SidebarCTA'
+import { findUpcomingEvents, SidebarEvents } from '@/modules/events/server'
+import {
+  findRecentPosts,
+  getPostBySlug,
+  listPostSlugs,
+  PostHero,
+  postJsonLd,
+  SidebarPosts,
+} from '@/modules/news/server'
+import { generateMeta } from '@/utilities/generateMeta'
+import PageClient from './page.client'
 
 export async function generateStaticParams() {
   try {
-    const payload = await getPayload({ config: configPromise })
-    const posts = await payload.find({
-      collection: 'posts',
-      draft: false,
-      limit: 1000,
-      overrideAccess: false,
-      pagination: false,
-      select: {
-        slug: true,
-      },
-    })
-
-    return posts.docs.map(({ slug }) => ({ slug }))
+    const posts = await listPostSlugs()
+    return posts.map(({ slug }) => ({ slug }))
   } catch (error) {
     console.error('[posts] generateStaticParams failed; falling back to []', error)
     return []
@@ -53,21 +43,20 @@ export default async function Post({ params: paramsPromise }: Args) {
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const url = '/posts/' + decodedSlug
-  const post = await queryPostBySlug({ slug: decodedSlug })
+  const post = await getPostBySlug(decodedSlug)
 
   if (!post) return <PayloadRedirects url={url} />
 
-  const relatedPosts = (post.relatedPosts?.filter((p) => typeof p === 'object') ?? []) as Post[]
-  const relatedPostIds = relatedPosts.map((p) => p.id)
-  const recentPosts = await queryRecentPosts({
-    excludeIds: [post.id, ...relatedPostIds],
-  })
-  const upcomingEvents = await findUpcomingEvents()
+  // News and events meet here, not in either module (docs/architecture decision 0008)
+  const [recentPosts, upcomingEvents] = await Promise.all([
+    findRecentPosts(post),
+    findUpcomingEvents(),
+  ])
 
   return (
     <article className="pt-16 pb-16">
       <PageClient />
-      <JsonLd data={articleJsonLd(post)} />
+      <JsonLd data={postJsonLd(post)} />
 
       {/* Allows redirects for valid pages too */}
       <PayloadRedirects disableNotFound url={url} />
@@ -92,7 +81,7 @@ export default async function Post({ params: paramsPromise }: Args) {
           </div>
 
           <aside className="mt-12 space-y-6 lg:sticky lg:top-24 lg:mt-0 lg:self-start">
-            <SidebarPosts posts={relatedPosts} title="Related Posts" />
+            <SidebarPosts posts={post.relatedPosts} title="Related Posts" />
             <SidebarPosts posts={recentPosts} title="You May Also Like" />
             <SidebarEvents events={upcomingEvents} title="Upcoming Events" />
             <SidebarCTA
@@ -110,11 +99,9 @@ export default async function Post({ params: paramsPromise }: Args) {
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { slug = '' } = await paramsPromise
-  // Decode to support slugs with special characters
-  const decodedSlug = decodeURIComponent(slug)
-  const post = await queryPostBySlug({ slug: decodedSlug })
+  const post = await getPostBySlug(decodeURIComponent(slug))
 
-  const meta = await generateMeta({ doc: post })
+  const meta = await generateMeta({ doc: post && { slug: post.slug, meta: post.meta } })
   if (!post) return meta
 
   return {
@@ -125,46 +112,3 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
     },
   }
 }
-
-const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {
-  const { isEnabled: draft } = await draftMode()
-
-  const payload = await getPayload({ config: configPromise })
-
-  const result = await payload.find({
-    collection: 'posts',
-    draft,
-    limit: 1,
-    overrideAccess: draft,
-    pagination: false,
-    where: {
-      slug: {
-        equals: slug,
-      },
-    },
-  })
-
-  return result.docs?.[0] || null
-})
-
-const queryRecentPosts = cache(async ({ excludeIds }: { excludeIds: number[] }) => {
-  const payload = await getPayload({ config: configPromise })
-
-  const result = await payload.find({
-    collection: 'posts',
-    draft: false,
-    limit: 3,
-    overrideAccess: false,
-    sort: '-publishedAt',
-    where: {
-      id: { not_in: excludeIds },
-    },
-    select: {
-      title: true,
-      slug: true,
-      meta: true,
-    },
-  })
-
-  return result.docs
-})

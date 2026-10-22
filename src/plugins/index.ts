@@ -12,8 +12,7 @@ import { limitSubmissionSize } from '@/hooks/limitSubmissionSize'
 import { verifyHumanSubmission } from '@/hooks/verifyHumanSubmission'
 import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
-import { searchFields } from '@/search/fieldOverrides'
-import { beforeSyncWithSearch } from '@/search/beforeSync'
+import { searchOptions } from '@/modules/news/cms'
 
 import type { Page, Post, Event } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -134,16 +133,6 @@ export const plugins: Plugin[] = [
       },
     },
   }),
-  searchPlugin({
-    collections: ['posts', 'events'],
-    beforeSync: beforeSyncWithSearch,
-    searchOverrides: {
-      // The plugin sets only create (off) and read (public). Its own sync bypasses access, so
-      // these only gate the admin screens: staff may reindex (needs both) and set priority (#140).
-      access: { update: isAdminOrEditor, delete: isAdminOrEditor },
-      fields: ({ defaultFields }) => {
-        return [...defaultFields, ...searchFields]
-      },
-    },
-  }),
+  // Search belongs to news; it also indexes events, which the module doesn't name (0008)
+  searchPlugin({ ...searchOptions, collections: ['posts', 'events'] }),
 ]
