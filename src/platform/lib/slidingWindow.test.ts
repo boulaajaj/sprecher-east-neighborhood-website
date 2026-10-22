@@ -34,6 +34,16 @@ describe('SlidingWindowCounter', () => {
     expect(counter.room('site', 5, NOW)).toBe(0)
   })
 
+  it('forgets the least recently used key past its size limit', () => {
+    const counter = new SlidingWindowCounter(HOUR, 2)
+    counter.tryTake('a', 2, NOW)
+    counter.tryTake('b', 2, NOW)
+    counter.tryTake('a', 2, NOW) // a is used again, so b is now the least recent
+    counter.tryTake('c', 2, NOW)
+    expect(counter.room('a', 2, NOW)).toBe(0)
+    expect(counter.room('b', 2, NOW)).toBe(2)
+  })
+
   it('forgets the oldest key past its size limit', () => {
     const counter = new SlidingWindowCounter(HOUR, 2)
     counter.tryTake('a', 1, NOW)

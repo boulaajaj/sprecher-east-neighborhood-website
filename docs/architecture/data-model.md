@@ -125,9 +125,11 @@ only admins can see it.
 | `sendCount`, `sendWindowStart` | number, date | No       | Hidden: links sent to this address in the current 24-hour window                            |
 
 What is kept: an unconfirmed record is deleted 7 days after its last link (whenever a link is
-requested, until scheduled jobs run, #141). A confirmed record keeps the address and the dates
-above until the person asks for removal through the contact form; an admin then deletes it in
-Admin.
+requested, until scheduled jobs run, #141). How long a confirmed record is kept is **not decided
+yet: it waits for the owner (#183)**. The proposal is to keep the address and the dates above
+until the person asks for removal through the contact form, and an admin then deletes it in
+Admin. The site's privacy text should say the same once he decides. Until then nothing deletes
+confirmed records.
 
 ### faq
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { hashConfirmationToken, newConfirmationToken, parseConfirmationToken } from './token'
+import { hashConfirmationToken, newConfirmationToken } from './token'
+import { parseConfirmationToken } from '../domain/tokenFormat'
 
 describe('newConfirmationToken', () => {
   it('makes a different 43-character URL-safe token each time, with its hash', () => {

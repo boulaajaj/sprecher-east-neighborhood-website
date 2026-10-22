@@ -7,7 +7,9 @@ import { EMAIL_CONFIRMATIONS } from './emailConfirmations'
 
 // Every call here runs for a visitor who may not read this collection (it is admin-only), so
 // access is bypassed on purpose: the server decides what to do, and the visitor never sees the
-// record. Each call passes `req`, so it joins the request's transaction.
+// record. Each call passes `req`, as Payload expects inside a request. No transaction runs today
+// (the SQLite adapter has no `transactionOptions`); callers outside this folder go through
+// `withOwnTransaction`, so if one ever does, a failure here can't undo the caller's work.
 
 /** Maps a stored document to the record the rules read. */
 export function toConfirmationRecord(doc: EmailConfirmation): ConfirmationRecord {
