@@ -84,6 +84,11 @@ export function Form<Input extends FieldValues, Output>({
   return (
     <form
       {...rest}
+      // Before the script runs (a slow phone, a chunk that failed to load), the browser submits
+      // the form itself. POST keeps the fields out of the URL, so out of history, logs and the
+      // Referer (#232). With no `action`, it posts to the page, which Next.js renders again
+      // without reading the body: a form-urlencoded POST is never run as a server action.
+      method="post"
       noValidate // the schema validates, with messages tied to each field
       onSubmit={submit}
       className={cn('grid items-start gap-6 *:col-span-full sm:grid-cols-2', className)}
