@@ -6,21 +6,22 @@ Every collection also has `id` (number), `createdAt` and `updatedAt`. Draft-enab
 
 ## Collections
 
-| Slug               | Purpose                                 | Drafts?                                | Read                          | Create/Update                                           | Delete            | Config file                                                   |
-| ------------------ | --------------------------------------- | -------------------------------------- | ----------------------------- | ------------------------------------------------------- | ----------------- | ------------------------------------------------------------- |
-| `pages`            | Pages built from hero and blocks        | Yes (autosave, scheduled, 50 versions) | `authenticatedOrPublished`    | `isAdminOrEditor`                                       | `isAdmin`         | `src/modules/site/cms/pages.ts`                               |
-| `posts`            | News articles with rich text            | Yes (autosave, scheduled, 50 versions) | `authenticatedOrPublished`    | `isAdminOrEditor`                                       | `isAdmin`         | `src/modules/news/cms/posts.ts`                               |
-| `events`           | Neighborhood events with date and place | Yes (autosave, scheduled, 25 versions) | `authenticatedOrPublished`    | `isAdminOrEditor`                                       | `isAdmin`         | `src/modules/events/cms/events.ts`                            |
-| `faq`              | Questions and answers by category       | Yes (plain)                            | `authenticatedOrPublished`    | `isAdminOrEditor`                                       | `isAdmin`         | `src/modules/directory/cms/faq.ts`                            |
-| `resources`        | Local links and contacts by category    | Yes (plain)                            | `authenticatedOrPublished`    | `isAdminOrEditor`                                       | `isAdmin`         | `src/modules/directory/cms/resources.ts`                      |
-| `team-members`     | Board members and AI agents             | No                                     | `anyone`                      | `isAdminOrEditor`                                       | `isAdmin`         | `src/modules/directory/cms/teamMembers.ts`                    |
-| `categories`       | Nested categories for posts             | No                                     | `anyone`                      | `isAdminOrEditor`                                       | `isAdmin`         | `src/modules/news/cms/categories.ts`                          |
-| `media`            | Uploaded images and files               | No                                     | `anyone`                      | `isAdminOrEditor`                                       | `isAdmin`         | `src/platform/payload/media.ts`                               |
-| `users`            | Login accounts with roles               | No                                     | `isAdminOrSelf`               | create `isAdmin`; update `isAdminOrSelf`                | `isAdmin`         | `src/modules/accounts/cms/users.ts`                           |
-| `forms`            | Form definitions built in admin         | No                                     | `anyone`                      | `isAdminOrEditor`                                       | `isAdmin`         | plugin form-builder, `src/modules/contact/cms/formBuilder.ts` |
-| `form-submissions` | Data visitors submit through forms      | No                                     | `isAdmin`                     | create `() => true` (inline); update `isAdmin`          | `isAdmin`         | plugin form-builder, `src/modules/contact/cms/formBuilder.ts` |
-| `redirects`        | Old URL to new URL mappings             | No                                     | `isAdmin`                     | `isAdmin`                                               | `isAdmin`         | plugin redirects, `src/payload.config.ts`                     |
-| `search`           | Search index of posts and events        | No                                     | `() => true` (plugin default) | create `() => false` (plugin); update `isAdminOrEditor` | `isAdminOrEditor` | plugin search, `src/modules/news/cms/search.ts`               |
+| Slug                  | Purpose                                                 | Drafts?                                | Read                          | Create/Update                                           | Delete            | Config file                                                   |
+| --------------------- | ------------------------------------------------------- | -------------------------------------- | ----------------------------- | ------------------------------------------------------- | ----------------- | ------------------------------------------------------------- |
+| `pages`               | Pages built from hero and blocks                        | Yes (autosave, scheduled, 50 versions) | `authenticatedOrPublished`    | `isAdminOrEditor`                                       | `isAdmin`         | `src/modules/site/cms/pages.ts`                               |
+| `posts`               | News articles with rich text                            | Yes (autosave, scheduled, 50 versions) | `authenticatedOrPublished`    | `isAdminOrEditor`                                       | `isAdmin`         | `src/modules/news/cms/posts.ts`                               |
+| `events`              | Neighborhood events with date and place                 | Yes (autosave, scheduled, 25 versions) | `authenticatedOrPublished`    | `isAdminOrEditor`                                       | `isAdmin`         | `src/modules/events/cms/events.ts`                            |
+| `faq`                 | Questions and answers by category                       | Yes (plain)                            | `authenticatedOrPublished`    | `isAdminOrEditor`                                       | `isAdmin`         | `src/modules/directory/cms/faq.ts`                            |
+| `resources`           | Local links and contacts by category                    | Yes (plain)                            | `authenticatedOrPublished`    | `isAdminOrEditor`                                       | `isAdmin`         | `src/modules/directory/cms/resources.ts`                      |
+| `team-members`        | Board members and AI agents                             | No                                     | `anyone`                      | `isAdminOrEditor`                                       | `isAdmin`         | `src/modules/directory/cms/teamMembers.ts`                    |
+| `categories`          | Nested categories for posts                             | No                                     | `anyone`                      | `isAdminOrEditor`                                       | `isAdmin`         | `src/modules/news/cms/categories.ts`                          |
+| `media`               | Uploaded images and files                               | No                                     | `anyone`                      | `isAdminOrEditor`                                       | `isAdmin`         | `src/platform/payload/media.ts`                               |
+| `users`               | Login accounts with roles                               | No                                     | `isAdminOrSelf`               | create `isAdmin`; update `isAdminOrSelf`                | `isAdmin`         | `src/modules/accounts/cms/users.ts`                           |
+| `email-confirmations` | Typed addresses and whether they were confirmed by link | No                                     | `isAdmin`                     | `isAdmin`                                               | `isAdmin`         | `src/modules/verification/cms/emailConfirmations.ts`          |
+| `forms`               | Form definitions built in admin                         | No                                     | `anyone`                      | `isAdminOrEditor`                                       | `isAdmin`         | plugin form-builder, `src/modules/contact/cms/formBuilder.ts` |
+| `form-submissions`    | Data visitors submit through forms                      | No                                     | `isAdmin`                     | create `() => true` (inline); update `isAdmin`          | `isAdmin`         | plugin form-builder, `src/modules/contact/cms/formBuilder.ts` |
+| `redirects`           | Old URL to new URL mappings                             | No                                     | `isAdmin`                     | `isAdmin`                                               | `isAdmin`         | plugin redirects, `src/payload.config.ts`                     |
+| `search`              | Search index of posts and events                        | No                                     | `() => true` (plugin default) | create `() => false` (plugin); update `isAdminOrEditor` | `isAdminOrEditor` | plugin search, `src/modules/news/cms/search.ts`               |
 
 What the access functions mean (`src/platform/payload/`):
 
@@ -107,6 +108,28 @@ Also present, added by Payload or its plugins rather than defined here: `payload
 | `name`      | text                                                                                                                                                       | No         |                                                                                                             |
 | `role`      | select                                                                                                                                                     | Yes        | `admin`, `editor`, `resident`; default `resident`; sidebar                                                  |
 | auth fields | `email`, `password`, `hash`, `salt`, `resetPasswordToken`, `resetPasswordExpiration`, `resetPasswordRequestedAt`, `loginAttempts`, `lockUntil`, `sessions` | email: Yes | From `auth: true`. `timestamps: true`. No OAuth fields: `payload-oauth2` is not in `package.json` or `src/` |
+
+### email-confirmations
+
+One record per address (#183). The server writes it through the Local API with access bypassed;
+only admins can see it.
+
+| Field                          | Type         | Required | Notes                                                                                       |
+| ------------------------------ | ------------ | -------- | ------------------------------------------------------------------------------------------- |
+| `email`                        | email        | Yes      | Unique, indexed, stored trimmed and lowercase                                               |
+| `confirmedAt`                  | date         | No       | When the link was clicked; empty while unconfirmed                                          |
+| `welcomeSentAt`                | date         | No       | When the welcome email went out (once)                                                      |
+| `lastSentAt`                   | date         | No       | When the latest link was sent                                                               |
+| `tokenHash`                    | text         | No       | SHA-256 of the latest link's token, hidden from every API; the token itself is never stored |
+| `tokenExpiresAt`               | date         | No       | 24 hours after the link was sent                                                            |
+| `sendCount`, `sendWindowStart` | number, date | No       | Hidden: links sent to this address in the current 24-hour window                            |
+
+What is kept: an unconfirmed record is deleted 7 days after its last link (whenever a link is
+requested, until scheduled jobs run, #141). How long a confirmed record is kept is **not decided
+yet: it waits for the owner (#183)**. The proposal is to keep the address and the dates above
+until the person asks for removal through the contact form, and an admin then deletes it in
+Admin. The site's privacy text should say the same once he decides. Until then nothing deletes
+confirmed records.
 
 ### faq
 
