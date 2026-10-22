@@ -19,7 +19,7 @@ import { toCurrentUser } from './mappers'
 const USERS = 'users'
 
 /** The Payload user this request's auth cookie belongs to, or null (Payload's own check). */
-async function findSessionUser(): Promise<TypedUser | null> {
+async function getSessionPayloadUser(): Promise<TypedUser | null> {
   const payload = await getPayload({ config: configPromise })
   const { user } = await payload.auth({ headers: await headers() })
   return user
@@ -27,7 +27,7 @@ async function findSessionUser(): Promise<TypedUser | null> {
 
 /** Who is signed in for this request, or null. */
 export async function getSessionUser(): Promise<CurrentUser | null> {
-  const user = await findSessionUser()
+  const user = await getSessionPayloadUser()
   return user ? toCurrentUser(user) : null
 }
 
@@ -41,7 +41,12 @@ export async function getSessionUser(): Promise<CurrentUser | null> {
  */
 export async function startSession({ email, password }: SignInValues): Promise<void> {
   const payload = await getPayload({ config: configPromise })
-  const { token } = await payload.login({ collection: USERS, data: { email, password } })
+  const { token } = await payload.login({
+    collection: USERS,
+    data: { email, password },
+    // As `POST /api/users/login` runs it: the returned user is read with access rules applied
+    overrideAccess: false,
+  })
   if (!token) throw new Error('Payload signed in without a token')
   const cookie = generatePayloadCookie({
     collectionAuthConfig: payload.collections[USERS].config.auth,
@@ -55,22 +60,26 @@ export async function startSession({ email, password }: SignInValues): Promise<v
 
 /**
  * Ends this request's session the way `POST /api/users/logout` does: Payload forgets the session,
- * then the auth cookie is replaced with Payload's expired one.
+ * then the auth cookie is replaced with Payload's expired one. The cookie is cleared even when
+ * Payload fails to forget the session, so signing out always signs this browser out.
  */
 export async function endSession(): Promise<void> {
   const payload = await getPayload({ config: configPromise })
   const users = payload.collections[USERS]
-  const user = await findSessionUser()
-  if (user) {
-    await logoutOperation({ collection: users, req: await createLocalReq({ user }, payload) })
+  try {
+    const user = await getSessionPayloadUser()
+    if (user) {
+      await logoutOperation({ collection: users, req: await createLocalReq({ user }, payload) })
+    }
+  } finally {
+    const expired = generateExpiredPayloadCookie({
+      collectionAuthConfig: users.config.auth,
+      cookiePrefix: payload.config.cookiePrefix,
+      returnCookieAsObject: true,
+    })
+    const cookieStore = await cookies()
+    cookieStore.set(toResponseCookie(expired))
   }
-  const expired = generateExpiredPayloadCookie({
-    collectionAuthConfig: users.config.auth,
-    cookiePrefix: payload.config.cookiePrefix,
-    returnCookieAsObject: true,
-  })
-  const cookieStore = await cookies()
-  cookieStore.set(toResponseCookie(expired))
 }
 
 /**
@@ -79,7 +88,7 @@ export async function endSession(): Promise<void> {
  * signed in; throws Payload's error when it refuses.
  */
 export async function setOwnPassword(password: string): Promise<boolean> {
-  const user = await findSessionUser()
+  const user = await getSessionPayloadUser()
   if (!user) return false
   const payload = await getPayload({ config: configPromise })
   await payload.update({

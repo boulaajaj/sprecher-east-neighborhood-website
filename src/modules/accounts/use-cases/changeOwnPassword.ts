@@ -3,6 +3,7 @@ import 'server-only'
 import { toPasswordFailure } from '../data/failures'
 import { setOwnPassword } from '../data/session'
 import type { ActionResult, PasswordFailure } from '../domain/types'
+import { logServerFailure } from './logServerFailure'
 
 /**
  * Sets a new password on the signed-in account. Who that is comes from the session, checked
@@ -16,7 +17,7 @@ export async function changeOwnPassword(
     return changed ? { ok: true } : { ok: false, failure: 'signed-out' }
   } catch (error) {
     const failure = toPasswordFailure(error)
-    if (failure === 'server-error') console.error('Password change failed on the server:', error)
+    if (failure === 'server-error') logServerFailure('Password change', error)
     return { ok: false, failure }
   }
 }

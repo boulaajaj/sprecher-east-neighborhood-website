@@ -55,7 +55,17 @@ describe('signIn', () => {
     expect(edges.login).toHaveBeenCalledWith({
       collection: 'users',
       data: { email: 'Ada@example.com', password: typed },
+      overrideAccess: false,
     })
+  })
+
+  it('treats a sign-in that returns no token as a failure on our side, and sets no cookie', async () => {
+    edges.login.mockResolvedValue({ user: resident })
+    expect(await signIn({ email: 'ada@example.com', password })).toEqual({
+      ok: false,
+      failure: 'server-error',
+    })
+    expect(edges.setCookie).not.toHaveBeenCalled()
   })
 
   it('sets Payload’s auth cookie: httpOnly, Lax, for the whole site, for the token’s lifetime', async () => {
@@ -98,7 +108,9 @@ describe('signIn', () => {
       ok: false,
       failure: 'server-error',
     })
+    // Only the error's name: a database error would carry the email in its message
     expect(console.error).toHaveBeenCalledTimes(1)
+    expect(console.error).toHaveBeenCalledWith('Sign-in failed on the server (APIError)')
   })
 })
 
@@ -184,6 +196,13 @@ describe('signOut', () => {
     edges.auth.mockResolvedValue({ user: null })
     await signOut()
     expect(edges.logoutOperation).not.toHaveBeenCalled()
+    expectExpiredCookie()
+  })
+
+  it('still expires the cookie when Payload fails to forget the session', async () => {
+    edges.auth.mockResolvedValue({ user: resident })
+    edges.logoutOperation.mockRejectedValue(new Error('Database down'))
+    await expect(signOut()).rejects.toThrow('Database down')
     expectExpiredCookie()
   })
 })

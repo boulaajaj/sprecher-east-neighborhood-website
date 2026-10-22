@@ -4,10 +4,15 @@ import { z } from 'zod'
 // because anyone can call an action directly (https://nextjs.org/docs/app/guides/data-security).
 
 export const MIN_PASSWORD_LENGTH = 8
+/** Far above any real password; bounds the work an anonymous caller can ask of the hashing */
+export const MAX_PASSWORD_LENGTH = 1024
+/** The longest an email address can be (RFC 5321: 64 + 1 + 255), with room to spare */
+export const MAX_EMAIL_LENGTH = 320
 
-export const signInSchema = z.object({
-  email: z.string().trim().min(1, 'Enter your email address'),
-  password: z.string().min(1, 'Enter your password'),
+/** Strict like every action schema: a field the form doesn't have is refused, not ignored. */
+export const signInSchema = z.strictObject({
+  email: z.string().trim().min(1, 'Enter your email address').max(MAX_EMAIL_LENGTH),
+  password: z.string().min(1, 'Enter your password').max(MAX_PASSWORD_LENGTH),
 })
 
 export type SignInValues = z.output<typeof signInSchema>
@@ -20,8 +25,9 @@ export const passwordChangeSchema = z
   .strictObject({
     newPassword: z
       .string()
-      .min(MIN_PASSWORD_LENGTH, `Use at least ${MIN_PASSWORD_LENGTH} characters`),
-    confirmPassword: z.string().min(1, 'Type the new password again'),
+      .min(MIN_PASSWORD_LENGTH, `Use at least ${MIN_PASSWORD_LENGTH} characters`)
+      .max(MAX_PASSWORD_LENGTH, `Use at most ${MAX_PASSWORD_LENGTH} characters`),
+    confirmPassword: z.string().min(1, 'Type the new password again').max(MAX_PASSWORD_LENGTH),
   })
   .refine((values) => values.newPassword === values.confirmPassword, {
     message: 'The passwords don’t match',

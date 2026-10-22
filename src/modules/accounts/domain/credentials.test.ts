@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { MIN_PASSWORD_LENGTH, passwordChangeSchema, signInSchema } from './credentials'
+import {
+  MAX_EMAIL_LENGTH,
+  MAX_PASSWORD_LENGTH,
+  MIN_PASSWORD_LENGTH,
+  passwordChangeSchema,
+  signInSchema,
+} from './credentials'
 
 describe('signInSchema', () => {
   it('accepts an email and a password, and trims the email', () => {
@@ -17,9 +23,22 @@ describe('signInSchema', () => {
     expect(signInSchema.safeParse(null).success).toBe(false)
   })
 
-  it('passes on only the email and the password', () => {
-    const parsed = signInSchema.parse({ email: 'a@example.com', password: 'x', role: 'admin' })
-    expect(Object.keys(parsed).sort()).toEqual(['email', 'password'])
+  it('refuses any other field', () => {
+    const extra = { email: 'a@example.com', password: 'x', role: 'admin' }
+    expect(signInSchema.safeParse(extra).success).toBe(false)
+  })
+
+  it('refuses an email or a password longer than any real one', () => {
+    const email = (length: number) => `${'a'.repeat(length - 12)}@example.com`
+    expect(signInSchema.safeParse({ email: email(MAX_EMAIL_LENGTH), password: 'x' }).success).toBe(
+      true,
+    )
+    expect(
+      signInSchema.safeParse({ email: email(MAX_EMAIL_LENGTH + 1), password: 'x' }).success,
+    ).toBe(false)
+    const password = (length: number) => ({ email: 'a@example.com', password: 'p'.repeat(length) })
+    expect(signInSchema.safeParse(password(MAX_PASSWORD_LENGTH)).success).toBe(true)
+    expect(signInSchema.safeParse(password(MAX_PASSWORD_LENGTH + 1)).success).toBe(false)
   })
 })
 
@@ -45,6 +64,18 @@ describe('passwordChangeSchema', () => {
     })
     expect(result.success).toBe(false)
     expect(result.error?.issues[0]?.path).toEqual(['confirmPassword'])
+  })
+
+  it('refuses a new password longer than any real one', () => {
+    const at = (length: number) => {
+      const password = 'p'.repeat(length)
+      return passwordChangeSchema.safeParse({ newPassword: password, confirmPassword: password })
+    }
+    expect(MAX_PASSWORD_LENGTH).toBe(1024)
+    expect(at(MAX_PASSWORD_LENGTH).success).toBe(true)
+    const tooLong = at(MAX_PASSWORD_LENGTH + 1)
+    expect(tooLong.success).toBe(false)
+    expect(tooLong.error?.issues.map((issue) => issue.path[0])).toContain('newPassword')
   })
 
   it('refuses any other field, so nobody can name another account', () => {
