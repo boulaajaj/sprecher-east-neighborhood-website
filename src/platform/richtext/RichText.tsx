@@ -48,7 +48,11 @@ const NO_BLOCKS = withBlocks({})
 
 type Props = {
   data: RichTextValue
-  /** Renderers for the blocks this field may hold; a block with none renders nothing */
+  /**
+   * Renderers for the blocks this field may hold. Pass them for any field whose editor has a
+   * blocks feature: Payload draws a block with no renderer as "unknown node". Today only a post's
+   * content has one (`payload.config.test.ts` checks every rich-text field).
+   */
   blocks?: RichTextBlocks
   enableGutter?: boolean
   enableProse?: boolean
