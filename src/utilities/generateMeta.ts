@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import type { Media, Page, Post, Event, Config } from '../payload-types'
+import type { Media, Page, Post, Event, Config } from '@/payload-types'
 
 import { mergeOpenGraph } from './mergeOpenGraph'
 import { toAbsoluteURL } from './getURL'
@@ -24,8 +24,7 @@ export const generateMeta = async (args: { doc: DocWithMeta | null }): Promise<M
 
   const meta = doc?.meta
 
-  // meta.image is added by the SEO plugin but missing from Payload's generated types
-  const ogImage = getImageURL((meta as Record<string, unknown> | undefined)?.image as Media | null)
+  const ogImage = getImageURL(meta?.image)
 
   const title = meta?.title || 'Sprecher East'
 

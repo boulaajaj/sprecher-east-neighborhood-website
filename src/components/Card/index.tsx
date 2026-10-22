@@ -22,11 +22,9 @@ export const Card: React.FC<{
   const { className, doc, relationTo, showCategories, title: titleFromProps } = props
 
   const { slug, categories, meta, publishedAt, title } = doc || {}
-  const { description } = meta || {}
-  // meta.image is added by the SEO plugin but missing from Payload's generated types
-  const metaImage = (meta as Record<string, unknown> | undefined)?.image as
-    | Post['heroImage']
-    | undefined
+  const { description, image } = meta || {}
+  // An unpopulated image is just an ID: show the placeholder rather than a broken image
+  const metaImage = image && typeof image === 'object' ? image : null
 
   const renderableCategories =
     showCategories && Array.isArray(categories)
@@ -59,7 +57,7 @@ export const Card: React.FC<{
             </div>
           </div>
         )}
-        {metaImage && typeof metaImage !== 'string' && (
+        {metaImage && (
           <div className="aspect-video overflow-hidden">
             <Media
               resource={metaImage}

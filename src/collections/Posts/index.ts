@@ -26,9 +26,7 @@ import {
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from 'payload'
 
-// SEO plugin adds meta fields at runtime that aren't in Payload's generated Select types,
-// so we use ungeneric CollectionConfig to avoid false type errors on defaultPopulate.meta.image.
-export const Posts: CollectionConfig = {
+export const Posts: CollectionConfig<'posts'> = {
   slug: 'posts',
   defaultSort: '-publishedAt',
   access: draftContentAccess,

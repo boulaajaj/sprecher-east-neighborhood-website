@@ -71,8 +71,10 @@ export const plugins: Plugin[] = [
     collections: ['categories'],
     generateURL: (docs) => docs.reduce((url, doc) => `${url}/${doc.slug}`, ''),
   }),
+  // No `collections`: Pages, Posts and Events build their own SEO tab (with an image) from the
+  // plugin's fields. Listing them here added a second `meta` group without one, which reads
+  // returned, so no share image or card thumbnail ever showed (#196).
   seoPlugin({
-    collections: ['pages', 'posts', 'events'],
     generateTitle,
     generateURL,
   }),
