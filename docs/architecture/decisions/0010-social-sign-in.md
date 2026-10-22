@@ -15,7 +15,7 @@ What must not change: the `users` collection (`auth: true`, roles `admin`, `edit
 the `/admin` sign-in, the email and password sign-in in `src/modules/accounts/`, which uses
 Payload's `login` and Payload's own cookie (`session.ts`), and the fixes on top of it: the Secure
 cookie (#234), admin-only unlock (#140) and the current-password check (#233). A new account
-gets `resident` only ([0007](0007-email-confirmation.md), in #186). Payload 3.91 has no official
+gets `resident` only (decision record 0007, in PR #186, and #187). Payload 3.91 has no official
 social sign-in: it ships cookie, JWT and API-key strategies plus custom `strategies` (Payload docs,
 authentication overview).
 
