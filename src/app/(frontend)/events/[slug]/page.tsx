@@ -8,8 +8,15 @@ import { JsonLd } from '@/components/JsonLd'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import RichText from '@/components/RichText'
 import { SidebarCTA } from '@/components/SidebarCTA'
-import { EventHero, EventLocation, SidebarEvents, eventJsonLd } from '@/modules/events'
-import { getEvent, listEventSlugs, listUpcomingEvents } from '@/modules/events/server'
+import {
+  EventHero,
+  EventLocation,
+  SidebarEvents,
+  eventJsonLd,
+  findUpcomingEvents,
+  getEventBySlug,
+  listEventSlugs,
+} from '@/modules/events/server'
 import { Button } from '@/platform/ui'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
@@ -32,11 +39,11 @@ export default async function EventPage({ params: paramsPromise }: Args) {
   const { slug = '' } = await paramsPromise
   const decodedSlug = decodeURIComponent(slug)
   const url = '/events/' + decodedSlug
-  const event = await getEvent(decodedSlug)
+  const event = await getEventBySlug(decodedSlug)
 
   if (!event) return <PayloadRedirects url={url} />
 
-  const upcomingEvents = await listUpcomingEvents({ excludeId: event.id })
+  const upcomingEvents = await findUpcomingEvents({ excludeId: event.id })
   const hasHeroImage = event.image !== null
 
   return (
@@ -99,7 +106,7 @@ export default async function EventPage({ params: paramsPromise }: Args) {
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { slug = '' } = await paramsPromise
-  const event = await getEvent(decodeURIComponent(slug))
+  const event = await getEventBySlug(decodeURIComponent(slug))
 
   const meta = await generateMeta({ doc: event && { slug: event.slug, meta: event.meta } })
   if (!event) return meta

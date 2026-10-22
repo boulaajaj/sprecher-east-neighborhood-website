@@ -3,11 +3,11 @@ import 'server-only'
 import type { FeedPage } from '@/platform/lib'
 import { startOfToday } from '@/utilities/timezone'
 
+import type { EventScope } from '../domain/scope'
 import type { EventSummary } from '../domain/types'
-import type { EventScope } from '../domain/upcoming'
-import { findEventPage } from '../data/queries'
+import * as queries from '../data/queries'
 
 /** One page of the upcoming or past listing, as of today in the site timezone. */
-export function listEventPage(scope: EventScope, page: number): Promise<FeedPage<EventSummary>> {
-  return findEventPage(scope, page, startOfToday())
+export function findEventPage(scope: EventScope, page: number): Promise<FeedPage<EventSummary>> {
+  return queries.findEventPage(scope, page, startOfToday())
 }

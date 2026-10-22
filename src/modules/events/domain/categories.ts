@@ -12,6 +12,6 @@ export const EVENT_CATEGORIES = [
 export type EventCategory = (typeof EVENT_CATEGORIES)[number]['value']
 
 /** The label shown for a category, for example "Sports & Recreation" for `sports`. */
-export function eventCategoryLabel(category: EventCategory): string {
+export function formatEventCategory(category: EventCategory): string {
   return EVENT_CATEGORIES.find(({ value }) => value === category)?.label ?? category
 }

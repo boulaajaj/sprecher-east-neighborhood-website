@@ -1,28 +1,18 @@
 import 'server-only'
 
 import configPromise from '@payload-config'
-import { getPayload, type Where } from 'payload'
+import { getPayload } from 'payload'
 
 import type { FeedPage } from '@/platform/lib'
+import { PUBLISHED } from '@/platform/payload/published'
 
-import type { EventDetail, EventSlug, EventSummary } from '../domain/types'
-import type { EventScope } from '../domain/upcoming'
+import type { EventScope } from '../domain/scope'
+import type { EventDetail, EventSitemapEntry, EventSummary } from '../domain/types'
 import { SUMMARY_FIELDS, toEventDetail, toEventSummary } from './mappers'
+import { inScope } from './scope'
 
-/** Events per page of each listing. */
-const PAGE_SIZE: Record<EventScope, number> = { upcoming: 12, past: 9 }
-
-// Always filter on _status explicitly. `overrideAccess: false` without a user already
-// limits results to published documents, but this keeps drafts out even if a caller
-// later passes a signed-in admin or editor (who can read drafts via the access rule).
-const published: Where = { _status: { equals: 'published' } }
-
-/** `isUpcoming` as a query: upcoming is on or after today, past is before it. */
-function inScope(scope: EventScope, today: string): Where {
-  return scope === 'upcoming'
-    ? { date: { greater_than_equal: today } }
-    : { date: { less_than: today } }
-}
+const UPCOMING_EVENTS_PAGE_SIZE = 12
+const PAST_EVENTS_PAGE_SIZE = 9
 
 /**
  * One page of published upcoming events (soonest first) or past events (most recent first).
@@ -34,7 +24,7 @@ export async function findEventPage(
   today: string,
 ): Promise<FeedPage<EventSummary>> {
   const payload = await getPayload({ config: configPromise })
-  const limit = PAGE_SIZE[scope]
+  const limit = scope === 'upcoming' ? UPCOMING_EVENTS_PAGE_SIZE : PAST_EVENTS_PAGE_SIZE
 
   const result = await payload.find({
     collection: 'events',
@@ -43,7 +33,7 @@ export async function findEventPage(
     page,
     sort: scope === 'upcoming' ? 'date' : '-date',
     overrideAccess: false,
-    where: { and: [published, inScope(scope, today)] },
+    where: { and: [PUBLISHED, inScope(scope, today)] },
     select: SUMMARY_FIELDS,
   })
 
@@ -76,7 +66,7 @@ export async function findUpcomingEvents({
     overrideAccess: false,
     where: {
       and: [
-        published,
+        PUBLISHED,
         inScope('upcoming', today),
         ...(excludeId === undefined ? [] : [{ id: { not_equals: excludeId } }]),
       ],
@@ -111,7 +101,7 @@ export async function getEventBySlug(
 }
 
 /** Every published event's slug and last edit. */
-export async function findEventSlugs(): Promise<EventSlug[]> {
+export async function listEventSlugs(): Promise<EventSitemapEntry[]> {
   const payload = await getPayload({ config: configPromise })
 
   const result = await payload.find({
@@ -121,7 +111,7 @@ export async function findEventSlugs(): Promise<EventSlug[]> {
     limit: 1000,
     pagination: false,
     overrideAccess: false,
-    where: published,
+    where: PUBLISHED,
     select: { slug: true, updatedAt: true },
   })
 

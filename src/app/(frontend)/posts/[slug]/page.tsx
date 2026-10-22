@@ -3,8 +3,7 @@ import type { Metadata } from 'next'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { SidebarPosts } from '@/components/SidebarPosts'
 import { SidebarCTA } from '@/components/SidebarCTA'
-import { SidebarEvents } from '@/modules/events'
-import { listUpcomingEvents } from '@/modules/events/server'
+import { findUpcomingEvents, SidebarEvents } from '@/modules/events/server'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
@@ -63,7 +62,7 @@ export default async function Post({ params: paramsPromise }: Args) {
   const recentPosts = await queryRecentPosts({
     excludeIds: [post.id, ...relatedPostIds],
   })
-  const upcomingEvents = await listUpcomingEvents()
+  const upcomingEvents = await findUpcomingEvents()
 
   return (
     <article className="pt-16 pb-16">

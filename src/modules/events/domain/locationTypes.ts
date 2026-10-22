@@ -8,6 +8,6 @@ export const EVENT_LOCATION_TYPES = [
 export type EventLocationType = (typeof EVENT_LOCATION_TYPES)[number]['value']
 
 /** The label shown for a location type, for example "In Person" for `in-person`. */
-export function eventLocationTypeLabel(locationType: EventLocationType): string {
+export function formatEventLocationType(locationType: EventLocationType): string {
   return EVENT_LOCATION_TYPES.find(({ value }) => value === locationType)?.label ?? locationType
 }

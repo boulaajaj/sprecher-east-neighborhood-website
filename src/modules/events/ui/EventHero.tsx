@@ -1,12 +1,12 @@
 import React from 'react'
 
 import { Media } from '@/components/Media'
-import { categoryPillClassName } from '@/utilities/ui'
+import { categoryPillClassName, cn } from '@/utilities/ui'
 import { formatDateTime, toDateTimeAttr } from '@/utilities/formatDateTime'
 import { siteTimeZoneLabel } from '@/utilities/timezone'
 
-import { eventCategoryLabel } from '../domain/categories'
-import { eventLocationTypeLabel } from '../domain/locationTypes'
+import { formatEventCategory } from '../domain/categories'
+import { formatEventLocationType } from '../domain/locationTypes'
 import type { EventDetail } from '../domain/types'
 
 export const EventHero: React.FC<{
@@ -14,7 +14,7 @@ export const EventHero: React.FC<{
 }> = ({ event }) => {
   const { category, date, image, locationType, timeEnd, timeStart, title } = event
 
-  const locationTypeLabel = locationType ? eventLocationTypeLabel(locationType) : null
+  const locationTypeLabel = locationType ? formatEventLocationType(locationType) : null
 
   if (image) {
     // Full-bleed hero with image, dark overlay, white text
@@ -24,7 +24,7 @@ export const EventHero: React.FC<{
           <div className="col-span-1 col-start-1 md:col-span-2 md:col-start-2">
             {category && (
               <div className="mb-4 text-sm tracking-widest uppercase opacity-90">
-                {eventCategoryLabel(category)}
+                {formatEventCategory(category)}
               </div>
             )}
 
@@ -69,7 +69,7 @@ export const EventHero: React.FC<{
     <div className="container pt-32 pb-10">
       <div className="max-w-3xl">
         {category && (
-          <span className={`mb-4 ${categoryPillClassName}`}>{eventCategoryLabel(category)}</span>
+          <span className={cn('mb-4', categoryPillClassName)}>{formatEventCategory(category)}</span>
         )}
 
         <h1 className="mb-6 text-4xl font-bold md:text-5xl">{title}</h1>

@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation'
 import React from 'react'
 
 import { isEventScope } from '@/modules/events'
-import { EventsFeed, listEventPage } from '@/modules/events/server'
+import { EventsFeed, findEventPage } from '@/modules/events/server'
 import { parsePageNumber } from '@/platform/lib'
 import { Link } from '@/platform/ui'
 
@@ -31,7 +31,7 @@ export default async function EventsListPage({ params: paramsPromise }: Args) {
   const page = parsePageNumber(pageParam)
   if (!isEventScope(scope) || page === null) notFound()
 
-  const events = await listEventPage(scope, page)
+  const events = await findEventPage(scope, page)
   if (page > 1 && page > events.totalPages) notFound()
 
   return (

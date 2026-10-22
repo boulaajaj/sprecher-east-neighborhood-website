@@ -97,7 +97,7 @@ src/
 | `src/app/(frontend)/globals.css`   | Tailwind v4 `@theme` block — all design tokens    |
 | `src/collections/Pages/index.ts`   | Pages collection with layout builder blocks       |
 | `src/collections/Posts/index.ts`   | Blog posts collection                             |
-| `src/modules/events/cms/Events.ts` | Events collection (custom)                        |
+| `src/modules/events/cms/events.ts` | Events collection (custom)                        |
 | `src/collections/Users/index.ts`   | Users collection with Payload native auth         |
 | `src/collections/Media.ts`         | Media uploads with size variants                  |
 | `src/blocks/`                      | Layout builder block configs + React components   |

@@ -6,7 +6,7 @@ import { Media } from '@/components/Media'
 import { categoryPillClassName, cn } from '@/utilities/ui'
 import { formatDateShort, formatDateBadge, toDateTimeAttr } from '@/utilities/formatDateTime'
 
-import { eventCategoryLabel } from '../domain/categories'
+import { formatEventCategory } from '../domain/categories'
 import type { EventSummary } from '../domain/types'
 
 /**
@@ -127,7 +127,7 @@ export const EventCard: React.FC<{
 
         {category && (
           <span className={cn(categoryPillClassName, 'mt-auto self-start')}>
-            {eventCategoryLabel(category)}
+            {formatEventCategory(category)}
           </span>
         )}
       </div>

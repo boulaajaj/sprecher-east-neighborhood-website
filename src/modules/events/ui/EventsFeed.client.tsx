@@ -8,7 +8,7 @@ import { cn } from '@/utilities/ui'
 
 import { loadEventsPage } from '../actions'
 import type { EventSummary } from '../domain/types'
-import type { EventScope } from '../domain/upcoming'
+import type { EventScope } from '../domain/scope'
 import { EventCard } from './EventCard'
 
 /** Upcoming or past events grid that loads more events as the reader scrolls. */

@@ -1,9 +1,13 @@
-// Server-only entry: the use cases pages call, and the components that use actions.ts.
+// Server-only entry: the use cases pages call, and the components pages render.
 import 'server-only'
 
-export { getEvent } from './use-cases/getEvent'
-export { listEventPage } from './use-cases/listEventPage'
+export { findEventPage } from './use-cases/findEventPage'
+export { findUpcomingEvents } from './use-cases/findUpcomingEvents'
+export { getEventBySlug } from './use-cases/getEventBySlug'
 export { listEventSlugs } from './use-cases/listEventSlugs'
-export { listUpcomingEvents } from './use-cases/listUpcomingEvents'
 
+export { EventHero } from './ui/EventHero'
+export { eventJsonLd } from './ui/eventJsonLd'
+export { EventLocation } from './ui/EventLocation'
 export { EventsFeed } from './ui/EventsFeed.client'
+export { SidebarEvents } from './ui/SidebarEvents'

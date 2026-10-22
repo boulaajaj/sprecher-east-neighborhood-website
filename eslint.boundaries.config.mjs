@@ -63,8 +63,8 @@ const LAYER_LIMITS = [
   ],
   [
     'index.ts',
-    ['{use-cases,data,cms}/**', '{server,actions,cms}.ts'],
-    'index.ts stays client-safe: domain/ and ui/ only',
+    ['{use-cases,data,cms,ui}/**', '{server,actions,cms}.ts'],
+    'index.ts holds types and pure rules: domain/ only',
   ],
   [
     'server.ts',

@@ -35,7 +35,7 @@ export type EventDetail = EventSummary & {
 }
 
 /** A published event's address and last edit, for static pages and the sitemap. */
-export type EventSlug = {
+export type EventSitemapEntry = {
   slug: string
   updatedAt: string
 }

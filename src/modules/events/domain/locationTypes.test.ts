@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { EVENT_LOCATION_TYPES, eventLocationTypeLabel } from './locationTypes'
+import { EVENT_LOCATION_TYPES, formatEventLocationType } from './locationTypes'
 
 describe('EVENT_LOCATION_TYPES', () => {
   it('lists in person, virtual and hybrid', () => {
@@ -12,10 +12,10 @@ describe('EVENT_LOCATION_TYPES', () => {
   })
 })
 
-describe('eventLocationTypeLabel', () => {
+describe('formatEventLocationType', () => {
   it('names the format the way the site shows it', () => {
-    expect(eventLocationTypeLabel('in-person')).toBe('In Person')
-    expect(eventLocationTypeLabel('virtual')).toBe('Virtual')
-    expect(eventLocationTypeLabel('hybrid')).toBe('Hybrid')
+    expect(formatEventLocationType('in-person')).toBe('In Person')
+    expect(formatEventLocationType('virtual')).toBe('Virtual')
+    expect(formatEventLocationType('hybrid')).toBe('Hybrid')
   })
 })

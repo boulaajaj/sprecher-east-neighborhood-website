@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { EVENT_CATEGORIES, eventCategoryLabel } from './categories'
+import { EVENT_CATEGORIES, formatEventCategory } from './categories'
 
 describe('EVENT_CATEGORIES', () => {
   it('lists the categories in the order editors see them', () => {
@@ -21,9 +21,9 @@ describe('EVENT_CATEGORIES', () => {
   })
 })
 
-describe('eventCategoryLabel', () => {
+describe('formatEventCategory', () => {
   it('names a category the way the site shows it', () => {
-    expect(eventCategoryLabel('sports')).toBe('Sports & Recreation')
-    expect(eventCategoryLabel('meeting')).toBe('Meeting')
+    expect(formatEventCategory('sports')).toBe('Sports & Recreation')
+    expect(formatEventCategory('meeting')).toBe('Meeting')
   })
 })

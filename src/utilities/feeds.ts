@@ -1,10 +1,11 @@
 import 'server-only'
 
 import configPromise from '@payload-config'
-import { getPayload, type Where } from 'payload'
+import { getPayload } from 'payload'
 
 import type { CardPostData } from '@/components/Card'
 import type { FeedPage } from '@/platform/lib'
+import { PUBLISHED } from '@/platform/payload/published'
 
 /**
  * Server-side query behind the incrementally loaded /posts listing. The page calls it for the
@@ -16,11 +17,6 @@ export const POSTS_PAGE_SIZE = 12
 
 export type PostFeedItem = CardPostData & { id: number | string }
 
-// Always filter on _status explicitly. `overrideAccess: false` without a user already
-// limits results to published documents, but this keeps drafts out even if a caller
-// later passes a signed-in admin or editor (who can read drafts via the access rule).
-const published: Where = { _status: { equals: 'published' } }
-
 export async function findPublishedPosts(page: number): Promise<FeedPage<PostFeedItem>> {
   const payload = await getPayload({ config: configPromise })
   const result = await payload.find({
@@ -30,7 +26,7 @@ export async function findPublishedPosts(page: number): Promise<FeedPage<PostFee
     page,
     sort: '-publishedAt',
     overrideAccess: false,
-    where: published,
+    where: PUBLISHED,
     select: {
       title: true,
       slug: true,
