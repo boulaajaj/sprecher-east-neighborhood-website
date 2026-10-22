@@ -25,9 +25,9 @@ afterEach(cleanup)
 const barFor = async (user: unknown) => {
   me = user
   const { container } = render(<AdminBar />)
-  const bar = container.querySelector('.admin-bar')
-  await waitFor(() => expect(bar).not.toBeNull())
-  return bar as HTMLElement
+  const bar = container.querySelector<HTMLElement>('.admin-bar')
+  if (!bar) throw new Error('AdminBar did not render its wrapper')
+  return bar
 }
 
 describe('AdminBar', () => {

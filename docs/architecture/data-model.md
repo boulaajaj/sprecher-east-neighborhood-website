@@ -33,7 +33,7 @@ What the access functions mean (`src/access/`):
 - `users` also sets `access.admin: isAdminOrEditorBoolean` (who may open `/admin`: admin and editor).
 - "Payload default" means no access function is set, so Payload uses `Boolean(req.user)`: any logged-in user, including `resident`.
 
-Also present, not configured in this repo: `payload-folders` (from `media.folders: true`, Payload default access: any signed-in user, a gap fixed in #143), `payload-jobs`, `payload-kv`, `payload-locked-documents`, `payload-preferences`, `payload-migrations`. `payload.config.ts` has no `jobs` config or runner, so scheduled publishing may never fire (#141).
+Also present, not configured in this repo: `payload-folders` (from `media.folders: true`, Payload default access: any signed-in user, a gap fixed in #143), `payload-jobs`, `payload-kv`, `payload-locked-documents` (edit locks; staff-only since #147, set on the built config by `src/access/restrictEditLocks.ts`), `payload-preferences`, `payload-migrations`. `payload.config.ts` has no `jobs` config or runner, so scheduled publishing may never fire (#141).
 
 ## Fields by collection
 
