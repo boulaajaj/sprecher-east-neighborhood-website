@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import type { Media, Page, Post, Event, Config } from '@/payload-types'
 
 import { mergeOpenGraph } from './mergeOpenGraph'
-import { toAbsoluteURL } from './getURL'
+import { toAbsoluteURL } from '@/platform/lib/getURL'
 import { documentHref } from '@/platform/payload/documentHref'
 
 const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {

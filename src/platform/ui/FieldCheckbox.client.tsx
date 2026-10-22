@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@/utilities/ui'
+import { cn } from '@/platform/lib/cn'
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox'
 import { Check } from 'lucide-react'
 import type { ComponentProps } from 'react'

@@ -18,7 +18,7 @@ import {
   listEventSlugs,
 } from '@/modules/events/server'
 import { Button } from '@/platform/ui'
-import { generateMeta } from '@/utilities/generateMeta'
+import { generateMeta } from '@/platform/seo/generateMeta'
 import PageClient from './page.client'
 
 export async function generateStaticParams() {

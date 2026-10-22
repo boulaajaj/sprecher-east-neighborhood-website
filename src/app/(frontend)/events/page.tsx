@@ -3,8 +3,8 @@ import type { Metadata } from 'next/types'
 import React from 'react'
 
 import { EventsFeed, findEventPage } from '@/modules/events/server'
-import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
-import { siteTimeZoneLabel } from '@/utilities/timezone'
+import { mergeOpenGraph } from '@/platform/seo/mergeOpenGraph'
+import { siteTimeZoneLabel } from '@/platform/lib/timezone'
 
 export const dynamic = 'force-static'
 export const revalidate = 600

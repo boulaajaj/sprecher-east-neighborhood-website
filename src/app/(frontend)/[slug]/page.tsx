@@ -9,7 +9,7 @@ import { homeStatic } from '@/endpoints/seed/home-static'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RenderHero } from '@/heros/RenderHero'
-import { generateMeta } from '@/utilities/generateMeta'
+import { generateMeta } from '@/platform/seo/generateMeta'
 import { HOME_PAGE_SLUG } from '@/platform/payload/documentHref'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'

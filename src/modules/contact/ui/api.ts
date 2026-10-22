@@ -1,4 +1,4 @@
-import { getClientSideURL } from '@/utilities/getURL'
+import { getClientSideURL } from '@/platform/lib/getURL'
 
 import { HUMAN_CHECK_TOKEN_HEADER } from '../domain/humanVerifier'
 

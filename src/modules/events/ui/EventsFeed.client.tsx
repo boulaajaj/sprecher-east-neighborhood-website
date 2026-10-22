@@ -4,7 +4,7 @@ import React, { useCallback } from 'react'
 
 import { LoadMoreFooter, useLoadMore } from '@/components/LoadMore'
 import type { FeedPage } from '@/platform/lib'
-import { cn } from '@/utilities/ui'
+import { cn } from '@/platform/lib/cn'
 
 import { loadEventsPage } from '../actions'
 import type { EventSummary } from '../domain/types'

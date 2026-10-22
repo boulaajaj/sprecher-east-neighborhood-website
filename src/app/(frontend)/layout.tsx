@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { cn } from '@/utilities/ui'
+import { cn } from '@/platform/lib/cn'
 import { Poppins } from 'next/font/google'
 import React from 'react'
 
@@ -11,13 +11,13 @@ import { Header } from '@/Header/Component'
 import { AccountMenu, AccountProvider } from '@/modules/accounts/server'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { Providers } from '@/providers'
-import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
-import { organizationJsonLd } from '@/utilities/structuredData'
+import { mergeOpenGraph } from '@/platform/seo/mergeOpenGraph'
+import { organizationJsonLd } from '@/platform/seo/organizationJsonLd'
 import { VersionCheck } from '@/components/VersionCheck'
 import { draftMode } from 'next/headers'
 
 import './globals.css'
-import { getServerSideURL } from '@/utilities/getURL'
+import { getServerSideURL } from '@/platform/lib/getURL'
 import { Button } from '@/platform/ui'
 
 const poppins = Poppins({

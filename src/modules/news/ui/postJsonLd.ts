@@ -1,4 +1,4 @@
-import { getServerSideURL } from '@/utilities/getURL'
+import { getServerSideURL } from '@/platform/lib/getURL'
 
 import type { PostDetail } from '../domain/types'
 

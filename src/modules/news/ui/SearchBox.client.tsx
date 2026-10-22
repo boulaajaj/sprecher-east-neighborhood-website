@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 
 import { Field } from '@/platform/ui'
-import { useDebounce } from '@/utilities/useDebounce'
+import { useDebounce } from './useDebounce'
 
 import { toSearchHref } from '../domain/search'
 

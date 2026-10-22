@@ -15,7 +15,7 @@ import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { isAdminBoolean, isAdminOrEditor, isAdminOrEditorBoolean } from '@/platform/payload/roles'
-import { getServerSideURL } from './utilities/getURL'
+import { getServerSideURL } from '@/platform/lib/getURL'
 import { emailAdapterFromEnv } from '@/platform/email/emailAdapter'
 import { restrictEditLocks } from '@/platform/payload/restrictEditLocks'
 

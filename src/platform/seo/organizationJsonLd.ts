@@ -1,4 +1,4 @@
-import { getServerSideURL } from './getURL'
+import { getServerSideURL } from '@/platform/lib/getURL'
 
 type WithContext<T> = T & { '@context': string }
 

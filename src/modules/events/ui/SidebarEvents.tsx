@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 
-import { formatDateBadge } from '@/utilities/formatDateTime'
+import { formatDateBadge } from '@/platform/lib/formatDateTime'
 
 import { formatEventCategory } from '../domain/categories'
 import type { EventSummary } from '../domain/types'

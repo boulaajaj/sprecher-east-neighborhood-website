@@ -89,7 +89,7 @@ src/
   migrations/      Database migrations (generated)
   plugins/         Payload plugin setup (form builder, SEO, search, redirects, nested docs)
   providers/       React context providers (theme, header theme)
-  utilities/       Helpers: dates, URLs, SEO, data access
+  utilities/       getDocument, getGlobals, getRedirects (site data) and splitRichText, until #135 moves them
   payload.config.ts
 ```
 
@@ -175,7 +175,7 @@ System-level env vars (not in .env.local):
 - **Sign-in cookie is Secure in production**: the Users collection sets `auth.cookies.secure` when `NODE_ENV` is `production` (#234), so signing in (site and `/admin`) works over HTTPS only. Over plain http, such as the IP on port 80, the browser drops the cookie. `next dev` on `http://localhost` is unaffected
 - **Live Preview**: Uses `window.postMessage` — component must use `useLivePreview()` hook
 - **Draft Preview**: Requires `PREVIEW_SECRET` env var for signed preview URLs
-- **Timezone**: Configured via `SITE_TIMEZONE` env var (default: `America/Chicago`). Use `startOfToday()` and `SITE_TIMEZONE` from `src/utilities/timezone.ts`. Never hardcode timezone strings or use bare `new Date().setHours(0,0,0,0)`. Day-only dates (midnight UTC) must be formatted with `timeZone: 'UTC'` to avoid off-by-one; `formatDateTime()` handles this automatically.
+- **Timezone**: Configured via `SITE_TIMEZONE` env var (default: `America/Chicago`). Use `startOfToday()` and `SITE_TIMEZONE` from `src/platform/lib/timezone.ts`. Never hardcode timezone strings or use bare `new Date().setHours(0,0,0,0)`. Day-only dates (midnight UTC) must be formatted with `timeZone: 'UTC'` to avoid off-by-one; `formatDateTime()` handles this automatically.
 
 ## Connected Tools
 

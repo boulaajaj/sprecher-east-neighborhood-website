@@ -1,4 +1,4 @@
-import { sitemapResponse } from '@/utilities/sitemapResponse'
+import { sitemapResponse } from '@/platform/seo/sitemapResponse'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { unstable_cache } from 'next/cache'

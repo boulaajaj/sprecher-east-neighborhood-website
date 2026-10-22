@@ -4,7 +4,7 @@ import React from 'react'
 import { JsonLd } from '@/components/JsonLd'
 import { toFaqSections } from '@/modules/directory'
 import { FaqList, faqJsonLd, findFaqEntries } from '@/modules/directory/server'
-import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+import { mergeOpenGraph } from '@/platform/seo/mergeOpenGraph'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
