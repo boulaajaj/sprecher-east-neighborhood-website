@@ -101,8 +101,16 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
             <div className="h-9 w-16 animate-pulse rounded-md bg-border" />
           ) : user ? (
             <>
-              <Link href="/account" variant="nav" size="sm" current={pathname === '/account'}>
-                {user.name || 'Account'}
+              {/* A long name is cut short so the bar never overflows; the full name is the title */}
+              <Link
+                href="/account"
+                variant="nav"
+                size="sm"
+                current={pathname === '/account'}
+                title={user.name || undefined}
+                className="max-w-40"
+              >
+                <span className="truncate">{user.name || 'Account'}</span>
               </Link>
               <Button variant="ghost" size="sm" onClick={logout}>
                 Sign Out

@@ -34,7 +34,7 @@ export async function Footer() {
             <h3 className="mb-5 text-xs font-bold tracking-widest text-muted-foreground uppercase">
               Quick Links
             </h3>
-            <nav className="flex flex-col gap-3">
+            <nav aria-label="Footer" className="flex flex-col gap-3">
               {navItems.map(({ link }, i) => {
                 const resolved = resolveLink(link)
                 if (!resolved) return null

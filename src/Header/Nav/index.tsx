@@ -41,7 +41,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ data, pathname, mobile, on
   const size = mobile ? 'md' : 'sm'
 
   return (
-    <nav className={mobile ? 'flex flex-col gap-1' : 'flex items-center gap-1'}>
+    <nav aria-label="Main" className={mobile ? 'flex flex-col gap-1' : 'flex items-center gap-1'}>
       {links.map((link, i) => (
         <Link
           key={i}

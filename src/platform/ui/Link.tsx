@@ -16,16 +16,18 @@ export const linkVariants = cva(
     variants: {
       variant: {
         // In running text
-        inline: 'font-medium text-primary underline underline-offset-4 hover:text-primary-dark',
+        inline: 'font-medium text-primary underline underline-offset-4 hover:text-primary-strong',
         // Header and menu items
-        nav: 'inline-flex items-center gap-2 rounded-md font-medium text-foreground hover:bg-secondary hover:text-primary aria-[current=page]:text-primary',
+        // Hover and current use primary-strong: plain primary is 4.33:1 on the secondary fill
+        nav: 'inline-flex items-center gap-2 rounded-md font-medium text-foreground hover:bg-secondary hover:text-primary-strong aria-[current=page]:text-primary-strong',
         // Footer and other quiet lists
         muted:
-          'inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary aria-[current=page]:text-primary',
+          'inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary-strong aria-[current=page]:text-primary-strong',
         // A single follow-up next to content: "Visit website", "Back to all events"
-        // 44 px tall: it stands alone, so it's a touch target (WCAG 2.5.8)
+        // 44 px tall: it stands alone, so it's a touch target (WCAG 2.5.8). primary-strong because
+        // it often sits on a surface panel, where plain primary is 4.33:1
         action:
-          'inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 hover:underline',
+          'inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-primary-strong underline-offset-4 hover:underline',
       },
       // For `nav`: `sm` sits in the desktop bar, `md` is a full-width row in the mobile menu
       size: {
@@ -77,7 +79,7 @@ export function Link({
       {...rest}
       {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
       aria-current={current ? 'page' : undefined}
-      className={cn(linkVariants({ variant, size }), iconOnly && 'p-2', className)}
+      className={cn(linkVariants({ variant, size }), iconOnly && 'p-2 [&_svg]:size-5', className)}
     >
       {iconPosition === 'start' && icon}
       {iconOnly ? <span className="sr-only">{children}</span> : children}

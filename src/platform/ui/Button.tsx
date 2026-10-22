@@ -17,14 +17,14 @@ export const buttonVariants = cva(
       variant: {
         primary:
           'bg-primary-fill text-primary-foreground hover:bg-primary-fill-hover focus-visible:outline-ring',
-        // A light hover tint: /10 would take the text under 4.5:1 on the light background
+        // On hover the text turns primary-strong: plain primary on the tint is just under 4.5:1
         secondary:
-          'border border-primary text-primary hover:bg-primary/5 focus-visible:outline-ring',
+          'border border-primary text-primary hover:bg-primary/5 hover:text-primary-strong focus-visible:outline-ring',
         accent: 'bg-accent text-accent-foreground hover:bg-accent-dark focus-visible:outline-ring',
         ghost: 'text-foreground hover:bg-surface focus-visible:outline-ring',
         // On a brand band (a data-theme="dark" scope): white fill, or a white outline
         inverse:
-          'bg-primary-foreground text-primary-dark hover:bg-primary-foreground/90 focus-visible:outline-primary-foreground',
+          'bg-primary-foreground text-primary-dark hover:bg-primary-foreground/95 focus-visible:outline-primary-foreground',
         'inverse-outline':
           'border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/5 focus-visible:outline-primary-foreground',
       },

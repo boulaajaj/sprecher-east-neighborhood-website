@@ -3,22 +3,14 @@ import { Button, Link } from '@/platform/ui'
 import React from 'react'
 
 type CMSLinkProps = Omit<CmsLink, 'appearance'> & {
-  /** `default` and `outline` (from the CMS) draw a `Button`; anything else a text `Link` */
-  appearance?: 'inline' | CmsLink['appearance']
-  /** Marks the link as the current page for assistive tech (aria-current="page"). */
-  ariaCurrent?: boolean
+  /** `default` and `outline` (from the CMS) draw a `Button`; none draws a text `Link` */
+  appearance?: CmsLink['appearance']
   children?: React.ReactNode
   className?: string
 }
 
 /** A link field from the CMS, drawn as a `Button` or a text link. The href comes from `resolveLink`. */
-export const CMSLink: React.FC<CMSLinkProps> = ({
-  appearance = 'inline',
-  ariaCurrent,
-  children,
-  className,
-  ...link
-}) => {
+export const CMSLink: React.FC<CMSLinkProps> = ({ appearance, children, className, ...link }) => {
   const resolved = resolveLink({
     ...link,
     appearance: appearance === 'outline' ? 'outline' : 'default',
@@ -32,7 +24,6 @@ export const CMSLink: React.FC<CMSLinkProps> = ({
         external={resolved.external}
         variant={resolved.appearance === 'outline' ? 'secondary' : 'primary'}
         className={className}
-        aria-current={ariaCurrent ? 'page' : undefined}
       >
         {resolved.label}
         {children}
@@ -41,12 +32,7 @@ export const CMSLink: React.FC<CMSLinkProps> = ({
   }
 
   return (
-    <Link
-      href={resolved.href}
-      external={resolved.external}
-      current={ariaCurrent}
-      className={className}
-    >
+    <Link href={resolved.href} external={resolved.external} className={className}>
       {resolved.label}
       {children}
     </Link>
