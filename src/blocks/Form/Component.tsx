@@ -6,7 +6,7 @@ import React, { useCallback, useRef, useState } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import RichText from '@/components/RichText'
 import { Alert } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/platform/ui'
 import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 
 import { fields } from './fields'
@@ -162,9 +162,6 @@ export const FormBlock: React.FC<
           {!isLoading && hasSubmitted && confirmationType === 'message' && (
             <RichText data={confirmationMessage} />
           )}
-          {isLoading && !hasSubmitted && (
-            <p className="animate-pulse text-sm text-muted-foreground">Loading, please wait...</p>
-          )}
           {error && (
             <Alert variant="error">
               {error.message || 'Something went wrong. Please try again.'}
@@ -207,15 +204,8 @@ export const FormBlock: React.FC<
                 </div>
               )}
 
-              <Button
-                className="min-h-11 w-full px-6 sm:w-auto"
-                disabled={isLoading}
-                form={formID}
-                size="lg"
-                type="submit"
-                variant="default"
-              >
-                {submitButtonLabel || 'Send'}
+              <Button form={formID} fullWidth="mobile" loading={isLoading} size="lg" type="submit">
+                {isLoading ? 'Sending' : submitButtonLabel || 'Send'}
               </Button>
             </form>
           )}

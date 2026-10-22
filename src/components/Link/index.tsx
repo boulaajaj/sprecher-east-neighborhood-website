@@ -1,70 +1,54 @@
-import { Button, type ButtonProps } from '@/components/ui/button'
-import { cn } from '@/utilities/ui'
+import { type CmsLink, resolveLink } from '@/platform/payload/resolveLink'
+import { Button } from '@/platform/ui'
 import Link from 'next/link'
 import React from 'react'
 
-import type { Page, Post } from '@/payload-types'
-
-type CMSLinkType = {
-  appearance?: 'inline' | ButtonProps['variant']
+type CMSLinkProps = Omit<CmsLink, 'appearance'> & {
+  /** `default` and `outline` (from the CMS) draw a `Button`; `inline` and `link` a text link */
+  appearance?: 'inline' | 'link' | CmsLink['appearance']
   /** Marks the link as the current page for assistive tech (aria-current="page"). */
   ariaCurrent?: boolean
   children?: React.ReactNode
   className?: string
-  label?: string | null
-  newTab?: boolean | null
-  reference?: {
-    relationTo: 'pages' | 'posts'
-    value: Page | Post | string | number
-  } | null
-  size?: ButtonProps['size'] | null
-  type?: 'custom' | 'reference' | null
-  url?: string | null
 }
 
-export const CMSLink: React.FC<CMSLinkType> = (props) => {
-  const {
-    type,
-    appearance = 'inline',
-    ariaCurrent,
-    children,
-    className,
-    label,
-    newTab,
-    reference,
-    size: sizeFromProps,
-    url,
-  } = props
+/** A link field from the CMS, drawn as a `Button` or a text link. The href comes from `resolveLink`. */
+export const CMSLink: React.FC<CMSLinkProps> = ({
+  appearance = 'inline',
+  ariaCurrent,
+  children,
+  className,
+  ...link
+}) => {
+  const resolved = resolveLink({
+    ...link,
+    appearance: appearance === 'outline' ? 'outline' : 'default',
+  })
+  if (!resolved) return null
 
-  const href =
-    type === 'reference' && typeof reference?.value === 'object' && reference.value.slug
-      ? `${reference?.relationTo !== 'pages' ? `/${reference?.relationTo}` : ''}/${
-          reference.value.slug
-        }`
-      : url
-
-  if (!href) return null
-
-  const size = appearance === 'link' ? 'clear' : sizeFromProps
-  const newTabProps = newTab ? { rel: 'noopener noreferrer', target: '_blank' } : {}
   const currentProps = ariaCurrent ? { 'aria-current': 'page' as const } : {}
 
-  /* Ensure we don't break any styles set by richText */
-  if (appearance === 'inline') {
+  if (appearance === 'default' || appearance === 'outline') {
     return (
-      <Link className={cn(className)} href={href || url || ''} {...newTabProps} {...currentProps}>
-        {label && label}
-        {children && children}
-      </Link>
+      <Button
+        href={resolved.href}
+        external={resolved.external}
+        variant={resolved.appearance === 'outline' ? 'secondary' : 'primary'}
+        className={className}
+        {...currentProps}
+      >
+        {resolved.label}
+        {children}
+      </Button>
     )
   }
 
+  // Text links: the styles come from the caller or the surrounding rich text (until `Link`, #210)
+  const newTabProps = resolved.external ? { rel: 'noopener noreferrer', target: '_blank' } : {}
   return (
-    <Button asChild className={className} size={size} variant={appearance}>
-      <Link className={cn(className)} href={href || url || ''} {...newTabProps} {...currentProps}>
-        {label && label}
-        {children && children}
-      </Link>
-    </Button>
+    <Link className={className} href={resolved.href} {...newTabProps} {...currentProps}>
+      {resolved.label}
+      {children}
+    </Link>
   )
 }

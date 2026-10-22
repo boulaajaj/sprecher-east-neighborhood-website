@@ -6,16 +6,12 @@ import type { Header as HeaderType } from '@/payload-types'
 
 import { cn } from '@/utilities/ui'
 import { CMSLink } from '@/components/Link'
+import { resolveLink } from '@/platform/payload/resolveLink'
 import Link from 'next/link'
 import { SearchIcon } from 'lucide-react'
 
 function resolveHref(link: NonNullable<HeaderType['navItems']>[number]['link']): string {
-  if (link.type === 'custom' && link.url) return link.url
-  if (link.type === 'reference' && link.reference && typeof link.reference.value === 'object') {
-    const slug = (link.reference.value as { slug?: string }).slug
-    if (slug) return slug === 'home' ? '/' : `/${slug}`
-  }
-  return ''
+  return resolveLink(link)?.href ?? ''
 }
 
 function normalizePath(value: string): string {

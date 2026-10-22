@@ -1,6 +1,7 @@
 'use client'
 
 import { RefreshCw, X } from 'lucide-react'
+import { Button } from '@/platform/ui'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 const POLL_INTERVAL = 30_000 // 30 seconds
@@ -112,19 +113,18 @@ export function VersionCheck() {
       <div className="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3 shadow-lg sm:px-5">
         <RefreshCw className="hidden h-4 w-4 shrink-0 text-primary sm:block" aria-hidden="true" />
         <p className="text-sm font-medium text-foreground">New version available</p>
-        <button
-          onClick={handleRefresh}
-          className="ml-auto shrink-0 rounded-lg bg-primary px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
-        >
+        <Button onClick={handleRefresh} size="sm" className="ml-auto shrink-0">
           Refresh
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleDismiss}
-          className="shrink-0 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
+          variant="ghost"
+          size="icon"
+          className="shrink-0 text-muted-foreground hover:text-foreground"
           aria-label="Dismiss update notification"
         >
-          <X className="h-4 w-4" aria-hidden="true" />
-        </button>
+          <X aria-hidden="true" />
+        </Button>
       </div>
     </div>
   )

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import React, { useCallback, useState } from 'react'
 
 import { Alert } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/platform/ui'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
@@ -79,8 +79,8 @@ export function LoginForm() {
         />
       </div>
 
-      <Button type="submit" disabled={loading} className="w-full">
-        {loading ? 'Signing in...' : 'Sign In'}
+      <Button type="submit" loading={loading} fullWidth>
+        {loading ? 'Logging in' : 'Log In'}
       </Button>
     </form>
   )

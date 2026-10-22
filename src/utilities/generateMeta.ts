@@ -4,9 +4,7 @@ import type { Media, Page, Post, Event, Config } from '@/payload-types'
 
 import { mergeOpenGraph } from './mergeOpenGraph'
 import { toAbsoluteURL } from './getURL'
-
-/** The CMS slug for the homepage — used to map /home → / in URLs */
-export const HOME_PAGE_SLUG = 'home'
+import { documentHref } from '@/platform/payload/documentHref'
 
 const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
   if (image && typeof image === 'object' && 'url' in image) {
@@ -40,8 +38,7 @@ export const generateMeta = async (args: { doc: DocWithMeta | null }): Promise<M
           ]
         : undefined,
       title,
-      url:
-        typeof doc?.slug === 'string' ? (doc.slug === HOME_PAGE_SLUG ? '/' : `/${doc.slug}`) : '/',
+      url: typeof doc?.slug === 'string' ? documentHref('pages', doc.slug) : '/',
     }),
     title,
   }

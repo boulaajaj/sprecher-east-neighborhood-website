@@ -135,6 +135,9 @@
   --primary-dark: #2e5e47;
   --primary-light: #4f9974;
   --accent-dark: #c97830;
+  /* Fill for primary buttons: white text on it is 5.1:1 (#121), 7.5:1 on hover. */
+  --primary-fill: #3d7a5e;
+  --primary-fill-hover: #2e5e47;
 }
 
 /* Sprecher East brand tokens — dark theme */
@@ -170,6 +173,9 @@
   --primary-dark: #3d7a5e;
   --primary-light: #5fb88e;
   --accent-dark: #d48a38;
+  /* Dark --primary (#4e9b76) gives white text only 3.35:1, so buttons keep the brand fill (#121) */
+  --primary-fill: #3d7a5e;
+  --primary-fill-hover: #2e5e47;
 }
 
 @theme inline {
@@ -208,6 +214,8 @@
   --color-primary-dark: var(--primary-dark);
   --color-primary-light: var(--primary-light);
   --color-accent-dark: var(--accent-dark);
+  --color-primary-fill: var(--primary-fill);
+  --color-primary-fill-hover: var(--primary-fill-hover);
 }
 
 @layer base {

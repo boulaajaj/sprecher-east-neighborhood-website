@@ -34,9 +34,6 @@ export const Search: React.FC = () => {
           }}
           placeholder="Search news and events"
         />
-        <button type="submit" className="sr-only">
-          submit
-        </button>
       </form>
     </div>
   )
