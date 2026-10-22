@@ -17,7 +17,7 @@ It is an unofficial, AI-assisted initiative (ground rules in [`AGENTS.md`](../AG
 
 ## Current Stack
 
-- **Framework**: Next.js 15 (App Router, TypeScript)
+- **Framework**: Next.js 16 (App Router, TypeScript; Turbopack builds), React 19.2
 - **CSS**: Tailwind CSS v4 (design tokens in `src/app/(frontend)/globals.css @theme {}`)
 - **CMS**: Payload CMS v3 Website Template at `/admin` (self-hosted, SQLite `data/payload.db`)
 - **Auth**: Payload native auth (Users collection with `auth: true`); roles `admin`, `editor`, `resident`
@@ -163,6 +163,9 @@ System-level env vars (not in .env.local):
 - **`graphql` package**: Must install separately from `@payloadcms/graphql`
 - **`overrideAccess`**: Set it on every Local API call: `false` for what a visitor may see, `true` only where access must be bypassed, with a comment saying why. The seed's writes don't set it yet (#135)
 - **`server-only`**: Server code outside the CMS config that queries Payload or reads cookies (utilities, `data/`, `use-cases/`, `server.ts`) starts with `import 'server-only'`, so a client component importing it fails the build. Collections, hooks and plugins never import it: the Payload CLI (`migrate`, seed) loads them outside Next.js, where it throws. Hooks use the `req.payload` they are given
+- **Cache tags**: Expire them with `expireCacheTag()` from `src/platform/payload/expireCacheTag.ts`. Since Next 16, `revalidateTag` needs a second argument; the helper passes `{ expire: 0 }`, so the next visitor gets fresh content
+- **Proxy**: `src/proxy.ts` (Next 16's name for middleware) answers 404 for junk paging URLs before they render (#119)
+- **Upload URLs stay relative**: `getMediaUrl()` turns Payload's upload URLs (prefixed with `serverURL`) back into `/api/media/file/...`, so next/image treats them as local; since Next 16 it refuses remote URLs on private IPs such as localhost
 - **Live Preview**: Uses `window.postMessage` — component must use `useLivePreview()` hook
 - **Draft Preview**: Requires `PREVIEW_SECRET` env var for signed preview URLs
 - **Timezone**: Configured via `SITE_TIMEZONE` env var (default: `America/Chicago`). Use `startOfToday()` and `SITE_TIMEZONE` from `src/utilities/timezone.ts`. Never hardcode timezone strings or use bare `new Date().setHours(0,0,0,0)`. Day-only dates (midnight UTC) must be formatted with `timeZone: 'UTC'` to avoid off-by-one; `formatDateTime()` handles this automatically.

@@ -102,7 +102,7 @@ export const boundariesConfig = {
       },
     ],
     'boundaries/files': [
-      // Root files (payload.config.ts, middleware.ts) belong to no element; this makes them checked
+      // Root files (payload.config.ts, proxy.ts) belong to no element; this makes them checked
       { pattern: 'src/*.ts', category: 'root' },
       { pattern: STILL_QUERYING_PAYLOAD, category: 'still-querying-payload' },
     ],

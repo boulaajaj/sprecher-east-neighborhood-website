@@ -1,3 +1,6 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { withPayload } from '@payloadcms/next/withPayload'
 import { PHASE_PRODUCTION_BUILD } from 'next/constants.js'
 
@@ -21,6 +24,10 @@ const nextConfig = {
     NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? '',
   },
   images: {
+    // Uploads are served by Payload under this path; getMediaUrl keeps them relative (local)
+    localPatterns: [{ pathname: '/api/media/file/**' }],
+    // ImageMedia asks for quality 100; Next 16 allows only 75 unless listed
+    qualities: [100],
     remotePatterns: [
       ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
         const url = new URL(item)
@@ -41,8 +48,14 @@ const nextConfig = {
 
     return webpackConfig
   },
+  // Next 16 writes a block into AGENTS.md when an AI agent runs `next dev`. AGENTS.md is a policy
+  // file, so it stays off until the owner decides (#194).
+  agentRules: false,
   reactStrictMode: true,
   redirects,
+  turbopack: {
+    root: path.dirname(fileURLToPath(import.meta.url)),
+  },
 }
 
 /**

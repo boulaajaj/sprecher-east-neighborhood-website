@@ -1,6 +1,6 @@
 /**
  * Checks for the paging parameters in listing URLs and "Load more" requests. Kept free of
- * Payload and Next imports so the middleware (#119), pages and server actions share one rule.
+ * Payload and Next imports so the proxy (`src/proxy.ts`, #119), pages and server actions share one rule.
  */
 
 /** Highest page a client may request — a sanity bound, far above real content. */

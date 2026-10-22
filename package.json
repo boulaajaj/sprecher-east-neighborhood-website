@@ -10,8 +10,8 @@
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
-    "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
-    "lint:fix": "cross-env NODE_OPTIONS=--no-deprecation next lint --fix",
+    "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
+    "lint:fix": "cross-env NODE_OPTIONS=--no-deprecation eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
@@ -42,11 +42,11 @@
     "cross-env": "^10.1.0",
     "graphql": "^16.13.1",
     "lucide-react": "^0.576.0",
-    "next": "^15.5.28",
+    "next": "^16.3.8",
     "payload": "^3.91.0",
     "prism-react-renderer": "^2.3.1",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "react-hook-form": "^7.71.1",
     "server-only": "^0.0.1",
     "sharp": "^0.35.5",
@@ -63,15 +63,13 @@
     "postcss": "$postcss"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.5",
-    "@eslint/js": "^10.0.1",
     "@tailwindcss/postcss": "^4.2.1",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^25.3.5",
-    "@types/react": "^19.0.2",
-    "@types/react-dom": "^19.0.2",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
     "eslint": "^9.39.4",
-    "eslint-config-next": "^15.5.28",
+    "eslint-config-next": "^16.3.8",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-boundaries": "^7.2.0",
     "eslint-plugin-unused-imports": "^4.4.1",
@@ -86,5 +84,8 @@
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.56.1",
     "vitest": "^4.1.12"
+  },
+  "engines": {
+    "node": ">=20.9.0"
   }
 }

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import { MAX_PAGE } from '@/utilities/feedParams'
 
-import { config, isValidPagingPath, middleware } from './middleware'
+import { config, isValidPagingPath, proxy } from './proxy'
 
 describe('isValidPagingPath', () => {
   it.each([
@@ -39,14 +39,14 @@ describe('isValidPagingPath', () => {
   })
 })
 
-describe('middleware', () => {
+describe('proxy', () => {
   it('answers 404 without rendering for a junk paging URL', () => {
-    const response = middleware(new NextRequest('https://sprechereast.example/posts/page/zz'))
+    const response = proxy(new NextRequest('https://sprechereast.example/posts/page/zz'))
     expect(response.status).toBe(404)
   })
 
   it('passes a valid paging URL on to the page', () => {
-    const response = middleware(new NextRequest('https://sprechereast.example/posts/page/2'))
+    const response = proxy(new NextRequest('https://sprechereast.example/posts/page/2'))
     expect(response.headers.get('x-middleware-next')).toBe('1')
   })
 })

@@ -1,19 +1,8 @@
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-import js from '@eslint/js'
-import { FlatCompat } from '@eslint/eslintrc'
+import nextVitals from 'eslint-config-next/core-web-vitals'
 import tseslint from 'typescript-eslint'
 import unusedImports from 'eslint-plugin-unused-imports'
 import eslintConfigPrettier from 'eslint-config-prettier'
 import { boundariesConfig } from './eslint.boundaries.config.mjs'
-
-// FlatCompat bridge for eslint-config-next (still uses legacy format)
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-})
 
 export default [
   // ─── 1. Global ignores ───────────────────────────────────────────────────────
@@ -38,8 +27,8 @@ export default [
     ],
   },
 
-  // ─── 2. Next.js recommended rules (via FlatCompat bridge) ────────────────────
-  ...compat.extends('next/core-web-vitals'),
+  // ─── 2. Next.js recommended rules (flat config since Next 16) ────────────────
+  ...nextVitals,
 
   // ─── 3. TypeScript strict rules ──────────────────────────────────────────────
   ...tseslint.configs.strict,
@@ -70,6 +59,11 @@ export default [
       '@typescript-eslint/no-import-type-side-effects': 'error',
 
       // ── React best practices ──────────────────────────────────────────────
+      // New in eslint-plugin-react-hooks 7 (Next 16). Off until the 9 places that break them are
+      // fixed (#193); then they come back as errors.
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/refs': 'off',
+      'react-hooks/purity': 'off',
       'react/self-closing-comp': 'error',
       'react/jsx-curly-brace-presence': ['error', { props: 'never', children: 'never' }],
       // Disable — modern React handles apostrophes/quotes in JSX fine
