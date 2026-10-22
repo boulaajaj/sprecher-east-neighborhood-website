@@ -45,10 +45,11 @@ A `to…` mapper in `data/` builds them from Payload documents. When generated P
 
 ## Entry files
 
-- `index.ts` exports what any code, including client components, may import: types, pure
-  helpers, components that load no data. It never imports server-only code.
+- `index.ts` exports types and pure rules from `domain/`, nothing else. Any code may import it:
+  the proxy (`src/proxy.ts`), client components and scripts get no React, Payload or server-only
+  code with it.
 - `server.ts` starts with `import 'server-only'` and re-exports the module's use cases (from
-  `use-cases/`) and the components that load data or use `actions.ts` (from `ui/`).
+  `use-cases/`) and the components pages render (from `ui/`).
 - `actions.ts` starts with `'use server'` and exports server actions; each one validates its
   input and calls a use case.
 - `cms.ts` exports the area's collection and global configs, blocks and plugin options for

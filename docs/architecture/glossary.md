@@ -25,15 +25,15 @@ which module owns it).
 
 ## Events
 
-| Term             | Meaning                                                                                                                       | Where the rule lives                                                                                                     |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Event date       | A calendar day with no time (Payload "day only"), stored as midnight UTC, for example `2026-03-03T00:00:00.000Z` for March 3. | `src/modules/events/cms/Events.ts`                                                                                       |
-| Event time       | Free text in site time, for example "6:00 PM". Not used for sorting.                                                          | same                                                                                                                     |
-| Upcoming event   | A published event whose date is today or later, where "today" is the date in the site timezone.                               | `isUpcoming` in `src/modules/events/domain/upcoming.ts`, with today from `startOfToday()` in `src/utilities/timezone.ts` |
-| Past event       | A published event whose date is before today in the site timezone.                                                            | same                                                                                                                     |
-| Event category   | One of: Meeting, Social, Volunteer, Workshop, Sports & Recreation, Community, Other. Phase 2 will revise the list (#122).     | `EVENT_CATEGORIES` in `src/modules/events/domain/categories.ts`, also the collection's options                           |
-| Cancelled event  | Planned (#122): still listed, clearly marked as cancelled, never silently removed.                                            | not built yet                                                                                                            |
-| Official meeting | Planned (#122): a city or county meeting, shown with a link to the official agenda.                                           | not built yet                                                                                                            |
+| Term             | Meaning                                                                                                                       | Where the rule lives                                                                                             |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Event date       | A calendar day with no time (Payload "day only"), stored as midnight UTC, for example `2026-03-03T00:00:00.000Z` for March 3. | `src/modules/events/cms/events.ts`                                                                               |
+| Event time       | Free text in site time, for example "6:00 PM". Not used for sorting.                                                          | same                                                                                                             |
+| Upcoming event   | A published event whose date is today or later, where "today" is the date in the site timezone.                               | `inScope` in `src/modules/events/data/scope.ts`, with today from `startOfToday()` in `src/utilities/timezone.ts` |
+| Past event       | A published event whose date is before today in the site timezone.                                                            | same                                                                                                             |
+| Event category   | One of: Meeting, Social, Volunteer, Workshop, Sports & Recreation, Community, Other. Phase 2 will revise the list (#122).     | `EVENT_CATEGORIES` in `src/modules/events/domain/categories.ts`, also the collection's options                   |
+| Cancelled event  | Planned (#122): still listed, clearly marked as cancelled, never silently removed.                                            | not built yet                                                                                                    |
+| Official meeting | Planned (#122): a city or county meeting, shown with a link to the official agenda.                                           | not built yet                                                                                                    |
 
 ## News and reference content
 
@@ -65,11 +65,11 @@ which module owns it).
 
 ## Code structure
 
-| Term         | Meaning                                                                                                                                                           |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Module       | One business area's folder under `src/modules/` ([architecture](README.md)).                                                                                      |
-| Entry file   | `index.ts` (client-safe), `server.ts` (server-only), `actions.ts` (server actions) or `cms.ts` (Payload config): the only files other code imports from a module. |
-| Domain layer | `domain/`: pure rules and types, no framework.                                                                                                                    |
-| Use case     | `use-cases/`: one thing a caller can do (list upcoming events, submit a form), returning the module's own types. Server-only.                                     |
-| Data layer   | `data/`: server-only queries over Payload that return the module's own types.                                                                                     |
-| Platform     | `src/platform/`: code every module shares.                                                                                                                        |
+| Term         | Meaning                                                                                                                                                                    |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Module       | One business area's folder under `src/modules/` ([architecture](README.md)).                                                                                               |
+| Entry file   | `index.ts` (types and pure rules), `server.ts` (server-only), `actions.ts` (server actions) or `cms.ts` (Payload config): the only files other code imports from a module. |
+| Domain layer | `domain/`: pure rules and types, no framework.                                                                                                                             |
+| Use case     | `use-cases/`: one thing a caller can do (list upcoming events, submit a form), returning the module's own types. Server-only.                                              |
+| Data layer   | `data/`: server-only queries over Payload that return the module's own types.                                                                                              |
+| Platform     | `src/platform/`: code every module shares.                                                                                                                                 |
