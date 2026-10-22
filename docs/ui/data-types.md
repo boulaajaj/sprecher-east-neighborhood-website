@@ -71,16 +71,16 @@ one field component; payment is turned off.
 The admin (`/admin`) keeps Payload's own fields, styled with the site's tokens, and isn't rebuilt
 with these components. Its field types still matter, so the public components and the CMS agree:
 
-| Payload field type                     | Used here                                       | Public component when one is needed                |
-| -------------------------------------- | ----------------------------------------------- | -------------------------------------------------- |
-| `text`, `textarea`, `email`, `number`  | everywhere                                      | `Field` (above)                                    |
-| `date`                                 | events (day only), `publishedAt` (day and time) | `DateField` when a public form needs a date        |
-| `select`, `radio`, `checkbox`          | categories, roles, link type, flags             | `Field · select`, `RadioGroup`, `Field · checkbox` |
-| `relationship`, `upload`               | links between documents, media                  | no public editor planned                           |
-| `richText`, `blocks`, `array`, `group` | content, layouts, lists                         | no public editor planned                           |
-| `code`                                 | code block                                      | no public editor planned                           |
-| `tabs`, `row`, `collapsible`, `ui`     | admin layout only                               | none: they hold no data                            |
-| `json`, `point`, `join`                | not used                                        | none                                               |
+| Payload field type                     | Used here                                       | Public component when one is needed                    |
+| -------------------------------------- | ----------------------------------------------- | ------------------------------------------------------ |
+| `text`, `textarea`, `email`, `number`  | everywhere                                      | `Field` (above)                                        |
+| `date`                                 | events (day only), `publishedAt` (day and time) | `Field.Input type="date"` when a public form needs one |
+| `select`, `radio`, `checkbox`          | categories, roles, link type, flags             | `Field · select`, `RadioGroup`, `Field · checkbox`     |
+| `relationship`, `upload`               | links between documents, media                  | no public editor planned                               |
+| `richText`, `blocks`, `array`, `group` | content, layouts, lists                         | no public editor planned                               |
+| `code`                                 | code block                                      | no public editor planned                               |
+| `tabs`, `row`, `collapsible`, `ui`     | admin layout only                               | none: they hold no data                                |
+| `json`, `point`, `join`                | not used                                        | none                                                   |
 
 ## Data with no public UI today
 

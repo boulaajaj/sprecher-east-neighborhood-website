@@ -15,7 +15,7 @@ the data each element shows, and the component set the elements point to.
 | [`elements-content.md`](elements-content.md)                     | Cards and lists (C), media (M), blocks and rich text (B).            |
 | [`elements-forms-feedback.md`](elements-forms-feedback.md)       | Form fields and actions (F), feedback, empty states, overlays (S).   |
 | [`data-types.md`](data-types.md)                                 | Each data type and Payload field type, and the component for it.     |
-| [`component-set.md`](component-set.md)                           | The proposed shared components: variants, props, where they live.    |
+| [`component-set.md`](component-set.md)                           | The shared components: variants, props, where they live.             |
 | [`component-set-modules.md`](component-set-modules.md)           | Area components, what's not needed yet, and the coverage check.      |
 | [`evidence.md`](evidence.md)                                     | Duplication, inconsistencies and bugs found, with file references.   |
 | [`screenshots/`](screenshots/)                                   | 172 WebP screenshots (6.4 MB, 6,446,992 bytes).                      |

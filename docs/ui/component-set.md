@@ -113,9 +113,10 @@ coverage table, `Field · email` means a field holding `Field.Input type="email"
 ## How many, and what to build first
 
 - **23 shared components** (21 in `platform/ui/`, 2 in `platform/richtext/`). The owner's review
-  on 2026-10-21 merged nine of the first proposal's 32: the four input components became parts of
-  `Field`, `Heading` became variants of `Text`, `DetailHero` became `PageHeader · image`, and
-  `Container` became `Section`'s `width`.
+  on 2026-10-21 cut nine of the first proposal's 32. Seven were merged: the four input components
+  became parts of `Field`, `Heading` became variants of `Text`, `DetailHero` became
+  `PageHeader · image`, and `Container` became `Section`'s `width`. Two moved into the one area
+  that uses them (next point).
 - **Kept in the one place that uses them,** under the rule "add a component when a second screen
   needs it" (#163): the loading placeholder is a style inside `SiteHeader`, and the FAQ accordion is
   `FaqList` in `directory/ui` (native `<details>`). Either moves to `platform/ui/` when a second
@@ -141,7 +142,7 @@ neither blocks `Button`, `Link`, `Field` or `Form`.
    - `padding: sm` (`p-4`, for the compact event card and the stats cards) is below the `p-6` minimum.
 2. **Plain props for blocks and heroes against
    [architecture rule 8](../architecture/README.md#dependency-rules).** Rule 8 says code that
-   renders CMS content as authored (blocks, heroes) takes the generated Payload types. This proposal
+   renders CMS content as authored (blocks, heroes) takes the generated Payload types. This set
    gives `PageHero`, `ContentBlock` and the other blocks plain typed props, mapped from the CMS by
    one function each, as the owner's plan on #163 (2026-10-20) asks: "Components receive plain
    typed data and never import Payload directly." If the owner agrees, rule 8 is updated in a

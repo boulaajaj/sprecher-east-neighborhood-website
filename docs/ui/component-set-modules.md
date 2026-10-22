@@ -26,7 +26,7 @@ page or layout in `src/app/` composes them ([0008](../architecture/decisions/000
 | `events`    | `DateBadge`         | `variant`: `floating`, `plain`, `tinted`        | `date`                                                                | —                                                                                                         | `DateBadge` in `EventCard` and a second copy in `SidebarEvents`  | C9–C11     |
 | `directory` | `ResourceCard`      | one look                                        | `resource` (`ResourceSummary`)                                        | `Card · elevated`, `Link · action`                                                                        | markup in `resources/page.tsx`                                   | C13        |
 | `directory` | `FaqList`           | one look                                        | `items` (`{ question, answer }[]`, answers as `RichTextValue`)        | `Card · outline`, `RichText · compact`, native `<details>`                                                | FAQ markup in `faq/page.tsx`                                     | N16        |
-| `contact`   | `FormBlock`         | one look                                        | `form` (fields mapped to field components), `intro`                   | `Form`, the field components, `Card · outline`, `Alert`                                                   | `src/blocks/Form/` (nine field files)                            | B17        |
+| `contact`   | `FormBlock`         | one look                                        | `form` (each field mapped to a `Field` control), `intro`              | `Form`, `Field`, `Card · outline`, `Alert`                                                                | `src/blocks/Form/` (nine field files)                            | B17        |
 | `contact`   | `TurnstileWidget`   | one look                                        | `onToken`, `onLoadError`, `onWidgetError`, `resetSignal`              | —                                                                                                         | `src/components/TurnstileWidget`                                 | F18        |
 
 Compositions with no element of their own: `PostsFeed` and `EventsFeed` (a `CardGrid` of cards plus
@@ -54,8 +54,8 @@ inventory keeps most, and finds no element for these components and variants:
 
 Added by the inventory, with no counterpart in the epic: `CardGrid`, `DateTime`, `MetaList`,
 `Text`, `PageHeader`, `EmptyState`, `Section`, `DetailLayout`, and variants on `RichText`.
-`Accordion` from the epic's list is `FaqList` until a second screen needs one. Each one replaces markup copied between files
-([evidence](evidence.md#duplication)).
+Each one replaces markup copied between files ([evidence](evidence.md#duplication)). `Accordion`
+from the epic's list is `FaqList` until a second screen needs one.
 
 ## Coverage
 
@@ -119,6 +119,7 @@ element tables by script, so no element is missing and none maps twice.
 | Alert · {style}             | B5                                                |     1 |
 | Toast · info                | S9                                                |     1 |
 | Dialog · sheet              | N10                                               |     1 |
+| AdminBar · default          | L5                                                |     1 |
 | Breadcrumbs · default       | N13                                               |     1 |
 | LoadMore · default          | N15                                               |     1 |
 | Section · narrow            | L11                                               |     1 |
@@ -153,7 +154,6 @@ element tables by script, so no element is missing and none maps twice.
 | DateBadge · plain           | C10                                               |     1 |
 | DateBadge · tinted          | C11                                               |     1 |
 | ResourceCard · default      | C13                                               |     1 |
+| FaqList · default           | N16                                               |     1 |
 | FormBlock · default         | B17                                               |     1 |
 | TurnstileWidget · default   | F18                                               |     1 |
-| AdminBar · default          | L5                                                |     1 |
-| FaqList · default           | N16                                               |     1 |
