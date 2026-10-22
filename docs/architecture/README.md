@@ -63,8 +63,8 @@ grows should split its top level "into domain oriented modules which are interna
   plugins no single module owns (SEO).
 - `ui/`: primitives (`Button`, `Input`, `Media`, `Link`) with their variants.
 - `theme/`: the token contract (`tokens.ts`) and the Tailwind mapping.
-- `richtext/`: the `RichText` renderer and the blocks that can sit inside rich text (banner, code,
-  media, call to action). Pages reuse them from here.
+- `richtext/`: the `RichText` renderer and the blocks that can sit inside rich text (banner, code
+  and media; only a post's content offers them). Pages reuse the media block from here.
 - `email/`, `seo/`, and `media` (uploads).
 
 Routes that serve no single area (`/api/version`, draft preview under `/next/`, the seed route)

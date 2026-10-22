@@ -68,9 +68,13 @@ The code is moving to that structure in small steps (#127). Events have moved to
 (#136), news posts, categories and search to `src/modules/news/` (#132), and the contact
 form's safeguards and form block to `src/modules/contact/` (#133), and accounts (who is signed in,
 sign-in and password flows, the users collection) to `src/modules/accounts/` (#134).
-`src/platform/lib/` holds the shared paging helpers and the role list, `src/platform/payload/` the
-role checks and access functions every collection uses, and `src/platform/email/` the SMTP
-settings that password-reset and form emails share. Until an area has moved, it is still in the Payload website template's folders,
+`src/platform/lib/` holds the shared helpers (paging, roles, dates and the site timezone, URLs,
+`cn`), `src/platform/seo/` the page metadata, Open Graph and sitemap helpers,
+`src/platform/payload/` the role checks and access functions every collection uses and the admin
+dashboard components, `src/platform/ui/` the UI kit (`Button`, `Link`, `Media`, `CMSLink`,
+`JsonLd`, `Breadcrumbs`, `LoadMore` and the rest), `src/platform/richtext/` the `RichText`
+renderer and the blocks an editor can put inside rich text, and `src/platform/email/` the SMTP
+settings that password-reset and form emails share (#135). Until an area has moved, it is still in the Payload website template's folders,
 sorted by technical type:
 
 ```
@@ -78,9 +82,9 @@ src/
   app/             Next.js App Router
     (frontend)/    Public routes (home, posts, events, faq, resources, search, login, account, sitemaps)
     (payload)/     Payload admin and API routes (generated; leave alone)
-  blocks/          Page-builder blocks: Payload config + React component each
+  blocks/          Page-builder blocks: Payload config + React component each (rich-text blocks: platform)
   collections/     Payload collections (Pages, Media)
-  components/      Shared React components; components/ui/ holds the shadcn/ui primitives
+  components/      The logo and the redirects component, until the site module moves (#135)
   endpoints/seed/  Seed data and script
   fields/          Reusable Payload field groups (link, linkGroup, defaultLexical)
   Header/, Footer/ Global configs and components
@@ -89,7 +93,7 @@ src/
   migrations/      Database migrations (generated)
   plugins/         Payload plugin setup (form builder, SEO, search, redirects, nested docs)
   providers/       React context providers (theme, header theme)
-  utilities/       getDocument, getGlobals, getRedirects (site data) and splitRichText, until #135 moves them
+  utilities/       getDocument, getGlobals, getRedirects (site data), until #135 moves them
   payload.config.ts
 ```
 

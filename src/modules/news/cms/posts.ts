@@ -16,9 +16,7 @@ import {
 } from '@payloadcms/plugin-seo/fields'
 
 import { draftContentAccess } from '@/platform/payload/draftContentAccess'
-import { Banner } from '@/blocks/Banner/config'
-import { Code } from '@/blocks/Code/config'
-import { MediaBlock } from '@/blocks/MediaBlock/config'
+import { RICH_TEXT_BLOCKS } from '@/platform/richtext/blockConfigs'
 import { generatePreviewPath } from '@/platform/payload/generatePreviewPath'
 
 import { populateAuthors } from './populateAuthors'
@@ -80,7 +78,7 @@ export const Posts: CollectionConfig<'posts'> = {
                   return [
                     ...rootFeatures,
                     HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
-                    BlocksFeature({ blocks: [Banner, Code, MediaBlock] }),
+                    BlocksFeature({ blocks: RICH_TEXT_BLOCKS }),
                     FixedToolbarFeature(),
                     InlineToolbarFeature(),
                     HorizontalRuleFeature(),

@@ -1,4 +1,6 @@
-// The shared UI primitives (docs/ui/component-set.md). Import them from here.
+// The shared UI primitives (docs/ui/component-set.md). Import them from here. Larger components
+// (Media, JsonLd, Breadcrumbs, LoadMore and the rest of this folder) are imported by their file,
+// so a client component that needs a Button does not bundle them.
 export { Button, type ButtonProps } from './Button'
 export { Field, type FieldProps } from './Field.client'
 export type { FieldCheckboxProps } from './FieldCheckbox.client'

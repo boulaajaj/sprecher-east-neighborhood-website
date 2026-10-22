@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 
-import { Media } from '@/components/Media'
+import { Media } from '@/platform/ui/Media'
 
 import type { PostSummary } from '../domain/types'
 

@@ -28,8 +28,8 @@ vi.mock('./TurnstileWidget.client', async () => {
 })
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }))
 // The CMS rich text isn't under test; the confirmation is a fixed line
-vi.mock('@/components/RichText', () => ({
-  default: () => <p>Thanks, your message is on its way.</p>,
+vi.mock('@/platform/richtext/RichText', () => ({
+  RichText: () => <p>Thanks, your message is on its way.</p>,
 }))
 
 import { FormBlock } from './FormBlock.client'

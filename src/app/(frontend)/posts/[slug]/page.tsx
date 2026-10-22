@@ -3,12 +3,13 @@ import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import React from 'react'
 
-import { Breadcrumbs } from '@/components/Breadcrumbs'
-import { JsonLd } from '@/components/JsonLd'
-import { LivePreviewListener } from '@/components/LivePreviewListener'
+import { Breadcrumbs } from '@/platform/ui/Breadcrumbs'
+import { JsonLd } from '@/platform/ui/JsonLd'
+import { LivePreviewListener } from '@/platform/ui/LivePreviewListener.client'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
-import RichText from '@/components/RichText'
-import { SidebarCTA } from '@/components/SidebarCTA'
+import { RichText } from '@/platform/richtext/RichText'
+import { richTextBlocks } from '@/platform/richtext/richTextBlocks'
+import { SidebarCTA } from '@/platform/ui/SidebarCTA'
 import { findUpcomingEvents, SidebarEvents } from '@/modules/events/server'
 import {
   findRecentPosts,
@@ -77,7 +78,12 @@ export default async function Post({ params: paramsPromise }: Args) {
         </div>
         <div className="container lg:grid lg:grid-cols-[1fr_18rem] lg:gap-8">
           <div>
-            <RichText className="max-w-[48rem]" data={post.content} enableGutter={false} />
+            <RichText
+              className="max-w-[48rem]"
+              data={post.content}
+              blocks={richTextBlocks}
+              enableGutter={false}
+            />
           </div>
 
           <aside className="mt-12 space-y-6 lg:sticky lg:top-24 lg:mt-0 lg:self-start">

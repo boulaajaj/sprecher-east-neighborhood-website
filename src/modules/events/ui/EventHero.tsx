@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Media } from '@/components/Media'
+import { Media } from '@/platform/ui/Media'
 import { cn } from '@/platform/lib/cn'
 import { categoryPillClassName } from '@/platform/ui/categoryPill'
 import { formatDateTime, toDateTimeAttr } from '@/platform/lib/formatDateTime'

@@ -2,9 +2,9 @@ import React from 'react'
 
 import type { Page } from '@/payload-types'
 
-import { Media } from '@/components/Media'
-import RichText from '@/components/RichText'
-import { splitHeadingFromBody } from '@/utilities/splitRichText'
+import { Media } from '@/platform/ui/Media'
+import { RichText } from '@/platform/richtext/RichText'
+import { splitHeadingFromBody } from '@/platform/richtext/splitHeadingFromBody'
 import { resolveLink } from '@/platform/payload/resolveLink'
 import { Button } from '@/platform/ui'
 

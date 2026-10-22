@@ -2,7 +2,7 @@
 
 import React from 'react'
 
-import { LoadMoreFooter, useLoadMore } from '@/components/LoadMore'
+import { LoadMoreFooter, useLoadMore } from '@/platform/ui/LoadMore.client'
 import type { FeedPage } from '@/platform/lib'
 
 import { loadPostsPage } from '../actions'

@@ -3,7 +3,7 @@ import type { Form as FormType } from '@payloadcms/plugin-form-builder/types'
 
 import { useRouter } from 'next/navigation'
 import React, { useCallback, useMemo, useState } from 'react'
-import RichText from '@/components/RichText'
+import { RichText } from '@/platform/richtext/RichText'
 import { Button, Form, type FormStatus } from '@/platform/ui'
 import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 

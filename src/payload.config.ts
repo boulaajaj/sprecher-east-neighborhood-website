@@ -26,8 +26,8 @@ const dirname = path.dirname(filename)
 export default buildConfig({
   admin: {
     components: {
-      beforeLogin: ['@/components/BeforeLogin'],
-      beforeDashboard: ['@/components/BeforeDashboard'],
+      beforeLogin: ['@/platform/payload/admin/BeforeLogin'],
+      beforeDashboard: ['@/platform/payload/admin/BeforeDashboard'],
     },
     importMap: {
       baseDir: path.resolve(dirname),
