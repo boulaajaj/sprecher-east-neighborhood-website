@@ -6,7 +6,7 @@ import {
   isAdminOrEditorBoolean,
   isAdminOrSelf,
   isAdminFieldAccess,
-} from '../../access/roles'
+} from '@/platform/payload/roles'
 
 export const Users: CollectionConfig = {
   slug: 'users',

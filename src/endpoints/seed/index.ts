@@ -4,7 +4,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-import { ROLES } from '../../access/roles'
+import { ROLES } from '@/platform/payload/roles'
 import { contactForm as contactFormData } from './contact-form'
 import { contact as contactPageData } from './contact-page'
 import { home } from './home'

@@ -15,7 +15,7 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 
-import { draftContentAccess } from '@/access/draftContentAccess'
+import { draftContentAccess } from '@/platform/payload/draftContentAccess'
 import { Banner } from '@/blocks/Banner/config'
 import { Code } from '@/blocks/Code/config'
 import { MediaBlock } from '@/blocks/MediaBlock/config'

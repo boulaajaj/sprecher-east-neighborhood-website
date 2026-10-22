@@ -1,8 +1,8 @@
 import type { PluginConfig } from '@payloadcms/plugin-form-builder/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 
-import { anyone } from '@/access/anyone'
-import { isAdmin, isAdminOrEditor, isAdminOrEditorFieldAccess } from '@/access/roles'
+import { anyone } from '@/platform/payload/anyone'
+import { isAdmin, isAdminOrEditor, isAdminOrEditorFieldAccess } from '@/platform/payload/roles'
 
 import { guardFormEmails } from './guardFormEmails'
 import { limitSubmissionSize } from './limitSubmissionSize'

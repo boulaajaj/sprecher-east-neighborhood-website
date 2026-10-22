@@ -9,7 +9,7 @@ import { useRouter, useSelectedLayoutSegments } from 'next/navigation'
 
 import './index.scss'
 
-import { isStaffRole } from '@/access/roles'
+import { isStaffRole } from '@/platform/payload/roles'
 import { getClientSideURL } from '@/utilities/getURL'
 
 const baseClass = 'admin-bar'

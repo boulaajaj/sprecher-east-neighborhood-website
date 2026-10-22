@@ -7,7 +7,7 @@ import type { NextRequest } from 'next/server'
 
 import configPromise from '@payload-config'
 
-import { hasAdminOrEditor } from '@/access/roles'
+import { hasAdminOrEditor } from '@/platform/payload/roles'
 import type { User } from '@/payload-types'
 
 export async function GET(req: NextRequest): Promise<Response> {
