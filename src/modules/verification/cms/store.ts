@@ -61,19 +61,24 @@ export async function getConfirmationByTokenHash(
 }
 
 /**
- * Marks the record confirmed, and its welcome email as sent, unless it already was. True only
+ * Marks the record confirmed, and its welcome email as claimed, unless it already was. True only
  * for the request that changed it, so two clicks at once confirm, and welcome, once.
+ *
+ * This one write goes to the database adapter, not the Local API: Payload's `update` with a
+ * `where` reads the matching rows first and then updates each by id, so two clicks at once both
+ * win. The adapter's `updateOne` with a `where` puts the condition into the UPDATE itself, so
+ * only one request changes the row; the other gets `null`. Nothing is skipped by going around
+ * the Local API: this collection has no hooks, and access is bypassed here anyway. The adapter
+ * doesn't set `updatedAt`, so it is set here.
  */
 export async function markConfirmed(req: PayloadRequest, id: number, at: string): Promise<boolean> {
-  const { docs } = await req.payload.update({
+  const doc: unknown = await req.payload.db.updateOne({
     collection: EMAIL_CONFIRMATIONS,
     where: { and: [{ id: { equals: id } }, { confirmedAt: { exists: false } }] },
-    data: { confirmedAt: at, welcomeSentAt: at },
-    depth: 0,
-    overrideAccess: true,
+    data: { confirmedAt: at, welcomeSentAt: at, updatedAt: at },
     req,
   })
-  return docs.length > 0
+  return doc !== null && doc !== undefined
 }
 
 /** What a new link changes on a record. */

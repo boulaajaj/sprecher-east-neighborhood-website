@@ -34,6 +34,13 @@ const MESSAGES: Record<ConfirmAnswer | 'offline', ConfirmMessage> = {
 export const toConfirmMessage = (answer: ConfirmAnswer | 'offline'): ConfirmMessage =>
   MESSAGES[answer]
 
-/** Whether the link is done with: confirmed now or before. No button then. */
+/** Whether the email is confirmed, now or before. */
 export const isSettled = (answer: ConfirmAnswer | 'offline' | null): boolean =>
   answer === 'confirmed' || answer === 'already-confirmed'
+
+/**
+ * Whether the link can do nothing more: confirmed, expired or not valid. No button then. Too many
+ * tries, a server error or no answer can still be tried again.
+ */
+export const isLinkDone = (answer: ConfirmAnswer | 'offline' | null): boolean =>
+  isSettled(answer) || answer === 'expired' || answer === 'invalid'

@@ -53,6 +53,16 @@ export function fakeRequest({ ip = '203.0.113.7' as string | null } = {}) {
       for (const doc of gone) docs.splice(docs.indexOf(doc), 1)
       return { docs: gone }
     }),
+    // The adapter: like SQL's UPDATE … WHERE, the condition and the write happen in one step, so
+    // of two calls at once only the first can match
+    db: {
+      updateOne: vi.fn(async (args: Args) => {
+        const doc = selected(args)[0]
+        if (!doc) return null
+        Object.assign(doc, args.data)
+        return { ...doc }
+      }),
+    },
     sendEmail: vi.fn(async (email: (typeof sent)[number]) => {
       sent.push(email)
     }),

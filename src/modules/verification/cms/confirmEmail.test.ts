@@ -50,6 +50,29 @@ describe('confirmEmail', () => {
     expect(sent).toHaveLength(1)
   })
 
+  it('confirms once when two clicks arrive at the same time', async () => {
+    const { docs, payload, sent, req, token } = withLink()
+    const listener = vi.fn(async () => {})
+
+    // Both clicks read the record before either writes, so only the write's own condition
+    // (confirmedAt still empty) can tell them apart
+    const outcomes = await Promise.all([
+      confirmEmail(token, req, [listener]),
+      confirmEmail(token, req, [listener]),
+    ])
+
+    expect(outcomes.sort()).toEqual(['already-confirmed', 'confirmed'])
+    expect(listener).toHaveBeenCalledOnce()
+    expect(sent).toHaveLength(1)
+    expect(payload.db.updateOne).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { and: [{ id: { equals: 1 } }, { confirmedAt: { exists: false } }] },
+        data: { confirmedAt: iso(NOW), welcomeSentAt: iso(NOW), updatedAt: iso(NOW) },
+      }),
+    )
+    expect(docs[0]?.confirmedAt).toBe(iso(NOW))
+  })
+
   it('says a link expired 24 hours after it was sent, and changes nothing', async () => {
     const { docs, sent, req, token } = withLink(24 * HOUR)
     expect(await confirmEmail(token, req, [])).toBe('expired')

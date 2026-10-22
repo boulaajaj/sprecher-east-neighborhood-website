@@ -30,6 +30,9 @@ export const confirmEndpoint = (listeners: readonly EmailConfirmedListener[]): E
   path: CONFIRM_ENDPOINT_PATH,
   method: 'post',
   handler: async (req) => {
+    // Without a client IP there is no key, so the limit doesn't apply. Caddy always sets
+    // X-Forwarded-For and Node listens on 127.0.0.1 only (#118), so in production every request
+    // has one; the same trade-off as the contact form's limits.
     const ip = parseClientIp(req.headers)
     if (ip && !attempts.tryTake(ip, CONFIRMATION_LIMITS.confirmAttemptsPerConnection, Date.now())) {
       return Response.json({ error: 'Too many tries. Please wait and try again.' }, { status: 429 })

@@ -24,7 +24,8 @@ export default async function ConfirmEmailPage({ searchParams }: Props) {
         <p className="mb-8 text-muted-foreground">
           One click to confirm this address is yours. Then we’ll send you a welcome email.
         </p>
-        <ConfirmEmail token={parseConfirmationToken(token)} />
+        {/* A dead link offers the contact form, where sending again brings a new link */}
+        <ConfirmEmail token={parseConfirmationToken(token)} retryHref="/contact" />
       </div>
     </div>
   )
