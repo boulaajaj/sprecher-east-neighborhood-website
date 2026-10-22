@@ -6,8 +6,7 @@ import React from 'react'
 
 import { AdminBar } from '@/platform/ui/AdminBar.client'
 import { JsonLd } from '@/platform/ui/JsonLd'
-import { Footer } from '@/Footer/Component'
-import { Header } from '@/Header/Component'
+import { SiteFooter, SiteHeader } from '@/modules/site/server'
 import { AccountMenu, AccountProvider } from '@/modules/accounts/server'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { Providers } from '@/providers'
@@ -56,13 +55,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
           {/* The header shows who is signed in through the accounts module's menus (0008) */}
           <AccountProvider>
-            <Header
+            <SiteHeader
               accountMenu={<AccountMenu variant="bar" />}
               mobileAccountMenu={<AccountMenu variant="drawer" />}
             />
           </AccountProvider>
           <main id="main-content">{children}</main>
-          <Footer />
+          <SiteFooter />
           <VersionCheck />
         </Providers>
       </body>

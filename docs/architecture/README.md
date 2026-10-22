@@ -204,9 +204,8 @@ drift, and the tested one may not be the one that runs.
 ## Where things are today
 
 Until each step of #127 lands, code lives in the Payload website template's folders, sorted by
-technical type: `src/collections/`, `src/components/`, `src/blocks/`, `src/heros/`, `src/hooks/`,
-`src/utilities/`, `src/fields/`, `src/Header/`, `src/Footer/`,
-`src/plugins/`, `src/providers/`, `src/endpoints/` (seed). When you touch code there, don't add
+technical type: `src/collections/` (media), `src/hooks/`, `src/fields/`, `src/plugins/`,
+`src/providers/`, `src/endpoints/` (seed). When you touch code there, don't add
 new duplication; if your change needs a rule that already exists elsewhere, reuse it.
 
 New code for an area that hasn't moved yet goes in its future module, with only the folders it

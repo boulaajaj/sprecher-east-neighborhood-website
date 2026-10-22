@@ -29,7 +29,7 @@ vi.mock('@/platform/richtext/RichText', () => ({
     return null
   },
 }))
-vi.mock('@/components/PayloadRedirects', () => ({
+vi.mock('@/modules/site/server', () => ({
   PayloadRedirects: (props: unknown) => {
     mocks.redirects(props)
     return null
