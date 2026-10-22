@@ -20,8 +20,11 @@ export type AccountSummary = {
  */
 export type SignInFailure = 'wrong-credentials' | 'server-error'
 
-/** Why a password change failed: nobody signed in, Payload refused it, or something broke. */
-export type PasswordFailure = 'signed-out' | 'rejected' | 'server-error'
+/**
+ * Why a password change failed: nobody signed in, the current password was refused (wrong, or
+ * the account is locked: one code, #233), Payload refused the new one, or something broke.
+ */
+export type PasswordFailure = 'signed-out' | 'wrong-password' | 'rejected' | 'server-error'
 
 /** What a server action that changes something returns. Failures are fixed codes, never text. */
 export type ActionResult<Failure extends string> = { ok: true } | { ok: false; failure: Failure }

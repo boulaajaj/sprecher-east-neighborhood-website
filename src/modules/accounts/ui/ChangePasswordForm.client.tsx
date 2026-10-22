@@ -53,6 +53,13 @@ export function ChangePasswordForm() {
     >
       {({ register, formState: { errors } }) => (
         <>
+          <Field label="Current password" required error={errors.currentPassword?.message}>
+            <Field.Input
+              type="password"
+              autoComplete="current-password"
+              {...register('currentPassword')}
+            />
+          </Field>
           <Field
             label="New password"
             required

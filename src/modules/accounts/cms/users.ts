@@ -8,6 +8,8 @@ import {
   isAdminOrSelf,
 } from '@/platform/payload/roles'
 
+import { requireCurrentPassword } from './requireCurrentPassword'
+
 export const Users: CollectionConfig = {
   slug: 'users',
   access: {
@@ -31,6 +33,10 @@ export const Users: CollectionConfig = {
       // over plain http in production (the IP on port 80) stops working, on purpose.
       secure: process.env.NODE_ENV === 'production',
     },
+  },
+  hooks: {
+    // Your own password changes only on /account, after your current one is checked (#233)
+    beforeChange: [requireCurrentPassword],
   },
   fields: [
     {
