@@ -3,6 +3,7 @@ import React from 'react'
 import type { PostSummary } from '@/modules/news'
 import { PostGrid } from '@/modules/news/server'
 import type { Post } from '@/payload-types'
+import { toImageRef } from '@/platform/payload/imageRef'
 
 /**
  * Temporary bridge for the search page only (#132). It still queries the search collection
@@ -24,7 +25,7 @@ function toPostSummary(doc: CardPostData, index: number): PostSummary {
         : [],
     ),
     description: doc.meta?.description ?? null,
-    image: typeof doc.meta?.image === 'object' ? doc.meta.image : null,
+    image: toImageRef(doc.meta?.image),
   }
 }
 

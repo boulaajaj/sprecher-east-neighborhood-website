@@ -26,9 +26,7 @@ export const PostHero: React.FC<{
             ))}
           </div>
 
-          <div className="">
-            <h1 className="mb-6 text-3xl md:text-5xl lg:text-6xl">{title}</h1>
-          </div>
+          <h1 className="mb-6 text-3xl md:text-5xl lg:text-6xl">{title}</h1>
 
           <div className="flex flex-col gap-4 md:flex-row md:gap-16">
             {byline && (

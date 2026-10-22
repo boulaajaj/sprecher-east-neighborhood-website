@@ -1,7 +1,7 @@
 import 'server-only'
 
 import type { ArchiveBlock, Post } from '@/payload-types'
-import type { ImageRef } from '@/platform/lib'
+import { toImageRef } from '@/platform/payload/imageRef'
 
 import type { PostCategory, PostDetail, PostSummary } from '../domain/types'
 
@@ -16,10 +16,6 @@ export const SUMMARY_FIELDS = {
 
 type SummaryDoc = Pick<Post, 'id' | keyof typeof SUMMARY_FIELDS>
 
-/** An upload field holds the image once loaded (`depth` ≥ 1), and only its id otherwise. */
-function toImage(value: Post['heroImage']): ImageRef | null {
-  return typeof value === 'object' ? value : null
-}
 
 /** The loaded categories; a category that is only an id (not loaded) is left out. */
 function toCategories(values: Post['categories']): PostCategory[] {
@@ -39,7 +35,7 @@ export function toPostSummary(doc: SummaryDoc): PostSummary {
     publishedAt: doc.publishedAt ?? null,
     categories: toCategories(doc.categories),
     description: doc.meta?.description ?? null,
-    image: toImage(doc.meta?.image),
+    image: toImageRef(doc.meta?.image),
   }
 }
 
@@ -50,7 +46,7 @@ export function toPostSummary(doc: SummaryDoc): PostSummary {
 export function toPostDetail(doc: Post): PostDetail {
   return {
     ...toPostSummary(doc),
-    heroImage: toImage(doc.heroImage),
+    heroImage: toImageRef(doc.heroImage),
     content: doc.content,
     authors: (doc.populatedAuthors ?? []).flatMap(({ name }) => (name ? [name] : [])),
     relatedPosts: (doc.relatedPosts ?? []).flatMap((related) =>
@@ -61,7 +57,7 @@ export function toPostDetail(doc: Post): PostDetail {
     meta: {
       title: doc.meta?.title ?? null,
       description: doc.meta?.description ?? null,
-      image: toImage(doc.meta?.image),
+      image: toImageRef(doc.meta?.image),
     },
   }
 }

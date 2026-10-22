@@ -50,7 +50,7 @@ export const Posts: CollectionConfig<'posts'> = {
     },
     preview: (data, { req }) =>
       generatePreviewPath({
-        slug: data?.slug as string,
+        slug: typeof data?.slug === 'string' ? data.slug : undefined,
         collection: 'posts',
         req,
       }),

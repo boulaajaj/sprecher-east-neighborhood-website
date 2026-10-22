@@ -1,7 +1,7 @@
 import 'server-only'
 
 import type { Event } from '@/payload-types'
-import type { ImageRef } from '@/platform/lib'
+import { toImageRef } from '@/platform/payload/imageRef'
 
 import { toMapsHref } from '../domain/maps'
 import type { EventDetail, EventSummary } from '../domain/types'
@@ -21,10 +21,6 @@ export const SUMMARY_FIELDS = {
 
 type SummaryDoc = Pick<Event, 'id' | keyof typeof SUMMARY_FIELDS>
 
-/** An upload field holds the image once loaded (`depth` ≥ 1), and only its id otherwise. */
-function toImage(value: Event['heroImage']): ImageRef | null {
-  return typeof value === 'object' ? value : null
-}
 
 /** An event document as a card or list item shows it. */
 export function toEventSummary(doc: SummaryDoc): EventSummary {
@@ -38,7 +34,7 @@ export function toEventSummary(doc: SummaryDoc): EventSummary {
     category: doc.category ?? null,
     description: doc.description ?? null,
     locationName: doc.locationName ?? null,
-    image: toImage(doc.heroImage),
+    image: toImageRef(doc.heroImage),
   }
 }
 
@@ -55,7 +51,7 @@ export function toEventDetail(doc: Event): EventDetail {
     meta: {
       title: doc.meta?.title ?? null,
       description: doc.meta?.description ?? null,
-      image: toImage(doc.meta?.image),
+      image: toImageRef(doc.meta?.image),
     },
   }
 }
