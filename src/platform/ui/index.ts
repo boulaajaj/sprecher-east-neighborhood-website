@@ -1,3 +1,10 @@
 // The shared UI primitives (docs/ui/component-set.md). Import them from here.
 export { Button, type ButtonProps } from './Button'
+export { Field, type FieldProps } from './Field.client'
+export type { FieldCheckboxProps } from './FieldCheckbox.client'
+export type { FieldInputProps } from './FieldInput.client'
+export type { FieldSelectProps, SelectOption } from './FieldSelect.client'
+export type { FieldTextAreaProps } from './FieldTextArea.client'
+export { Form, type FormApi, type FormProps, type FormStatus } from './Form.client'
+export { FORM_MESSAGES } from './formMessages'
 export { Link, type LinkProps } from './Link'

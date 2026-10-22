@@ -1,14 +1,15 @@
 import { cn } from '@/utilities/ui'
 import React from 'react'
 
+// The -strong text tokens: plain destructive and primary are under 4.5:1 on their own tints
 const variants = {
   error: {
-    className: 'border-destructive/30 bg-destructive/10 text-destructive',
+    className: 'border-destructive/30 bg-destructive/10 text-destructive-strong',
     role: 'alert' as const,
     'aria-live': 'assertive' as const,
   },
   success: {
-    className: 'border-primary/30 bg-primary/10 text-primary',
+    className: 'border-primary/30 bg-primary/10 text-primary-strong',
     role: 'status' as const,
     'aria-live': 'polite' as const,
   },

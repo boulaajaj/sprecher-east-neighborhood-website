@@ -1,13 +1,10 @@
 import RichText from '@/components/RichText'
 import React from 'react'
 
-import { Width } from '../Width'
 import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 
+/** Text between a form's fields: a full-width grid cell, lined up with the fields (no gutter). */
 export const Message: React.FC<{ message: DefaultTypedEditorState }> = ({ message }) => {
-  return (
-    <Width className="my-12" width="100">
-      {message && <RichText data={message} />}
-    </Width>
-  )
+  if (!message) return null
+  return <RichText data={message} enableGutter={false} />
 }

@@ -68,7 +68,7 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
           Search
         </h1>
         <div className="max-w-[50rem]">
-          <Search />
+          <Search initialQuery={query} />
         </div>
       </div>
 

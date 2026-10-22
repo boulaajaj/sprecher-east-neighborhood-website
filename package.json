@@ -20,6 +20,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.9.2",
     "@libsql/client": "0.14.0",
     "@payloadcms/admin-bar": "^3.91.0",
     "@payloadcms/db-sqlite": "^3.91.0",
@@ -34,7 +35,6 @@
     "@payloadcms/richtext-lexical": "^3.91.0",
     "@payloadcms/ui": "^3.91.0",
     "@radix-ui/react-checkbox": "^1.0.4",
-    "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-slot": "^1.0.2",
     "class-variance-authority": "^0.7.0",
@@ -50,7 +50,8 @@
     "react-hook-form": "^7.71.1",
     "server-only": "^0.0.1",
     "sharp": "^0.35.5",
-    "tailwind-merge": "^3.4.0"
+    "tailwind-merge": "^3.4.0",
+    "zod": "^4.6.7"
   },
   "overrides": {
     "payload": {
