@@ -1,16 +1,9 @@
-import type { PayloadRequest } from 'payload'
-
 import type { EmailConfirmer } from '@/platform/payload/emailConfirmer'
 
 import { parseEmailAddress } from '../domain/address'
+import { logFailure } from './logFailure'
 import { requestConfirmation } from './requestConfirmation'
 import { getConfirmationByEmail } from './store'
-
-/** Logs a failure with only its kind: an error from the database can carry the address. */
-const logFailure = (req: PayloadRequest, what: string, error: unknown) => {
-  const name = error instanceof Error ? error.name : typeof error
-  req.payload.logger.error(`${what} failed (${name})`)
-}
 
 /**
  * The site's email confirmation (#183), for `payload.config.ts` to hand to the modules that need

@@ -1,8 +1,7 @@
+import { CONFIRM_EMAIL_PATH } from './paths'
+
 /** An email the module sends: fixed text only, never anything a visitor typed (decision 0004). */
 export type OutgoingEmail = { subject: string; text: string; html: string }
-
-/** The path of the page a confirmation link opens. */
-export const CONFIRM_EMAIL_PATH = '/confirm-email'
 
 /** The link in a confirmation email: the confirm page, with the token in the query string. */
 export function toConfirmationLink(siteUrl: string, token: string): string {
@@ -38,5 +37,19 @@ export function toConfirmationEmail(link: string): OutgoingEmail {
     subject: 'Confirm your email for Sprecher East',
     text: `${intro}\n\n${link}\n\n${outro}\n`,
     html: toHtml([intro, outro], { label: 'Confirm my email', href: link }),
+  }
+}
+
+/** The welcome email, sent once, after the link is clicked (#183). */
+export function toWelcomeEmail(siteUrl: string): OutgoingEmail {
+  const paragraphs = [
+    'Thanks for confirming your email, and thanks for reaching out to Sprecher East.',
+    'If you wrote to us, we have your message and will get back to you. In the meantime, see what’s happening in the neighborhood:',
+  ]
+  const home = new URL('/', siteUrl).toString()
+  return {
+    subject: 'Welcome to Sprecher East',
+    text: `${paragraphs.join('\n\n')}\n\n${home}\n`,
+    html: toHtml(paragraphs, { label: 'Visit Sprecher East', href: home }),
   }
 }

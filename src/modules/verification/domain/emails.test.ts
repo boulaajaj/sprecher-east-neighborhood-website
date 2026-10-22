@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { toConfirmationEmail, toConfirmationLink } from './emails'
+import { toConfirmationEmail, toConfirmationLink, toWelcomeEmail } from './emails'
 
 describe('toConfirmationLink', () => {
   it('points at the confirm page on this site, with the token', () => {
@@ -25,5 +25,15 @@ describe('toConfirmationEmail', () => {
     const { html } = toConfirmationEmail(link)
     expect(html).toContain('token=abc&amp;x=&quot;y&quot;')
     expect(html).not.toContain('"y"')
+  })
+})
+
+describe('toWelcomeEmail', () => {
+  it('welcomes and thanks the person, linking to the site', () => {
+    const email = toWelcomeEmail('https://sprechereast.com')
+    expect(email.subject).toBe('Welcome to Sprecher East')
+    expect(email.text).toContain('thanks for reaching out')
+    expect(email.text).toContain('https://sprechereast.com/')
+    expect(email.html).toContain('href="https://sprechereast.com/"')
   })
 })

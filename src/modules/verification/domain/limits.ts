@@ -18,6 +18,8 @@ export const CONFIRMATION_LIMITS = {
   /** Confirmation emails per hour, site-wide: bounds Mailgun use even if X-Forwarded-For is spoofed (#118). */
   siteWide: 30,
   siteWideWindowMs: HOUR,
+  /** Clicks on "Confirm my email" per hour from one connection. */
+  confirmAttemptsPerConnection: 20,
   /** An unconfirmed address is deleted this long after its last link was sent. */
   keepUnconfirmedMs: 7 * DAY,
 } as const

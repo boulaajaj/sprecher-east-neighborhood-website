@@ -124,8 +124,14 @@ only admins can see it.
 | `tokenExpiresAt`               | date         | No       | 24 hours after the link was sent                                                            |
 | `sendCount`, `sendWindowStart` | number, date | No       | Hidden: links sent to this address in the current 24-hour window                            |
 
+Endpoint: `POST /api/email-confirmations/confirm` with `{ token }`, public (the token is the proof),
+20 tries an hour per connection. It answers `{ outcome }`: `confirmed`, `already-confirmed`,
+`expired` or `invalid`. The first valid click sets `confirmedAt` and `welcomeSentAt` in one
+conditional update, runs the `onConfirmed` listeners `payload.config.ts` passes in, then sends the
+welcome email. The page `/confirm-email` calls it on a button click, never on load.
+
 What is kept: an unconfirmed record is deleted 7 days after its last link (whenever a link is
-requested, until scheduled jobs run, #141). A confirmed record keeps the address and the dates
+requested or confirmed, until scheduled jobs run, #141). A confirmed record keeps the address and the dates
 above until the person asks for removal through the contact form; an admin then deletes it in
 Admin.
 
