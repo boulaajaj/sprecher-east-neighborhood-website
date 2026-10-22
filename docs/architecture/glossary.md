@@ -35,15 +35,24 @@ which module owns it).
 | Cancelled event  | Planned (#122): still listed, clearly marked as cancelled, never silently removed.                                            | not built yet                                                                                                    |
 | Official meeting | Planned (#122): a city or county meeting, shown with a link to the official agenda.                                           | not built yet                                                                                                    |
 
-## News and reference content
+## News
 
-| Term          | Meaning                                                                                       |
-| ------------- | --------------------------------------------------------------------------------------------- |
-| Post          | A news article (`posts`). Shown newest first by its published date.                           |
-| Post category | A nested category (`categories`) a post can belong to.                                        |
-| Resource      | An entry in the local directory: a link and contact for a service, by category (`resources`). |
-| FAQ entry     | A question and answer, by category (`faq`).                                                   |
-| Team member   | A board member or an AI agent listed on the site (`team-members`).                            |
+| Term              | Meaning                                                                                                            | Where the rule lives                                                   |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| Post              | A news article (`posts`). Shown newest first by its published date.                                                | `src/modules/news/cms/posts.ts`; the order in `data/queries.ts`        |
+| Post category     | A nested category (`categories`) a post can belong to.                                                             | `src/modules/news/cms/categories.ts`                                   |
+| Byline            | A post's author names: "Ana", "Ana and Ben", "Ana, Ben and Cy". Authors without a name are left out.               | `formatAuthors` in `src/modules/news/domain/authors.ts`                |
+| Related posts     | Posts an editor links to a post, listed beside it. Only those the reader may see are shown.                        | `toPostDetail` in `src/modules/news/data/mappers.ts`                   |
+| You May Also Like | The 3 newest published posts beside a post, other than the post itself and its related posts.                      | `recentPostExclusions` in `src/modules/news/domain/related.ts`         |
+| Archive block     | A page-builder block listing posts (the home page's "Recent News"): the newest, optionally by category, or picked. | `findArchivePosts` in `src/modules/news/use-cases/findArchivePosts.ts` |
+
+## Reference content
+
+| Term        | Meaning                                                                                       |
+| ----------- | --------------------------------------------------------------------------------------------- |
+| Resource    | An entry in the local directory: a link and contact for a service, by category (`resources`). |
+| FAQ entry   | A question and answer, by category (`faq`).                                                   |
+| Team member | A board member or an AI agent listed on the site (`team-members`).                            |
 
 ## Forms and email
 
