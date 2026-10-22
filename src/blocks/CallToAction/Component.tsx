@@ -9,7 +9,7 @@ import { Button } from '@/platform/ui'
 export const CallToActionBlock: React.FC<CTABlockProps> = ({ links, richText }) => {
   return (
     <div
-      className="bg-gradient-to-br from-primary to-primary-dark py-10 md:py-14"
+      className="bg-gradient-to-br from-primary-fill to-primary-fill-hover py-10 md:py-14"
       data-theme="dark"
     >
       <div className="container">

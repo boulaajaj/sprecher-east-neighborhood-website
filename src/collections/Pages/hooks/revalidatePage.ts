@@ -2,6 +2,7 @@ import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'paylo
 
 import { revalidatePath } from 'next/cache'
 
+import { documentHref } from '@/platform/payload/documentHref'
 import { expireCacheTag } from '@/platform/payload/expireCacheTag'
 
 import type { Page } from '../../../payload-types'
@@ -13,7 +14,7 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
 }) => {
   if (!context.disableRevalidate) {
     if (doc._status === 'published') {
-      const path = doc.slug === 'home' ? '/' : `/${doc.slug}`
+      const path = documentHref('pages', doc.slug ?? '')
 
       payload.logger.info(`Revalidating page at path: ${path}`)
 
@@ -23,7 +24,7 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
 
     // If the page was previously published, we need to revalidate the old path
     if (previousDoc?._status === 'published' && doc._status !== 'published') {
-      const oldPath = previousDoc.slug === 'home' ? '/' : `/${previousDoc.slug}`
+      const oldPath = documentHref('pages', previousDoc.slug ?? '')
 
       payload.logger.info(`Revalidating old page at path: ${oldPath}`)
 
@@ -36,7 +37,7 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
 
 export const revalidateDelete: CollectionAfterDeleteHook<Page> = ({ doc, req: { context } }) => {
   if (!context.disableRevalidate) {
-    const path = doc?.slug === 'home' ? '/' : `/${doc?.slug}`
+    const path = documentHref('pages', doc?.slug ?? '')
     revalidatePath(path)
     expireCacheTag('pages-sitemap')
   }

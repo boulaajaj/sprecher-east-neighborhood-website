@@ -26,7 +26,9 @@ type NodeTypes =
   | SerializedBlockNode<CTABlockProps | MediaBlockProps | BannerBlockProps | CodeBlockProps>
 
 const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
-  const { value, relationTo } = linkNode.fields.doc!
+  const doc = linkNode.fields.doc
+  if (!doc) return '/'
+  const { value, relationTo } = doc
   if (typeof value !== 'object') {
     throw new Error('Expected value to be an object')
   }

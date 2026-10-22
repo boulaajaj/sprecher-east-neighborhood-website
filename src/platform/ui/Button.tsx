@@ -15,15 +15,16 @@ export const buttonVariants = cva(
       variant: {
         primary:
           'bg-primary-fill text-primary-foreground hover:bg-primary-fill-hover focus-visible:outline-ring',
+        // A light hover tint: /10 would take the text under 4.5:1 on the light background
         secondary:
-          'border border-primary text-primary hover:bg-primary/10 focus-visible:outline-ring',
+          'border border-primary text-primary hover:bg-primary/5 focus-visible:outline-ring',
         accent: 'bg-accent text-accent-foreground hover:bg-accent-dark focus-visible:outline-ring',
         ghost: 'text-foreground hover:bg-surface focus-visible:outline-ring',
         // On a brand band (a data-theme="dark" scope): white fill, or a white outline
         inverse:
           'bg-primary-foreground text-primary-dark hover:bg-primary-foreground/90 focus-visible:outline-primary-foreground',
         'inverse-outline':
-          'border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 focus-visible:outline-primary-foreground',
+          'border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/5 focus-visible:outline-primary-foreground',
       },
       // Every size is at least 44 px tall on phones (WCAG 2.5.8); `sm` shrinks from lg up
       size: {
@@ -130,17 +131,37 @@ function ButtonLink({
   external = false,
   ...rest
 }: ButtonLinkProps) {
-  return (
-    <NextLink
-      {...rest}
-      {...busy(loading, onClick)}
-      {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
-      className={cn(buttonVariants({ variant, size, fullWidth }), className)}
-    >
+  const props = {
+    ...busy(loading, onClick),
+    ...(external && { target: '_blank', rel: 'noopener noreferrer' }),
+    className: cn(buttonVariants({ variant, size, fullWidth }), className),
+  }
+  const content = (
+    <>
       {loading ? spinner : iconStart}
       {children}
       {iconEnd}
       {external && <span className="sr-only">, opens in a new tab</span>}
+    </>
+  )
+
+  // An in-page link stays a plain <a>: next/link scrolls without moving focus, so a skip link
+  // through it would leave keyboard users where they were
+  if (rest.href.startsWith('#')) {
+    const { href, id, title, tabIndex, ...aria } = rest
+    const ariaProps = Object.fromEntries(
+      Object.entries(aria).filter(([key]) => key.startsWith('aria-')),
+    )
+    return (
+      <a href={href} id={id} title={title} tabIndex={tabIndex} {...ariaProps} {...props}>
+        {content}
+      </a>
+    )
+  }
+
+  return (
+    <NextLink {...rest} {...props}>
+      {content}
     </NextLink>
   )
 }

@@ -2,7 +2,13 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Home } from 'lucide-react'
+import type { ComponentProps } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+
+// next/link renders a plain <a> in tests (no router), so mark it to tell the two apart
+vi.mock('next/link', () => ({
+  default: ({ href, ...props }: ComponentProps<'a'>) => <a data-next-link href={href} {...props} />,
+}))
 
 import { Button } from './Button'
 import { expectAccessible } from './testing/expectAccessible'
@@ -83,6 +89,20 @@ describe('Button', () => {
 
     expect(event.defaultPrevented).toBe(true)
     expect(onClick).not.toHaveBeenCalled()
+  })
+
+  it('leaves an in-page link to the browser, so focus moves to the target', () => {
+    render(<Button href="#main-content">Skip to content</Button>)
+
+    const link = screen.getByRole('link', { name: 'Skip to content' })
+    expect(link.getAttribute('href')).toBe('#main-content')
+    expect(link.hasAttribute('data-next-link')).toBe(false)
+  })
+
+  it('routes other links through next/link', () => {
+    render(<Button href="/contact">Contact us</Button>)
+
+    expect(screen.getByRole('link').hasAttribute('data-next-link')).toBe(true)
   })
 
   it('keeps its own classes after a caller adds one', () => {

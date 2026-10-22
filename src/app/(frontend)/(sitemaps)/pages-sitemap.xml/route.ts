@@ -2,6 +2,7 @@ import { sitemapResponse } from '@/utilities/sitemapResponse'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { unstable_cache } from 'next/cache'
+import { documentHref } from '@/platform/payload/documentHref'
 
 const getPagesSitemap = unstable_cache(
   async () => {
@@ -59,7 +60,7 @@ const getPagesSitemap = unstable_cache(
           .filter((page) => Boolean(page?.slug))
           .map((page) => {
             return {
-              loc: page?.slug === 'home' ? `${SITE_URL}/` : `${SITE_URL}/${page?.slug}`,
+              loc: `${SITE_URL}${documentHref('pages', page.slug ?? '')}`,
               lastmod: page.updatedAt || dateFallback,
             }
           })
