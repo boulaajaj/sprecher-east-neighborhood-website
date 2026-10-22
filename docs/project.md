@@ -64,7 +64,7 @@ of code goes, naming [conventions](architecture/conventions.md), the [glossary](
 the [data model](architecture/data-model.md) and [decision records](architecture/decisions/README.md).
 
 The code is moving to that structure in small steps (#127). Events have moved to
-`src/modules/events/` (#131), and `src/platform/lib/` holds the shared paging helpers. Until an
+`src/modules/events/` (#131), FAQ, resources and team members to `src/modules/directory/` (#136), and `src/platform/lib/` holds the shared paging helpers. Until an
 area has moved, it is still in the Payload website template's folders, sorted by technical type:
 
 ```
@@ -74,7 +74,7 @@ src/
     (frontend)/    Public routes (home, posts, events, faq, resources, search, login, account, sitemaps)
     (payload)/     Payload admin and API routes (generated; leave alone)
   blocks/          Page-builder blocks: Payload config + React component each
-  collections/     Payload collections (Pages, Posts, FAQ, Resources, TeamMembers, Users, Media, Categories)
+  collections/     Payload collections (Pages, Posts, Users, Media, Categories)
   components/      Shared React components; components/ui/ holds the shadcn/ui primitives
   endpoints/seed/  Seed data and script
   fields/          Reusable Payload field groups (link, linkGroup, defaultLexical)

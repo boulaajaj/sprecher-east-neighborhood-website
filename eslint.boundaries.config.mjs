@@ -34,12 +34,10 @@ const PAYLOAD = [
 // to a module (#131 to #136); any other file in src/app/ that does it gets a warning.
 const STILL_QUERYING_PAYLOAD = [
   '(frontend)/[slug]/page.tsx',
-  '(frontend)/faq/page.tsx',
   '(frontend)/next/preview/route.ts',
   '(frontend)/next/seed/route.ts',
   '(frontend)/posts/[slug]/page.tsx',
   '(frontend)/posts/page/[pageNumber]/page.tsx',
-  '(frontend)/resources/page.tsx',
   '(frontend)/search/page.tsx',
   '(frontend)/(sitemaps)/pages-sitemap.xml/route.ts',
   '(frontend)/(sitemaps)/posts-sitemap.xml/route.ts',

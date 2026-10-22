@@ -1,10 +1,14 @@
 import type { CollectionConfig } from 'payload'
 
-import { draftContentAccess } from '../../access/draftContentAccess'
-import { populatePublishedAt } from '../../hooks/populatePublishedAt'
-import { revalidateDelete, revalidateFAQ } from './hooks/revalidateFAQ'
+import { draftContentAccess } from '@/access/draftContentAccess'
+import { populatePublishedAt } from '@/hooks/populatePublishedAt'
 
-export const FAQ: CollectionConfig = {
+import { FAQ_CATEGORIES } from '../domain/categories'
+import { revalidateListPage } from './revalidateListPage'
+
+const revalidate = revalidateListPage('faq')
+
+export const FAQ: CollectionConfig<'faq'> = {
   slug: 'faq',
   defaultSort: 'order',
   access: draftContentAccess,
@@ -26,12 +30,7 @@ export const FAQ: CollectionConfig = {
     {
       name: 'category',
       type: 'select',
-      options: [
-        { label: 'General', value: 'general' },
-        { label: 'Membership', value: 'membership' },
-        { label: 'Events', value: 'events' },
-        { label: 'Neighborhood', value: 'neighborhood' },
-      ],
+      options: [...FAQ_CATEGORIES],
       defaultValue: 'general',
     },
     {
@@ -50,9 +49,9 @@ export const FAQ: CollectionConfig = {
     },
   ],
   hooks: {
-    afterChange: [revalidateFAQ],
+    afterChange: [revalidate.afterChange],
     beforeChange: [populatePublishedAt],
-    afterDelete: [revalidateDelete],
+    afterDelete: [revalidate.afterDelete],
   },
   versions: {
     drafts: true,

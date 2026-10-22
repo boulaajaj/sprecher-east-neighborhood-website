@@ -1,9 +1,9 @@
 import type { CollectionConfig } from 'payload'
 
-import { isAdmin, isAdminOrEditor, isAdminOrEditorFieldAccess } from '../../access/roles'
-import { anyone } from '../../access/anyone'
+import { anyone } from '@/access/anyone'
+import { isAdmin, isAdminOrEditor, isAdminOrEditorFieldAccess } from '@/access/roles'
 
-export const TeamMembers: CollectionConfig = {
+export const TeamMembers: CollectionConfig<'team-members'> = {
   slug: 'team-members',
   defaultSort: 'order',
   access: {
