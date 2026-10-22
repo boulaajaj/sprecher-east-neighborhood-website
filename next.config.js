@@ -56,6 +56,10 @@ const nextConfig = {
   logging: { serverFunctions: false },
   reactStrictMode: true,
   redirects,
+  // CI type-checks every PR with `tsc --noEmit` (the required "Type-check & Build" check), so
+  // `next build` skips its own type check. On the 1-CPU server that step took over 8 minutes and
+  // pushed the deploy past its time limit (#246)
+  typescript: { ignoreBuildErrors: true },
   turbopack: {
     root: path.dirname(fileURLToPath(import.meta.url)),
   },

@@ -90,16 +90,33 @@ describe('Form', () => {
     email.value = 'ada@example.com'
 
     const root = await act(async () => hydrateRoot(container, early))
+    // Cleaned up even when an assertion fails, so the next tests don't find a second form
+    try {
+      expect(name.value).toBe('Ada')
+      await userEvent.click(screen.getByRole('button', { name: 'Send' }))
+      expect(onSubmit).toHaveBeenCalledWith(
+        { name: 'Ada', email: 'ada@example.com' },
+        expect.anything(),
+      )
+    } finally {
+      act(() => root.unmount())
+      container.remove()
+    }
+  })
 
-    expect(name.value).toBe('Ada')
-    await userEvent.click(screen.getByRole('button', { name: 'Send' }))
-    expect(onSubmit).toHaveBeenCalledWith(
-      { name: 'Ada', email: 'ada@example.com' },
-      expect.anything(),
-    )
+  it('posts to its own page, so a submit before the script runs never puts the fields in a URL', () => {
+    // The server's HTML: what the browser submits when JavaScript hasn't run (#232)
+    const container = document.createElement('div')
+    container.innerHTML = renderToString(<ContactForm send={vi.fn()} />)
+    const served = container.querySelector('form')
+    expect(served?.getAttribute('method')).toBe('post')
+    // No action: it posts to the page's own URL. The default encoding, form-urlencoded, is one
+    // Next.js never runs as a server action, so it renders the page and ignores the body
+    expect(served?.hasAttribute('action')).toBe(false)
+    expect(served?.hasAttribute('enctype')).toBe(false)
 
-    act(() => root.unmount())
-    container.remove()
+    render(<ContactForm send={vi.fn()} />)
+    expect(screen.getByRole('form', { name: 'Contact' }).getAttribute('method')).toBe('post')
   })
 
   it('shows each field’s error and does not submit when the schema fails', async () => {
