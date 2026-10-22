@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation'
 
 import './index.scss'
 
+import { isStaffRole } from '@/access/roles'
 import { getClientSideURL } from '@/utilities/getURL'
 
 const baseClass = 'admin-bar'
@@ -38,8 +39,10 @@ export const AdminBar: React.FC<{
   ) as keyof typeof collectionLabels
   const router = useRouter()
 
+  // Staff only (#203): residents are signed in too, but can't use the admin. The bar's user type
+  // leaves out `role`, though /api/users/me returns it
   const onAuthChange = React.useCallback((user: PayloadMeUser) => {
-    setShow(Boolean(user?.id))
+    setShow(isStaffRole(user && 'role' in user ? user.role : null))
   }, [])
 
   return (

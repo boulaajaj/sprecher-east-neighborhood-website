@@ -24,11 +24,11 @@ const getRole = (user: User | null): UserRole | null => {
 /** Check if user has admin role (also used by routes that only admins may call) */
 export const hasAdmin = (user: User | null): boolean => getRole(user) === ROLES.admin
 
+/** Whether a role is staff (admin or editor). Takes any value, so untyped data can be checked */
+export const isStaffRole = (role: unknown): boolean => role === ROLES.admin || role === ROLES.editor
+
 /** Check if user has admin or editor role (also used by hooks that exempt staff) */
-export const hasAdminOrEditor = (user: User | null): boolean => {
-  const role = getRole(user)
-  return role === ROLES.admin || role === ROLES.editor
-}
+export const hasAdminOrEditor = (user: User | null): boolean => isStaffRole(getRole(user))
 
 /** Admin only — full access to everything */
 export const isAdmin: Access = ({ req: { user } }) => hasAdmin(user as User | null)
