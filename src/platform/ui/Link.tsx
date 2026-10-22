@@ -1,6 +1,8 @@
 import { cn } from '@/utilities/ui'
 import { type VariantProps, cva } from 'class-variance-authority'
-import NextLink from 'next/link'
+import type NextLink from 'next/link'
+
+import { AppLink } from './AppLink'
 import type { ComponentProps, ReactNode } from 'react'
 
 /**
@@ -71,7 +73,7 @@ export function Link({
   ...rest
 }: LinkProps) {
   return (
-    <NextLink
+    <AppLink
       {...rest}
       {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
       aria-current={current ? 'page' : undefined}
@@ -81,6 +83,6 @@ export function Link({
       {iconOnly ? <span className="sr-only">{children}</span> : children}
       {iconPosition === 'end' && icon}
       {external && <span className="sr-only">, opens in a new tab</span>}
-    </NextLink>
+    </AppLink>
   )
 }

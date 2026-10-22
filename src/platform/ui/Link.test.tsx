@@ -1,7 +1,13 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from '@testing-library/react'
 import { Search } from 'lucide-react'
-import { afterEach, describe, expect, it } from 'vitest'
+import type { ComponentProps } from 'react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
+// next/link renders a plain <a> in tests (no router), so mark it to tell the two apart
+vi.mock('next/link', () => ({
+  default: ({ href, ...props }: ComponentProps<'a'>) => <a data-next-link href={href} {...props} />,
+}))
 
 import { Link } from './Link'
 import { expectAccessible } from './testing/expectAccessible'
@@ -55,6 +61,14 @@ describe('Link', () => {
     )
 
     expect(screen.getByRole('link', { name: 'Search' })).toBeTruthy()
+  })
+
+  it('leaves an in-page link to the browser', () => {
+    render(<Link href="#comments">Comments</Link>)
+
+    expect(screen.getByRole('link', { name: 'Comments' }).hasAttribute('data-next-link')).toBe(
+      false,
+    )
   })
 
   it('has no accessibility violations in any variant', async () => {

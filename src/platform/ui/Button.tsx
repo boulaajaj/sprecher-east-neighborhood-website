@@ -1,7 +1,9 @@
 import { cn } from '@/utilities/ui'
 import { type VariantProps, cva } from 'class-variance-authority'
 import { LoaderCircle } from 'lucide-react'
-import NextLink from 'next/link'
+import type NextLink from 'next/link'
+
+import { AppLink } from './AppLink'
 import type { ComponentProps, ReactNode } from 'react'
 
 /**
@@ -145,23 +147,9 @@ function ButtonLink({
     </>
   )
 
-  // An in-page link stays a plain <a>: next/link scrolls without moving focus, so a skip link
-  // through it would leave keyboard users where they were
-  if (rest.href.startsWith('#')) {
-    const { href, id, title, tabIndex, ...aria } = rest
-    const ariaProps = Object.fromEntries(
-      Object.entries(aria).filter(([key]) => key.startsWith('aria-')),
-    )
-    return (
-      <a href={href} id={id} title={title} tabIndex={tabIndex} {...ariaProps} {...props}>
-        {content}
-      </a>
-    )
-  }
-
   return (
-    <NextLink {...rest} {...props}>
+    <AppLink {...rest} {...props}>
       {content}
-    </NextLink>
+    </AppLink>
   )
 }
