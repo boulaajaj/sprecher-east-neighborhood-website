@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { draftContentAccess } from '@/platform/payload/draftContentAccess'
-import { populatePublishedAt } from '@/hooks/populatePublishedAt'
+import { populatePublishedAt } from '@/platform/payload/populatePublishedAt'
 
 import { RESOURCE_CATEGORIES } from '../domain/categories'
 import { isResourceUrl } from '../domain/resourceUrl'

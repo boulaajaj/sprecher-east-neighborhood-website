@@ -7,7 +7,7 @@ import type { Header } from '@/payload-types'
 import { Button, Link } from '@/platform/ui'
 
 vi.mock('next/navigation', () => ({ usePathname: () => '/' }))
-vi.mock('@/providers/HeaderTheme', () => ({
+vi.mock('@/platform/theme/HeaderThemeProvider.client', () => ({
   useHeaderTheme: () => ({ headerTheme: null, setHeaderTheme: () => {} }),
 }))
 

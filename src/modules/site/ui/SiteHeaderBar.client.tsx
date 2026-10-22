@@ -1,5 +1,5 @@
 'use client'
-import { useHeaderTheme } from '@/providers/HeaderTheme'
+import { useHeaderTheme } from '@/platform/theme/HeaderThemeProvider.client'
 import NextLink from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'

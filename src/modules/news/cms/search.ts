@@ -7,7 +7,7 @@ import { beforeSyncWithSearch } from './searchSync'
 
 /**
  * Search plugin options: what each search entry keeps (title, slug, search-engine fields,
- * categories) and who may manage the index. The plugin setup (src/plugins/index.ts) chooses
+ * categories) and who may manage the index. The plugin setup (src/payload.config.ts) chooses
  * which collections it indexes, so this module names no other module's collection.
  */
 export const searchOptions: Omit<SearchPluginConfig, 'collections'> = {

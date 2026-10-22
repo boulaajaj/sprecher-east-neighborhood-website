@@ -3,8 +3,8 @@
 import React from 'react'
 
 import { Field } from '@/platform/ui'
-import { useTheme } from '@/providers/Theme'
-import { themeLocalStorageKey } from '@/providers/Theme/shared'
+import { useTheme } from './ThemeProvider.client'
+import { themeLocalStorageKey } from './theme'
 
 const THEME_OPTIONS = [
   { label: 'Auto', value: 'auto' },
