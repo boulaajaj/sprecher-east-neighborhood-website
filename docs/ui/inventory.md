@@ -3,10 +3,8 @@
 Issue #170, part of epic #163. Every route and state of the public site, every UI element on it,
 the data each element shows, and the component set the elements point to.
 
-> **Owner review comes first.** The [proposed component set](component-set.md) is a proposal. The
-> owner (Amine) reviews it, changes it if he wants, and approves it before any component is built.
-> No issue under #163 starts building a component until then. The owner closes #170 once he
-> approves the set.
+> **Approved.** The owner approved the [component set](component-set.md) on 2026-10-21, with the
+> merges he asked for that day. Each component is built in its own issue under #163.
 
 ## The files
 
