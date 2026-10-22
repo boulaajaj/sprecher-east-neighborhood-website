@@ -8,7 +8,7 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 
-import { populatePublishedAt } from '@/hooks/populatePublishedAt'
+import { populatePublishedAt } from '@/platform/payload/populatePublishedAt'
 import { draftContentAccess } from '@/platform/payload/draftContentAccess'
 import { generatePreviewPath } from '@/platform/payload/generatePreviewPath'
 

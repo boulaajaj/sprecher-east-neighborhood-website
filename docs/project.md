@@ -63,35 +63,34 @@ target structure (one module per business area under `src/modules/`, shared code
 of code goes, naming [conventions](architecture/conventions.md), the [glossary](architecture/glossary.md),
 the [data model](architecture/data-model.md) and [decision records](architecture/decisions/README.md).
 
-The code is moving to that structure in small steps (#127). Events have moved to
-`src/modules/events/` (#131), FAQ, resources and team members to `src/modules/directory/`
-(#136), news posts, categories and search to `src/modules/news/` (#132), and the contact
-form's safeguards and form block to `src/modules/contact/` (#133), and accounts (who is signed in,
-sign-in and password flows, the users collection) to `src/modules/accounts/` (#134), and CMS
-pages, the page-builder blocks, heroes, header, footer and redirects to `src/modules/site/`
-(#135).
-`src/platform/lib/` holds the shared helpers (paging, roles, dates and the site timezone, URLs,
-`cn`), `src/platform/seo/` the page metadata, Open Graph and sitemap helpers,
-`src/platform/payload/` the role checks and access functions every collection uses and the admin
-dashboard components, `src/platform/ui/` the UI kit (`Button`, `Link`, `Media`, `CMSLink`,
-`JsonLd`, `Breadcrumbs`, `LoadMore` and the rest), `src/platform/richtext/` the `RichText`
-renderer and the blocks an editor can put inside rich text, and `src/platform/email/` the SMTP
-settings that password-reset and form emails share (#135). Until an area has moved, it is still in the Payload website template's folders,
-sorted by technical type:
+Every business area has moved to that structure (#127), and lint fails on an import that breaks
+its rules (#137). The Payload website template's folders are gone; the few exceptions (seed,
+generated files) are listed in [`architecture/`](architecture/README.md#exceptions).
 
 ```
 src/
-  app/             Next.js App Router
-    (frontend)/    Public routes (home, posts, events, faq, resources, search, login, account, sitemaps)
-    (payload)/     Payload admin and API routes (generated; leave alone)
-  collections/     Payload collections (Media)
-  endpoints/seed/  Seed data and script
-  fields/          Reusable Payload field groups (link, linkGroup, defaultLexical)
-  hooks/           Payload hooks (publishedAt)
-  migrations/      Database migrations (generated)
-  plugins/         Payload plugin setup (form builder, SEO, search, redirects, nested docs)
-  providers/       React context providers (theme, header theme)
-  payload.config.ts
+  app/                 Next.js App Router: routes and composition only
+    (frontend)/        Public routes (home, posts, events, faq, resources, search, login, account, sitemaps)
+    (payload)/         Payload admin and API routes (generated; leave alone)
+  modules/             One folder per business area
+    accounts/          Who is signed in, sign-in and password flows, the users collection
+    contact/           Form safeguards, the robot check, the form block
+    directory/         FAQ, local resources, team members
+    events/            Events and the upcoming rule
+    news/              Posts, categories, search
+    site/              CMS pages, page-builder blocks, heroes, header, footer, redirects, link fields
+  platform/            Shared by every module; imports no module
+    email/             SMTP settings for password-reset and form emails
+    lib/               Pure helpers: paging, roles, dates and the site timezone, URLs, `cn`
+    payload/           Role checks, access functions, media collection, default editor, publishedAt hook, admin components
+    richtext/          The `RichText` renderer and the blocks inside rich text
+    seo/               Page metadata, Open Graph and sitemap helpers
+    theme/             Light and dark mode: theme providers, `InitTheme`, `ThemeSelector`
+    ui/                The UI kit: `Button`, `Link`, `Media`, `CMSLink`, `JsonLd`, `Breadcrumbs`, `LoadMore`…
+  endpoints/seed/      Seed data and script (exception)
+  migrations/          Database migrations (generated)
+  payload.config.ts    CMS composition: collections, globals, plugins
+  proxy.ts             Next.js proxy (middleware)
 ```
 
 ## Key Files
@@ -104,13 +103,13 @@ src/
 | `src/modules/news/cms/posts.ts`     | News posts collection                             |
 | `src/modules/events/cms/events.ts`  | Events collection (custom)                        |
 | `src/modules/accounts/cms/users.ts` | Users collection with Payload native auth         |
-| `src/collections/Media.ts`          | Media uploads with size variants                  |
-| `src/modules/site/cms/`             | Layout builder block and hero configs, globals    |
+| `src/platform/payload/media.ts`     | Media uploads with size variants                  |
+| `src/modules/site/cms/`             | Block, hero and link field configs, globals       |
 | `src/modules/site/ui/`              | Blocks, heroes, header and footer components      |
 | `src/platform/payload/roles.ts`     | Role checks and access functions                  |
-| `src/fields/`                       | Reusable field groups (link, linkGroup, lexical)  |
+| `src/platform/theme/`               | Light and dark mode providers and init script     |
 | `ecosystem.config.cjs`              | PM2 config for VPS (CommonJS: package is ESM)     |
-| `eslint.boundaries.config.mjs`      | Dependency rules as lint (warnings until #137)    |
+| `eslint.boundaries.config.mjs`      | Dependency rules as lint errors (#137)            |
 
 ## Design Tokens
 

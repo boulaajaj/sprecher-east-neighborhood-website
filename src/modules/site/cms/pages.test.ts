@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 
 import { draftContentAccess } from '@/platform/payload/draftContentAccess'
-import { populatePublishedAt } from '@/hooks/populatePublishedAt'
+import { populatePublishedAt } from '@/platform/payload/populatePublishedAt'
 
 import { createPagesCollection } from './pages'
 import { revalidateDelete, revalidatePage } from './revalidatePage'

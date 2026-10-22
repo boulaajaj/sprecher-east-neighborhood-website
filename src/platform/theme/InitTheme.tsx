@@ -1,7 +1,7 @@
 import React from 'react'
 import Script from 'next/script'
 
-import { defaultTheme, themeLocalStorageKey } from '../shared'
+import { defaultTheme, themeLocalStorageKey } from './theme'
 
 /**
  * Sets `data-theme` on <html> before first paint to avoid flash of wrong theme.
@@ -9,6 +9,9 @@ import { defaultTheme, themeLocalStorageKey } from '../shared'
  */
 export const InitTheme: React.FC = () => {
   return (
+    // The rule predates the App Router: there, beforeInteractive belongs in the root layout, which
+    // is where this renders (app/(frontend)/layout.tsx)
+    // eslint-disable-next-line @next/next/no-before-interactive-script-outside-document
     <Script
       dangerouslySetInnerHTML={{
         __html: `

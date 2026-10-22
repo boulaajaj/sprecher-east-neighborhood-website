@@ -9,7 +9,9 @@ File references are as they were when the inventory was taken. Since then #223 r
 form-builder field files under `src/blocks/Form/` (`Width/`, `Error/` and the rest) with `Field`,
 #133 moved the form block to `src/modules/contact/ui/FormBlock.client.tsx`, and #134 moved
 `login/LoginForm.tsx` and `account/ChangePasswordForm.tsx` to `src/modules/accounts/ui/`
-(`SignInForm.client.tsx`, `ChangePasswordForm.client.tsx`).
+(`SignInForm.client.tsx`, `ChangePasswordForm.client.tsx`). #137 moved the plugin setup from
+`src/plugins/index.ts` into `src/payload.config.ts`, and the theme providers and
+`ThemeSelector` from `src/providers/` to `src/platform/theme/`.
 
 ## Duplication
 

@@ -70,7 +70,7 @@ export default [
       'react/no-unescaped-entities': 'off',
 
       // ── Max file length ───────────────────────────────────────────────────
-      'max-lines': ['warn', { max: 300, skipBlankLines: true, skipComments: true }],
+      'max-lines': ['error', { max: 250, skipBlankLines: true, skipComments: true }],
 
       // ── General quality ───────────────────────────────────────────────────
       'no-console': ['warn', { allow: ['warn', 'error'] }],
@@ -80,22 +80,9 @@ export default [
     },
   },
 
-  // ─── 5. Payload CMS overrides (hooks and collections use `any` in their API)
-  {
-    files: [
-      'src/payload/**/*.ts',
-      'src/collections/**/*.ts',
-      'src/hooks/**/*.ts',
-      'src/access/**/*.ts',
-    ],
-    rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
-    },
-  },
-
-  // ─── 6. Architecture boundaries (warnings while code moves, #130) ────────────
+  // ─── 5. Architecture boundaries (errors since #137) ──────────────────────────
   boundariesConfig,
 
-  // ─── 7. Prettier must be last ────────────────────────────────────────────────
+  // ─── 6. Prettier must be last ────────────────────────────────────────────────
   eslintConfigPrettier,
 ]
