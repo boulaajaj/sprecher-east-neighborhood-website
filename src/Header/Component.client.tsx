@@ -1,12 +1,12 @@
 'use client'
 import { useHeaderTheme } from '@/providers/HeaderTheme'
-import Link from 'next/link'
+import NextLink from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import type { Header } from '@/payload-types'
 
-import { Button } from '@/platform/ui'
+import { Button, Link } from '@/platform/ui'
 import { Menu, X } from 'lucide-react'
 import { Logo } from '@/components/Logo/Logo'
 import { HeaderNav } from './Nav'
@@ -89,9 +89,9 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
       {...(theme ? { 'data-theme': theme } : {})}
     >
       <div className="container flex items-center justify-between py-4">
-        <Link href="/" className="shrink-0">
+        <NextLink href="/" className="shrink-0">
           <Logo loading="eager" priority="high" />
-        </Link>
+        </NextLink>
 
         {/* Desktop nav */}
         {/* Desktop nav starts at lg: below 1024px the items don't fit and the page scrolls sideways */}
@@ -101,21 +101,23 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
             <div className="h-9 w-16 animate-pulse rounded-md bg-border" />
           ) : user ? (
             <>
+              {/* A long name is cut short so the bar never overflows; the full name is the title */}
               <Link
                 href="/account"
-                className="rounded-md px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-primary"
+                variant="nav"
+                size="sm"
+                current={pathname === '/account'}
+                title={user.name || undefined}
+                className="max-w-40"
               >
-                {user.name || 'Account'}
+                <span className="truncate">{user.name || 'Account'}</span>
               </Link>
               <Button variant="ghost" size="sm" onClick={logout}>
                 Sign Out
               </Button>
             </>
           ) : (
-            <Link
-              href="/login"
-              className="rounded-md px-3 py-2 text-sm font-medium whitespace-nowrap text-foreground transition-colors hover:bg-secondary hover:text-primary"
-            >
+            <Link href="/login" variant="nav" size="sm" current={pathname === '/login'}>
               Log In
             </Link>
           )}
@@ -163,8 +165,9 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
                   <>
                     <Link
                       href="/account"
+                      variant="nav"
+                      current={pathname === '/account'}
                       onClick={() => closeMobileMenu()}
-                      className="block w-full rounded-md px-3 py-2.5 text-base font-medium text-foreground transition-colors hover:bg-secondary hover:text-primary"
                     >
                       {user.name || 'Account'}
                     </Link>
@@ -183,8 +186,9 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
                 ) : (
                   <Link
                     href="/login"
+                    variant="nav"
+                    current={pathname === '/login'}
                     onClick={() => closeMobileMenu()}
-                    className="block w-full rounded-md px-3 py-2.5 text-base font-medium text-foreground transition-colors hover:bg-secondary hover:text-primary"
                   >
                     Log In
                   </Link>

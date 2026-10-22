@@ -4,15 +4,9 @@ import React from 'react'
 
 import type { Header as HeaderType } from '@/payload-types'
 
-import { cn } from '@/utilities/ui'
-import { CMSLink } from '@/components/Link'
-import { resolveLink } from '@/platform/payload/resolveLink'
-import Link from 'next/link'
+import { type ResolvedLink, resolveLink } from '@/platform/payload/resolveLink'
+import { Link } from '@/platform/ui'
 import { SearchIcon } from 'lucide-react'
-
-function resolveHref(link: NonNullable<HeaderType['navItems']>[number]['link']): string {
-  return resolveLink(link)?.href ?? ''
-}
 
 function normalizePath(value: string): string {
   const [pathOnly] = value.split(/[?#]/)
@@ -39,77 +33,40 @@ interface HeaderNavProps {
 }
 
 export const HeaderNav: React.FC<HeaderNavProps> = ({ data, pathname, mobile, onNavigate }) => {
-  const navItems = (data?.navItems || []).filter(
-    ({ link }) => !CTA_PATHS.has(normalizePath(resolveHref(link))),
-  )
-
-  if (mobile) {
-    return (
-      <nav className="flex flex-col gap-1">
-        {navItems.map(({ link }, i) => {
-          const href = resolveHref(link)
-          const active = href && isActivePath(pathname, href)
-
-          return (
-            <div key={i} onClick={onNavigate}>
-              <CMSLink
-                {...link}
-                appearance="link"
-                ariaCurrent={Boolean(active)}
-                className={cn(
-                  'block min-h-11 w-full rounded-md px-3 py-2.5 text-base font-medium transition-colors hover:bg-secondary hover:text-primary',
-                  active ? 'bg-secondary text-primary' : 'text-foreground',
-                )}
-              />
-            </div>
-          )
-        })}
-        <div onClick={onNavigate}>
-          <Link
-            href="/search"
-            aria-current={isActivePath(pathname, '/search') ? 'page' : undefined}
-            className={cn(
-              'flex min-h-11 items-center gap-2 rounded-md px-3 py-2.5 text-base font-medium transition-colors hover:bg-secondary hover:text-primary',
-              isActivePath(pathname, '/search') ? 'bg-secondary text-primary' : 'text-foreground',
-            )}
-          >
-            <SearchIcon aria-hidden="true" className="h-5 w-5" />
-            Search
-          </Link>
-        </div>
-      </nav>
+  const links = (data?.navItems || [])
+    .map(({ link }) => resolveLink(link))
+    .filter(
+      (link): link is ResolvedLink => link !== null && !CTA_PATHS.has(normalizePath(link.href)),
     )
-  }
+  const size = mobile ? 'md' : 'sm'
 
   return (
-    <nav className="flex items-center gap-1">
-      {navItems.map(({ link }, i) => {
-        const href = resolveHref(link)
-        const active = href && isActivePath(pathname, href)
-
-        return (
-          <CMSLink
-            key={i}
-            {...link}
-            appearance="link"
-            ariaCurrent={Boolean(active)}
-            className={cn(
-              'relative rounded-md px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors hover:bg-secondary hover:text-primary',
-              active ? 'text-primary' : 'text-foreground',
-            )}
-          />
-        )
-      })}
+    <nav aria-label="Main" className={mobile ? 'flex flex-col gap-1' : 'flex items-center gap-1'}>
+      {links.map((link, i) => (
+        <Link
+          key={i}
+          href={link.href}
+          external={link.external}
+          variant="nav"
+          size={size}
+          current={isActivePath(pathname, link.href)}
+          onClick={onNavigate}
+        >
+          {link.label}
+        </Link>
+      ))}
       <Link
         href="/search"
-        aria-current={isActivePath(pathname, '/search') ? 'page' : undefined}
-        className={cn(
-          'rounded-md p-2 transition-colors hover:bg-secondary hover:text-primary',
-          isActivePath(pathname, '/search') ? 'text-primary' : 'text-muted-foreground',
-        )}
+        variant="nav"
+        size={size}
+        current={isActivePath(pathname, '/search')}
+        icon={<SearchIcon aria-hidden="true" />}
+        // In the desktop bar only the magnifier shows, muted until it's the current page
+        iconOnly={!mobile}
+        className={mobile ? undefined : 'text-muted-foreground'}
+        onClick={onNavigate}
       >
-        <span className="sr-only">Search</span>
-        <SearchIcon aria-hidden="true" className="h-5 w-5" />
+        Search
       </Link>
     </nav>
   )

@@ -4,7 +4,8 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
+import { Link } from '@/platform/ui'
+import { ArrowLeft } from 'lucide-react'
 
 import { PostsFeed } from '@/components/PostsFeed'
 import { findPublishedPosts, parsePageNumber, POSTS_PAGE_SIZE } from '@/utilities/feeds'
@@ -42,9 +43,11 @@ export default async function Page({ params: paramsPromise }: Args) {
         </h1>
         <Link
           href="/posts"
-          className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-primary hover:underline"
+          variant="action"
+          icon={<ArrowLeft aria-hidden="true" />}
+          className="mt-4"
         >
-          ← Back to the latest news
+          Back to the latest news
         </Link>
       </div>
 

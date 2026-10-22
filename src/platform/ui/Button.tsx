@@ -1,7 +1,9 @@
 import { cn } from '@/utilities/ui'
 import { type VariantProps, cva } from 'class-variance-authority'
 import { LoaderCircle } from 'lucide-react'
-import NextLink from 'next/link'
+import type NextLink from 'next/link'
+
+import { AppLink } from './AppLink'
 import type { ComponentProps, ReactNode } from 'react'
 
 /**
@@ -15,14 +17,14 @@ export const buttonVariants = cva(
       variant: {
         primary:
           'bg-primary-fill text-primary-foreground hover:bg-primary-fill-hover focus-visible:outline-ring',
-        // A light hover tint: /10 would take the text under 4.5:1 on the light background
+        // primary-strong text: plain primary is 4.33:1 on surface panels and on the hover tint
         secondary:
-          'border border-primary text-primary hover:bg-primary/5 focus-visible:outline-ring',
+          'border border-primary text-primary-strong hover:bg-primary/5 focus-visible:outline-ring',
         accent: 'bg-accent text-accent-foreground hover:bg-accent-dark focus-visible:outline-ring',
         ghost: 'text-foreground hover:bg-surface focus-visible:outline-ring',
         // On a brand band (a data-theme="dark" scope): white fill, or a white outline
         inverse:
-          'bg-primary-foreground text-primary-dark hover:bg-primary-foreground/90 focus-visible:outline-primary-foreground',
+          'bg-primary-foreground text-primary-dark hover:bg-primary-foreground/95 focus-visible:outline-primary-foreground',
         'inverse-outline':
           'border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/5 focus-visible:outline-primary-foreground',
       },
@@ -145,23 +147,9 @@ function ButtonLink({
     </>
   )
 
-  // An in-page link stays a plain <a>: next/link scrolls without moving focus, so a skip link
-  // through it would leave keyboard users where they were
-  if (rest.href.startsWith('#')) {
-    const { href, id, title, tabIndex, ...aria } = rest
-    const ariaProps = Object.fromEntries(
-      Object.entries(aria).filter(([key]) => key.startsWith('aria-')),
-    )
-    return (
-      <a href={href} id={id} title={title} tabIndex={tabIndex} {...ariaProps} {...props}>
-        {content}
-      </a>
-    )
-  }
-
   return (
-    <NextLink {...rest} {...props}>
+    <AppLink {...rest} {...props}>
       {content}
-    </NextLink>
+    </AppLink>
   )
 }

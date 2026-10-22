@@ -1,6 +1,7 @@
 import type { Metadata } from 'next/types'
 
-import Link from 'next/link'
+import { Link } from '@/platform/ui'
+import { ArrowLeft } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
@@ -43,9 +44,11 @@ export default async function EventsListPage({ params: paramsPromise }: Args) {
         </h1>
         <Link
           href="/events"
-          className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-primary hover:underline"
+          variant="action"
+          icon={<ArrowLeft aria-hidden="true" />}
+          className="mt-4"
         >
-          ← Back to all events
+          Back to all events
         </Link>
       </div>
       <section className="container">
