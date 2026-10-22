@@ -28,6 +28,9 @@ function renderBlock(block: LayoutBlock, components: PageBlockComponents): React
     case 'mediaBlock':
       return <components.mediaBlock {...block} disableInnerContainer />
     default:
+      // A block type added to Pages without a case here fails tsc; an unknown type in old data
+      // still draws nothing at runtime
+      block satisfies never
       return null
   }
 }

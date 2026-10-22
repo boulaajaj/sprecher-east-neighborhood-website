@@ -18,7 +18,7 @@ const cachedGlobal = <T extends 'header' | 'footer'>(slug: T) =>
         slug,
         depth: 1,
         // Keeps today's behavior: nav links populate whether or not their page is published
-        // yet, since nothing revalidates the header or footer when a page is published
+        // yet, since nothing revalidates the header or footer when a page is published (#251)
         overrideAccess: true,
       })
     },
