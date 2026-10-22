@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from '@testing-library/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type { RichTextValue } from '@/platform/lib'
 
@@ -74,11 +74,13 @@ describe('RichText', () => {
     expect(screen.getByText('Banner: info')).toBeTruthy()
   })
 
-  it('renders no block it has no renderer for', () => {
+  it('draws a block it has no renderer for as Payload’s "unknown node"', () => {
+    // Why every field that can hold blocks must get renderers (payload.config.test.ts)
+    vi.spyOn(console, 'error').mockImplementation(() => {})
     const { container } = render(<RichText data={doc(block({ blockType: 'banner' }))} />)
 
     expect(container.querySelector('aside')).toBeNull()
-    expect(container.textContent).not.toContain('Banner')
+    expect(container.textContent).toBe('unknown node')
   })
 
   it('links to a post or a page by its address on the site', () => {
