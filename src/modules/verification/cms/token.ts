@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from 'node:crypto'
 
-/** 32 random bytes in base64url: 43 characters (`tokenFormat.ts`), 256 bits nobody can guess. */
+/** 32 random bytes in base64url: 43 characters (`domain/tokenFormat.ts`), 256 bits nobody can guess. */
 const TOKEN_BYTES = 32
 
 /** A new confirmation token, for the link, and its hash, the only part the database keeps. */

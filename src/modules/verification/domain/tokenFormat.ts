@@ -1,4 +1,5 @@
-// Apart from token.ts, which needs node:crypto: the confirm page and the browser parse links too.
+// Pure, so the confirm page and the browser can check a link too. Tokens are made in cms/token.ts
+// (node:crypto stays out of the domain).
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/
 
 /** A token from a link, or `null` when it can't be one of ours (wrong type, length or characters). */

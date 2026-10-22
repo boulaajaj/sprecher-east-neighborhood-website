@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { newConfirmationToken } from '../domain/token'
+import { newConfirmationToken } from './token'
 import { fakeRequest } from '../testing/fakeRequest'
 import { confirmEmail } from './confirmEmail'
 

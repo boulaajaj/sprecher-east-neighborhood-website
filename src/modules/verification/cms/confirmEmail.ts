@@ -5,7 +5,7 @@ import type { EmailConfirmedListener } from '@/platform/payload/emailConfirmer'
 
 import { toWelcomeEmail } from '../domain/emails'
 import { checkLink, toUnconfirmedCutoff } from '../domain/rules'
-import { hashConfirmationToken } from '../domain/token'
+import { hashConfirmationToken } from './token'
 import { parseConfirmationToken } from '../domain/tokenFormat'
 import type { ConfirmOutcome } from '../domain/types'
 import { logFailure } from './logFailure'

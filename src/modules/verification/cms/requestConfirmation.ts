@@ -7,7 +7,7 @@ import { parseEmailAddress } from '../domain/address'
 import { toConfirmationEmail, toConfirmationLink } from '../domain/emails'
 import { CONFIRMATION_LIMITS } from '../domain/limits'
 import { checkAddressLimit, toTokenExpiry, toUnconfirmedCutoff } from '../domain/rules'
-import { newConfirmationToken } from '../domain/token'
+import { newConfirmationToken } from './token'
 import type { RequestOutcome } from '../domain/types'
 import { deleteUnconfirmedBefore, getConfirmationByEmail, saveLinkSent } from './store'
 

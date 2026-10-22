@@ -60,3 +60,20 @@ describe('emailConfirmer.request', () => {
     )
   })
 })
+
+describe('emailConfirmer and the caller’s transaction', () => {
+  it('never passes the caller’s transaction to its own reads and writes', async () => {
+    const { payload, req } = fakeRequest()
+    req.transactionID = 'caller-tx'
+
+    await emailConfirmer.isConfirmed('ana@example.com', req)
+    await emailConfirmer.request('ana@example.com', req)
+
+    const calls = [payload.find, payload.create, payload.delete].flatMap((fn) => fn.mock.calls)
+    expect(calls.length).toBeGreaterThan(0)
+    for (const [args] of calls) {
+      expect((args as { req: { transactionID?: unknown } }).req.transactionID).toBeUndefined()
+    }
+    expect(req.transactionID).toBe('caller-tx')
+  })
+})

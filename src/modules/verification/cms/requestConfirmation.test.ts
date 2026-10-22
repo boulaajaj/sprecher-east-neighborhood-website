@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { hashConfirmationToken } from '../domain/token'
+import { hashConfirmationToken } from './token'
 import { fakeRequest } from '../testing/fakeRequest'
 
 /** The limits keep per-process counters, so every test loads a fresh copy. */
@@ -95,6 +95,11 @@ describe('requestConfirmation', () => {
 
     expect(await request('person5@example.com', req)).toBe('connection-limit')
     expect(sent).toHaveLength(5)
+
+    vi.setSystemTime(NOW + HOUR - 1)
+    expect(await request('person6@example.com', req)).toBe('connection-limit')
+    vi.setSystemTime(NOW + HOUR)
+    expect(await request('person7@example.com', req)).toBe('sent')
   })
 
   it('sends at most 30 links an hour site-wide, even without a client IP', async () => {
@@ -104,6 +109,11 @@ describe('requestConfirmation', () => {
 
     expect(await request('person30@example.com', req)).toBe('site-limit')
     expect(sent).toHaveLength(30)
+
+    vi.setSystemTime(NOW + HOUR - 1)
+    expect(await request('person31@example.com', req)).toBe('site-limit')
+    vi.setSystemTime(NOW + HOUR)
+    expect(await request('person32@example.com', req)).toBe('sent')
   })
 
   it('deletes unconfirmed addresses 7 days after their last link, never confirmed ones', async () => {
