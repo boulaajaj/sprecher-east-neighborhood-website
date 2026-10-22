@@ -17,17 +17,19 @@ beforeEach(() => {
 })
 afterEach(cleanup)
 
+const currentPassword = () => screen.getByLabelText<HTMLInputElement>(/^Current password/)
 const newPassword = () => screen.getByLabelText<HTMLInputElement>(/^New password/)
 const confirmation = () => screen.getByLabelText<HTMLInputElement>(/^Confirm new password/)
 
 const fillAndSend = async (password = 'correct-horse') => {
+  await userEvent.type(currentPassword(), 'old-horse')
   await userEvent.type(newPassword(), password)
   await userEvent.type(confirmation(), password)
   await userEvent.click(screen.getByRole('button', { name: 'Update Password' }))
 }
 
 describe('ChangePasswordForm', () => {
-  it('sends only the two passwords, then confirms and clears the fields', async () => {
+  it('sends only the three passwords, then confirms and clears the fields', async () => {
     mocks.changePassword.mockResolvedValue({ ok: true })
     render(<ChangePasswordForm />)
     await expectAccessible(document.body)
@@ -35,11 +37,29 @@ describe('ChangePasswordForm', () => {
     await fillAndSend()
 
     expect(mocks.changePassword).toHaveBeenCalledWith({
+      currentPassword: 'old-horse',
       newPassword: 'correct-horse',
       confirmPassword: 'correct-horse',
     })
     expect((await screen.findByRole('status')).textContent).toContain('Password updated.')
+    expect(currentPassword().value).toBe('')
     expect(newPassword().value).toBe('')
+  })
+
+  it('asks for the current password as a required password field the browser can fill', () => {
+    render(<ChangePasswordForm />)
+    expect(currentPassword()).toMatchObject({ type: 'password', autocomplete: 'current-password' })
+    expect(screen.getByLabelText(/^Current password.*\(required\)$/)).toBe(currentPassword())
+    expect(newPassword().autocomplete).toBe('new-password')
+  })
+
+  it('doesn’t send without the current password', async () => {
+    render(<ChangePasswordForm />)
+    await userEvent.type(newPassword(), 'correct-horse')
+    await userEvent.type(confirmation(), 'correct-horse')
+    await userEvent.click(screen.getByRole('button', { name: 'Update Password' }))
+    expect(await screen.findByText('Enter your current password')).toBeTruthy()
+    expect(mocks.changePassword).not.toHaveBeenCalled()
   })
 
   it('doesn’t send a password that is too short', async () => {
@@ -49,6 +69,7 @@ describe('ChangePasswordForm', () => {
   })
 
   it.each([
+    ['wrong-password', 'Your current password isn’t right. Please try again.'],
     ['signed-out', 'Your session has ended. Log in again, then change your password.'],
     ['rejected', 'That password can’t be used. Choose a different one and try again.'],
     ['server-error', 'We couldn’t update your password. Please try again in a few minutes.'],

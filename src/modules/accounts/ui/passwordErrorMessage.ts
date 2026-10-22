@@ -11,6 +11,7 @@ export function toPasswordErrorMessage(failure: PasswordFailure | 'offline'): st
   if (failure === 'signed-out') {
     return 'Your session has ended. Log in again, then change your password.'
   }
+  if (failure === 'wrong-password') return 'Your current password isn’t right. Please try again.'
   if (failure === 'rejected') {
     return 'That password can’t be used. Choose a different one and try again.'
   }

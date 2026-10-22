@@ -9,6 +9,12 @@ describe('toPasswordErrorMessage', () => {
     )
   })
 
+  it('gives one message for a refused current password, so it never says the account is locked', () => {
+    expect(toPasswordErrorMessage('wrong-password')).toBe(
+      'Your current password isn’t right. Please try again.',
+    )
+  })
+
   it('says why when the resident can act on it', () => {
     expect(toPasswordErrorMessage('rejected')).toBe(
       'That password can’t be used. Choose a different one and try again.',

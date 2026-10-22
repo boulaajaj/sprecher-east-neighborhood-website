@@ -36,7 +36,7 @@ vi.mock('next/headers', () => ({
 import { changePassword, getSignedInAccount, signIn, signOut } from './actions'
 
 // Payload's real errors, as its operations throw them
-const { APIError, AuthenticationError, Forbidden, ValidationError } =
+const { APIError, AuthenticationError, Forbidden, LockedAuth, ValidationError } =
   await vi.importActual<typeof PayloadModule>('payload')
 
 const resident = { id: 7, email: 'ada@example.com', name: 'Ada', role: 'resident', _sid: 's7' }
@@ -115,49 +115,74 @@ describe('signIn', () => {
 })
 
 describe('changePassword', () => {
-  const input = { newPassword: password, confirmPassword: password }
-
-  it('changes the signed-in account’s own password, with access rules applied', async () => {
+  const currentPassword = 'old-horse'
+  const input = { currentPassword, newPassword: password, confirmPassword: password }
+  beforeEach(() => {
     edges.auth.mockResolvedValue({ user: resident })
+  })
+
+  it('checks the current password, then changes the session account’s own password', async () => {
+    edges.login.mockResolvedValue({ user: resident, token: 'other-session' })
     expect(await changePassword(input)).toEqual({ ok: true })
+    // Payload's own check, for the session's account only, with access rules applied
+    expect(edges.login).toHaveBeenCalledExactlyOnceWith({
+      collection: 'users',
+      data: { email: 'ada@example.com', password: currentPassword },
+      overrideAccess: false,
+    })
     expect(edges.update).toHaveBeenCalledWith(
       expect.objectContaining({
         collection: 'users',
         id: 7,
         data: { password },
         overrideAccess: false,
-        user: resident,
+        user: resident, // with its session id, so Payload keeps this session and ends the others
       }),
     )
+    // The check's token is dropped: the browser keeps its own session cookie
+    expect(edges.setCookie).not.toHaveBeenCalled()
   })
 
-  it('refuses to name another account', async () => {
-    edges.auth.mockResolvedValue({ user: resident })
-    expect(await changePassword({ ...input, id: 1 })).toEqual({ ok: false, failure: 'rejected' })
-    expect(await changePassword({ ...input, user: { id: 1 } })).toEqual({
-      ok: false,
-      failure: 'rejected',
-    })
+  it.each([
+    ['a wrong current password', new AuthenticationError()],
+    ['a locked account', new LockedAuth()],
+    ['a blank current password', new ValidationError({ errors: [{ message: 'x', path: 'p' }] })],
+  ])('refuses %s with one failure, and changes nothing', async (_, error) => {
+    edges.login.mockRejectedValue(error)
+    expect(await changePassword(input)).toEqual({ ok: false, failure: 'wrong-password' })
+    expect(edges.update).not.toHaveBeenCalled()
+    expect(console.error).not.toHaveBeenCalled()
+  })
+
+  it('checks the passwords again on the server, and refuses to name another account', async () => {
+    for (const values of [
+      { currentPassword, newPassword: 'short', confirmPassword: 'short' },
+      { ...input, confirmPassword: `${password}!` },
+      { newPassword: password, confirmPassword: password },
+      { ...input, id: 1 },
+      { ...input, user: { id: 1 } },
+      { ...input, email: 'grace@example.com' },
+    ]) {
+      expect(await changePassword(values)).toEqual({ ok: false, failure: 'rejected' })
+    }
+    expect(edges.login).not.toHaveBeenCalled()
     expect(edges.update).not.toHaveBeenCalled()
   })
 
-  it('checks the new password again on the server', async () => {
-    edges.auth.mockResolvedValue({ user: resident })
-    const short = { newPassword: 'short', confirmPassword: 'short' }
-    const mismatch = { newPassword: password, confirmPassword: `${password}!` }
-    expect(await changePassword(short)).toEqual({ ok: false, failure: 'rejected' })
-    expect(await changePassword(mismatch)).toEqual({ ok: false, failure: 'rejected' })
-    expect(edges.update).not.toHaveBeenCalled()
-  })
-
-  it('asks a visitor to sign in again, without changing anything', async () => {
+  it('asks a visitor to sign in again, without checking or changing anything', async () => {
     edges.auth.mockResolvedValue({ user: null })
     expect(await changePassword(input)).toEqual({ ok: false, failure: 'signed-out' })
+    expect(edges.login).not.toHaveBeenCalled()
     expect(edges.update).not.toHaveBeenCalled()
   })
 
-  it('turns Payload’s refusals into fixed failures', async () => {
-    edges.auth.mockResolvedValue({ user: resident })
+  it('turns the other failures into fixed ones, and logs only the error’s name', async () => {
+    // Checking the current password fails on our side: nothing changes
+    edges.login.mockRejectedValueOnce(new APIError('Database down', 500))
+    expect(await changePassword(input)).toEqual({ ok: false, failure: 'server-error' })
+    expect(edges.update).not.toHaveBeenCalled()
+    // Payload refuses the new password, or the update fails
+    edges.login.mockResolvedValue({ user: resident, token: 'unused' })
     const invalid = new ValidationError({ errors: [{ message: 'Bad', path: 'password' }] })
     edges.update.mockRejectedValueOnce(invalid)
     expect(await changePassword(input)).toEqual({ ok: false, failure: 'rejected' })
@@ -165,6 +190,11 @@ describe('changePassword', () => {
     expect(await changePassword(input)).toEqual({ ok: false, failure: 'signed-out' })
     edges.update.mockRejectedValueOnce(new Error('Database down'))
     expect(await changePassword(input)).toEqual({ ok: false, failure: 'server-error' })
+    // Never the error itself: a database error on this update would carry the password hash
+    expect(vi.mocked(console.error).mock.calls).toEqual([
+      ['Password change failed on the server (APIError)'],
+      ['Password change failed on the server (Error)'],
+    ])
   })
 })
 
