@@ -1,10 +1,15 @@
 import type { CollectionConfig } from 'payload'
 
-import { draftContentAccess } from '../../access/draftContentAccess'
-import { populatePublishedAt } from '../../hooks/populatePublishedAt'
-import { revalidateDelete, revalidateResource } from './hooks/revalidateResource'
+import { draftContentAccess } from '@/access/draftContentAccess'
+import { populatePublishedAt } from '@/hooks/populatePublishedAt'
 
-export const Resources: CollectionConfig = {
+import { RESOURCE_CATEGORIES } from '../domain/categories'
+import { isResourceUrl } from '../domain/resourceUrl'
+import { revalidateListPage } from './revalidateListPage'
+
+const revalidate = revalidateListPage('resources')
+
+export const Resources: CollectionConfig<'resources'> = {
   slug: 'resources',
   defaultSort: 'order',
   access: draftContentAccess,
@@ -26,12 +31,8 @@ export const Resources: CollectionConfig = {
       name: 'url',
       type: 'text',
       admin: { placeholder: 'https://...' },
-      validate: (value: string | null | undefined) => {
-        if (value && !/^https?:\/\//.test(value)) {
-          return 'Must be a valid URL starting with http:// or https://'
-        }
-        return true
-      },
+      validate: (value: string | null | undefined) =>
+        !value || isResourceUrl(value) || 'Must be a valid URL starting with http:// or https://',
     },
     {
       name: 'phone',
@@ -42,16 +43,7 @@ export const Resources: CollectionConfig = {
       name: 'category',
       type: 'select',
       required: true,
-      options: [
-        { label: 'Elected Officials', value: 'elected-officials' },
-        { label: 'Public Safety', value: 'public-safety' },
-        { label: 'Childcare & Education', value: 'childcare' },
-        { label: 'Renting & Housing', value: 'renting' },
-        { label: 'Parks & Recreation', value: 'parks' },
-        { label: 'Community Organizations', value: 'community' },
-        { label: 'Utilities & Services', value: 'utilities' },
-        { label: 'Other', value: 'other' },
-      ],
+      options: [...RESOURCE_CATEGORIES],
     },
     {
       name: 'order',
@@ -71,9 +63,9 @@ export const Resources: CollectionConfig = {
     },
   ],
   hooks: {
-    afterChange: [revalidateResource],
+    afterChange: [revalidate.afterChange],
     beforeChange: [populatePublishedAt],
-    afterDelete: [revalidateDelete],
+    afterDelete: [revalidate.afterDelete],
   },
   versions: {
     drafts: true,
