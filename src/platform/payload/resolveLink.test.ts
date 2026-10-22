@@ -10,7 +10,7 @@ describe('resolveLink', () => {
         label: 'About',
         reference: { relationTo: 'pages', value: { slug: 'about' } },
       }),
-    ).toEqual({ href: '/about', label: 'About', external: false, variant: 'primary' })
+    ).toEqual({ href: '/about', label: 'About', external: false, appearance: 'default' })
   })
 
   it('prefixes a referenced post with its collection', () => {
@@ -32,13 +32,21 @@ describe('resolveLink', () => {
     })
   })
 
-  it('maps the CMS appearance to a button variant', () => {
+  it('links the home page to /', () => {
     expect(
-      resolveLink({ type: 'custom', url: '/a', label: 'A', appearance: 'outline' })?.variant,
-    ).toBe('secondary')
+      resolveLink({
+        type: 'reference',
+        label: 'Home',
+        reference: { relationTo: 'pages', value: { slug: 'home' } },
+      })?.href,
+    ).toBe('/')
+  })
+
+  it('keeps the CMS appearance, defaulting to default', () => {
     expect(
-      resolveLink({ type: 'custom', url: '/a', label: 'A', appearance: 'default' })?.variant,
-    ).toBe('primary')
+      resolveLink({ type: 'custom', url: '/a', label: 'A', appearance: 'outline' })?.appearance,
+    ).toBe('outline')
+    expect(resolveLink({ type: 'custom', url: '/a', label: 'A' })?.appearance).toBe('default')
   })
 
   it('returns null when the reference is unpopulated or has no slug, or there is no URL', () => {
@@ -50,6 +58,13 @@ describe('resolveLink', () => {
         type: 'reference',
         label: 'X',
         reference: { relationTo: 'pages', value: { slug: null } },
+      }),
+    ).toBeNull()
+    expect(
+      resolveLink({
+        type: 'reference',
+        label: 'X',
+        reference: { relationTo: 'pages', value: null as never },
       }),
     ).toBeNull()
     expect(resolveLink({ type: 'custom', url: '', label: 'X' })).toBeNull()

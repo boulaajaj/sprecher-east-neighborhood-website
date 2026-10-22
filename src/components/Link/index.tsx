@@ -33,7 +33,7 @@ export const CMSLink: React.FC<CMSLinkProps> = ({
       <Button
         href={resolved.href}
         external={resolved.external}
-        variant={resolved.variant}
+        variant={resolved.appearance === 'outline' ? 'secondary' : 'primary'}
         className={className}
         {...currentProps}
       >

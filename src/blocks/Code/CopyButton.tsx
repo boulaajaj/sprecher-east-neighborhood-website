@@ -22,7 +22,6 @@ export function CopyButton({ code }: { code: string }) {
         variant="inverse-outline"
         size="sm"
         iconStart={<Copy aria-hidden="true" />}
-        aria-live="polite"
         onClick={async () => {
           await navigator.clipboard.writeText(code)
           updateCopyStatus()
@@ -30,6 +29,10 @@ export function CopyButton({ code }: { code: string }) {
       >
         {text}
       </Button>
+      {/* Announced once, apart from the button, so the control itself isn't a live region */}
+      <span role="status" className="sr-only">
+        {text === 'Copied!' ? 'Code copied' : ''}
+      </span>
     </div>
   )
 }

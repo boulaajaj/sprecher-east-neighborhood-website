@@ -1,3 +1,5 @@
+import { documentHref } from './documentHref'
+
 /**
  * The CMS link field (`src/fields/link.ts`) as plain data for `Button` and `Link`: the one place
  * that turns a reference or a custom URL into an `href`. Typed structurally, so any collection's
@@ -20,8 +22,8 @@ export type ResolvedLink = {
   label: string
   /** Opens in a new tab */
   external: boolean
-  /** The `Button` variant the editor chose */
-  variant: 'primary' | 'secondary'
+  /** The look the editor chose; the UI maps it to a `Button` variant */
+  appearance: 'default' | 'outline'
 }
 
 export function resolveLink(link: CmsLink | null | undefined): ResolvedLink | null {
@@ -34,14 +36,13 @@ export function resolveLink(link: CmsLink | null | undefined): ResolvedLink | nu
     href,
     label: link.label ?? '',
     external: Boolean(link.newTab),
-    variant: link.appearance === 'outline' ? 'secondary' : 'primary',
+    appearance: link.appearance === 'outline' ? 'outline' : 'default',
   }
 }
 
 function referenceHref(reference: CmsLink['reference']): string | null {
-  const slug = typeof reference?.value === 'object' ? reference.value.slug : null
-  if (!reference || !slug) return null
-
-  // Pages live at the root; every other collection under its own path
-  return reference.relationTo === 'pages' ? `/${slug}` : `/${reference.relationTo}/${slug}`
+  // A deleted document leaves the value null; an unpopulated one leaves its ID
+  const value = reference?.value
+  const slug = value && typeof value === 'object' ? value.slug : null
+  return reference && slug ? documentHref(reference.relationTo, slug) : null
 }

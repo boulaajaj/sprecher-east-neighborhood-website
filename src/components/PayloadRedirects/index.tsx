@@ -1,5 +1,6 @@
 import type React from 'react'
 
+import { documentHref } from '@/platform/payload/documentHref'
 import { getCachedDocument } from '@/utilities/getDocument'
 import { getCachedRedirects } from '@/utilities/getRedirects'
 import { notFound, redirect } from 'next/navigation'
@@ -29,8 +30,7 @@ export const PayloadRedirects: React.FC<Props> = async ({ disableNotFound, url }
     }
 
     if (reference && target?.slug) {
-      const prefix = reference.relationTo !== 'pages' ? `/${reference.relationTo}` : ''
-      redirect(`${prefix}/${target.slug}`)
+      redirect(documentHref(reference.relationTo, target.slug))
     }
   }
 

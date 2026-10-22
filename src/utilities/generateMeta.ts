@@ -4,9 +4,10 @@ import type { Media, Page, Post, Event, Config } from '@/payload-types'
 
 import { mergeOpenGraph } from './mergeOpenGraph'
 import { toAbsoluteURL } from './getURL'
+import { HOME_PAGE_SLUG } from '@/platform/payload/documentHref'
 
 /** The CMS slug for the homepage — used to map /home → / in URLs */
-export const HOME_PAGE_SLUG = 'home'
+export { HOME_PAGE_SLUG }
 
 const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
   if (image && typeof image === 'object' && 'url' in image) {

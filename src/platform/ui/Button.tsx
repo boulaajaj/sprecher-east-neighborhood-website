@@ -9,7 +9,7 @@ import type { ComponentProps, ReactNode } from 'react'
  * action, "Load more" and a toast's action all place a Button; with `href` it renders a link.
  */
 export const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 rounded-lg text-center font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:not-aria-busy:opacity-60 aria-busy:cursor-progress [&_svg]:size-4 [&_svg]:shrink-0',
+  'inline-flex items-center justify-center gap-2 rounded-lg text-center font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-60 aria-busy:cursor-progress [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -49,14 +49,17 @@ type Look = Omit<VariantProps<typeof buttonVariants>, 'fullWidth'> & {
   children?: ReactNode
   iconStart?: ReactNode
   iconEnd?: ReactNode
+  /**
+   * Shows a spinner in place of `iconStart` and ignores clicks. It stays focusable
+   * (`aria-disabled`, not `disabled`), so keyboard focus isn't lost while the work runs.
+   */
+  loading?: boolean
 }
 
 type ButtonElementProps = Look &
   Omit<ComponentProps<'button'>, keyof Look> & {
     href?: undefined
     external?: never
-    /** Shows a spinner in place of `iconStart`, keeps the width, and blocks a second click */
-    loading?: boolean
   }
 
 type ButtonLinkProps = Look &
@@ -64,7 +67,6 @@ type ButtonLinkProps = Look &
     href: string
     /** Opens in a new tab and tells screen readers so */
     external?: boolean
-    loading?: never
   }
 
 export type ButtonProps = ButtonElementProps | ButtonLinkProps
@@ -72,6 +74,21 @@ export type ButtonProps = ButtonElementProps | ButtonLinkProps
 export function Button(props: ButtonProps) {
   return props.href === undefined ? <ButtonElement {...props} /> : <ButtonLink {...props} />
 }
+
+/** What a loading button or link adds: busy state, a click guard and the spinner. */
+function busy<E extends { preventDefault(): void }>(
+  loading: boolean,
+  onClick?: (event: E) => void,
+) {
+  if (!loading) return { onClick }
+  return {
+    'aria-busy': true,
+    'aria-disabled': true,
+    onClick: (event: E) => event.preventDefault(),
+  } as const
+}
+
+const spinner = <LoaderCircle aria-hidden="true" className="motion-safe:animate-spin" />
 
 function ButtonElement({
   variant,
@@ -82,23 +99,18 @@ function ButtonElement({
   iconStart,
   iconEnd,
   loading = false,
-  disabled,
+  onClick,
   type = 'button',
   ...rest
 }: ButtonElementProps) {
   return (
     <button
       {...rest}
+      {...busy(loading, onClick)}
       type={type}
-      disabled={disabled || loading}
-      aria-busy={loading || undefined}
       className={cn(buttonVariants({ variant, size, fullWidth }), className)}
     >
-      {loading ? (
-        <LoaderCircle aria-hidden="true" className="motion-safe:animate-spin" />
-      ) : (
-        iconStart
-      )}
+      {loading ? spinner : iconStart}
       {children}
       {iconEnd}
     </button>
@@ -113,16 +125,19 @@ function ButtonLink({
   children,
   iconStart,
   iconEnd,
+  loading = false,
+  onClick,
   external = false,
   ...rest
 }: ButtonLinkProps) {
   return (
     <NextLink
       {...rest}
+      {...busy(loading, onClick)}
       {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
       className={cn(buttonVariants({ variant, size, fullWidth }), className)}
     >
-      {iconStart}
+      {loading ? spinner : iconStart}
       {children}
       {iconEnd}
       {external && <span className="sr-only">, opens in a new tab</span>}

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Loader2 } from 'lucide-react'
+import { Button } from '@/platform/ui'
 
 import type { FeedPage } from '@/utilities/feeds'
 import { cn } from '@/utilities/ui'
@@ -146,9 +146,6 @@ export const LoadMoreFooter: React.FC<LoadMoreFooterProps> = ({
       ? `Showing ${range} of ${totalDocs} ${noun} — that's the end of the list`
       : `That's all ${totalDocs} ${noun}`
 
-  const buttonClassName =
-    'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-primary px-6 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/10 aria-disabled:opacity-60'
-
   return (
     <div className={cn('mt-10 flex flex-col items-center gap-4 text-center', className)}>
       <div ref={sentinelRef} aria-hidden="true" className="h-px w-full" />
@@ -172,12 +169,13 @@ export const LoadMoreFooter: React.FC<LoadMoreFooterProps> = ({
 
       {hasMore && (
         // A real link, so "Load more" also works without JavaScript and can open in a new tab.
-        // aria-disabled, not removal, while loading: keyboard focus stays on it.
-        <a
+        // Button's loading state keeps keyboard focus on it.
+        <Button
           ref={controlRef}
           href={fallbackHref}
-          aria-disabled={status === 'loading'}
-          className={buttonClassName}
+          variant="secondary"
+          size="sm"
+          loading={status === 'loading'}
           onClick={(event) => {
             // Let Ctrl/Cmd/Shift/middle clicks open the fallback page in a new tab or window
             if (
@@ -189,14 +187,11 @@ export const LoadMoreFooter: React.FC<LoadMoreFooterProps> = ({
             )
               return
             event.preventDefault()
-            if (status !== 'loading') startLoad()
+            startLoad()
           }}
         >
-          {status === 'loading' && (
-            <Loader2 aria-hidden="true" className="h-4 w-4 motion-safe:animate-spin" />
-          )}
           {status === 'error' ? 'Try again' : `Load more ${noun}`}
-        </a>
+        </Button>
       )}
     </div>
   )

@@ -48,18 +48,40 @@ describe('Button', () => {
     expect(link.getAttribute('rel')).toBe('noopener noreferrer')
   })
 
-  it('while loading, is busy and ignores clicks', async () => {
+  it('while loading, is busy, ignores clicks and keeps focus', async () => {
     const onClick = vi.fn()
+    const onSubmit = vi.fn()
     render(
-      <Button loading onClick={onClick}>
-        Sending
-      </Button>,
+      <form onSubmit={onSubmit}>
+        <Button type="submit" loading onClick={onClick}>
+          Sending
+        </Button>
+      </form>,
     )
 
     const button = screen.getByRole('button', { name: 'Sending' })
     await userEvent.click(button)
 
     expect(button.getAttribute('aria-busy')).toBe('true')
+    expect(button.getAttribute('aria-disabled')).toBe('true')
+    expect(document.activeElement).toBe(button)
+    expect(onClick).not.toHaveBeenCalled()
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('as a loading link, does not navigate', async () => {
+    const onClick = vi.fn()
+    render(
+      <Button href="/events?page=2" loading onClick={onClick}>
+        Load more events
+      </Button>,
+    )
+
+    const link = screen.getByRole('link', { name: 'Load more events' })
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true })
+    link.dispatchEvent(event)
+
+    expect(event.defaultPrevented).toBe(true)
     expect(onClick).not.toHaveBeenCalled()
   })
 
