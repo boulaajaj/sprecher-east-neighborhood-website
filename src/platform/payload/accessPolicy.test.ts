@@ -41,6 +41,7 @@ const ALLOWED: Record<string, Partial<Record<Operation, Audience[]>>> = {
     update: RESIDENT_ONLY,
     delete: RESIDENT_ONLY,
   },
+  // `email-confirmations` is admin-only: the server writes it with access bypassed (#183)
   // Payload's own edit locks are staff-only (`restrictEditLocks`, #147), so not listed here
   // Payload's own, with no REST or GraphQL endpoints (`endpoints: false`)
   'payload-migrations': {
@@ -123,8 +124,27 @@ describe('collections', () => {
     expect(await allows(users?.access.read, 'resident', 7)).toBe(true)
   })
 
+  it('let only admins reach email confirmations, which hold typed addresses (#183)', async () => {
+    const confirmations = config.collections.find((c) => c.slug === 'email-confirmations')
+    const editor = { req: { user: { id: 2, role: 'editor', collection: 'users' } } }
+    const admin = { req: { user: { id: 1, role: 'admin', collection: 'users' } } }
+    for (const operation of ['read', 'create', 'update', 'delete'] as const) {
+      const access = confirmations?.access[operation] as AccessFn
+      expect(await access(editor)).toBe(false)
+      expect(await access(admin)).toBe(true)
+    }
+    const hidden = confirmations?.fields.filter((f) => 'hidden' in f && f.hidden)
+    expect(hidden?.map((f) => ('name' in f ? f.name : ''))).toContain('tokenHash')
+  })
+
   it('have no collection missing from the policy review', () => {
-    const reviewed = new Set([...Object.keys(ALLOWED), 'users', 'redirects', 'payload-kv'])
+    const reviewed = new Set([
+      ...Object.keys(ALLOWED),
+      'users',
+      'redirects',
+      'email-confirmations',
+      'payload-kv',
+    ])
     const unreviewed = config.collections
       .map((c) => c.slug)
       .filter((slug) => !reviewed.has(slug) && !slug.startsWith('payload-'))

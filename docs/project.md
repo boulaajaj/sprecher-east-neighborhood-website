@@ -21,7 +21,7 @@ It is an unofficial, AI-assisted initiative (ground rules in [`AGENTS.md`](../AG
 - **CSS**: Tailwind CSS v4 (design tokens in `src/app/(frontend)/globals.css @theme {}`)
 - **CMS**: Payload CMS v3 Website Template at `/admin` (self-hosted, SQLite `data/payload.db`)
 - **Auth**: Payload native auth (Users collection with `auth: true`); roles `admin`, `editor`, `resident`. Pages and server actions ask `src/modules/accounts/` who is signed in (`getCurrentUser`, `requireUser`, `requireRole`); sign-in, sign-out and password changes are its server actions
-- **Email**: `@payloadcms/email-nodemailer` over SMTP (Mailgun in production); logs to the console when `SMTP_HOST` is unset
+- **Email**: `@payloadcms/email-nodemailer` over SMTP (Mailgun in production); logs to the console when `SMTP_HOST` is unset. Email addresses typed into public forms are confirmed by link (`src/modules/verification/`, #183)
 - **Spam protection**: Cloudflare Turnstile on public forms, plus size and rate limits (decision records in `docs/architecture/decisions/`)
 - **Tests**: Vitest unit tests next to the code (`*.test.ts`), run with `npm test` and in CI (#139). Component tests (`*.test.tsx`) run in jsdom with Testing Library and axe (`expectAccessible` in `src/platform/ui/testing/`)
 - **Rich Text**: Lexical editor with slash menu, toolbars, inline images, and custom blocks
@@ -97,21 +97,22 @@ src/
 
 ## Key Files
 
-| File                                | Purpose                                           |
-| ----------------------------------- | ------------------------------------------------- |
-| `src/payload.config.ts`             | Payload CMS config (SQLite, collections, plugins) |
-| `src/app/(frontend)/globals.css`    | Tailwind v4 `@theme` block — all design tokens    |
-| `src/modules/site/cms/pages.ts`     | Pages collection with layout builder blocks       |
-| `src/modules/news/cms/posts.ts`     | News posts collection                             |
-| `src/modules/events/cms/events.ts`  | Events collection (custom)                        |
-| `src/modules/accounts/cms/users.ts` | Users collection with Payload native auth         |
-| `src/platform/payload/media.ts`     | Media uploads with size variants                  |
-| `src/modules/site/cms/`             | Block, hero and link field configs, globals       |
-| `src/modules/site/ui/`              | Blocks, heroes, header and footer components      |
-| `src/platform/payload/roles.ts`     | Role checks and access functions                  |
-| `src/platform/theme/`               | Light and dark mode providers and init script     |
-| `ecosystem.config.cjs`              | PM2 config for VPS (CommonJS: package is ESM)     |
-| `eslint.boundaries.config.mjs`      | Dependency rules as lint errors (#137)            |
+| File                                | Purpose                                                 |
+| ----------------------------------- | ------------------------------------------------------- |
+| `src/payload.config.ts`             | Payload CMS config (SQLite, collections, plugins)       |
+| `src/app/(frontend)/globals.css`    | Tailwind v4 `@theme` block — all design tokens          |
+| `src/modules/site/cms/pages.ts`     | Pages collection with layout builder blocks             |
+| `src/modules/news/cms/posts.ts`     | News posts collection                                   |
+| `src/modules/events/cms/events.ts`  | Events collection (custom)                              |
+| `src/modules/accounts/cms/users.ts` | Users collection with Payload native auth               |
+| `src/modules/verification/cms/`     | Email confirmations collection and confirmation service |
+| `src/platform/payload/media.ts`     | Media uploads with size variants                        |
+| `src/modules/site/cms/`             | Block, hero and link field configs, globals             |
+| `src/modules/site/ui/`              | Blocks, heroes, header and footer components            |
+| `src/platform/payload/roles.ts`     | Role checks and access functions                        |
+| `src/platform/theme/`               | Light and dark mode providers and init script           |
+| `ecosystem.config.cjs`              | PM2 config for VPS (CommonJS: package is ESM)           |
+| `eslint.boundaries.config.mjs`      | Dependency rules as lint errors (#137)                  |
 
 ## Design Tokens
 

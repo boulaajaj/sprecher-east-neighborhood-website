@@ -23,6 +23,7 @@ import {
   revalidateRedirects,
   SITE_LAYOUT_BLOCKS,
 } from '@/modules/site/cms'
+import { EmailConfirmations } from '@/modules/verification/cms'
 import { Media } from '@/platform/payload/media'
 import { defaultLexical } from '@/platform/payload/defaultLexical'
 import {
@@ -148,7 +149,18 @@ export default buildConfig({
       url: process.env.DATABASE_URI ?? 'file:./data/payload.db',
     },
   }),
-  collections: [Pages, Posts, Events, TeamMembers, Resources, FAQ, Media, Categories, Users],
+  collections: [
+    Pages,
+    Posts,
+    Events,
+    TeamMembers,
+    Resources,
+    FAQ,
+    Media,
+    Categories,
+    Users,
+    EmailConfirmations,
+  ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
   folders: {

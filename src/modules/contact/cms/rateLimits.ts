@@ -1,17 +1,15 @@
 import { APIError, type CollectionBeforeChangeHook } from 'payload'
 
+import { parseClientIp, SlidingWindowCounter } from '@/platform/lib'
 import { hasAdminOrEditor } from '@/platform/payload/roles'
 
 import { RATE_LIMITS } from '../domain/rateLimits'
-import { parseClientIp } from './clientIp'
 
 // In memory: the site runs as one PM2 process.
-const recentByIp = new Map<string, number[]>()
-let emailsSent: number[] = []
+const submissions = new SlidingWindowCounter(RATE_LIMITS.windowMs, RATE_LIMITS.trackedConnections)
+const formEmails = new SlidingWindowCounter(RATE_LIMITS.windowMs)
+const SITE_WIDE = 'site'
 let capLoggedAt = 0
-
-const withinWindow = (times: number[], now: number) =>
-  times.filter((t) => now - t < RATE_LIMITS.windowMs)
 
 /**
  * A hook that gives anonymous visitors a few submissions per hour per connection (client IP),
@@ -24,22 +22,13 @@ export const rateLimitSubmissions: CollectionBeforeChangeHook = ({ data, operati
   const ip = parseClientIp(req.headers)
   if (!ip) return data
 
-  const now = Date.now()
-  const recent = withinWindow(recentByIp.get(ip) ?? [], now)
-  if (recent.length >= RATE_LIMITS.submissionsPerConnection) {
+  if (!submissions.tryTake(ip, RATE_LIMITS.submissionsPerConnection, Date.now())) {
     throw new APIError(
       'Too many messages from your connection. Please try again later.',
       429,
       null,
       true,
     )
-  }
-  recent.push(now)
-  recentByIp.delete(ip) // re-insert so this IP becomes the newest entry
-  recentByIp.set(ip, recent)
-  if (recentByIp.size > RATE_LIMITS.trackedConnections) {
-    const oldest = recentByIp.keys().next().value
-    if (oldest !== undefined) recentByIp.delete(oldest)
   }
 
   return data
@@ -48,8 +37,7 @@ export const rateLimitSubmissions: CollectionBeforeChangeHook = ({ data, operati
 /** Applies the site-wide hourly email cap to the emails a submission is about to send. */
 export const capFormEmails = <T>(emails: T[], logger: { warn: (msg: string) => void }): T[] => {
   const now = Date.now()
-  emailsSent = withinWindow(emailsSent, now)
-  const room = Math.max(0, RATE_LIMITS.emailsSiteWide - emailsSent.length)
+  const room = formEmails.room(SITE_WIDE, RATE_LIMITS.emailsSiteWide, now)
   if (emails.length > room) {
     // One log line per window, not one per request
     if (now - capLoggedAt >= RATE_LIMITS.windowMs) {
@@ -58,6 +46,6 @@ export const capFormEmails = <T>(emails: T[], logger: { warn: (msg: string) => v
     }
   }
   const allowed = emails.slice(0, room)
-  for (let i = 0; i < allowed.length; i++) emailsSent.push(now)
+  formEmails.record(SITE_WIDE, now, allowed.length)
   return allowed
 }
