@@ -1,28 +1,22 @@
 import React from 'react'
 
-import type { Event } from '@/payload-types'
-
 import { Media } from '@/components/Media'
 import { categoryPillClassName } from '@/utilities/ui'
 import { formatDateTime, toDateTimeAttr } from '@/utilities/formatDateTime'
 import { siteTimeZoneLabel } from '@/utilities/timezone'
-import { getCategoryLabel } from '@/utilities/eventCategories'
+
+import { eventCategoryLabel } from '../domain/categories'
+import { eventLocationTypeLabel } from '../domain/locationTypes'
+import type { EventDetail } from '../domain/types'
 
 export const EventHero: React.FC<{
-  event: Event
+  event: EventDetail
 }> = ({ event }) => {
-  const { category, date, heroImage, locationType, timeEnd, timeStart, title } = event
+  const { category, date, image, locationType, timeEnd, timeStart, title } = event
 
-  const locationTypeLabel =
-    locationType === 'in-person'
-      ? 'In Person'
-      : locationType === 'virtual'
-        ? 'Virtual'
-        : locationType === 'hybrid'
-          ? 'Hybrid'
-          : null
+  const locationTypeLabel = locationType ? eventLocationTypeLabel(locationType) : null
 
-  if (heroImage && typeof heroImage === 'object') {
+  if (image) {
     // Full-bleed hero with image, dark overlay, white text
     return (
       <div className="relative -mt-[var(--header-height)] flex items-end">
@@ -30,7 +24,7 @@ export const EventHero: React.FC<{
           <div className="col-span-1 col-start-1 md:col-span-2 md:col-start-2">
             {category && (
               <div className="mb-4 text-sm tracking-widest uppercase opacity-90">
-                {getCategoryLabel(category)}
+                {eventCategoryLabel(category)}
               </div>
             )}
 
@@ -63,7 +57,7 @@ export const EventHero: React.FC<{
         </div>
 
         <div className="min-h-[80vh] select-none">
-          <Media fill priority imgClassName="-z-10 object-cover" resource={heroImage} />
+          <Media fill priority imgClassName="-z-10 object-cover" resource={image} />
           <div className="pointer-events-none absolute bottom-0 left-0 h-1/2 w-full bg-linear-to-t from-black to-transparent" />
         </div>
       </div>
@@ -75,7 +69,7 @@ export const EventHero: React.FC<{
     <div className="container pt-32 pb-10">
       <div className="max-w-3xl">
         {category && (
-          <span className={`mb-4 ${categoryPillClassName}`}>{getCategoryLabel(category)}</span>
+          <span className={`mb-4 ${categoryPillClassName}`}>{eventCategoryLabel(category)}</span>
         )}
 
         <h1 className="mb-6 text-4xl font-bold md:text-5xl">{title}</h1>

@@ -1,36 +1,23 @@
 import type { Metadata } from 'next'
 
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
-import { draftMode } from 'next/headers'
-import React, { cache } from 'react'
-import RichText from '@/components/RichText'
-import { PayloadRedirects } from '@/components/PayloadRedirects'
-import { SidebarEvents } from '@/components/SidebarEvents'
-import { SidebarCTA } from '@/components/SidebarCTA'
-import { startOfToday } from '@/utilities/timezone'
-import { eventJsonLd } from '@/utilities/structuredData'
-import { generateMeta } from '@/utilities/generateMeta'
-import { JsonLd } from '@/components/JsonLd'
-import { Breadcrumbs } from '@/components/Breadcrumbs'
-import { EventHero } from '@/heros/EventHero'
-import { Button, Link } from '@/platform/ui'
 import { ArrowRight } from 'lucide-react'
+import React from 'react'
+
+import { Breadcrumbs } from '@/components/Breadcrumbs'
+import { JsonLd } from '@/components/JsonLd'
+import { PayloadRedirects } from '@/components/PayloadRedirects'
+import RichText from '@/components/RichText'
+import { SidebarCTA } from '@/components/SidebarCTA'
+import { EventHero, EventLocation, SidebarEvents, eventJsonLd } from '@/modules/events'
+import { getEvent, listEventSlugs, listUpcomingEvents } from '@/modules/events/server'
+import { Button } from '@/platform/ui'
+import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 
 export async function generateStaticParams() {
   try {
-    const payload = await getPayload({ config: configPromise })
-    const events = await payload.find({
-      collection: 'events',
-      draft: false,
-      limit: 1000,
-      overrideAccess: false,
-      pagination: false,
-      select: { slug: true },
-    })
-
-    return events.docs.map(({ slug }) => ({ slug }))
+    const events = await listEventSlugs()
+    return events.map(({ slug }) => ({ slug }))
   } catch (error) {
     console.error('[events] generateStaticParams failed; falling back to []', error)
     return []
@@ -45,20 +32,12 @@ export default async function EventPage({ params: paramsPromise }: Args) {
   const { slug = '' } = await paramsPromise
   const decodedSlug = decodeURIComponent(slug)
   const url = '/events/' + decodedSlug
-  const event = await queryEventBySlug({ slug: decodedSlug })
+  const event = await getEvent(decodedSlug)
 
   if (!event) return <PayloadRedirects url={url} />
 
-  const upcomingEvents = await queryUpcomingEvents({ excludeId: event.id })
-
-  const hasHeroImage = !!event.heroImage && typeof event.heroImage === 'object'
-  // Use the editor's map link if set; otherwise build a plain search link from the
-  // address (no API key, no embedded map).
-  const mapsHref =
-    event.mapsUrl ||
-    (event.locationAddress
-      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.locationAddress)}`
-      : null)
+  const upcomingEvents = await listUpcomingEvents({ excludeId: event.id })
+  const hasHeroImage = event.image !== null
 
   return (
     <article className="pb-24">
@@ -80,27 +59,7 @@ export default async function EventPage({ params: paramsPromise }: Args) {
         </div>
         <div className="container lg:grid lg:grid-cols-[1fr_18rem] lg:gap-8">
           <div>
-            {(event.locationName || event.locationAddress) && (
-              <div className="mb-8 rounded-lg border border-border bg-surface p-4">
-                <h2 className="mb-2 text-base font-semibold">Location</h2>
-                {event.locationName && <p>{event.locationName}</p>}
-                {event.locationAddress && (
-                  <p className="text-sm text-muted-foreground">{event.locationAddress}</p>
-                )}
-                {mapsHref && (
-                  <Link
-                    href={mapsHref}
-                    variant="action"
-                    external
-                    icon={<ArrowRight aria-hidden="true" />}
-                    iconPosition="end"
-                    className="mt-2"
-                  >
-                    Open in Google Maps
-                  </Link>
-                )}
-              </div>
-            )}
+            <EventLocation event={event} />
 
             {event.registrationUrl && (
               <div className="mb-8">
@@ -140,9 +99,9 @@ export default async function EventPage({ params: paramsPromise }: Args) {
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { slug = '' } = await paramsPromise
-  const event = await queryEventBySlug({ slug: decodeURIComponent(slug) })
+  const event = await getEvent(decodeURIComponent(slug))
 
-  const meta = await generateMeta({ doc: event })
+  const meta = await generateMeta({ doc: event && { slug: event.slug, meta: event.meta } })
   if (!event) return meta
 
   return {
@@ -153,43 +112,3 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
     },
   }
 }
-
-const queryEventBySlug = cache(async ({ slug }: { slug: string }) => {
-  const { isEnabled: draft } = await draftMode()
-
-  const payload = await getPayload({ config: configPromise })
-
-  const result = await payload.find({
-    collection: 'events',
-    draft,
-    limit: 1,
-    overrideAccess: draft,
-    pagination: false,
-    where: { slug: { equals: slug } },
-  })
-
-  return result.docs?.[0] || null
-})
-
-const queryUpcomingEvents = cache(async ({ excludeId }: { excludeId: number }) => {
-  const payload = await getPayload({ config: configPromise })
-
-  const result = await payload.find({
-    collection: 'events',
-    draft: false,
-    limit: 3,
-    overrideAccess: false,
-    sort: 'date',
-    where: {
-      and: [{ date: { greater_than_equal: startOfToday() } }, { id: { not_equals: excludeId } }],
-    },
-    select: {
-      title: true,
-      slug: true,
-      date: true,
-      category: true,
-    },
-  })
-
-  return result.docs
-})

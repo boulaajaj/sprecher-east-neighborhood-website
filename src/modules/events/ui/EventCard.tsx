@@ -2,26 +2,12 @@ import Link from 'next/link'
 import React from 'react'
 import { MapPin, Clock, Calendar } from 'lucide-react'
 
-import type { Event } from '@/payload-types'
-
 import { Media } from '@/components/Media'
 import { categoryPillClassName, cn } from '@/utilities/ui'
 import { formatDateShort, formatDateBadge, toDateTimeAttr } from '@/utilities/formatDateTime'
-import { getCategoryLabel } from '@/utilities/eventCategories'
 
-export type EventCardData = Pick<
-  Event,
-  | 'id'
-  | 'slug'
-  | 'title'
-  | 'date'
-  | 'timeStart'
-  | 'timeEnd'
-  | 'category'
-  | 'description'
-  | 'locationName'
-  | 'heroImage'
->
+import { eventCategoryLabel } from '../domain/categories'
+import type { EventSummary } from '../domain/types'
 
 /**
  * Stretches the title link over the whole card so the card stays clickable, while the
@@ -59,10 +45,10 @@ const DateBadge: React.FC<{
 }
 
 export const EventCard: React.FC<{
-  event: EventCardData
+  event: EventSummary
   compact?: boolean
 }> = ({ event, compact }) => {
-  const { slug, title, date, timeStart, timeEnd, category, description, locationName, heroImage } =
+  const { slug, title, date, timeStart, timeEnd, category, description, locationName, image } =
     event
 
   if (!slug) return null
@@ -91,9 +77,9 @@ export const EventCard: React.FC<{
     <article className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-md transition-all duration-200 hover:shadow-xl has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring motion-safe:hover:-translate-y-1">
       {/* Image area with date badge overlay */}
       <div className="relative aspect-[16/9] w-full overflow-hidden">
-        {heroImage && typeof heroImage === 'object' ? (
+        {image ? (
           <Media
-            resource={heroImage}
+            resource={image}
             fill
             imgClassName="h-full w-full object-cover transition-transform duration-300 motion-safe:group-hover:scale-105"
           />
@@ -141,7 +127,7 @@ export const EventCard: React.FC<{
 
         {category && (
           <span className={cn(categoryPillClassName, 'mt-auto self-start')}>
-            {getCategoryLabel(category)}
+            {eventCategoryLabel(category)}
           </span>
         )}
       </div>

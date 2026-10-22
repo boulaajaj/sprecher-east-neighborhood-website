@@ -34,7 +34,6 @@ const PAYLOAD = [
 // to a module (#131 to #136); any other file in src/app/ that does it gets a warning.
 const STILL_QUERYING_PAYLOAD = [
   '(frontend)/[slug]/page.tsx',
-  '(frontend)/events/[slug]/page.tsx',
   '(frontend)/faq/page.tsx',
   '(frontend)/next/preview/route.ts',
   '(frontend)/next/seed/route.ts',
@@ -42,7 +41,6 @@ const STILL_QUERYING_PAYLOAD = [
   '(frontend)/posts/page/[pageNumber]/page.tsx',
   '(frontend)/resources/page.tsx',
   '(frontend)/search/page.tsx',
-  '(frontend)/(sitemaps)/events-sitemap.xml/route.ts',
   '(frontend)/(sitemaps)/pages-sitemap.xml/route.ts',
   '(frontend)/(sitemaps)/posts-sitemap.xml/route.ts',
 ].map((file) => `src/app/${file}`.replace(/[\\()[\]{}*?!+@]/g, '\\$&')) // escape glob characters

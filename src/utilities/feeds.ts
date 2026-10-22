@@ -4,30 +4,15 @@ import configPromise from '@payload-config'
 import { getPayload, type Where } from 'payload'
 
 import type { CardPostData } from '@/components/Card'
-import type { EventCardData } from '@/components/EventCard'
-import type { EventScope } from './feedParams'
-import { startOfToday } from './timezone'
-
-// URL parameter checks live in feedParams.ts (no Payload import, so the proxy can use them).
-export { isEventScope, parsePageNumber, type EventScope } from './feedParams'
+import type { FeedPage } from '@/platform/lib'
 
 /**
- * Server-side queries behind the incrementally loaded listings (/posts, /events).
- * Pages call these for the first page; the matching server actions call them for
- * the next pages, so both paths return exactly the same shape and filters.
+ * Server-side query behind the incrementally loaded /posts listing. The page calls it for the
+ * first page and the server action for the next pages, so both return the same shape and
+ * filters. Events have their own in src/modules/events (#131); this moves to news in #132.
  */
 
 export const POSTS_PAGE_SIZE = 12
-export const UPCOMING_EVENTS_PAGE_SIZE = 12
-export const PAST_EVENTS_PAGE_SIZE = 9
-
-export type FeedPage<T> = {
-  docs: T[]
-  page: number
-  totalPages: number
-  totalDocs: number
-  limit: number
-}
 
 export type PostFeedItem = CardPostData & { id: number | string }
 
@@ -61,51 +46,5 @@ export async function findPublishedPosts(page: number): Promise<FeedPage<PostFee
     totalPages: result.totalPages,
     totalDocs: result.totalDocs,
     limit: POSTS_PAGE_SIZE,
-  }
-}
-
-export async function findPublishedEvents(
-  scope: EventScope,
-  page: number,
-): Promise<FeedPage<EventCardData>> {
-  const payload = await getPayload({ config: configPromise })
-  const today = startOfToday()
-  const limit = scope === 'upcoming' ? UPCOMING_EVENTS_PAGE_SIZE : PAST_EVENTS_PAGE_SIZE
-
-  const result = await payload.find({
-    collection: 'events',
-    depth: 1,
-    limit,
-    page,
-    // Upcoming: soonest first. Past: most recent first.
-    sort: scope === 'upcoming' ? 'date' : '-date',
-    overrideAccess: false,
-    where: {
-      and: [
-        published,
-        scope === 'upcoming'
-          ? { date: { greater_than_equal: today } }
-          : { date: { less_than: today } },
-      ],
-    },
-    select: {
-      title: true,
-      slug: true,
-      date: true,
-      timeStart: true,
-      timeEnd: true,
-      category: true,
-      description: true,
-      locationName: true,
-      heroImage: true,
-    },
-  })
-
-  return {
-    docs: result.docs as EventCardData[],
-    page: result.page ?? page,
-    totalPages: result.totalPages,
-    totalDocs: result.totalDocs,
-    limit,
   }
 }

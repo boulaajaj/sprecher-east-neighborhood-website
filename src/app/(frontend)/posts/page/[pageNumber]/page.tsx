@@ -8,7 +8,8 @@ import { Link } from '@/platform/ui'
 import { ArrowLeft } from 'lucide-react'
 
 import { PostsFeed } from '@/components/PostsFeed'
-import { findPublishedPosts, parsePageNumber, POSTS_PAGE_SIZE } from '@/utilities/feeds'
+import { parsePageNumber } from '@/platform/lib'
+import { findPublishedPosts, POSTS_PAGE_SIZE } from '@/utilities/feeds'
 import PageClient from './page.client'
 
 export const revalidate = 600

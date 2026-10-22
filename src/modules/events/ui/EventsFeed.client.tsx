@@ -2,16 +2,19 @@
 
 import React, { useCallback } from 'react'
 
-import { loadEventsPage } from '@/app/(frontend)/events/actions'
-import { EventCard, type EventCardData } from '@/components/EventCard'
 import { LoadMoreFooter, useLoadMore } from '@/components/LoadMore'
-import type { EventScope, FeedPage } from '@/utilities/feeds'
+import type { FeedPage } from '@/platform/lib'
 import { cn } from '@/utilities/ui'
+
+import { loadEventsPage } from '../actions'
+import type { EventSummary } from '../domain/types'
+import type { EventScope } from '../domain/upcoming'
+import { EventCard } from './EventCard'
 
 /** Upcoming or past events grid that loads more events as the reader scrolls. */
 export const EventsFeed: React.FC<{
   scope: EventScope
-  initial: FeedPage<EventCardData>
+  initial: FeedPage<EventSummary>
 }> = ({ scope, initial }) => {
   const load = useCallback((page: number) => loadEventsPage(scope, page), [scope])
   const feed = useLoadMore(initial, load)
