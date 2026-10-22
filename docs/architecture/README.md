@@ -148,9 +148,9 @@ What this buys:
    `cms.ts` never reach anything server-only: the Payload CLI (migrations, seed) loads every hook
    outside Next.js, where `server-only` throws. Hooks use the `req.payload` they are given.
 5. **Client components** get DTOs as props and never import `data/`, `use-cases/` or `server.ts`.
-   To change something they call a server action, or one of Payload's own REST endpoints through
-   the owning module's browser client (`ui/api.ts`: sign-in and passwords in `accounts`, form
-   submissions in `contact`, where the robot check runs).
+   To change something they call a server action (sign-in, sign-out and passwords in `accounts`),
+   or one of Payload's own REST endpoints through the owning module's browser client (`ui/api.ts`:
+   form submissions in `contact`, where the robot check runs).
 6. **Payload at the edges.** Runtime imports of `payload`, `@payloadcms/*` or `@payload-config`
    are allowed only in `data/`, `cms/`, `platform/` and `payload.config.ts`. `import type` is
    allowed anywhere. The generated `app/(payload)/` (including the admin import map, which loads
@@ -205,7 +205,7 @@ drift, and the tested one may not be the one that runs.
 
 Until each step of #127 lands, code lives in the Payload website template's folders, sorted by
 technical type: `src/collections/`, `src/components/`, `src/blocks/`, `src/heros/`, `src/hooks/`,
-`src/utilities/`, `src/access/`, `src/fields/`, `src/Header/`, `src/Footer/`,
+`src/utilities/`, `src/fields/`, `src/Header/`, `src/Footer/`,
 `src/plugins/`, `src/providers/`, `src/endpoints/` (seed). When you touch code there, don't add
 new duplication; if your change needs a rule that already exists elsewhere, reuse it.
 

@@ -8,6 +8,7 @@ import { AdminBar } from '@/components/AdminBar'
 import { JsonLd } from '@/components/JsonLd'
 import { Footer } from '@/Footer/Component'
 import { Header } from '@/Header/Component'
+import { AccountMenu, AccountProvider } from '@/modules/accounts/server'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { Providers } from '@/providers'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
@@ -53,7 +54,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             }}
           />
 
-          <Header />
+          {/* The header shows who is signed in through the accounts module's menus (0008) */}
+          <AccountProvider>
+            <Header
+              accountMenu={<AccountMenu variant="bar" />}
+              mobileAccountMenu={<AccountMenu variant="drawer" />}
+            />
+          </AccountProvider>
           <main id="main-content">{children}</main>
           <Footer />
           <VersionCheck />

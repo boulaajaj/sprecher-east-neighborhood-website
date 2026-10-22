@@ -16,13 +16,13 @@ Every collection also has `id` (number), `createdAt` and `updatedAt`. Draft-enab
 | `team-members`     | Board members and AI agents             | No                                     | `anyone`                      | `isAdminOrEditor`                                       | `isAdmin`         | `src/modules/directory/cms/teamMembers.ts`                    |
 | `categories`       | Nested categories for posts             | No                                     | `anyone`                      | `isAdminOrEditor`                                       | `isAdmin`         | `src/modules/news/cms/categories.ts`                          |
 | `media`            | Uploaded images and files               | No                                     | `anyone`                      | `isAdminOrEditor`                                       | `isAdmin`         | `src/collections/Media.ts`                                    |
-| `users`            | Login accounts with roles               | No                                     | `isAdminOrSelf`               | create `isAdmin`; update `isAdminOrSelf`                | `isAdmin`         | `src/collections/Users/index.ts`                              |
+| `users`            | Login accounts with roles               | No                                     | `isAdminOrSelf`               | create `isAdmin`; update `isAdminOrSelf`                | `isAdmin`         | `src/modules/accounts/cms/users.ts`                           |
 | `forms`            | Form definitions built in admin         | No                                     | `anyone`                      | `isAdminOrEditor`                                       | `isAdmin`         | plugin form-builder, `src/modules/contact/cms/formBuilder.ts` |
 | `form-submissions` | Data visitors submit through forms      | No                                     | `isAdmin`                     | create `() => true` (inline); update `isAdmin`          | `isAdmin`         | plugin form-builder, `src/modules/contact/cms/formBuilder.ts` |
 | `redirects`        | Old URL to new URL mappings             | No                                     | `isAdmin`                     | `isAdmin`                                               | `isAdmin`         | plugin redirects, `src/plugins/index.ts`                      |
 | `search`           | Search index of posts and events        | No                                     | `() => true` (plugin default) | create `() => false` (plugin); update `isAdminOrEditor` | `isAdminOrEditor` | plugin search, `src/modules/news/cms/search.ts`               |
 
-What the access functions mean (`src/access/`):
+What the access functions mean (`src/platform/payload/`):
 
 - `anyone`: always true.
 - `authenticatedOrPublished`: admin and editor see everything, including drafts; everyone else only sees `_status = published`.
@@ -33,7 +33,7 @@ What the access functions mean (`src/access/`):
 - `users` also sets `access.admin: isAdminOrEditorBoolean` (who may open `/admin`: admin and editor).
 - "Payload default" means no access function is set, so Payload uses `Boolean(req.user)`: any logged-in user, including `resident`.
 
-Also present, added by Payload or its plugins rather than defined here: `payload-folders` (from `media.folders: true`; staff-only through `folders.collectionOverrides` in `payload.config.ts`, #143), `payload-jobs` (access set by `jobs.access` in `payload.config.ts`; nothing runs the queue yet, so scheduled publishing may never fire, #141), `payload-locked-documents` (edit locks; staff-only since #147, set on the built config by `src/access/restrictEditLocks.ts`), `payload-kv`, `payload-preferences` and `payload-migrations`.
+Also present, added by Payload or its plugins rather than defined here: `payload-folders` (from `media.folders: true`; staff-only through `folders.collectionOverrides` in `payload.config.ts`, #143), `payload-jobs` (access set by `jobs.access` in `payload.config.ts`; nothing runs the queue yet, so scheduled publishing may never fire, #141), `payload-locked-documents` (edit locks; staff-only since #147, set on the built config by `src/platform/payload/restrictEditLocks.ts`), `payload-kv`, `payload-preferences` and `payload-migrations`.
 
 ## Fields by collection
 

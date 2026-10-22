@@ -1,11 +1,11 @@
 import type { CollectionConfig } from 'payload'
 
+import { ROLES } from '@/platform/lib'
 import {
-  ROLES,
   isAdmin,
+  isAdminFieldAccess,
   isAdminOrEditorBoolean,
   isAdminOrSelf,
-  isAdminFieldAccess,
 } from '@/platform/payload/roles'
 
 export const Users: CollectionConfig = {

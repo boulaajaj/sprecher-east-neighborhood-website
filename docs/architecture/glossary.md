@@ -6,14 +6,17 @@ which module owns it).
 
 ## People and roles
 
-| Term     | Meaning                                                                                                                | Where the rule lives                        |
-| -------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| Visitor  | Anyone on the site who isn't signed in.                                                                                | n/a                                         |
-| Resident | A signed-in account with the `resident` role: reads published content, edits only their own profile. The default role. | `src/access/roles.ts` → `platform/payload/` |
-| Editor   | A signed-in account with the `editor` role: creates and edits content, opens `/admin`.                                 | same                                        |
-| Admin    | A signed-in account with the `admin` role: everything, including users, roles and deletes.                             | same                                        |
-| Staff    | Admins and editors together (`hasAdminOrEditor`). Staff skip the form rate limit and robot check.                      | same                                        |
-| Owner    | The repo owner. Decides policy and `needs owner` items, and can merge or revert anything (`AGENTS.md`).                | n/a                                         |
+| Term         | Meaning                                                                                                                | Where the rule lives                                                              |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Visitor      | Anyone on the site who isn't signed in.                                                                                | n/a                                                                               |
+| Resident     | A signed-in account with the `resident` role: reads published content, edits only their own profile. The default role. | `ROLES` in `src/platform/lib/roles.ts`; checks in `src/platform/payload/roles.ts` |
+| Editor       | A signed-in account with the `editor` role: creates and edits content, opens `/admin`.                                 | same                                                                              |
+| Admin        | A signed-in account with the `admin` role: everything, including users, roles and deletes.                             | same                                                                              |
+| Staff        | Admins and editors together (`hasAdminOrEditor`). Staff skip the form rate limit and robot check.                      | same                                                                              |
+| Account      | A login in `users`: an email, a password, an optional name and one role.                                               | `src/modules/accounts/cms/users.ts`                                               |
+| Current user | Who is signed in for a request, from Payload's auth cookie; `null` for a visitor.                                      | `getCurrentUser` in `src/modules/accounts/`                                       |
+| Signing in   | Email and password, checked by Payload. Every refusal (wrong password, unknown email, locked account) reads the same.  | `signIn` in `src/modules/accounts/actions.ts`                                     |
+| Owner        | The repo owner. Decides policy and `needs owner` items, and can merge or revert anything (`AGENTS.md`).                | n/a                                                                               |
 
 ## Content states
 

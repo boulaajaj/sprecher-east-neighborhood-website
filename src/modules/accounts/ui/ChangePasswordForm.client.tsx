@@ -1,52 +1,41 @@
 'use client'
 
 import React, { useState } from 'react'
-import { z } from 'zod'
 
 import { Button, Field, Form, type FormApi, type FormStatus } from '@/platform/ui'
 
+import { changePassword } from '../actions'
+import {
+  MIN_PASSWORD_LENGTH,
+  passwordChangeSchema,
+  type PasswordChangeValues,
+} from '../domain/credentials'
+import type { PasswordFailure } from '../domain/types'
 import { toPasswordErrorMessage } from './passwordErrorMessage'
 
-const MIN_PASSWORD_LENGTH = 8
-
-const passwordSchema = z
-  .object({
-    newPassword: z
-      .string()
-      .min(MIN_PASSWORD_LENGTH, `Use at least ${MIN_PASSWORD_LENGTH} characters`),
-    confirmPassword: z.string().min(1, 'Type the new password again'),
-  })
-  .refine((values) => values.newPassword === values.confirmPassword, {
-    message: 'The passwords don’t match',
-    path: ['confirmPassword'],
-  })
-
-type Values = z.output<typeof passwordSchema>
-
-export function ChangePasswordForm({ userId }: { userId: number }) {
+/** Changes the signed-in account's password. The account comes from the session, not a prop. */
+export function ChangePasswordForm() {
   const [status, setStatus] = useState<FormStatus>('idle')
   const [errorMessage, setErrorMessage] = useState('')
 
-  // Never the server's text (#204); Payload logs the details
-  const fail = (httpStatus: number | null) => {
-    setErrorMessage(toPasswordErrorMessage(httpStatus))
+  // Never the server's text (#204); the server logs the details
+  const fail = (failure: PasswordFailure | 'offline') => {
+    setErrorMessage(toPasswordErrorMessage(failure))
     setStatus('error')
   }
 
-  const changePassword = async (values: Values, form: FormApi<Values, Values>) => {
+  const submit = async (
+    values: PasswordChangeValues,
+    form: FormApi<PasswordChangeValues, PasswordChangeValues>,
+  ) => {
     setStatus('submitting')
-    let res: Response
+    let result: Awaited<ReturnType<typeof changePassword>>
     try {
-      res = await fetch(`/api/users/${userId}`, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: values.newPassword }),
-      })
+      result = await changePassword(values)
     } catch {
-      return fail(null)
+      return fail('offline')
     }
-    if (!res.ok) return fail(res.status)
+    if (!result.ok) return fail(result.failure)
 
     form.reset()
     setStatus('success')
@@ -55,9 +44,9 @@ export function ChangePasswordForm({ userId }: { userId: number }) {
   return (
     <Form
       aria-label="Change password"
-      schema={passwordSchema}
+      schema={passwordChangeSchema}
       defaultValues={{}} // keeps what was typed before the page loaded
-      onSubmit={changePassword}
+      onSubmit={submit}
       status={status}
       successMessage="Password updated."
       errorMessage={errorMessage}

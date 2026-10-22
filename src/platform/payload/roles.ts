@@ -2,21 +2,13 @@ import type { Access, AccessArgs, FieldAccess } from 'payload'
 
 import type { User } from '@/payload-types'
 
-/** Role constants — single source of truth for role string values */
-export const ROLES = {
-  admin: 'admin',
-  editor: 'editor',
-  resident: 'resident',
-} as const
-
-/** Derived from the User type's role field — stays in sync with payload-types automatically */
-type UserRole = User['role']
+import { ROLES, type Role } from '../lib/roles'
 
 /**
  * Extract role from the request user.
  * Returns 'resident' as the safe default if no role is set (e.g., pre-migration users).
  */
-const getRole = (user: User | null): UserRole | null => {
+const getRole = (user: User | null): Role | null => {
   if (!user) return null
   return user.role || ROLES.resident
 }
