@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 
-import { getMeUser } from '@/utilities/getMeUser'
-import { ChangePasswordForm } from './ChangePasswordForm'
+import { ChangePasswordForm, requireUser } from '@/modules/accounts/server'
 
 export const metadata: Metadata = {
   title: 'Account',
@@ -9,7 +8,7 @@ export const metadata: Metadata = {
 }
 
 export default async function AccountPage() {
-  const { user } = await getMeUser({ nullUserRedirect: '/login' })
+  const user = await requireUser()
 
   return (
     <div className="container py-16">
@@ -32,7 +31,7 @@ export default async function AccountPage() {
 
         <div className="rounded-lg border border-border bg-surface p-6">
           <h2 className="mb-4 text-lg font-semibold text-foreground">Change Password</h2>
-          <ChangePasswordForm userId={user.id} />
+          <ChangePasswordForm />
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { APIError, type CollectionBeforeChangeHook } from 'payload'
 
-import { hasAdminOrEditor } from '@/access/roles'
+import { hasAdminOrEditor } from '@/platform/payload/roles'
 
 import { HUMAN_CHECK_TOKEN_HEADER, type HumanVerifier } from '../domain/humanVerifier'
 

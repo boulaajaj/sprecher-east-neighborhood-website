@@ -2,34 +2,47 @@
 import { useHeaderTheme } from '@/providers/HeaderTheme'
 import NextLink from 'next/link'
 import { usePathname } from 'next/navigation'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 
 import type { Header } from '@/payload-types'
 
-import { Button, Link } from '@/platform/ui'
+import { Button } from '@/platform/ui'
 import { Menu, X } from 'lucide-react'
 import { Logo } from '@/components/Logo/Logo'
 import { HeaderNav } from './Nav'
-import { useAuth } from '@/hooks/useAuth'
 
 interface HeaderClientProps {
   data: Header
+  /** The account links in the desktop bar */
+  accountMenu: ReactNode
+  /** The account links in the mobile menu */
+  mobileAccountMenu: ReactNode
 }
 
-export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
+export const HeaderClient: React.FC<HeaderClientProps> = ({
+  data,
+  accountMenu,
+  mobileAccountMenu,
+}) => {
   /* Storing the value in a useState to avoid hydration errors */
   const [theme, setTheme] = useState<string | null>(null)
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const { headerTheme, setHeaderTheme } = useHeaderTheme()
   const pathname = usePathname()
-  const { user, loading: authLoading, logout } = useAuth()
   const toggleRef = useRef<HTMLButtonElement>(null)
 
   const closeMobileMenu = useCallback((restoreFocus = false) => {
     setMobileOpen(false)
     if (restoreFocus) toggleRef.current?.focus()
   }, [])
+
+  const closeOnLinkOrButton = useCallback(
+    (event: React.MouseEvent) => {
+      if (event.target instanceof Element && event.target.closest('a, button')) closeMobileMenu()
+    },
+    [closeMobileMenu],
+  )
 
   useEffect(() => {
     setHeaderTheme(null)
@@ -97,30 +110,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
         {/* Desktop nav starts at lg: below 1024px the items don't fit and the page scrolls sideways */}
         <div className="hidden items-center gap-1 lg:flex">
           <HeaderNav data={data} pathname={pathname} />
-          {authLoading ? (
-            <div className="h-9 w-16 animate-pulse rounded-md bg-border" />
-          ) : user ? (
-            <>
-              {/* A long name is cut short so the bar never overflows; the full name is the title */}
-              <Link
-                href="/account"
-                variant="nav"
-                size="sm"
-                current={pathname === '/account'}
-                title={user.name || undefined}
-                className="max-w-40"
-              >
-                <span className="truncate">{user.name || 'Account'}</span>
-              </Link>
-              <Button variant="ghost" size="sm" onClick={logout}>
-                Sign Out
-              </Button>
-            </>
-          ) : (
-            <Link href="/login" variant="nav" size="sm" current={pathname === '/login'}>
-              Log In
-            </Link>
-          )}
+          {accountMenu}
           <Button
             href="/contact"
             size="sm"
@@ -159,42 +149,10 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
               mobile
               onNavigate={() => closeMobileMenu()}
             />
-            {!authLoading && (
-              <>
-                {user ? (
-                  <>
-                    <Link
-                      href="/account"
-                      variant="nav"
-                      current={pathname === '/account'}
-                      onClick={() => closeMobileMenu()}
-                    >
-                      {user.name || 'Account'}
-                    </Link>
-                    <Button
-                      variant="ghost"
-                      fullWidth
-                      onClick={() => {
-                        closeMobileMenu()
-                        logout()
-                      }}
-                      className="justify-start rounded-md px-3 font-medium hover:bg-secondary hover:text-primary"
-                    >
-                      Sign Out
-                    </Button>
-                  </>
-                ) : (
-                  <Link
-                    href="/login"
-                    variant="nav"
-                    current={pathname === '/login'}
-                    onClick={() => closeMobileMenu()}
-                  >
-                    Log In
-                  </Link>
-                )}
-              </>
-            )}
+            {/* Following a link or signing out in the account links closes the menu too */}
+            <div className="contents" onClick={closeOnLinkOrButton}>
+              {mobileAccountMenu}
+            </div>
             <Button
               href="/contact"
               fullWidth

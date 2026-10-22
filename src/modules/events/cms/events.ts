@@ -14,7 +14,7 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 
-import { draftContentAccess } from '@/access/draftContentAccess'
+import { draftContentAccess } from '@/platform/payload/draftContentAccess'
 import { populatePublishedAt } from '@/hooks/populatePublishedAt'
 
 import { EVENT_CATEGORIES } from '../domain/categories'

@@ -3,3 +3,4 @@
 export type { ImageRef, RichTextValue } from './content'
 export { isSingleAddress } from './emailAddress'
 export { MAX_PAGE, parsePageNumber, toPageNumbers, type FeedPage } from './paging'
+export { ROLES, type Role } from './roles'

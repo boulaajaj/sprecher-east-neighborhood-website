@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
-import { anyone } from '@/access/anyone'
-import { isAdmin, isAdminOrEditor, isAdminOrEditorFieldAccess } from '@/access/roles'
+import { anyone } from '@/platform/payload/anyone'
+import { isAdmin, isAdminOrEditor, isAdminOrEditorFieldAccess } from '@/platform/payload/roles'
 
 export const TeamMembers: CollectionConfig<'team-members'> = {
   slug: 'team-members',

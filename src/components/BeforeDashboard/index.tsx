@@ -1,7 +1,7 @@
 import { Banner } from '@payloadcms/ui/elements/Banner'
 import React from 'react'
 
-import { isSeedEnabled } from '@/access/isSeedEnabled'
+import { isSeedEnabled } from '@/platform/payload/isSeedEnabled'
 
 import { SeedButton } from './SeedButton'
 import './index.scss'

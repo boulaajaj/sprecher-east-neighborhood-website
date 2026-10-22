@@ -51,6 +51,9 @@ const nextConfig = {
   // Next 16 writes a block into AGENTS.md when an AI agent runs `next dev`. AGENTS.md is a policy
   // file, so it stays off until the owner decides (#194).
   agentRules: false,
+  // `next dev` prints every server action call with its arguments, which would put the passwords
+  // typed into sign-in and change-password in the terminal, and in any log pasted into an issue
+  logging: { serverFunctions: false },
   reactStrictMode: true,
   redirects,
   turbopack: {

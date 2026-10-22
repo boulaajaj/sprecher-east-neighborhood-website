@@ -7,7 +7,9 @@ the component work under #163 or to their own issues.
 
 File references are as they were when the inventory was taken. Since then #223 replaced the
 form-builder field files under `src/blocks/Form/` (`Width/`, `Error/` and the rest) with `Field`,
-and #133 moved the form block to `src/modules/contact/ui/FormBlock.client.tsx`.
+#133 moved the form block to `src/modules/contact/ui/FormBlock.client.tsx`, and #134 moved
+`login/LoginForm.tsx` and `account/ChangePasswordForm.tsx` to `src/modules/accounts/ui/`
+(`SignInForm.client.tsx`, `ChangePasswordForm.client.tsx`).
 
 ## Duplication
 

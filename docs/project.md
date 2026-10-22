@@ -20,7 +20,7 @@ It is an unofficial, AI-assisted initiative (ground rules in [`AGENTS.md`](../AG
 - **Framework**: Next.js 16 (App Router, TypeScript; Turbopack builds), React 19.2
 - **CSS**: Tailwind CSS v4 (design tokens in `src/app/(frontend)/globals.css @theme {}`)
 - **CMS**: Payload CMS v3 Website Template at `/admin` (self-hosted, SQLite `data/payload.db`)
-- **Auth**: Payload native auth (Users collection with `auth: true`); roles `admin`, `editor`, `resident`
+- **Auth**: Payload native auth (Users collection with `auth: true`); roles `admin`, `editor`, `resident`. Pages and server actions ask `src/modules/accounts/` who is signed in (`getCurrentUser`, `requireUser`, `requireRole`); sign-in, sign-out and password changes are its server actions
 - **Email**: `@payloadcms/email-nodemailer` over SMTP (Mailgun in production); logs to the console when `SMTP_HOST` is unset
 - **Spam protection**: Cloudflare Turnstile on public forms, plus size and rate limits (decision records in `docs/architecture/decisions/`)
 - **Tests**: Vitest unit tests next to the code (`*.test.ts`), run with `npm test` and in CI (#139). Component tests (`*.test.tsx`) run in jsdom with Testing Library and axe (`expectAccessible` in `src/platform/ui/testing/`)
@@ -66,25 +66,26 @@ the [data model](architecture/data-model.md) and [decision records](architecture
 The code is moving to that structure in small steps (#127). Events have moved to
 `src/modules/events/` (#131), FAQ, resources and team members to `src/modules/directory/`
 (#136), news posts, categories and search to `src/modules/news/` (#132), and the contact
-form's safeguards and form block to `src/modules/contact/` (#133). `src/platform/lib/` holds the
-shared paging helpers, and `src/platform/email/` the SMTP settings that password-reset and form
-emails share. Until an area has moved, it is still in the Payload website template's folders,
+form's safeguards and form block to `src/modules/contact/` (#133), and accounts (who is signed in,
+sign-in and password flows, the users collection) to `src/modules/accounts/` (#134).
+`src/platform/lib/` holds the shared paging helpers and the role list, `src/platform/payload/` the
+role checks and access functions every collection uses, and `src/platform/email/` the SMTP
+settings that password-reset and form emails share. Until an area has moved, it is still in the Payload website template's folders,
 sorted by technical type:
 
 ```
 src/
-  access/          Role checks and access functions (roles.ts, authenticatedOrPublished, anyone)
   app/             Next.js App Router
     (frontend)/    Public routes (home, posts, events, faq, resources, search, login, account, sitemaps)
     (payload)/     Payload admin and API routes (generated; leave alone)
   blocks/          Page-builder blocks: Payload config + React component each
-  collections/     Payload collections (Pages, Users, Media)
+  collections/     Payload collections (Pages, Media)
   components/      Shared React components; components/ui/ holds the shadcn/ui primitives
   endpoints/seed/  Seed data and script
   fields/          Reusable Payload field groups (link, linkGroup, defaultLexical)
   Header/, Footer/ Global configs and components
   heros/           Hero components and config
-  hooks/           Payload hooks (publishedAt, redirects) and one React hook (useAuth)
+  hooks/           Payload hooks (publishedAt, redirects)
   migrations/      Database migrations (generated)
   plugins/         Payload plugin setup (form builder, SEO, search, redirects, nested docs)
   providers/       React context providers (theme, header theme)
@@ -94,23 +95,23 @@ src/
 
 ## Key Files
 
-| File                               | Purpose                                           |
-| ---------------------------------- | ------------------------------------------------- |
-| `src/payload.config.ts`            | Payload CMS config (SQLite, collections, plugins) |
-| `src/app/(frontend)/globals.css`   | Tailwind v4 `@theme` block — all design tokens    |
-| `src/collections/Pages/index.ts`   | Pages collection with layout builder blocks       |
-| `src/modules/news/cms/posts.ts`    | News posts collection                             |
-| `src/modules/events/cms/events.ts` | Events collection (custom)                        |
-| `src/collections/Users/index.ts`   | Users collection with Payload native auth         |
-| `src/collections/Media.ts`         | Media uploads with size variants                  |
-| `src/blocks/`                      | Layout builder block configs + React components   |
-| `src/heros/`                       | Hero block configs + React components             |
-| `src/access/`                      | Access control helpers                            |
-| `src/fields/`                      | Reusable field groups (link, linkGroup, lexical)  |
-| `src/Header/`                      | Header global component                           |
-| `src/Footer/`                      | Footer global component                           |
-| `ecosystem.config.cjs`             | PM2 config for VPS (CommonJS: package is ESM)     |
-| `eslint.boundaries.config.mjs`     | Dependency rules as lint (warnings until #137)    |
+| File                                | Purpose                                           |
+| ----------------------------------- | ------------------------------------------------- |
+| `src/payload.config.ts`             | Payload CMS config (SQLite, collections, plugins) |
+| `src/app/(frontend)/globals.css`    | Tailwind v4 `@theme` block — all design tokens    |
+| `src/collections/Pages/index.ts`    | Pages collection with layout builder blocks       |
+| `src/modules/news/cms/posts.ts`     | News posts collection                             |
+| `src/modules/events/cms/events.ts`  | Events collection (custom)                        |
+| `src/modules/accounts/cms/users.ts` | Users collection with Payload native auth         |
+| `src/collections/Media.ts`          | Media uploads with size variants                  |
+| `src/blocks/`                       | Layout builder block configs + React components   |
+| `src/heros/`                        | Hero block configs + React components             |
+| `src/platform/payload/roles.ts`     | Role checks and access functions                  |
+| `src/fields/`                       | Reusable field groups (link, linkGroup, lexical)  |
+| `src/Header/`                       | Header global component                           |
+| `src/Footer/`                       | Footer global component                           |
+| `ecosystem.config.cjs`              | PM2 config for VPS (CommonJS: package is ESM)     |
+| `eslint.boundaries.config.mjs`      | Dependency rules as lint (warnings until #137)    |
 
 ## Design Tokens
 

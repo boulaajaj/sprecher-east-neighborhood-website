@@ -1,6 +1,6 @@
 import type { SearchPluginConfig } from '@payloadcms/plugin-search/types'
 
-import { isAdminOrEditor } from '@/access/roles'
+import { isAdminOrEditor } from '@/platform/payload/roles'
 
 import { searchFields } from './searchFields'
 import { beforeSyncWithSearch } from './searchSync'

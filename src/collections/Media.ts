@@ -8,8 +8,8 @@ import {
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-import { anyone } from '../access/anyone'
-import { isAdmin, isAdminOrEditor } from '../access/roles'
+import { anyone } from '@/platform/payload/anyone'
+import { isAdmin, isAdminOrEditor } from '@/platform/payload/roles'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)

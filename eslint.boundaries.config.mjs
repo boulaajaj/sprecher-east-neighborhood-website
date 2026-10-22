@@ -8,7 +8,6 @@ const ENTRY_FILES = '{index,server,actions,cms}.ts'
 
 // The Payload website template's folders, until their code moves to src/modules/ and src/platform/
 const TEMPLATE_FOLDERS = [
-  'access',
   'blocks',
   'collections',
   'components',

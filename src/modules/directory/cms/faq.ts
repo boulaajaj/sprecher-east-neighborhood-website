@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { draftContentAccess } from '@/access/draftContentAccess'
+import { draftContentAccess } from '@/platform/payload/draftContentAccess'
 import { populatePublishedAt } from '@/hooks/populatePublishedAt'
 
 import { FAQ_CATEGORIES } from '../domain/categories'

@@ -1,6 +1,6 @@
 import type { GlobalConfig } from 'payload'
 
-import { isAdminOrEditor } from '@/access/roles'
+import { isAdminOrEditor } from '@/platform/payload/roles'
 import { link } from '@/fields/link'
 import { revalidateFooter } from './hooks/revalidateFooter'
 

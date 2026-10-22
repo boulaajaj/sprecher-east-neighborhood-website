@@ -1,8 +1,8 @@
 import { APIError, type CollectionBeforeChangeHook } from 'payload'
 import { describe, expect, it, vi } from 'vitest'
 
-import { anyone } from '@/access/anyone'
-import { isAdmin, isAdminOrEditor } from '@/access/roles'
+import { anyone } from '@/platform/payload/anyone'
+import { isAdmin, isAdminOrEditor } from '@/platform/payload/roles'
 
 import { formBuilderOptions } from './formBuilder'
 import { guardFormEmails } from './guardFormEmails'
