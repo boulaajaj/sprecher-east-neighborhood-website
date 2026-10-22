@@ -1,4 +1,4 @@
-import { getServerSideURL, toAbsoluteURL } from '@/utilities/getURL'
+import { getServerSideURL, toAbsoluteURL } from '@/platform/lib/getURL'
 
 import type { EventDetail } from '../domain/types'
 

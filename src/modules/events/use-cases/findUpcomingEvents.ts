@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { startOfToday } from '@/utilities/timezone'
+import { startOfToday } from '@/platform/lib/timezone'
 
 import type { EventSummary } from '../domain/types'
 import * as queries from '../data/queries'

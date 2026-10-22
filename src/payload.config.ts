@@ -1,23 +1,109 @@
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
+import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
+import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
+import { redirectsPlugin } from '@payloadcms/plugin-redirects'
+import { searchPlugin } from '@payloadcms/plugin-search'
+import { seoPlugin } from '@payloadcms/plugin-seo'
+import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import sharp from 'sharp'
 import path from 'path'
-import { buildConfig } from 'payload'
+import { buildConfig, type Plugin } from 'payload'
 import { fileURLToPath } from 'url'
 
+import type { Event, Page, Post } from '@/payload-types'
 import { Users } from '@/modules/accounts/cms'
+import { FormBlock, formBuilderOptions } from '@/modules/contact/cms'
 import { FAQ, Resources, TeamMembers } from '@/modules/directory/cms'
 import { Events } from '@/modules/events/cms'
-import { Categories, Posts } from '@/modules/news/cms'
-import { Media } from './collections/Media'
-import { Pages } from './collections/Pages'
-import { Footer } from './Footer/config'
-import { Header } from './Header/config'
-import { plugins } from './plugins'
-import { defaultLexical } from '@/fields/defaultLexical'
-import { isAdminBoolean, isAdminOrEditor, isAdminOrEditorBoolean } from '@/platform/payload/roles'
-import { getServerSideURL } from './utilities/getURL'
+import { Categories, Posts, searchOptions } from '@/modules/news/cms'
+import {
+  createPagesCollection,
+  Footer,
+  Header,
+  revalidateRedirects,
+  SITE_LAYOUT_BLOCKS,
+} from '@/modules/site/cms'
+import { Media } from '@/platform/payload/media'
+import { defaultLexical } from '@/platform/payload/defaultLexical'
+import {
+  isAdmin,
+  isAdminBoolean,
+  isAdminOrEditor,
+  isAdminOrEditorBoolean,
+} from '@/platform/payload/roles'
+import { getServerSideURL } from '@/platform/lib/getURL'
 import { emailAdapterFromEnv } from '@/platform/email/emailAdapter'
 import { restrictEditLocks } from '@/platform/payload/restrictEditLocks'
+
+// Modules meet here (0008): the contact form joins the site's own page-builder blocks
+const Pages = createPagesCollection({ layoutBlocks: [...SITE_LAYOUT_BLOCKS, FormBlock] })
+
+const generateTitle: GenerateTitle<Post | Page | Event> = ({ doc }) => {
+  return doc?.title || 'Sprecher East'
+}
+
+const generateURL: GenerateURL<Post | Page | Event> = ({ doc, collectionConfig }) => {
+  const url = getServerSideURL()
+
+  if (!doc?.slug) return url
+
+  if (collectionConfig?.slug === 'events') {
+    return `${url}/events/${doc.slug}`
+  }
+
+  if (collectionConfig?.slug === 'posts') {
+    return `${url}/posts/${doc.slug}`
+  }
+
+  return `${url}/${doc.slug}`
+}
+
+// Plugins are composed here too: several modules each bring their own options (0008)
+const plugins: Plugin[] = [
+  redirectsPlugin({
+    collections: ['pages', 'posts'],
+    overrides: {
+      access: {
+        create: isAdmin,
+        read: isAdmin,
+        update: isAdmin,
+        delete: isAdmin,
+      },
+      // @ts-expect-error - This is a valid override, mapped fields don't resolve to the same type
+      fields: ({ defaultFields }) => {
+        return defaultFields.map((field) => {
+          if ('name' in field && field.name === 'from') {
+            return {
+              ...field,
+              admin: {
+                description: 'You will need to rebuild the website when changing this field.',
+              },
+            }
+          }
+          return field
+        })
+      },
+      hooks: {
+        afterChange: [revalidateRedirects],
+      },
+    },
+  }),
+  nestedDocsPlugin({
+    collections: ['categories'],
+    generateURL: (docs) => docs.reduce((url, doc) => `${url}/${doc.slug}`, ''),
+  }),
+  // No `collections`: Pages, Posts and Events build their own SEO tab (with an image) from the
+  // plugin's fields. Listing them here added a second `meta` group without one, which reads
+  // returned, so no share image or card thumbnail ever showed (#196).
+  seoPlugin({
+    generateTitle,
+    generateURL,
+  }),
+  // Forms, submissions and their safeguards belong to the contact module
+  formBuilderPlugin(formBuilderOptions),
+  // Search belongs to news; it also indexes events, which the module doesn't name (0008)
+  searchPlugin({ ...searchOptions, collections: ['posts', 'events'] }),
+]
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -26,8 +112,8 @@ const dirname = path.dirname(filename)
 export default buildConfig({
   admin: {
     components: {
-      beforeLogin: ['@/components/BeforeLogin'],
-      beforeDashboard: ['@/components/BeforeDashboard'],
+      beforeLogin: ['@/platform/payload/admin/BeforeLogin'],
+      beforeDashboard: ['@/platform/payload/admin/BeforeDashboard'],
     },
     importMap: {
       baseDir: path.resolve(dirname),

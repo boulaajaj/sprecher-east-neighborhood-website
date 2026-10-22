@@ -3,10 +3,11 @@
 import Link from 'next/link'
 import React from 'react'
 
-import { Media } from '@/components/Media'
-import { formatDateShort } from '@/utilities/formatDateTime'
-import { categoryPillClassName, cn } from '@/utilities/ui'
-import useClickableCard from '@/utilities/useClickableCard'
+import { Media } from '@/platform/ui/Media'
+import { formatDateShort } from '@/platform/lib/formatDateTime'
+import { cn } from '@/platform/lib/cn'
+import { categoryPillClassName } from '@/platform/ui/categoryPill'
+import useClickableCard from './useClickableCard'
 
 import type { PostSummary } from '../domain/types'
 

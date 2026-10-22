@@ -1,7 +1,7 @@
 import React from 'react'
 import { ChevronDown } from 'lucide-react'
 
-import RichText from '@/components/RichText'
+import { RichText } from '@/platform/richtext/RichText'
 
 import type { FaqEntry } from '../domain/types'
 

@@ -1,26 +1,9 @@
 // The architecture's dependency rules as lint (docs/architecture/README.md#dependency-rules).
-// Warnings for now, so nothing breaks while code moves out of the template folders (#127);
-// #137 turns them into errors once it has.
+// Errors since every area moved out of the template folders (#137).
 import boundaries from 'eslint-plugin-boundaries'
 
 // A module's entry files: the only files code outside the module may import (rule 2)
 const ENTRY_FILES = '{index,server,actions,cms}.ts'
-
-// The Payload website template's folders, until their code moves to src/modules/ and src/platform/
-const TEMPLATE_FOLDERS = [
-  'blocks',
-  'collections',
-  'components',
-  'endpoints',
-  'fields',
-  'Footer',
-  'Header',
-  'heros',
-  'hooks',
-  'plugins',
-  'providers',
-  'utilities',
-]
 
 // Runtime Payload: the framework, its packages and the config (rule 6). `import type` is fine.
 const PAYLOAD = [
@@ -31,10 +14,8 @@ const PAYLOAD = [
 // Pages and routes that still query Payload themselves. Each leaves this list when its area moves
 // to a module (#131 to #136); any other file in src/app/ that does it gets a warning.
 const STILL_QUERYING_PAYLOAD = [
-  '(frontend)/[slug]/page.tsx',
   '(frontend)/next/preview/route.ts',
   '(frontend)/next/seed/route.ts',
-  '(frontend)/(sitemaps)/pages-sitemap.xml/route.ts',
 ].map((file) => `src/app/${file}`.replace(/[\\()[\]{}*?!+@]/g, '\\$&')) // escape glob characters
 
 // Inside a module, what each part must not import from the same module (rules 1, 4 and 5).
@@ -85,11 +66,9 @@ export const boundariesConfig = {
       { type: 'app', pattern: 'src/app', partialMatch: false },
       { type: 'module', pattern: 'src/modules/*', partialMatch: false, capture: ['module'] },
       { type: 'platform', pattern: 'src/platform', partialMatch: false },
-      {
-        type: 'template',
-        pattern: TEMPLATE_FOLDERS.map((folder) => `src/${folder}`),
-        partialMatch: false,
-      },
+      // The one template folder that stays: seed data and its script. ESLint skips it (and the
+      // generated migrations/ and app/(payload)/), so only its importers are checked.
+      { type: 'seed', pattern: 'src/endpoints/seed', partialMatch: false },
     ],
     'boundaries/files': [
       // Root files (payload.config.ts, proxy.ts) belong to no element; this makes them checked
@@ -98,10 +77,13 @@ export const boundariesConfig = {
     ],
   },
   rules: {
+    // A file outside every element above (a new top-level folder in src/) fails lint: give it a
+    // home in app/, a module or platform/ instead
+    'boundaries/no-unknown-files': 'error',
     'boundaries/dependencies': [
-      'warn',
+      'error',
       {
-        // Only these policies apply; the template folders stay unchecked until they move
+        // Only these policies apply
         default: 'allow',
         checkAllOrigins: true,
         checkUnknownLocals: true,
@@ -120,6 +102,11 @@ export const boundariesConfig = {
             from: { element: { type: ['module', 'platform'] } },
             disallow: { to: { element: { type: ['module', 'app'] } } },
             message: `No module imports another, and platform/ imports none: compose them in src/app/ or payload.config.ts (${rule(3)})`,
+          },
+          {
+            from: { element: { type: ['module', 'platform'] } },
+            disallow: { to: { element: { type: 'seed' } } },
+            message: `Only src/app/ uses the seed (${rule(3)})`,
           },
           // A module's own files may import each other; the layer limits below narrow this
           { allow: { dependency: { relationship: { to: 'internal' } } } },

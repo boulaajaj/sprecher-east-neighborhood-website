@@ -65,34 +65,34 @@ target structure (one module per business area under `src/modules/`, shared code
 of code goes, naming [conventions](architecture/conventions.md), the [glossary](architecture/glossary.md),
 the [data model](architecture/data-model.md) and [decision records](architecture/decisions/README.md).
 
-The code is moving to that structure in small steps (#127). Events have moved to
-`src/modules/events/` (#131), FAQ, resources and team members to `src/modules/directory/`
-(#136), news posts, categories and search to `src/modules/news/` (#132), and the contact
-form's safeguards and form block to `src/modules/contact/` (#133), and accounts (who is signed in,
-sign-in and password flows, the users collection) to `src/modules/accounts/` (#134).
-`src/platform/lib/` holds the shared paging helpers and the role list, `src/platform/payload/` the
-role checks and access functions every collection uses, and `src/platform/email/` the SMTP
-settings that password-reset and form emails share. Until an area has moved, it is still in the Payload website template's folders,
-sorted by technical type:
+Every business area has moved to that structure (#127), and lint fails on an import that breaks
+its rules (#137). The Payload website template's folders are gone; the few exceptions (seed,
+generated files) are listed in [`architecture/`](architecture/README.md#exceptions).
 
 ```
 src/
-  app/             Next.js App Router
-    (frontend)/    Public routes (home, posts, events, faq, resources, search, login, account, sitemaps)
-    (payload)/     Payload admin and API routes (generated; leave alone)
-  blocks/          Page-builder blocks: Payload config + React component each
-  collections/     Payload collections (Pages, Media)
-  components/      Shared React components; components/ui/ holds the shadcn/ui primitives
-  endpoints/seed/  Seed data and script
-  fields/          Reusable Payload field groups (link, linkGroup, defaultLexical)
-  Header/, Footer/ Global configs and components
-  heros/           Hero components and config
-  hooks/           Payload hooks (publishedAt, redirects)
-  migrations/      Database migrations (generated)
-  plugins/         Payload plugin setup (form builder, SEO, search, redirects, nested docs)
-  providers/       React context providers (theme, header theme)
-  utilities/       Helpers: dates, URLs, SEO, data access
-  payload.config.ts
+  app/                 Next.js App Router: routes and composition only
+    (frontend)/        Public routes (home, posts, events, faq, resources, search, login, account, sitemaps)
+    (payload)/         Payload admin and API routes (generated; leave alone)
+  modules/             One folder per business area
+    accounts/          Who is signed in, sign-in and password flows, the users collection
+    contact/           Form safeguards, the robot check, the form block
+    directory/         FAQ, local resources, team members
+    events/            Events and the upcoming rule
+    news/              Posts, categories, search
+    site/              CMS pages, page-builder blocks, heroes, header, footer, redirects, link fields
+  platform/            Shared by every module; imports no module
+    email/             SMTP settings for password-reset and form emails
+    lib/               Pure helpers: paging, roles, dates and the site timezone, URLs, `cn`
+    payload/           Role checks, access functions, media collection, default editor, publishedAt hook, admin components
+    richtext/          The `RichText` renderer and the blocks inside rich text
+    seo/               Page metadata, Open Graph and sitemap helpers
+    theme/             Light and dark mode: theme providers, `InitTheme`, `ThemeSelector`
+    ui/                The UI kit: `Button`, `Link`, `Media`, `CMSLink`, `JsonLd`, `Breadcrumbs`, `LoadMore`…
+  endpoints/seed/      Seed data and script (exception)
+  migrations/          Database migrations (generated)
+  payload.config.ts    CMS composition: collections, globals, plugins
+  proxy.ts             Next.js proxy (middleware)
 ```
 
 ## Key Files
@@ -101,19 +101,17 @@ src/
 | ----------------------------------- | ------------------------------------------------- |
 | `src/payload.config.ts`             | Payload CMS config (SQLite, collections, plugins) |
 | `src/app/(frontend)/globals.css`    | Tailwind v4 `@theme` block — all design tokens    |
-| `src/collections/Pages/index.ts`    | Pages collection with layout builder blocks       |
+| `src/modules/site/cms/pages.ts`     | Pages collection with layout builder blocks       |
 | `src/modules/news/cms/posts.ts`     | News posts collection                             |
 | `src/modules/events/cms/events.ts`  | Events collection (custom)                        |
 | `src/modules/accounts/cms/users.ts` | Users collection with Payload native auth         |
-| `src/collections/Media.ts`          | Media uploads with size variants                  |
-| `src/blocks/`                       | Layout builder block configs + React components   |
-| `src/heros/`                        | Hero block configs + React components             |
+| `src/platform/payload/media.ts`     | Media uploads with size variants                  |
+| `src/modules/site/cms/`             | Block, hero and link field configs, globals       |
+| `src/modules/site/ui/`              | Blocks, heroes, header and footer components      |
 | `src/platform/payload/roles.ts`     | Role checks and access functions                  |
-| `src/fields/`                       | Reusable field groups (link, linkGroup, lexical)  |
-| `src/Header/`                       | Header global component                           |
-| `src/Footer/`                       | Footer global component                           |
+| `src/platform/theme/`               | Light and dark mode providers and init script     |
 | `ecosystem.config.cjs`              | PM2 config for VPS (CommonJS: package is ESM)     |
-| `eslint.boundaries.config.mjs`      | Dependency rules as lint (warnings until #137)    |
+| `eslint.boundaries.config.mjs`      | Dependency rules as lint errors (#137)            |
 
 ## Design Tokens
 
@@ -168,15 +166,16 @@ System-level env vars (not in .env.local):
 - **`defaultSort`**: Must be on collection root, NOT inside `admin: {}`
 - **`npx payload run` broken on Node v24**: Use direct node scripts instead
 - **`graphql` package**: Must install separately from `@payloadcms/graphql`
-- **`overrideAccess`**: Set it on every Local API call: `false` for what a visitor may see, `true` only where access must be bypassed, with a comment saying why. The seed's writes don't set it yet (#135)
+- **`overrideAccess`**: Set it on every Local API call: `false` for what a visitor may see, `true` only where access must be bypassed, with a comment saying why. The seed's writes don't set it yet, and the header and footer are read with `overrideAccess: true` (#251)
 - **`server-only`**: Server code outside the CMS config that queries Payload or reads cookies (utilities, `data/`, `use-cases/`, `server.ts`) starts with `import 'server-only'`, so a client component importing it fails the build. Collections, hooks and plugins never import it: the Payload CLI (`migrate`, seed) loads them outside Next.js, where it throws. Hooks use the `req.payload` they are given
 - **Cache tags**: Expire them with `expireCacheTag()` from `src/platform/payload/expireCacheTag.ts`. Since Next 16, `revalidateTag` needs a second argument; the helper passes `{ expire: 0 }`, so the next visitor gets fresh content
+- **`next build` skips the type check**: `next.config.js` sets `typescript.ignoreBuildErrors`, because CI's required `tsc --noEmit` already checks types and the step timed out the deploy on the server (#246). Run `npx tsc --noEmit` locally; a green build alone doesn't mean the types are right
 - **Proxy**: `src/proxy.ts` (Next 16's name for middleware) answers 404 for junk paging URLs before they render (#119)
 - **Upload URLs stay relative**: `getMediaUrl()` turns Payload's upload URLs (prefixed with `serverURL`) back into `/api/media/file/...`, so next/image treats them as local; since Next 16 it refuses remote URLs on private IPs such as localhost
 - **Sign-in cookie is Secure in production**: the Users collection sets `auth.cookies.secure` when `NODE_ENV` is `production` (#234), so signing in (site and `/admin`) works over HTTPS only. Over plain http, such as the IP on port 80, the browser drops the cookie. `next dev` on `http://localhost` is unaffected
 - **Live Preview**: Uses `window.postMessage` — component must use `useLivePreview()` hook
 - **Draft Preview**: Requires `PREVIEW_SECRET` env var for signed preview URLs
-- **Timezone**: Configured via `SITE_TIMEZONE` env var (default: `America/Chicago`). Use `startOfToday()` and `SITE_TIMEZONE` from `src/utilities/timezone.ts`. Never hardcode timezone strings or use bare `new Date().setHours(0,0,0,0)`. Day-only dates (midnight UTC) must be formatted with `timeZone: 'UTC'` to avoid off-by-one; `formatDateTime()` handles this automatically.
+- **Timezone**: Configured via `SITE_TIMEZONE` env var (default: `America/Chicago`). Use `startOfToday()` and `SITE_TIMEZONE` from `src/platform/lib/timezone.ts`. Never hardcode timezone strings or use bare `new Date().setHours(0,0,0,0)`. Day-only dates (midnight UTC) must be formatted with `timeZone: 'UTC'` to avoid off-by-one; `formatDateTime()` handles this automatically.
 
 ## Connected Tools
 

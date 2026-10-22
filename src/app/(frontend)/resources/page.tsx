@@ -3,7 +3,7 @@ import type { Metadata } from 'next/types'
 import React from 'react'
 import { toResourceSections } from '@/modules/directory'
 import { ResourceCard, findResources } from '@/modules/directory/server'
-import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+import { mergeOpenGraph } from '@/platform/seo/mergeOpenGraph'
 
 export const dynamic = 'force-static'
 export const revalidate = 600

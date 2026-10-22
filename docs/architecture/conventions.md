@@ -16,9 +16,6 @@ PR. Where things go is in the [architecture map](README.md).
 | Constant value           | UPPER_SNAKE_CASE                                   | `UPCOMING_EVENTS_PAGE_SIZE`         |
 | Fixed list of options    | `as const` array plus a derived union type         | `EVENT_CATEGORIES`, `EventCategory` |
 
-Folders that came from the template (`src/components/Media/index.tsx`) keep their names until
-their module moves (#127).
-
 ### Function names say what they do
 
 | Prefix                | Meaning                                                     | Example                      |

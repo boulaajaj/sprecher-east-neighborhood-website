@@ -1,4 +1,4 @@
-import { cn } from '@/utilities/ui'
+import { cn } from '@/platform/lib/cn'
 import { type VariantProps, cva } from 'class-variance-authority'
 import type NextLink from 'next/link'
 

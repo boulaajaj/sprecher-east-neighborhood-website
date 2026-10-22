@@ -2,9 +2,10 @@ import Link from 'next/link'
 import React from 'react'
 import { MapPin, Clock, Calendar } from 'lucide-react'
 
-import { Media } from '@/components/Media'
-import { categoryPillClassName, cn } from '@/utilities/ui'
-import { formatDateShort, formatDateBadge, toDateTimeAttr } from '@/utilities/formatDateTime'
+import { Media } from '@/platform/ui/Media'
+import { cn } from '@/platform/lib/cn'
+import { categoryPillClassName } from '@/platform/ui/categoryPill'
+import { formatDateShort, formatDateBadge, toDateTimeAttr } from '@/platform/lib/formatDateTime'
 
 import { formatEventCategory } from '../domain/categories'
 import type { EventSummary } from '../domain/types'

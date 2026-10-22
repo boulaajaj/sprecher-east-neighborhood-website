@@ -6,7 +6,7 @@
  * Docs: https://developers.cloudflare.com/turnstile/get-started/server-side-validation/
  */
 
-import { getServerSideURL } from '@/utilities/getURL'
+import { getServerSideURL } from '@/platform/lib/getURL'
 
 import type { HumanCheck, HumanVerifier } from '../domain/humanVerifier'
 import { TURNSTILE_ACTION } from '../domain/turnstile'

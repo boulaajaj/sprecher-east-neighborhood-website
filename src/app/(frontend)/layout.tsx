@@ -1,23 +1,22 @@
 import type { Metadata } from 'next'
 
-import { cn } from '@/utilities/ui'
+import { cn } from '@/platform/lib/cn'
 import { Poppins } from 'next/font/google'
 import React from 'react'
 
-import { AdminBar } from '@/components/AdminBar'
-import { JsonLd } from '@/components/JsonLd'
-import { Footer } from '@/Footer/Component'
-import { Header } from '@/Header/Component'
+import { AdminBar } from '@/platform/ui/AdminBar.client'
+import { JsonLd } from '@/platform/ui/JsonLd'
+import { SiteFooter, SiteHeader } from '@/modules/site/server'
 import { AccountMenu, AccountProvider } from '@/modules/accounts/server'
-import { InitTheme } from '@/providers/Theme/InitTheme'
-import { Providers } from '@/providers'
-import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
-import { organizationJsonLd } from '@/utilities/structuredData'
-import { VersionCheck } from '@/components/VersionCheck'
+import { InitTheme } from '@/platform/theme/InitTheme'
+import { Providers } from '@/platform/theme/Providers'
+import { mergeOpenGraph } from '@/platform/seo/mergeOpenGraph'
+import { organizationJsonLd } from '@/platform/seo/organizationJsonLd'
+import { VersionCheck } from '@/platform/ui/VersionCheck.client'
 import { draftMode } from 'next/headers'
 
 import './globals.css'
-import { getServerSideURL } from '@/utilities/getURL'
+import { getServerSideURL } from '@/platform/lib/getURL'
 import { Button } from '@/platform/ui'
 
 const poppins = Poppins({
@@ -56,13 +55,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
           {/* The header shows who is signed in through the accounts module's menus (0008) */}
           <AccountProvider>
-            <Header
+            <SiteHeader
               accountMenu={<AccountMenu variant="bar" />}
               mobileAccountMenu={<AccountMenu variant="drawer" />}
             />
           </AccountProvider>
           <main id="main-content">{children}</main>
-          <Footer />
+          <SiteFooter />
           <VersionCheck />
         </Providers>
       </body>

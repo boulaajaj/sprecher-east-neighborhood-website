@@ -4,9 +4,9 @@ How the Sprecher East website's code is organized, and where new code goes. This
 people and AI agents alike. The rules for _how_ changes are made (issue, PR, review, merge) are in
 [`AGENTS.md`](../../AGENTS.md).
 
-> **Status (2026-10-20):** this page describes the **target** structure. The code is moving there
-> in small steps, tracked in #127. Until a business area has moved, its code is still in the
-> template folders listed in [Where things are today](#where-things-are-today).
+> **Status (2026-10-22):** every business area has moved to this structure (#127), and lint fails
+> on an import that breaks the rules below (#137). What is still outside it is listed in
+> [Exceptions](#exceptions).
 
 ## The shape: a modular monolith
 
@@ -59,13 +59,16 @@ grows should split its top level "into domain oriented modules which are interna
 
 - `lib/`: pure helpers for dates, text, URLs and shared content types; no framework, so the domain
   may use them.
-- `payload/`: role checks and access functions (every module uses them), reusable fields, and
-  plugins no single module owns (SEO).
+- `payload/`: role checks and access functions (every module uses them), the `media` uploads
+  collection, the default rich-text editor (`defaultLexical`), the `populatePublishedAt` hook and
+  the admin dashboard components. Plugin setup is composed in `payload.config.ts`, because each
+  module brings its own options.
 - `ui/`: primitives (`Button`, `Input`, `Media`, `Link`) with their variants.
-- `theme/`: the token contract (`tokens.ts`) and the Tailwind mapping.
-- `richtext/`: the `RichText` renderer and the blocks that can sit inside rich text (banner, code,
-  media, call to action). Pages reuse them from here.
-- `email/`, `seo/`, and `media` (uploads).
+- `theme/`: light and dark mode (the theme providers, `InitTheme`, `ThemeSelector`); the token
+  contract (`tokens.ts`) and the Tailwind mapping join them with #146.
+- `richtext/`: the `RichText` renderer and the blocks that can sit inside rich text (banner, code
+  and media; only a post's content offers them). Pages reuse the media block from here.
+- `email/` and `seo/`.
 
 Routes that serve no single area (`/api/version`, draft preview under `/next/`, the seed route)
 belong to `platform`; `app/(payload)/` is Payload's generated admin and API.
@@ -135,8 +138,7 @@ What this buys:
 2. **Entry files only.** Outside a module, import it only through its entry files: `index.ts`
    (types and pure rules) from anywhere, including `src/proxy.ts` and client components;
    `actions.ts` from `app/`; `server.ts` from server code in `app/`; and `cms.ts` from
-   `payload.config.ts`. `app/` may also import `platform/` directly. Until an area moves (#127),
-   the template folders may import a module's entry files too.
+   `payload.config.ts`. `app/` may also import `platform/` directly.
 3. **No module imports another.** Modules meet only in the composition roots: pages, layouts
    and the block registry in `app/`, and `payload.config.ts`
    ([0008](decisions/0008-compose-modules-at-the-app-level.md)). For example, the post page calls
@@ -173,11 +175,13 @@ What this buys:
    [frontend patterns](../guidelines/frontend-patterns/README.md) use raw `white` or `black`
    anywhere but text and overlays on photos, this rule wins until #146 updates them.
 
-How they are checked (warnings until #137): [`eslint.boundaries.config.mjs`](../../eslint.boundaries.config.mjs)
-checks the imports in rules 1–3 and 6 and the `cms/` part of rule 4. For the rest of rule 4,
+How they are checked: [`eslint.boundaries.config.mjs`](../../eslint.boundaries.config.mjs)
+checks the imports in rules 1–3 and 6 and the `cms/` part of rule 4, as errors (#137). It also
+fails on a file under `src/` that belongs to no known part (`app/`, a module, `platform/`, the seed
+or a root file), so a new top-level folder can't appear unnoticed. For the rest of rule 4,
 `server-only` fails the build when browser code imports server code, and CI's `payload migrate`
-fails when the CMS config reaches it. Review covers rules 5, 7 and 8 (#137 adds a lint check for
-`overrideAccess`); rule 9 comes with lint and the theme test (#146). Vitest aliases
+fails when the CMS config reaches it. Review covers rules 5, 7 and 8; rule 9 comes with lint and
+the theme test (#146). Vitest aliases
 `server-only` to an empty module so `data/` mappers can be unit-tested.
 
 ## Where does it go?
@@ -201,18 +205,24 @@ A rule the site only ever applies as a query filter, like the events upcoming ru
 `Where`, with its own unit test. Don't also write it as a pure function in `domain/`: two copies
 drift, and the tested one may not be the one that runs.
 
-## Where things are today
+## Exceptions
 
-Until each step of #127 lands, code lives in the Payload website template's folders, sorted by
-technical type: `src/collections/`, `src/components/`, `src/blocks/`, `src/heros/`, `src/hooks/`,
-`src/utilities/`, `src/fields/`, `src/Header/`, `src/Footer/`,
-`src/plugins/`, `src/providers/`, `src/endpoints/` (seed). When you touch code there, don't add
-new duplication; if your change needs a rule that already exists elsewhere, reuse it.
+The Payload website template's folders are gone (#137). These stay outside the structure above,
+on purpose:
 
-New code for an area that hasn't moved yet goes in its future module, with only the folders it
-needs (for example `src/modules/events/domain/categories.ts` plus an `index.ts` that exports it),
-and the old code imports it through that entry file. Where [`docs/guidelines/payload-cms.md`](../guidelines/payload-cms.md)
-names a template folder, it describes today's code; new code follows this page.
+| Path                    | Why                                                                    |
+| ----------------------- | ---------------------------------------------------------------------- |
+| `src/endpoints/seed/`   | Demo data and the seed script; only `app/` may import it (lint)        |
+| `src/migrations/`       | Generated by `payload migrate:create`                                  |
+| `src/app/(payload)/`    | Payload's generated admin and API routes, with the admin import map    |
+| `src/payload-types.ts`  | Generated by `npm run generate:types`                                  |
+| `src/*.ts` (root files) | `payload.config.ts` (CMS composition, plugins included) and `proxy.ts` |
+
+ESLint skips the seed and the generated files, so they are also exempt from the 250-line limit.
+The seed script (`src/endpoints/seed/index.ts`) is the one hand-written file above it.
+
+Where [`docs/guidelines/payload-cms.md`](../guidelines/payload-cms.md) still names a template
+folder (`src/collections/`, `src/hooks/`, `src/fields/`), follow this page.
 
 ## More
 

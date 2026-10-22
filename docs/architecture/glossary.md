@@ -29,15 +29,15 @@ which module owns it).
 
 ## Events
 
-| Term             | Meaning                                                                                                                       | Where the rule lives                                                                                             |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Event date       | A calendar day with no time (Payload "day only"), stored as midnight UTC, for example `2026-03-03T00:00:00.000Z` for March 3. | `src/modules/events/cms/events.ts`                                                                               |
-| Event time       | Free text in site time, for example "6:00 PM". Not used for sorting.                                                          | same                                                                                                             |
-| Upcoming event   | A published event whose date is today or later, where "today" is the date in the site timezone.                               | `inScope` in `src/modules/events/data/scope.ts`, with today from `startOfToday()` in `src/utilities/timezone.ts` |
-| Past event       | A published event whose date is before today in the site timezone.                                                            | same                                                                                                             |
-| Event category   | One of: Meeting, Social, Volunteer, Workshop, Sports & Recreation, Community, Other. Phase 2 will revise the list (#122).     | `EVENT_CATEGORIES` in `src/modules/events/domain/categories.ts`, also the collection's options                   |
-| Cancelled event  | Planned (#122): still listed, clearly marked as cancelled, never silently removed.                                            | not built yet                                                                                                    |
-| Official meeting | Planned (#122): a city or county meeting, shown with a link to the official agenda.                                           | not built yet                                                                                                    |
+| Term             | Meaning                                                                                                                       | Where the rule lives                                                                                                |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Event date       | A calendar day with no time (Payload "day only"), stored as midnight UTC, for example `2026-03-03T00:00:00.000Z` for March 3. | `src/modules/events/cms/events.ts`                                                                                  |
+| Event time       | Free text in site time, for example "6:00 PM". Not used for sorting.                                                          | same                                                                                                                |
+| Upcoming event   | A published event whose date is today or later, where "today" is the date in the site timezone.                               | `inScope` in `src/modules/events/data/scope.ts`, with today from `startOfToday()` in `src/platform/lib/timezone.ts` |
+| Past event       | A published event whose date is before today in the site timezone.                                                            | same                                                                                                                |
+| Event category   | One of: Meeting, Social, Volunteer, Workshop, Sports & Recreation, Community, Other. Phase 2 will revise the list (#122).     | `EVENT_CATEGORIES` in `src/modules/events/domain/categories.ts`, also the collection's options                      |
+| Cancelled event  | Planned (#122): still listed, clearly marked as cancelled, never silently removed.                                            | not built yet                                                                                                       |
+| Official meeting | Planned (#122): a city or county meeting, shown with a link to the official agenda.                                           | not built yet                                                                                                       |
 
 ## News
 
@@ -59,6 +59,16 @@ which module owns it).
 | FAQ entry   | A question and answer, by category (`faq`).                                                   |
 | Team member | A board member or an AI agent listed on the site (`team-members`).                            |
 
+## Site
+
+| Term               | Meaning                                                                                                                  | Where the rule lives                                                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| Page               | A CMS page (`pages`) built from a hero and page-builder blocks, at `/<slug>`; the page `home` is the front page, at `/`. | `src/modules/site/cms/pages.ts`; the address in `documentHref` (`src/platform/payload/documentHref.ts`)                  |
+| Page-builder block | One section of a page's layout: call to action, content, media, archive (news) or form (contact).                        | the site's own in `SITE_LAYOUT_BLOCKS`; the components in the block registry, `src/app/(frontend)/[slug]/pageBlocks.tsx` |
+| Nav item           | A link in the header or footer (`header`, `footer` globals), up to six each.                                             | `src/modules/site/cms/navGlobal.ts`                                                                                      |
+| Current page link  | The header link for the page a visitor is on, or for the section that page is in.                                        | `isActivePath` in `src/modules/site/domain/nav.ts`                                                                       |
+| Redirect           | An old address that sends visitors to a URL, page or post. A redirect to a draft goes nowhere.                           | `getRedirectTarget` in `src/modules/site/use-cases/getRedirectTarget.ts`                                                 |
+
 ## Forms and email
 
 | Term                 | Meaning                                                                                                                                                 | Where the rule lives                                                                                                                    |
@@ -72,10 +82,10 @@ which module owns it).
 
 ## Time
 
-| Term          | Meaning                                                                                                | Where the rule lives                     |
-| ------------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------- |
-| Site timezone | `SITE_TIMEZONE`, default `America/Chicago`. "Today" and every displayed time use it.                   | `src/utilities/timezone.ts` → `platform` |
-| Today         | The current calendar date in the site timezone, as midnight UTC (to match how event dates are stored). | `startOfToday()`                         |
+| Term          | Meaning                                                                                                | Where the rule lives           |
+| ------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------ |
+| Site timezone | `SITE_TIMEZONE`, default `America/Chicago`. "Today" and every displayed time use it.                   | `src/platform/lib/timezone.ts` |
+| Today         | The current calendar date in the site timezone, as midnight UTC (to match how event dates are stored). | `startOfToday()`               |
 
 ## Code structure
 

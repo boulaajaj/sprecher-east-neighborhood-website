@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@/utilities/ui'
+import { cn } from '@/platform/lib/cn'
 import type { ComponentProps } from 'react'
 
 import { controlVariants } from './controlVariants'

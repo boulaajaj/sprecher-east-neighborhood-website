@@ -1,8 +1,8 @@
 import { unstable_cache } from 'next/cache'
 
 import { listPostSlugs } from '@/modules/news/server'
-import { getServerSideURL } from '@/utilities/getURL'
-import { sitemapResponse } from '@/utilities/sitemapResponse'
+import { getServerSideURL } from '@/platform/lib/getURL'
+import { sitemapResponse } from '@/platform/seo/sitemapResponse'
 
 const getPostsSitemap = unstable_cache(
   async () => {

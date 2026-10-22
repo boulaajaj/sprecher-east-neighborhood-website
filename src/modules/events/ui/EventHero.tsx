@@ -1,9 +1,10 @@
 import React from 'react'
 
-import { Media } from '@/components/Media'
-import { categoryPillClassName, cn } from '@/utilities/ui'
-import { formatDateTime, toDateTimeAttr } from '@/utilities/formatDateTime'
-import { siteTimeZoneLabel } from '@/utilities/timezone'
+import { Media } from '@/platform/ui/Media'
+import { cn } from '@/platform/lib/cn'
+import { categoryPillClassName } from '@/platform/ui/categoryPill'
+import { formatDateTime, toDateTimeAttr } from '@/platform/lib/formatDateTime'
+import { siteTimeZoneLabel } from '@/platform/lib/timezone'
 
 import { formatEventCategory } from '../domain/categories'
 import { formatEventLocationType } from '../domain/locationTypes'
