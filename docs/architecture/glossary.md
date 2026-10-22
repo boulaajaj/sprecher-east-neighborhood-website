@@ -47,14 +47,14 @@ which module owns it).
 
 ## Forms and email
 
-| Term                 | Meaning                                                                                                                                                 | Where the rule lives                            |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| Form                 | A form built in Admin (`forms`), for example the contact form. Its email settings are visible to staff only.                                            | `src/plugins/index.ts` → `contact`              |
-| Submission           | What a visitor sends through a form (`form-submissions`). Always stored, even when no email goes out.                                                   | same                                            |
-| Owner notification   | An email from a submission to an address configured in Admin (for example the association inbox), with Reply-To set to the visitor.                     | `src/hooks/formSubmissionGuards.ts` → `contact` |
-| Visitor confirmation | An email to the address a visitor typed. Blocked today on purpose: otherwise anyone could make the site email any address.                              | same                                            |
-| Robot check          | Cloudflare Turnstile: an invisible check that a submission comes from a person. When on, any error rejects; staff skip it; off when its keys are unset. | `src/utilities/turnstile.ts` → `contact`        |
-| Rate limit           | At most 5 submissions per hour from one connection (skipped when no client IP is known), and at most 30 form emails per hour site-wide.                 | `src/hooks/formSubmissionGuards.ts` → `contact` |
+| Term                 | Meaning                                                                                                                                                 | Where the rule lives                                                                                                                    |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Form                 | A form built in Admin (`forms`), for example the contact form. Its email settings are visible to staff only.                                            | `src/modules/contact/cms/formBuilder.ts`                                                                                                |
+| Submission           | What a visitor sends through a form (`form-submissions`). Always stored, even when no email goes out.                                                   | same                                                                                                                                    |
+| Owner notification   | An email from a submission to an address configured in Admin (for example the association inbox), with Reply-To set to the visitor.                     | `toSafeFormEmail` in `src/modules/contact/domain/formEmails.ts`                                                                         |
+| Visitor confirmation | An email to the address a visitor typed. Blocked today on purpose: otherwise anyone could make the site email any address.                              | same                                                                                                                                    |
+| Robot check          | Cloudflare Turnstile: an invisible check that a submission comes from a person. When on, any error rejects; staff skip it; off when its keys are unset. | `HumanVerifier` in `src/modules/contact/domain/humanVerifier.ts`; `TurnstileVerifier` in `src/modules/contact/cms/turnstileVerifier.ts` |
+| Rate limit           | At most 5 submissions per hour from one connection (skipped when no client IP is known), and at most 30 form emails per hour site-wide.                 | `RATE_LIMITS` in `src/modules/contact/domain/rateLimits.ts`, applied in `src/modules/contact/cms/rateLimits.ts`                         |
 
 ## Time
 

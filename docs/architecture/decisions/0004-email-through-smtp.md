@@ -27,4 +27,5 @@ the visitor typed (`{{email}}`) would let anyone make the site send mail to any 
 
 ## Links
 
-- Code: `src/utilities/email.ts`, `src/hooks/formSubmissionGuards.ts`
+- Code: `src/platform/email/emailAdapter.ts`, `src/modules/contact/domain/formEmails.ts`,
+  `src/modules/contact/cms/guardFormEmails.ts`, `src/modules/contact/cms/rateLimits.ts`

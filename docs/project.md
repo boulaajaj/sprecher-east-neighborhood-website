@@ -65,7 +65,9 @@ the [data model](architecture/data-model.md) and [decision records](architecture
 
 The code is moving to that structure in small steps (#127). Events have moved to
 `src/modules/events/` (#131), FAQ, resources and team members to `src/modules/directory/`
-(#136), and `src/platform/lib/` holds the shared paging helpers. Until an area has moved, it is
+(#136), and `src/platform/lib/` holds the shared paging helpers. The contact form's safeguards
+and form block are in `src/modules/contact/` (#133), and the SMTP settings that password-reset
+and form emails share are in `src/platform/email/`. Until an area has moved, it is
 still in the Payload website template's folders, sorted by technical type:
 
 ```
@@ -81,12 +83,12 @@ src/
   fields/          Reusable Payload field groups (link, linkGroup, defaultLexical)
   Header/, Footer/ Global configs and components
   heros/           Hero components and config
-  hooks/           Payload hooks (form guards, publishedAt, redirects) and one React hook (useAuth)
+  hooks/           Payload hooks (publishedAt, redirects) and one React hook (useAuth)
   migrations/      Database migrations (generated)
   plugins/         Payload plugin setup (form builder, SEO, search, redirects, nested docs)
   providers/       React context providers (theme, header theme)
   search/          Search plugin config and component
-  utilities/       Helpers: dates, URLs, SEO, data access, Turnstile, email
+  utilities/       Helpers: dates, URLs, SEO, data access
   payload.config.ts
 ```
 

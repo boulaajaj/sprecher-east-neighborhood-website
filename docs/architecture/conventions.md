@@ -69,7 +69,9 @@ Add an interface only where it pays:
 - a test needs to replace a real dependency.
 
 Name the interface after the capability and the adapter after the provider: `HumanVerifier`,
-`TurnstileVerifier`. Don't wrap Payload collections in repository interfaces; the typed Local API
+`TurnstileVerifier`. The interface goes in the module's `domain/`; the adapter goes in the layer
+that calls it. A Payload hook's adapter sits in `cms/`, because the Payload CLI loads hooks
+outside Next.js, where `server-only` code can't run (`contact`'s `TurnstileVerifier`). Don't wrap Payload collections in repository interfaces; the typed Local API
 plus a module's `data/` functions is the boundary ([decision 0002](decisions/0002-no-repository-layer.md)).
 Values that change between environments come from env vars read in one place, never literals in
 code.

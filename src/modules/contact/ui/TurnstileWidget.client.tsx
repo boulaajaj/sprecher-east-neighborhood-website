@@ -4,7 +4,7 @@ import Script from 'next/script'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useTheme } from '@/providers/Theme'
-import { TURNSTILE_ACTION } from '@/utilities/turnstileHeader'
+import { TURNSTILE_ACTION } from '../domain/turnstile'
 
 /**
  * Cloudflare Turnstile spam check, Managed mode with appearance "interaction-only": the check

@@ -4,13 +4,13 @@ import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { TURNSTILE_TOKEN_HEADER } from '@/utilities/turnstileHeader'
+import { TURNSTILE_TOKEN_HEADER } from '../domain/turnstile'
 
 // The robot check, replaced by a widget that hands out a token for each reset
 const turnstile = vi.hoisted(() => ({
   tokenFor: (reset: number): string | null => `token-${reset}`,
 }))
-vi.mock('@/components/TurnstileWidget', async () => {
+vi.mock('./TurnstileWidget.client', async () => {
   const { useEffect } = await import('react')
   return {
     TURNSTILE_SITE_KEY: 'test-site-key',
@@ -32,7 +32,7 @@ vi.mock('@/components/RichText', () => ({
   default: () => <p>Thanks, your message is on its way.</p>,
 }))
 
-import { FormBlock } from './Component'
+import { FormBlock } from './FormBlock.client'
 
 const form = {
   id: '7',
