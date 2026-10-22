@@ -1,6 +1,6 @@
+import { parseEmailAddress } from '@/platform/lib'
 import type { EmailConfirmer } from '@/platform/payload/emailConfirmer'
 
-import { parseEmailAddress } from '../domain/address'
 import { logFailure } from './logFailure'
 import { withOwnTransaction } from './ownTransaction'
 import { requestConfirmation } from './requestConfirmation'

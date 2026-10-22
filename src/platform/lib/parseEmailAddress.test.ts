@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseEmailAddress } from './address'
+import { parseEmailAddress } from './emailAddress'
 
 describe('parseEmailAddress', () => {
   it('trims and lowercases one address', () => {

@@ -199,6 +199,9 @@ describe('private fields', () => {
   it.each([
     ['team-members', 'email'],
     ['forms', 'emails'],
+    // Would tell a visitor whether the address they typed is confirmed (#183)
+    ['form-submissions', 'senderEmail'],
+    ['form-submissions', 'emailConfirmed'],
   ])('%s.%s is hidden from visitors and residents', async (collection, name) => {
     const read = fieldReadAccess(collection, name)
     expect(await allows(read, 'visitor')).toBe(false)
