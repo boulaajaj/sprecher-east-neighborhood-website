@@ -1,11 +1,10 @@
 import { type CmsLink, resolveLink } from '@/platform/payload/resolveLink'
-import { Button } from '@/platform/ui'
-import Link from 'next/link'
+import { Button, Link } from '@/platform/ui'
 import React from 'react'
 
 type CMSLinkProps = Omit<CmsLink, 'appearance'> & {
-  /** `default` and `outline` (from the CMS) draw a `Button`; `inline` and `link` a text link */
-  appearance?: 'inline' | 'link' | CmsLink['appearance']
+  /** `default` and `outline` (from the CMS) draw a `Button`; anything else a text `Link` */
+  appearance?: 'inline' | CmsLink['appearance']
   /** Marks the link as the current page for assistive tech (aria-current="page"). */
   ariaCurrent?: boolean
   children?: React.ReactNode
@@ -26,8 +25,6 @@ export const CMSLink: React.FC<CMSLinkProps> = ({
   })
   if (!resolved) return null
 
-  const currentProps = ariaCurrent ? { 'aria-current': 'page' as const } : {}
-
   if (appearance === 'default' || appearance === 'outline') {
     return (
       <Button
@@ -35,7 +32,7 @@ export const CMSLink: React.FC<CMSLinkProps> = ({
         external={resolved.external}
         variant={resolved.appearance === 'outline' ? 'secondary' : 'primary'}
         className={className}
-        {...currentProps}
+        aria-current={ariaCurrent ? 'page' : undefined}
       >
         {resolved.label}
         {children}
@@ -43,10 +40,13 @@ export const CMSLink: React.FC<CMSLinkProps> = ({
     )
   }
 
-  // Text links: the styles come from the caller or the surrounding rich text (until `Link`, #210)
-  const newTabProps = resolved.external ? { rel: 'noopener noreferrer', target: '_blank' } : {}
   return (
-    <Link className={className} href={resolved.href} {...newTabProps} {...currentProps}>
+    <Link
+      href={resolved.href}
+      external={resolved.external}
+      current={ariaCurrent}
+      className={className}
+    >
       {resolved.label}
       {children}
     </Link>

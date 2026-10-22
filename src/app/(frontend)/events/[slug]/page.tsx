@@ -14,7 +14,7 @@ import { generateMeta } from '@/utilities/generateMeta'
 import { JsonLd } from '@/components/JsonLd'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { EventHero } from '@/heros/EventHero'
-import { Button } from '@/platform/ui'
+import { Button, Link } from '@/platform/ui'
 import { ArrowRight } from 'lucide-react'
 import PageClient from './page.client'
 
@@ -88,15 +88,16 @@ export default async function EventPage({ params: paramsPromise }: Args) {
                   <p className="text-sm text-muted-foreground">{event.locationAddress}</p>
                 )}
                 {mapsHref && (
-                  <a
+                  <Link
                     href={mapsHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 inline-flex min-h-11 items-center text-sm font-medium text-primary hover:underline"
+                    variant="action"
+                    external
+                    icon={<ArrowRight aria-hidden="true" />}
+                    iconPosition="end"
+                    className="mt-2"
                   >
                     Open in Google Maps
-                    <span className="sr-only"> (opens in a new tab)</span> →
-                  </a>
+                  </Link>
                 )}
               </div>
             )}

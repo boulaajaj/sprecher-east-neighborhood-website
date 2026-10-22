@@ -4,6 +4,7 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
 import { ExternalLink, Phone } from 'lucide-react'
+import { Link } from '@/platform/ui'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 
 export const dynamic = 'force-static'
@@ -79,24 +80,23 @@ export default async function ResourcesPage() {
                     )}
                     <div className="flex flex-wrap gap-3">
                       {resource.url && (
-                        <a
+                        <Link
                           href={resource.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+                          variant="action"
+                          external
+                          icon={<ExternalLink aria-hidden="true" />}
                         >
-                          <ExternalLink className="h-3.5 w-3.5" />
                           Visit Website
-                        </a>
+                        </Link>
                       )}
                       {resource.phone && (
-                        <a
+                        <Link
                           href={`tel:${resource.phone}`}
-                          className="inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+                          variant="action"
+                          icon={<Phone aria-hidden="true" />}
                         >
-                          <Phone className="h-3.5 w-3.5" />
                           {resource.phone}
-                        </a>
+                        </Link>
                       )}
                     </div>
                   </div>

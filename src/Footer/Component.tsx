@@ -1,11 +1,12 @@
 import { getCachedGlobal } from '@/utilities/getGlobals'
-import Link from 'next/link'
+import NextLink from 'next/link'
 import React from 'react'
 import { MapPin, Mail } from 'lucide-react'
 
 import type { Footer } from '@/payload-types'
 
-import { CMSLink } from '@/components/Link'
+import { resolveLink } from '@/platform/payload/resolveLink'
+import { Link } from '@/platform/ui'
 import { Logo } from '@/components/Logo/Logo'
 
 export async function Footer() {
@@ -20,9 +21,9 @@ export async function Footer() {
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-12">
           {/* Brand column */}
           <div className="space-y-4">
-            <Link href="/" className="inline-block">
+            <NextLink href="/" className="inline-block">
               <Logo className="text-2xl" />
-            </Link>
+            </NextLink>
             <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
               Connecting neighbors on Madison&apos;s Far East Side.
             </p>
@@ -35,12 +36,18 @@ export async function Footer() {
             </h3>
             <nav className="flex flex-col gap-3">
               {navItems.map(({ link }, i) => {
+                const resolved = resolveLink(link)
+                if (!resolved) return null
                 return (
-                  <CMSLink
+                  <Link
                     key={i}
-                    {...link}
-                    className="group/link flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary"
-                  />
+                    href={resolved.href}
+                    external={resolved.external}
+                    variant="muted"
+                    className="self-start"
+                  >
+                    {resolved.label}
+                  </Link>
                 )
               })}
             </nav>
@@ -58,7 +65,7 @@ export async function Footer() {
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4 shrink-0 text-primary" />
-                <Link href="/contact" className="font-medium transition-colors hover:text-primary">
+                <Link href="/contact" variant="muted" className="font-medium">
                   Contact us
                 </Link>
               </div>
