@@ -21,10 +21,6 @@ import { EVENT_CATEGORIES } from '../domain/categories'
 import { EVENT_LOCATION_TYPES } from '../domain/locationTypes'
 import { revalidateDelete, revalidateEvent } from './revalidateEvent'
 
-/** A select field's options from one of the domain's `as const` lists. */
-const toOptions = (list: readonly { value: string; label: string }[]) =>
-  list.map(({ value, label }) => ({ label, value }))
-
 export const Events: CollectionConfig<'events'> = {
   slug: 'events',
   access: draftContentAccess,
@@ -86,7 +82,7 @@ export const Events: CollectionConfig<'events'> = {
             {
               name: 'category',
               type: 'select',
-              options: toOptions(EVENT_CATEGORIES),
+              options: [...EVENT_CATEGORIES],
               defaultValue: 'community',
             },
             {
@@ -98,7 +94,7 @@ export const Events: CollectionConfig<'events'> = {
             {
               name: 'locationType',
               type: 'select',
-              options: toOptions(EVENT_LOCATION_TYPES),
+              options: [...EVENT_LOCATION_TYPES],
               defaultValue: 'in-person',
             },
             {

@@ -9,7 +9,7 @@ const ATTENDANCE_MODE = {
 } as const
 
 /** Structured data for the event page (schema.org `Event`), for search engines' rich results. */
-export function eventJsonLd(event: EventDetail): Record<string, unknown> & { '@context': string } {
+export function eventJsonLd(event: EventDetail): Record<string, unknown> {
   const siteUrl = getServerSideURL()
   const { title, slug, date, description, image, locationName, locationAddress } = event
   const hasPlace = Boolean(locationName || locationAddress)
