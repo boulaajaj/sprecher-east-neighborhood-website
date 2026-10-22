@@ -53,7 +53,9 @@ It is an unofficial, AI-assisted initiative (ground rules in [`AGENTS.md`](../AG
   The server scripts are in [`ops/`](../ops/README.md)
 - **Caddy config**: `/etc/caddy/Caddyfile`. Rules for editing it (never overwrite, back up,
   validate) are in [`guidelines/security.md`](guidelines/security.md#infrastructure-security)
-- **Live domains**: `sprechereast.com` (HTTPS), `www.sprechereast.com` (redirects to it), IP `:80` (HTTP)
+- **Live domains**: `sprechereast.com` (HTTPS), `www.sprechereast.com` (redirects to it), IP `:80` (HTTP).
+  Signing in doesn't work over the IP on port 80: the sign-in cookie is Secure (#234). #235 tracks
+  redirecting it to HTTPS
 
 ## Architecture
 
