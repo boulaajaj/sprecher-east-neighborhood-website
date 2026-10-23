@@ -23,11 +23,14 @@ export async function signOut(): Promise<void> {
   await signOutCurrentUser()
 }
 
-/** Changes the signed-in account's own password. There is no way to name another account. */
+/**
+ * Changes the signed-in account's own password, after checking its current one. There is no way
+ * to name another account.
+ */
 export async function changePassword(input: unknown): Promise<ActionResult<PasswordFailure>> {
   const parsed = passwordChangeSchema.safeParse(input)
   if (!parsed.success) return { ok: false, failure: 'rejected' }
-  return changeOwnPassword(parsed.data.newPassword)
+  return changeOwnPassword(parsed.data)
 }
 
 /**

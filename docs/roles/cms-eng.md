@@ -32,9 +32,9 @@ This project is built on the official Payload CMS v3 Website Template. Key patte
 
 ## Development Principles
 
-### Framework First — Use Payload to Its Fullest
+### Native First — Use Payload to Its Fullest
 
-Payload CMS v3 is a full-featured content framework. Before writing custom code, exhaust what Payload provides natively:
+Payload CMS v3 is a full-featured content framework. Follow [the ladder](../guidelines/development.md#native-first-then-plugins-then-our-code), starting with what Payload provides natively:
 
 - **Email**: `@payloadcms/email-nodemailer` adapter — configured once in `payload.config.ts`, available everywhere via `payload.sendEmail()`
 - **Forms**: `@payloadcms/plugin-form-builder` — creates `forms` + `form-submissions` collections with admin-configurable email notifications

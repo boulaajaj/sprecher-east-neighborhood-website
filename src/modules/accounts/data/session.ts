@@ -8,12 +8,15 @@ import {
   generatePayloadCookie,
   getPayload,
   logoutOperation,
+  type Payload,
   type TypedUser,
 } from 'payload'
 
-import type { SignInValues } from '../domain/credentials'
+import type { PasswordChangeValues, SignInValues } from '../domain/credentials'
+import { CURRENT_PASSWORD_CONFIRMED } from '../domain/passwordConfirmation'
 import type { CurrentUser } from '../domain/types'
 import { toResponseCookie } from './cookies'
+import { isRefusal } from './failures'
 import { toCurrentUser } from './mappers'
 
 const USERS = 'users'
@@ -82,22 +85,59 @@ export async function endSession(): Promise<void> {
   }
 }
 
+/** How a password change ended, when it didn't throw. */
+export type PasswordChangeOutcome = 'changed' | 'signed-out' | 'wrong-password'
+
 /**
- * Sets a new password on the signed-in account only: the id comes from the session, and the
- * users collection's access rules still apply (`isAdminOrSelf`). Returns false when nobody is
- * signed in; throws Payload's error when it refuses.
+ * Sets a new password on the signed-in account only, once its current password is confirmed
+ * (#233): the account comes from the session, and the users collection's access rules still
+ * apply (`isAdminOrSelf`). Throws Payload's error when it refuses the new password.
+ *
+ * Payload keeps only this request's session when a password changes, so the browser stays signed
+ * in and every other session ends, including the one the check below records.
  */
-export async function setOwnPassword(password: string): Promise<boolean> {
+export async function setOwnPassword({
+  currentPassword,
+  newPassword,
+}: Pick<PasswordChangeValues, 'currentPassword' | 'newPassword'>): Promise<PasswordChangeOutcome> {
   const user = await getSessionPayloadUser()
-  if (!user) return false
+  if (!user) return 'signed-out'
   const payload = await getPayload({ config: configPromise })
+  if (!(await isOwnPassword(payload, user, currentPassword))) return 'wrong-password'
   await payload.update({
     collection: USERS,
     id: user.id,
-    data: { password },
+    data: { password: newPassword },
     depth: 0,
     overrideAccess: false,
     user,
+    // Only now: the users collection refuses your own new password without it
+    context: { [CURRENT_PASSWORD_CONFIRMED]: true },
   })
-  return true
+  return 'changed'
+}
+
+/**
+ * Checks a password against the session's own account with Payload's `login` operation, as
+ * `POST /api/users/login` runs it, so a wrong one counts towards the lockout. The email is the
+ * session's, never the caller's. Its token is dropped and no cookie is set. The session it
+ * records ends when the password changes, or expires if the update then fails (nobody holds its
+ * token). Throws when Payload fails rather than refuses.
+ */
+async function isOwnPassword(
+  payload: Payload,
+  user: TypedUser,
+  password: string,
+): Promise<boolean> {
+  try {
+    await payload.login({
+      collection: USERS,
+      data: { email: user.email, password },
+      overrideAccess: false,
+    })
+    return true
+  } catch (error) {
+    if (isRefusal(error)) return false
+    throw error
+  }
 }

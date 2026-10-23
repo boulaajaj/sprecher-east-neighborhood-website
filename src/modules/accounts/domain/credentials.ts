@@ -18,11 +18,13 @@ export const signInSchema = z.strictObject({
 export type SignInValues = z.output<typeof signInSchema>
 
 /**
- * A new password for the signed-in account. Strict: the account is always the signed-in one, so
- * an extra field (such as an `id`) is refused rather than ignored.
+ * A new password for the signed-in account, with its current one (#233). Strict: the account is
+ * always the signed-in one, so an extra field (such as an `id` or an `email`) is refused rather
+ * than ignored. The current password is kept exactly as typed, like the one used to sign in.
  */
 export const passwordChangeSchema = z
   .strictObject({
+    currentPassword: z.string().min(1, 'Enter your current password').max(MAX_PASSWORD_LENGTH),
     newPassword: z
       .string()
       .min(MIN_PASSWORD_LENGTH, `Use at least ${MIN_PASSWORD_LENGTH} characters`)

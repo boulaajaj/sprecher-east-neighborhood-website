@@ -9,7 +9,7 @@ import {
 } from 'payload'
 import { describe, expect, it } from 'vitest'
 
-import { toPasswordFailure, toSignInFailure } from './failures'
+import { isRefusal, toPasswordFailure, toSignInFailure } from './failures'
 
 const invalid = () =>
   new ValidationError({ collection: 'users', errors: [{ message: 'Bad', path: 'password' }] })
@@ -31,6 +31,25 @@ describe('toSignInFailure', () => {
     expect(toSignInFailure(new APIError('Database down', 500))).toBe('server-error')
     expect(toSignInFailure(new Error('Email is required.'))).toBe('server-error')
     expect(toSignInFailure('not an error')).toBe('server-error')
+  })
+})
+
+describe('isRefusal', () => {
+  it('is true for each way Payload refuses a password, whatever the account’s state', () => {
+    for (const error of [
+      new AuthenticationError(),
+      new LockedAuth(),
+      new UnverifiedEmail({}),
+      invalid(),
+    ]) {
+      expect(isRefusal(error)).toBe(true)
+    }
+  })
+
+  it('is false for a failure on our side', () => {
+    expect(isRefusal(new APIError('Database down', 500))).toBe(false)
+    expect(isRefusal(new Error('boom'))).toBe(false)
+    expect(isRefusal('not an error')).toBe(false)
   })
 })
 

@@ -8,6 +8,7 @@ import {
   isAdminOrSelf,
 } from '@/platform/payload/roles'
 
+import { requireCurrentPassword } from './requireCurrentPassword'
 import { Users } from './users'
 
 describe('Users', () => {
@@ -25,6 +26,10 @@ describe('Users', () => {
   it('signs in with email and password, Payload’s defaults apart from the cookie’s Secure flag', () => {
     // Tests don't run in production, so the flag is off here; the tests below cover both
     expect(Users.auth).toEqual({ cookies: { secure: false } })
+  })
+
+  it('asks for the current password before anyone changes their own (#233)', () => {
+    expect(Users.hooks).toEqual({ beforeChange: [requireCurrentPassword] })
   })
 
   it('makes new accounts residents, and only admins may set a role', () => {

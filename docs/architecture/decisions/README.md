@@ -14,6 +14,7 @@ that supersedes the old one; don't edit history.
 | [0006](0006-clean-layers-and-pluggable-themes.md) | Clean layers inside each module, and pluggable themes          | 2026-10-20 | Accepted |
 | [0007](0007-email-confirmation.md)                | People confirm their email with a link; an account is optional | 2026-10-21 | Accepted |
 | [0008](0008-compose-modules-at-the-app-level.md)  | Modules don't import each other; the app composes them         | 2026-10-21 | Accepted |
+| [0009](0009-email-confirmation-token.md)          | Confirmation links use our own hashed token, not `auth.verify` | 2026-10-22 | Accepted |
 
 Template for a new record: **Context** (the problem and the forces), **Decision**, **Consequences**
 (what gets easier, what gets harder), **Links** (issues, PRs, sources).

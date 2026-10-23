@@ -76,6 +76,7 @@ export interface Config {
     media: Media
     categories: Category
     users: User
+    'email-confirmations': EmailConfirmation
     redirects: Redirect
     forms: Form
     'form-submissions': FormSubmission
@@ -102,6 +103,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>
     categories: CategoriesSelect<false> | CategoriesSelect<true>
     users: UsersSelect<false> | UsersSelect<true>
+    'email-confirmations': EmailConfirmationsSelect<false> | EmailConfirmationsSelect<true>
     redirects: RedirectsSelect<false> | RedirectsSelect<true>
     forms: FormsSelect<false> | FormsSelect<true>
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>
@@ -930,6 +932,31 @@ export interface Faq {
   _status?: ('draft' | 'published') | null
 }
 /**
+ * Addresses typed into a public form, and when they were confirmed by link. Unconfirmed ones are deleted 7 days after their last link. To remove a confirmed address on request, delete it here.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "email-confirmations".
+ */
+export interface EmailConfirmation {
+  id: number
+  email: string
+  /**
+   * When the link was clicked. Empty: not confirmed yet.
+   */
+  confirmedAt?: string | null
+  welcomeSentAt?: string | null
+  /**
+   * When the latest confirmation link was sent.
+   */
+  lastSentAt?: string | null
+  tokenHash?: string | null
+  tokenExpiresAt?: string | null
+  sendCount?: number | null
+  sendWindowStart?: string | null
+  updatedAt: string
+  createdAt: string
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -1159,6 +1186,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users'
         value: number | User
+      } | null)
+    | ({
+        relationTo: 'email-confirmations'
+        value: number | EmailConfirmation
       } | null)
     | ({
         relationTo: 'redirects'
@@ -1607,6 +1638,22 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T
         expiresAt?: T
       }
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "email-confirmations_select".
+ */
+export interface EmailConfirmationsSelect<T extends boolean = true> {
+  email?: T
+  confirmedAt?: T
+  welcomeSentAt?: T
+  lastSentAt?: T
+  tokenHash?: T
+  tokenExpiresAt?: T
+  sendCount?: T
+  sendWindowStart?: T
+  updatedAt?: T
+  createdAt?: T
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
