@@ -8,6 +8,8 @@ describe('toForgotPasswordErrorMessage', () => {
   it('says the site couldn’t be reached, or asks to check the address', () => {
     expect(toForgotPasswordErrorMessage('offline')).toBe(FORM_MESSAGES.offline)
     expect(toForgotPasswordErrorMessage('rejected')).toBe('Check the email address and try again.')
+    expect(toForgotPasswordErrorMessage('robot-check')).toMatch(/spam check/)
+    expect(toForgotPasswordErrorMessage('too-many')).toMatch(/try again in an hour/)
   })
 })
 

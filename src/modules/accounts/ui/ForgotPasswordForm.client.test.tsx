@@ -7,6 +7,11 @@ import { expectAccessible } from '@/platform/ui/testing/expectAccessible'
 
 const mocks = vi.hoisted(() => ({ forgotPassword: vi.fn() }))
 vi.mock('../actions', () => ({ forgotPassword: mocks.forgotPassword }))
+// The robot check is on, and its widget hands out a fresh token after each reset
+vi.mock(
+  '@/platform/turnstile/TurnstileWidget.client',
+  () => import('@/platform/turnstile/testing/fakeTurnstileWidget'),
+)
 
 import { FORGOT_PASSWORD_SENT, ForgotPasswordForm } from './ForgotPasswordForm.client'
 
@@ -33,7 +38,10 @@ describe('ForgotPasswordForm', () => {
 
     await send()
 
-    expect(mocks.forgotPassword).toHaveBeenCalledExactlyOnceWith({ email: 'ada@example.com' })
+    expect(mocks.forgotPassword).toHaveBeenCalledExactlyOnceWith(
+      { email: 'ada@example.com' },
+      'token-0',
+    )
     expect((await screen.findByRole('status')).textContent).toBe(FORGOT_PASSWORD_SENT)
     expect(FORGOT_PASSWORD_SENT).toMatch(/^If an account uses that email/)
   })
@@ -50,6 +58,24 @@ describe('ForgotPasswordForm', () => {
     render(<ForgotPasswordForm />)
     await send()
     expect((await screen.findByRole('alert')).textContent).toMatch(/connection/)
+  })
+
+  it('explains a failed robot check or limit, and uses a fresh token every time', async () => {
+    mocks.forgotPassword.mockResolvedValueOnce({ ok: false, failure: 'robot-check' })
+    mocks.forgotPassword.mockResolvedValueOnce({ ok: true })
+    mocks.forgotPassword.mockResolvedValueOnce({ ok: false, failure: 'too-many' })
+    render(<ForgotPasswordForm />)
+    await send()
+    expect((await screen.findByRole('alert')).textContent).toMatch(/spam check/)
+    await userEvent.click(screen.getByRole('button', { name: 'Send Reset Link' }))
+    expect((await screen.findByRole('status')).textContent).toBe(FORGOT_PASSWORD_SENT)
+    await userEvent.click(screen.getByRole('button', { name: 'Send Reset Link' }))
+    expect((await screen.findByRole('alert')).textContent).toMatch(/try again in an hour/)
+    expect(mocks.forgotPassword.mock.calls.map((call) => call[1])).toEqual([
+      'token-0',
+      'token-1',
+      'token-2',
+    ])
   })
 
   it('links back to the sign-in page', () => {

@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react'
 
+import { TurnstileWidget } from '@/platform/turnstile/TurnstileWidget.client'
+import { useRobotCheck } from '@/platform/turnstile/useRobotCheck.client'
 import { Button, Field, Form, type FormStatus, Link } from '@/platform/ui'
 
 import { forgotPassword } from '../actions'
@@ -21,20 +23,32 @@ export const FORGOT_PASSWORD_SENT =
 export function ForgotPasswordForm() {
   const [status, setStatus] = useState<FormStatus>('idle')
   const [errorMessage, setErrorMessage] = useState('')
+  // The same robot check as the contact form (#282): only when a site key is configured
+  const robotCheck = useRobotCheck()
 
   const fail = (failure: ForgotPasswordFailure | 'offline') => {
     setErrorMessage(toForgotPasswordErrorMessage(failure))
     setStatus('error')
   }
 
+  // `Form` ignores a second submit while this runs, so one single-use token is sent once
   const send = async (values: ForgotPasswordValues) => {
+    const pending = robotCheck.pendingMessage()
+    if (pending) {
+      setErrorMessage(pending)
+      setStatus('error')
+      return
+    }
     setStatus('submitting')
     let result: Awaited<ReturnType<typeof forgotPassword>>
     try {
-      result = await forgotPassword(values)
+      result = await forgotPassword(values, robotCheck.token)
     } catch {
+      robotCheck.renewToken()
       return fail('offline')
     }
+    // The form stays after a success, so the next request needs a fresh token too
+    robotCheck.renewToken()
     if (!result.ok) return fail(result.failure)
     setStatus('success')
   }
@@ -60,6 +74,7 @@ export function ForgotPasswordForm() {
                 {...register('email')}
               />
             </Field>
+            {robotCheck.enabled && <TurnstileWidget {...robotCheck.widgetProps} />}
             <div>
               <Button type="submit" loading={status === 'submitting'} fullWidth>
                 {status === 'submitting' ? 'Sending' : 'Send Reset Link'}

@@ -33,10 +33,11 @@ export type PasswordFailure = 'signed-out' | 'wrong-password' | 'rejected' | 'se
 export type ResetPasswordFailure = 'invalid-link' | 'rejected' | 'server-error'
 
 /**
- * Why asking for a reset link failed. Only input that doesn't parse: every request that does
- * gets the same answer, whether or not an account uses the email (no enumeration, #269).
+ * Why asking for a reset link failed: input that doesn't parse, a failed robot check, or too many
+ * requests (#282). None depends on the email: every request past them gets the same answer,
+ * whether or not an account uses it (no enumeration, #269).
  */
-export type ForgotPasswordFailure = 'rejected'
+export type ForgotPasswordFailure = 'rejected' | 'robot-check' | 'too-many'
 
 /**
  * Why a sign-up failed (#187): input that doesn't parse, a failed robot check, or too many

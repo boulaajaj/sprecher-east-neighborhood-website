@@ -7,30 +7,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { HUMAN_CHECK_TOKEN_HEADER } from '@/platform/lib/humanCheck'
 
 // The robot check, replaced by a widget that hands out a token for each reset
-const turnstile = vi.hoisted(() => ({
-  tokenFor: (reset: number): string | null => `token-${reset}`,
-}))
-vi.mock('@/platform/turnstile/TurnstileWidget.client', async () => {
-  const { useEffect } = await import('react')
-  return {
-    TURNSTILE_SITE_KEY: 'test-site-key',
-    TurnstileWidget: ({
-      onToken,
-      resetSignal = 0,
-    }: {
-      onToken: (token: string | null) => void
-      resetSignal?: number
-    }) => {
-      useEffect(() => onToken(turnstile.tokenFor(resetSignal)), [onToken, resetSignal])
-      return null
-    },
-  }
-})
+vi.mock(
+  '@/platform/turnstile/TurnstileWidget.client',
+  () => import('@/platform/turnstile/testing/fakeTurnstileWidget'),
+)
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }))
 // The CMS rich text isn't under test; the confirmation is a fixed line
 vi.mock('@/platform/richtext/RichText', () => ({
   RichText: () => <p>Thanks, your message is on its way.</p>,
 }))
+
+import { fakeTurnstile } from '@/platform/turnstile/testing/fakeTurnstileWidget'
 
 import { FormBlock } from './FormBlock.client'
 
@@ -50,7 +37,7 @@ const form = {
 const fetchMock = vi.fn()
 
 beforeEach(() => {
-  turnstile.tokenFor = (reset) => `token-${reset}`
+  fakeTurnstile.tokenFor = (reset) => `token-${reset}`
   fetchMock.mockReset()
   vi.stubGlobal('fetch', fetchMock)
 })
@@ -118,7 +105,7 @@ describe('FormBlock', () => {
   })
 
   it('waits for the robot check instead of sending without a token', async () => {
-    turnstile.tokenFor = () => null
+    fakeTurnstile.tokenFor = () => null
     render(<FormBlock enableIntro={false} form={form} />)
 
     await fillAndSend()

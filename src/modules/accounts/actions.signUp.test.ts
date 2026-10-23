@@ -8,21 +8,15 @@ import {
   payloadWithEdges,
   requestHeaders,
   resetEdges,
+  robotCheck,
+  robotCheckWithEdges,
 } from './testing/actionEdges'
-
-// The robot check (Cloudflare Turnstile), replaced: on, and passing unless a test says otherwise
-const robotCheck = vi.hoisted(() => ({ enabled: true, verify: vi.fn() }))
-vi.mock('@/platform/turnstile/turnstileVerifier', () => ({
-  TurnstileVerifier: class {
-    isEnabled = () => robotCheck.enabled
-    verify = robotCheck.verify
-  },
-}))
 
 vi.mock('payload', async (importActual) => payloadWithEdges(await importActual()))
 vi.mock('@payloadcms/next/auth', () => nextAuthWithEdges())
 vi.mock('@payload-config', () => ({ default: {} }))
 vi.mock('next/headers', () => nextHeadersWithEdges())
+vi.mock('@/platform/turnstile/turnstileVerifier', () => robotCheckWithEdges())
 
 import { signUp, verifyAccount } from './actions'
 
@@ -33,9 +27,6 @@ const { APIError, ValidationError } = await vi.importActual<typeof PayloadModule
 let hour = 0
 beforeEach(() => {
   resetEdges()
-  vi.spyOn(console, 'warn').mockImplementation(() => {})
-  robotCheck.enabled = true
-  robotCheck.verify.mockReset().mockResolvedValue({ ok: true })
   hour += 2
   vi.useFakeTimers({ toFake: ['Date'] })
   vi.setSystemTime(Date.UTC(2026, 9, 23, hour))

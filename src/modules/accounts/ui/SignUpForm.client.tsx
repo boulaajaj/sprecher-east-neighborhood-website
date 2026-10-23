@@ -57,11 +57,11 @@ export function SignUpForm({ email }: { email: string | null }) {
     try {
       result = await signUp(values, robotCheck.token)
     } catch {
-      robotCheck.resetAfterFailure()
+      robotCheck.renewToken()
       return fail('offline')
     }
     if (!result.ok) {
-      robotCheck.resetAfterFailure()
+      robotCheck.renewToken()
       return fail(result.failure)
     }
     setStatus('success')

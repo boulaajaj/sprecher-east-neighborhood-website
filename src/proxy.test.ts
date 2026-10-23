@@ -45,6 +45,12 @@ describe('proxy', () => {
     expect(response.status).toBe(404)
   })
 
+  it('sends the admin panel’s forgot-password page to the site’s (#282)', () => {
+    const response = proxy(new NextRequest('https://sprechereast.example/admin/forgot'))
+    expect(response.status).toBe(307)
+    expect(response.headers.get('location')).toBe('https://sprechereast.example/forgot-password')
+  })
+
   it('passes a valid paging URL on to the page', () => {
     const response = proxy(new NextRequest('https://sprechereast.example/posts/page/2'))
     expect(response.headers.get('x-middleware-next')).toBe('1')
@@ -55,17 +61,25 @@ describe('matcher', () => {
   const runsOn = (path: string) =>
     unstable_doesMiddlewareMatch({ config, url: `https://sprechereast.example${path}` })
 
-  it.each(['/posts/page/2', '/posts/page/zz', '/events/list/upcoming/1', '/events/list/x1/1'])(
-    'runs on %s',
-    (path) => {
-      expect(runsOn(path)).toBe(true)
-    },
-  )
+  it.each([
+    '/posts/page/2',
+    '/posts/page/zz',
+    '/events/list/upcoming/1',
+    '/events/list/x1/1',
+    '/admin/forgot',
+  ])('runs on %s', (path) => {
+    expect(runsOn(path)).toBe(true)
+  })
 
-  it.each(['/posts/page', '/events/list', '/posts/some-post', '/events', '/'])(
-    'does not run on %s',
-    (path) => {
-      expect(runsOn(path)).toBe(false)
-    },
-  )
+  it.each([
+    '/posts/page',
+    '/events/list',
+    '/posts/some-post',
+    '/events',
+    '/',
+    '/admin',
+    '/admin/login',
+  ])('does not run on %s', (path) => {
+    expect(runsOn(path)).toBe(false)
+  })
 })

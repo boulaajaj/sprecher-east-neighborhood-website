@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
+import { FORGOT_PASSWORD_PATH } from '@/modules/accounts'
 import { isEventScope } from '@/modules/events'
 import { parsePageNumber } from '@/platform/lib'
 
@@ -24,13 +25,24 @@ export function isValidPagingPath(pathname: string): boolean {
   return true
 }
 
+/**
+ * The admin panel's "Forgot password?" page (Payload's `admin.routes.forgot`). Payload's own
+ * forgot-password endpoint is closed (#282), so the page couldn't send anything.
+ */
+export const ADMIN_FORGOT_PATH = '/admin/forgot'
+
 export function proxy(request: NextRequest): NextResponse {
-  if (isValidPagingPath(request.nextUrl.pathname)) return NextResponse.next()
+  const { pathname } = request.nextUrl
+  // The site's page sends the same reset email, after the robot check and the limits
+  if (pathname === ADMIN_FORGOT_PATH) {
+    return NextResponse.redirect(new URL(FORGOT_PASSWORD_PATH, request.url))
+  }
+  if (isValidPagingPath(pathname)) return NextResponse.next()
   return new NextResponse('Not found', { status: 404 })
 }
 
 // `:path+` needs at least one segment after the prefix, so slug pages like `/posts/page` never
 // reach the proxy.
 export const config = {
-  matcher: ['/posts/page/:path+', '/events/list/:path+'],
+  matcher: ['/posts/page/:path+', '/events/list/:path+', '/admin/forgot'],
 }

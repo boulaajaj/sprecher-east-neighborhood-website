@@ -1,10 +1,12 @@
 import { FORM_MESSAGES } from '@/platform/ui'
 
 import type { ForgotPasswordFailure, ResetPasswordFailure } from '../domain/types'
+import { GUARD_MESSAGES } from './guardMessages'
 
 /** What a visitor reads when asking for a reset link fails. `offline`: no answer came back. */
 export function toForgotPasswordErrorMessage(failure: ForgotPasswordFailure | 'offline'): string {
   if (failure === 'offline') return FORM_MESSAGES.offline
+  if (failure === 'robot-check' || failure === 'too-many') return GUARD_MESSAGES[failure]
   return 'Check the email address and try again.'
 }
 

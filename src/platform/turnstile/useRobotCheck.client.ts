@@ -41,8 +41,8 @@ export function useRobotCheck() {
       if (!TURNSTILE_SITE_KEY || token) return null
       return ROBOT_CHECK_MESSAGES[blocked ? 'blocked' : failed ? 'failed' : 'running']
     },
-    /** Tokens are single use: after a failed attempt, get a fresh one for the retry. */
-    resetAfterFailure: () => {
+    /** Tokens are single use: after an attempt, get a fresh one for the next. */
+    renewToken: () => {
       if (TURNSTILE_SITE_KEY) setResetSignal((n) => n + 1)
     },
     widgetProps: { onToken, onLoadError, onWidgetError, resetSignal },

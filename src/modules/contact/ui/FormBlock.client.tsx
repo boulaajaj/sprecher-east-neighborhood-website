@@ -76,7 +76,7 @@ export const FormBlock: React.FC<
     } catch {
       fail(toSubmitErrorMessage(null))
     } finally {
-      if (!succeeded) robotCheck.resetAfterFailure()
+      if (!succeeded) robotCheck.renewToken()
     }
   }
 

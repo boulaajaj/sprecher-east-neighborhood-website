@@ -8,22 +8,10 @@ import { expectAccessible } from '@/platform/ui/testing/expectAccessible'
 const mocks = vi.hoisted(() => ({ signUp: vi.fn() }))
 vi.mock('../actions', () => ({ signUp: mocks.signUp }))
 // The robot check is on, and its widget hands out a fresh token after each reset
-vi.mock('@/platform/turnstile/TurnstileWidget.client', async () => {
-  const { useEffect } = await import('react')
-  return {
-    TURNSTILE_SITE_KEY: 'test-site-key',
-    TurnstileWidget: ({
-      onToken,
-      resetSignal = 0,
-    }: {
-      onToken: (token: string | null) => void
-      resetSignal?: number
-    }) => {
-      useEffect(() => onToken(`token-${resetSignal}`), [onToken, resetSignal])
-      return null
-    },
-  }
-})
+vi.mock(
+  '@/platform/turnstile/TurnstileWidget.client',
+  () => import('@/platform/turnstile/testing/fakeTurnstileWidget'),
+)
 
 import { SignUpForm } from './SignUpForm.client'
 import { SIGN_UP_SENT } from './signUpMessages'
