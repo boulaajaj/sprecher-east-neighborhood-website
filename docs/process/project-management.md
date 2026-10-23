@@ -45,6 +45,15 @@ The allowed labels are in [`.github/label-policy.json`](../../.github/label-poli
     stays the epic it belongs to. The issues that depend on it are marked **blocked by** it, so
     nobody starts them too early.
 
+### Waits for owner
+
+**Waits for owner** means: that issue or PR stops until the owner answers or removes the
+`needs owner` label. Nobody works on it, merges it, or starts anything marked blocked by it.
+Other work goes on. An agent never decides for him, and never takes silence as a yes.
+
+How to ask him ([`project-tracking`](../../.agents/skills/project-tracking/SKILL.md) step 5):
+one plain question, the options in a sentence each, a recommendation, and what happens next.
+
 Priority lives only in the `priority:` label. GitHub's issue types (Bug, Feature, Task) are
 optional; the type label stays the required one because the `PR Policy` check reads labels.
 
