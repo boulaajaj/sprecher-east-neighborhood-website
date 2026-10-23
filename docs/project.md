@@ -72,7 +72,7 @@ generated files) are listed in [`architecture/`](architecture/README.md#exceptio
 ```
 src/
   app/                 Next.js App Router: routes and composition only
-    (frontend)/        Public routes (home, posts, events, faq, resources, search, login, account, sitemaps)
+    (frontend)/        Public routes (home, posts, events, faq, resources, search, login, account)
     (payload)/         Payload admin and API routes (generated; leave alone)
   modules/             One folder per business area
     accounts/          Who is signed in, sign-in and password flows, the users collection
@@ -86,7 +86,7 @@ src/
     lib/               Pure helpers: paging, roles, dates and the site timezone, URLs, `cn`
     payload/           Role checks, access functions, media collection, default editor, publishedAt hook, admin components
     richtext/          The `RichText` renderer and the blocks inside rich text
-    seo/               Page metadata, Open Graph and sitemap helpers
+    seo/               Page metadata and Open Graph helpers
     theme/             Light and dark mode: theme providers, `InitTheme`, `ThemeSelector`
     ui/                The UI kit: `Button`, `Link`, `Media`, `CMSLink`, `JsonLd`, `Breadcrumbs`, `LoadMore`…
   endpoints/seed/      Seed data and script (exception)

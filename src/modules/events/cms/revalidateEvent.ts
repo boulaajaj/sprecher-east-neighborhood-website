@@ -3,6 +3,8 @@ import { revalidatePath } from 'next/cache'
 
 import { expireCacheTag } from '@/platform/payload/expireCacheTag'
 
+import { EVENTS_SITEMAP_CACHE_TAG } from '../domain/cacheTags'
+
 /**
  * Refreshes every cached page that shows the event at `slug`: its own page, /events, and the
  * no-JavaScript list pages (/events/list/<scope>/<n>), which are cached per URL and refreshed all
@@ -14,7 +16,7 @@ function revalidateEventPages(slug: string) {
   revalidatePath('/events')
   revalidatePath('/(frontend)/events/list/[scope]/[page]', 'page')
   expireCacheTag('events')
-  expireCacheTag('events-sitemap')
+  expireCacheTag(EVENTS_SITEMAP_CACHE_TAG)
 }
 
 export const revalidateEvent: CollectionAfterChangeHook = ({
