@@ -35,4 +35,8 @@ describe('richTextToPlainText', () => {
     expect(richTextToPlainText(null)).toBe('')
     expect(richTextToPlainText(doc(paragraph()))).toBe('')
   })
+
+  it('trims an empty paragraph and spaces at either end', () => {
+    expect(richTextToPlainText(doc(paragraph(text('  A ')), paragraph()))).toBe('A')
+  })
 })

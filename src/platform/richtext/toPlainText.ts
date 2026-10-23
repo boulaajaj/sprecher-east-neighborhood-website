@@ -4,8 +4,9 @@ import type { RichTextValue } from '@/platform/lib'
 
 /**
  * Rich text as plain text, for places that can't hold HTML such as structured data (JSON-LD).
- * Payload's converter: blocks are separated by a blank line, list items by a line break.
+ * Payload's converter: blocks are separated by a blank line, list items by a line break. Trimmed,
+ * so an empty paragraph at the end of an answer doesn't leave a blank line.
  */
 export function richTextToPlainText(value: RichTextValue | null | undefined): string {
-  return value ? convertLexicalToPlaintext({ data: value }) : ''
+  return value ? convertLexicalToPlaintext({ data: value }).trim() : ''
 }
