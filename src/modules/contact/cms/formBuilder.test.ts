@@ -4,12 +4,14 @@ import { describe, expect, it, vi } from 'vitest'
 import { anyone } from '@/platform/payload/anyone'
 import { isAdmin, isAdminOrEditor } from '@/platform/payload/roles'
 
-import { formBuilderOptions } from './formBuilder'
+import { createFormBuilderOptions } from './formBuilder'
 import { guardFormEmails } from './guardFormEmails'
 import { limitSubmissionSize } from './limitSubmissionSize'
 import { rateLimitSubmissions } from './rateLimits'
 
 // The safeguards are only as good as their wiring: each must be registered, in this order.
+const emailConfirmer = { isConfirmed: vi.fn(async () => false), request: vi.fn(async () => {}) }
+const formBuilderOptions = createFormBuilderOptions({ emailConfirmer })
 const submissions = formBuilderOptions.formSubmissionOverrides
 const beforeChange = submissions?.hooks?.beforeChange ?? []
 
@@ -31,8 +33,30 @@ describe('formBuilderOptions: safeguards', () => {
   })
 
   it('rate-limits before the robot check, so a limited client never reaches Cloudflare', () => {
-    expect(beforeChange).toHaveLength(2)
+    expect(beforeChange).toHaveLength(3)
     expect(beforeChange[0]).toBe(rateLimitSubmissions)
+  })
+
+  it('records the sender last, and asks them to confirm after the owner is notified', async () => {
+    const findByID = vi.fn(async () => ({ fields: [{ blockType: 'email', name: 'email' }] }))
+    const data = await beforeChange[2]?.({
+      data: { form: 1, submissionData: [{ field: 'email', value: 'ana@example.com' }] },
+      operation: 'create',
+      req: { payload: { findByID } },
+    } as unknown as Parameters<CollectionBeforeChangeHook>[0])
+    expect(data).toMatchObject({ senderEmail: 'ana@example.com', emailConfirmed: false })
+
+    const afterChange = submissions?.hooks?.afterChange ?? []
+    expect(afterChange).toHaveLength(1)
+    const req = {}
+    await afterChange[0]?.({ data, doc: {}, operation: 'create', req } as never)
+    expect(emailConfirmer.request).toHaveBeenCalledWith('ana@example.com', req)
+  })
+
+  it('adds the sender fields to submissions', () => {
+    const fields = submissions?.fields
+    const names = typeof fields === 'function' ? fields({ defaultFields: [] }) : []
+    expect(names.map((f) => ('name' in f ? f.name : ''))).toEqual(['senderEmail', 'emailConfirmed'])
   })
 
   it('runs the robot check second: off without keys', async () => {

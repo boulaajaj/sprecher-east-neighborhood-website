@@ -2,7 +2,7 @@
 // A module's domain may import these and nothing else from platform/.
 export { parseClientIp } from './clientIp'
 export type { ImageRef, RichTextValue } from './content'
-export { isSingleAddress } from './emailAddress'
+export { isSingleAddress, parseEmailAddress } from './emailAddress'
 export { escapeMarkup } from './escapeMarkup'
 export { MAX_PAGE, parsePageNumber, toPageNumbers, type FeedPage } from './paging'
 export { ROLES, type Role } from './roles'

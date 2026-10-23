@@ -3,6 +3,7 @@ import type { BeforeEmail } from '@payloadcms/plugin-form-builder/types'
 import type { FormSubmission } from '@/payload-types'
 
 import { toSafeFormEmail } from '../domain/formEmails'
+import { toSenderEmailNote } from '../domain/senderEmail'
 import { capFormEmails } from './rateLimits'
 
 /**
@@ -42,5 +43,11 @@ export const guardFormEmails: BeforeEmail<FormSubmission> = async (emails, { dat
     return [decision.email]
   })
 
-  return capFormEmails(allowed, req.payload.logger)
+  // Every email that goes out says whether the sender confirmed their address (#183)
+  const note = toSenderEmailNote(data?.senderEmail, data?.emailConfirmed)
+  const marked = note
+    ? allowed.map((email) => ({ ...email, html: `${email.html}<p>${note}</p>` }))
+    : allowed
+
+  return capFormEmails(marked, req.payload.logger)
 }

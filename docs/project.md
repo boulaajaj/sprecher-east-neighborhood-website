@@ -85,7 +85,7 @@ src/
     email/             SMTP settings for password-reset and form emails
     lib/               Pure helpers: paging, roles, dates and the site timezone, URLs, `cn`
     payload/           Role checks, access functions, media collection, default editor, publishedAt hook, admin components
-    richtext/          The `RichText` renderer and the blocks inside rich text
+    richtext/          The `RichText` renderer, the blocks inside rich text, plain-text conversion
     seo/               Page metadata and Open Graph helpers
     theme/             Light and dark mode: theme providers, `InitTheme`, `ThemeSelector`
     ui/                The UI kit: `Button`, `Link`, `Media`, `CMSLink`, `JsonLd`, `Breadcrumbs`, `LoadMore`…

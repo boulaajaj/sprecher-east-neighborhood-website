@@ -2,19 +2,26 @@ import type { PluginConfig } from '@payloadcms/plugin-form-builder/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 
 import { anyone } from '@/platform/payload/anyone'
+import type { EmailConfirmer } from '@/platform/payload/emailConfirmer'
 import { isAdmin, isAdminOrEditor, isAdminOrEditorFieldAccess } from '@/platform/payload/roles'
 
 import { guardFormEmails } from './guardFormEmails'
 import { limitSubmissionSize } from './limitSubmissionSize'
 import { rateLimitSubmissions } from './rateLimits'
+import { recordSenderEmail, requestSenderConfirmation, senderEmailFields } from './senderEmail'
 import { TurnstileVerifier } from './turnstileVerifier'
 import { verifyHumanSubmission } from './verifyHumanSubmission'
 
 /**
- * The form-builder plugin's options: who may read and change forms and submissions, and the
- * safeguards every public submission passes (size, rate limit, robot check, email rules).
+ * The form-builder plugin's options: who may read and change forms and submissions, the
+ * safeguards every public submission passes (size, rate limit, robot check, email rules), and
+ * the sender's email confirmation (#183), through the confirmer `payload.config.ts` passes in.
  */
-export const formBuilderOptions: PluginConfig = {
+export const createFormBuilderOptions = ({
+  emailConfirmer,
+}: {
+  emailConfirmer: EmailConfirmer
+}): PluginConfig => ({
   beforeEmail: guardFormEmails,
   fields: {
     payment: false,
@@ -60,8 +67,17 @@ export const formBuilderOptions: PluginConfig = {
       // Cheapest check first: oversized submissions never reach Turnstile or the database
       beforeValidate: [limitSubmissionSize],
       // Rate limit before Turnstile, so a rate-limited client never triggers a Siteverify call
-      beforeChange: [rateLimitSubmissions, verifyHumanSubmission(new TurnstileVerifier())],
+      // Then who sent it: only a submission that passed the safeguards is looked up
+      beforeChange: [
+        rateLimitSubmissions,
+        verifyHumanSubmission(new TurnstileVerifier()),
+        recordSenderEmail(emailConfirmer),
+      ],
+      // After the plugin's own hook has sent the owner notification: the message reaches him
+      // right away, marked confirmed or not (open question for the owner on #183)
+      afterChange: [requestSenderConfirmation(emailConfirmer)],
     },
+    fields: ({ defaultFields }) => [...defaultFields, ...senderEmailFields],
     access: {
       create: () => true,
       read: isAdmin,
@@ -69,4 +85,4 @@ export const formBuilderOptions: PluginConfig = {
       delete: isAdmin,
     },
   },
-}
+})

@@ -35,6 +35,10 @@ export const createEmailConfirmations = ({
   defaultSort: '-updatedAt',
   fields: [
     {
+      // `email`, on purpose: Payload's check is stricter than `parseEmailAddress` (it refuses
+      // "josé@example.com" or "ana@example.c"). For such an address no record is saved and no link
+      // goes out; the confirmer catches the error and logs it, and the message that asked is kept,
+      // unconfirmed. The site only emails addresses it can be sure are well formed.
       name: 'email',
       type: 'email',
       required: true,
