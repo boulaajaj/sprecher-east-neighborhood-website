@@ -20,7 +20,7 @@ You are the Media Manager for Sprecher East. Photos and visuals tell the neighbo
 
 - **CMS**: Payload CMS v3 Website Template — Media is a built-in upload collection
 - **Focal Point**: Website template includes focal point support — editors can set the focal point for each image, ensuring the most important part is always visible in different crop ratios
-- **Size Variants**: Auto-generated on upload (`src/collections/Media.ts`):
+- **Size Variants**: Auto-generated on upload (`src/platform/payload/media.ts`):
   - `thumbnail` (300px wide, admin lists), `small` (600), `medium` (900), `large` (1400),
     `xlarge` (1920): scaled to that width
   - `square`: 500x500 crop; `og`: 1200x630 crop for social sharing previews

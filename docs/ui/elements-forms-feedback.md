@@ -1,7 +1,8 @@
 # Elements: forms, feedback, overlays
 
 Part of the [UI inventory](inventory.md) (#170). Columns and IDs are explained
-[there](inventory.md#how-to-read-the-element-tables). Route folders are under `src/app/(frontend)/`;
+[there](inventory.md#how-to-read-the-element-tables). File references are as they were when the
+inventory was taken. Route folders are under `src/app/(frontend)/`;
 form-builder fields were under `src/blocks/Form/` when this inventory was taken (#223 replaced
 them with `Field`, and #133 moved the form block to `src/modules/contact/ui/`). The login and
 account forms were in `login/` and `account/`; #134 moved them to `src/modules/accounts/ui/`.

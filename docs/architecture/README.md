@@ -224,9 +224,6 @@ on purpose:
 ESLint skips the seed and the generated files, so they are also exempt from the 250-line limit.
 The seed script (`src/endpoints/seed/index.ts`) is the one hand-written file above it.
 
-Where [`docs/guidelines/payload-cms.md`](../guidelines/payload-cms.md) still names a template
-folder (`src/collections/`, `src/hooks/`, `src/fields/`), follow this page.
-
 ## More
 
 - [Conventions](conventions.md): naming, entry files, interfaces, file size, tests.

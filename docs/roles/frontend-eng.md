@@ -110,7 +110,7 @@ the [current folders](../project.md#architecture). File size and naming: [conven
 
 - [ ] TypeScript compiles with no errors
 - [ ] All interactive elements are keyboard accessible
-- [ ] Components follow the template architecture (blocks in src/blocks/, heros in src/heros/, shared in src/components/)
+- [ ] Components follow the [architecture](../architecture/README.md#where-does-it-go) (a module's components in its `ui/`, page-builder blocks and heroes in `src/modules/site/ui/`, shared ones in `src/platform/ui/`)
 - [ ] No hardcoded content that should come from CMS
 - [ ] Responsive at all six [test widths](../guidelines/nextjs-tailwind.md#responsive-design--6-viewport-testing) (320 to 1920px)
 - [ ] No `console.log` left in code

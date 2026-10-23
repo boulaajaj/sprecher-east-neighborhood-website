@@ -4,21 +4,20 @@ Patterns for using existing components and maintaining content quality standards
 
 ## Before Creating Components
 
-1. Check `src/components/` and `src/components/ui/` first — most UI needs are already covered
-2. Prefer Payload layout builder blocks (`src/blocks/`) over custom page components for content pages
-3. Use `shadcn/ui` components from `src/components/ui/` for generic UI (Button, Card, Input, etc.)
+1. Check `src/platform/ui/` and `src/platform/richtext/` first — most UI needs are already covered
+2. Prefer Payload layout builder blocks (configs in `src/modules/site/cms/`, components in `src/modules/site/ui/`) over custom page components for content pages
+3. Use the UI kit's primitives from `src/platform/ui/` for generic UI (`Button`, `Link`, `Field`, `Form`, etc.)
 
 ## Key Reusable Components
 
-| Component         | Path                                         | Usage                                                          |
-| ----------------- | -------------------------------------------- | -------------------------------------------------------------- |
-| CMSLink           | `src/components/Link/index.tsx`              | Internal/external links with reference support                 |
-| Media             | `src/components/Media/index.tsx`             | Image/video rendering with Payload media docs                  |
-| RichText          | `src/components/RichText/index.tsx`          | Renders Lexical rich text content                              |
-| CollectionArchive | `src/components/CollectionArchive/index.tsx` | Grid display of posts/docs with cards                          |
-| Card              | `src/components/ui/card.tsx`                 | shadcn/ui card primitives                                      |
-| Button            | `src/components/ui/button.tsx`               | shadcn/ui button with variants (default, outline, ghost, link) |
-| JsonLd            | `src/components/JsonLd.tsx`                  | Safe JSON-LD structured data (escapes XSS). Always use this.   |
+| Component | Path                                 | Usage                                                                                    |
+| --------- | ------------------------------------ | ---------------------------------------------------------------------------------------- |
+| CMSLink   | `src/platform/ui/CMSLink.tsx`        | Internal/external links with reference support                                           |
+| Media     | `src/platform/ui/Media.tsx`          | Image/video rendering with Payload media docs                                            |
+| RichText  | `src/platform/richtext/RichText.tsx` | Renders Lexical rich text content                                                        |
+| PostGrid  | `src/modules/news/ui/PostGrid.tsx`   | Grid display of posts with cards                                                         |
+| Button    | `src/platform/ui/Button.tsx`         | The one button, `cva` variants (`primary`, `secondary`, `accent`, `ghost`, `inverse`, …) |
+| JsonLd    | `src/platform/ui/JsonLd.tsx`         | Safe JSON-LD structured data (escapes XSS). Always use this.                             |
 
 ## Nav Links
 
@@ -45,11 +44,11 @@ When creating navigation links (header, footer, CTAs):
 
 ## Form Components
 
-All forms must use the shadcn/ui primitives — never raw HTML `<input>`, `<label>`, or `<button>` elements:
+All forms must use the UI kit's primitives — never raw HTML `<input>`, `<label>`, or `<button>` elements:
 
-- **Input**: `src/components/ui/input.tsx` — handles focus ring, dark mode, `aria-invalid` styling
-- **Label**: `src/components/ui/label.tsx` — Radix Label primitive with `peer-disabled` support
-- **Button**: `src/components/ui/button.tsx` — CVA variants (`default`, `ghost`, `outline`, `destructive`, etc.)
+- **Field**: `src/platform/ui/Field.client.tsx` — the label, required mark, hint and error around one control (`Field.Input`, `Field.TextArea`, `Field.Select`, `Field.Checkbox`), which it gives its id, `aria-describedby` and `aria-invalid`
+- **Form**: `src/platform/ui/Form.client.tsx` — react-hook-form with a Zod schema, the fields grid and the fixed success or error message; for forms that submit data. A plain search box can use a `<form>` with `Field`
+- **Button**: `src/platform/ui/Button.tsx` — CVA variants (`primary`, `secondary`, `ghost`, etc.)
 
 For feedback messages (errors, success), use design tokens — never hardcoded Tailwind color classes. Always include ARIA live regions so screen readers announce state changes:
 
