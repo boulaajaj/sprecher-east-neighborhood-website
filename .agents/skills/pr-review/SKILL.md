@@ -33,7 +33,9 @@ gh api "repos/{owner}/{repo}/stacks?pull_request=<number>" -H 'X-GitHub-Api-Vers
       needed. A merge order written only in prose is a **Blocker**.
 - [ ] **Policy changes are flagged.** If the diff touches `AGENTS.md`, `.agents/`,
       `.github/` (workflows, templates, label policy), `docs/guidelines/`, `docs/roles/`, or the
-      Claude Code adapter (`CLAUDE.md`, `.claude/`), list each such change under
+      Claude Code adapter (`CLAUDE.md`, `.claude/`), or changes how the team works in
+      `docs/process/` (sprint length, Ready or Done, levels, the board's columns and fields, but
+      not wording, link or fact fixes), list each such change under
       **Policy changes** in the review. Then check the owner asked for it. Agents file issues
       through his account, so an issue alone isn't proof: the issue or PR must quote his words,
       with the date and where he said them. Check the change stays within that quote. If there
