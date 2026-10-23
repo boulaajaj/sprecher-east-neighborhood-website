@@ -4,11 +4,9 @@ import { notFound, redirect } from 'next/navigation'
 
 import type { Role } from '@/platform/lib'
 
+import { SIGN_IN_PATH } from '../domain/paths'
 import type { CurrentUser } from '../domain/types'
 import { getCurrentUser } from './getCurrentUser'
-
-/** Where a visitor goes when a page needs an account. */
-export const SIGN_IN_PATH = '/login'
 
 /** The signed-in user. A visitor is sent to the sign-in page instead. */
 export async function requireUser(): Promise<CurrentUser> {

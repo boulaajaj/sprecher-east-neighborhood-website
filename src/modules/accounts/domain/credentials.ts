@@ -8,14 +8,34 @@ export const MIN_PASSWORD_LENGTH = 8
 export const MAX_PASSWORD_LENGTH = 1024
 /** The longest an email address can be (RFC 5321: 64 + 1 + 255), with room to spare */
 export const MAX_EMAIL_LENGTH = 320
+/** Far above Payload's reset tokens (40 characters in 3.91) */
+const MAX_TOKEN_LENGTH = 128
+
+/** The email field of the sign-in and forgot-password forms. */
+const email = z.string().trim().min(1, 'Enter your email address').max(MAX_EMAIL_LENGTH)
 
 /** Strict like every action schema: a field the form doesn't have is refused, not ignored. */
 export const signInSchema = z.strictObject({
-  email: z.string().trim().min(1, 'Enter your email address').max(MAX_EMAIL_LENGTH),
+  email,
   password: z.string().min(1, 'Enter your password').max(MAX_PASSWORD_LENGTH),
 })
 
 export type SignInValues = z.output<typeof signInSchema>
+
+/** A new password, typed twice: one rule for changing it and for resetting it. */
+const newPasswordFields = {
+  newPassword: z
+    .string()
+    .min(MIN_PASSWORD_LENGTH, `Use at least ${MIN_PASSWORD_LENGTH} characters`)
+    .max(MAX_PASSWORD_LENGTH, `Use at most ${MAX_PASSWORD_LENGTH} characters`),
+  confirmPassword: z.string().min(1, 'Type the new password again').max(MAX_PASSWORD_LENGTH),
+}
+
+const passwordsMatch = {
+  check: (values: { newPassword: string; confirmPassword: string }) =>
+    values.newPassword === values.confirmPassword,
+  issue: { message: 'The passwords don’t match', path: ['confirmPassword'] },
+}
 
 /**
  * A new password for the signed-in account, with its current one (#233). Strict: the account is
@@ -25,15 +45,33 @@ export type SignInValues = z.output<typeof signInSchema>
 export const passwordChangeSchema = z
   .strictObject({
     currentPassword: z.string().min(1, 'Enter your current password').max(MAX_PASSWORD_LENGTH),
-    newPassword: z
-      .string()
-      .min(MIN_PASSWORD_LENGTH, `Use at least ${MIN_PASSWORD_LENGTH} characters`)
-      .max(MAX_PASSWORD_LENGTH, `Use at most ${MAX_PASSWORD_LENGTH} characters`),
-    confirmPassword: z.string().min(1, 'Type the new password again').max(MAX_PASSWORD_LENGTH),
+    ...newPasswordFields,
   })
-  .refine((values) => values.newPassword === values.confirmPassword, {
-    message: 'The passwords don’t match',
-    path: ['confirmPassword'],
-  })
+  .refine(passwordsMatch.check, passwordsMatch.issue)
 
 export type PasswordChangeValues = z.output<typeof passwordChangeSchema>
+
+/** Asking for a reset link (#269). */
+export const forgotPasswordSchema = z.strictObject({ email })
+
+export type ForgotPasswordValues = z.output<typeof forgotPasswordSchema>
+
+/** The reset form's fields: the new password, typed twice. */
+export const newPasswordSchema = z
+  .strictObject(newPasswordFields)
+  .refine(passwordsMatch.check, passwordsMatch.issue)
+
+export type NewPasswordValues = z.output<typeof newPasswordSchema>
+
+/**
+ * A new password set from a reset link (#269), as the action gets it. The token comes from the
+ * link, not from a field the person types; Payload checks it and its expiry.
+ */
+export const resetPasswordSchema = z
+  .strictObject({
+    token: z.string().min(1).max(MAX_TOKEN_LENGTH),
+    ...newPasswordFields,
+  })
+  .refine(passwordsMatch.check, passwordsMatch.issue)
+
+export type ResetPasswordValues = z.output<typeof resetPasswordSchema>

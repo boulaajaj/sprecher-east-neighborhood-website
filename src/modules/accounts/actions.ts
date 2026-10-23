@@ -4,10 +4,24 @@
 // (https://nextjs.org/docs/app/guides/data-security). Each one parses its input again and finds
 // the account from the session, never from what the caller sends.
 
-import { passwordChangeSchema, signInSchema } from './domain/credentials'
-import type { AccountSummary, ActionResult, PasswordFailure, SignInFailure } from './domain/types'
+import {
+  forgotPasswordSchema,
+  passwordChangeSchema,
+  resetPasswordSchema,
+  signInSchema,
+} from './domain/credentials'
+import type {
+  AccountSummary,
+  ActionResult,
+  ForgotPasswordFailure,
+  PasswordFailure,
+  ResetPasswordFailure,
+  SignInFailure,
+} from './domain/types'
 import { changeOwnPassword } from './use-cases/changeOwnPassword'
 import { getAccountSummary } from './use-cases/getAccountSummary'
+import { requestPasswordReset } from './use-cases/requestPasswordReset'
+import { resetPasswordFromLink } from './use-cases/resetPasswordFromLink'
 import { signInWithPassword } from './use-cases/signInWithPassword'
 import { signOutCurrentUser } from './use-cases/signOutCurrentUser'
 
@@ -31,6 +45,24 @@ export async function changePassword(input: unknown): Promise<ActionResult<Passw
   const parsed = passwordChangeSchema.safeParse(input)
   if (!parsed.success) return { ok: false, failure: 'rejected' }
   return changeOwnPassword(parsed.data)
+}
+
+/**
+ * Emails a link to reset a forgotten password. The answer is the same whether or not an account
+ * uses the email; only input that doesn't parse is refused.
+ */
+export async function forgotPassword(input: unknown): Promise<ActionResult<ForgotPasswordFailure>> {
+  const parsed = forgotPasswordSchema.safeParse(input)
+  if (!parsed.success) return { ok: false, failure: 'rejected' }
+  await requestPasswordReset(parsed.data)
+  return { ok: true }
+}
+
+/** Sets a new password from a reset link's token. Input that doesn't parse is refused. */
+export async function resetPassword(input: unknown): Promise<ActionResult<ResetPasswordFailure>> {
+  const parsed = resetPasswordSchema.safeParse(input)
+  if (!parsed.success) return { ok: false, failure: 'rejected' }
+  return resetPasswordFromLink(parsed.data)
 }
 
 /**

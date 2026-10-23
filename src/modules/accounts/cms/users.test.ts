@@ -23,9 +23,26 @@ describe('Users', () => {
     })
   })
 
-  it('signs in with email and password, Payload’s defaults apart from the cookie’s Secure flag', () => {
+  it('keeps Payload’s auth defaults but the cookie’s Secure flag and the reset email', () => {
     // Tests don't run in production, so the flag is off here; the tests below cover both
-    expect(Users.auth).toEqual({ cookies: { secure: false } })
+    expect(Users.auth).toEqual({
+      cookies: { secure: false },
+      forgotPassword: {
+        generateEmailHTML: expect.any(Function),
+        generateEmailSubject: expect.any(Function),
+      },
+    })
+  })
+
+  it('sends a branded reset email whose link opens the site’s reset page, not the admin', async () => {
+    vi.stubEnv('NEXT_PUBLIC_SERVER_URL', 'https://sprechereast.com')
+    const forgot = typeof Users.auth === 'object' ? Users.auth.forgotPassword : undefined
+    const html = await forgot?.generateEmailHTML?.({ token: 'abc123' })
+    expect(html).toContain('href="https://sprechereast.com/reset-password?token=abc123"')
+    expect(html).not.toContain('/admin')
+    expect(await forgot?.generateEmailSubject?.({ token: 'abc123' })).toBe(
+      'Reset your Sprecher East password',
+    )
   })
 
   it('asks for the current password before anyone changes their own (#233)', () => {

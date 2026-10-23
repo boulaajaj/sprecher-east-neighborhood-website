@@ -9,7 +9,7 @@ import {
 } from 'payload'
 import { describe, expect, it } from 'vitest'
 
-import { isRefusal, toPasswordFailure, toSignInFailure } from './failures'
+import { isRefusal, toPasswordFailure, toResetPasswordFailure, toSignInFailure } from './failures'
 
 const invalid = () =>
   new ValidationError({ collection: 'users', errors: [{ message: 'Bad', path: 'password' }] })
@@ -67,5 +67,22 @@ describe('toPasswordFailure', () => {
     expect(toPasswordFailure(new APIError('Database down', 500))).toBe('server-error')
     expect(toPasswordFailure(new APIError('Locked', 423))).toBe('server-error')
     expect(toPasswordFailure(new Error('boom'))).toBe('server-error')
+  })
+})
+
+describe('toResetPasswordFailure', () => {
+  it('reads Payload’s refusal of the token as a dead link', () => {
+    expect(toResetPasswordFailure(new APIError('Token is either invalid or has expired.', 403))).toBe(
+      'invalid-link',
+    )
+  })
+
+  it('says the password was refused when Payload rejects the value', () => {
+    expect(toResetPasswordFailure(invalid())).toBe('rejected')
+  })
+
+  it('treats anything else as a failure on our side', () => {
+    expect(toResetPasswordFailure(new APIError('Database down', 500))).toBe('server-error')
+    expect(toResetPasswordFailure(new Error('boom'))).toBe('server-error')
   })
 })

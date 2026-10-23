@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { CURRENT_PASSWORD_CONFIRMED } from './domain/passwordConfirmation'
 import {
   edges,
+  nextAuthWithEdges,
   nextHeadersWithEdges,
   payloadWithEdges,
   resetEdges,
@@ -11,6 +12,7 @@ import {
 } from './testing/actionEdges'
 
 vi.mock('payload', async (importActual) => payloadWithEdges(await importActual()))
+vi.mock('@payloadcms/next/auth', () => nextAuthWithEdges())
 vi.mock('@payload-config', () => ({ default: {} }))
 vi.mock('next/headers', () => nextHeadersWithEdges())
 
@@ -50,7 +52,8 @@ describe('changePassword', () => {
       context: { [CURRENT_PASSWORD_CONFIRMED]: true },
     })
     // The check's token is dropped: the browser keeps its own session cookie
-    expect(edges.setCookie).not.toHaveBeenCalled()
+    expect(edges.signInHelper).not.toHaveBeenCalled()
+    expect(edges.deleteCookie).not.toHaveBeenCalled()
   })
 
   it.each([

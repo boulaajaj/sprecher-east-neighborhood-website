@@ -1,11 +1,11 @@
 import 'server-only'
 
 import configPromise from '@payload-config'
+import { login } from '@payloadcms/next/auth'
 import { cookies, headers } from 'next/headers'
 import {
   createLocalReq,
   generateExpiredPayloadCookie,
-  generatePayloadCookie,
   getPayload,
   logoutOperation,
   type Payload,
@@ -15,7 +15,6 @@ import {
 import type { PasswordChangeValues, SignInValues } from '../domain/credentials'
 import { CURRENT_PASSWORD_CONFIRMED } from '../domain/passwordConfirmation'
 import type { CurrentUser } from '../domain/types'
-import { toResponseCookie } from './cookies'
 import { isRefusal } from './failures'
 import { toCurrentUser } from './mappers'
 
@@ -35,36 +34,24 @@ export async function getSessionUser(): Promise<CurrentUser | null> {
 }
 
 /**
- * Signs in with Payload's `login` operation and sets the auth cookie Payload's own
- * `POST /api/users/login` sets: same name, lifetime, httpOnly, sameSite and secure settings.
- * Throws Payload's error when it refuses, after counting the attempt towards the lockout.
- * (Payload's Next.js helpers in `@payloadcms/next/auth` aren't used: they are a `'use server'`
- * module, and their `logout` deletes the first cookie named `payload…`, which can be the
- * admin's `payload-theme`.)
+ * Signs in with Payload's own Next.js helper (`login` from `@payloadcms/next/auth`): it runs
+ * Payload's `login` operation, so a wrong password counts towards the lockout, and sets the auth
+ * cookie from the users collection's auth settings (#234: Secure in production). Throws Payload's
+ * error when it refuses.
  */
 export async function startSession({ email, password }: SignInValues): Promise<void> {
-  const payload = await getPayload({ config: configPromise })
-  const { token } = await payload.login({
-    collection: USERS,
-    data: { email, password },
-    // As `POST /api/users/login` runs it: the returned user is read with access rules applied
-    overrideAccess: false,
-  })
-  if (!token) throw new Error('Payload signed in without a token')
-  const cookie = generatePayloadCookie({
-    collectionAuthConfig: payload.collections[USERS].config.auth,
-    cookiePrefix: payload.config.cookiePrefix,
-    returnCookieAsObject: true,
-    token,
-  })
-  const cookieStore = await cookies()
-  cookieStore.set(toResponseCookie(cookie))
+  await login({ collection: USERS, config: configPromise, email, password })
 }
 
 /**
  * Ends this request's session the way `POST /api/users/logout` does: Payload forgets the session,
- * then the auth cookie is replaced with Payload's expired one. The cookie is cleared even when
- * Payload fails to forget the session, so signing out always signs this browser out.
+ * then the auth cookie is deleted. The cookie is deleted even when Payload fails to forget the
+ * session, so signing out always signs this browser out.
+ *
+ * Not Payload's `logout` helper from `@payloadcms/next/auth`: in 3.91 it deletes the first cookie
+ * whose name starts with the cookie prefix, which can be the admin's `payload-theme` instead of
+ * the auth cookie, leaving the browser signed in. The auth cookie's name, domain and path come
+ * from Payload's own expired cookie, so the right one is deleted.
  */
 export async function endSession(): Promise<void> {
   const payload = await getPayload({ config: configPromise })
@@ -75,13 +62,13 @@ export async function endSession(): Promise<void> {
       await logoutOperation({ collection: users, req: await createLocalReq({ user }, payload) })
     }
   } finally {
-    const expired = generateExpiredPayloadCookie({
+    const { name, domain, path, secure } = generateExpiredPayloadCookie({
       collectionAuthConfig: users.config.auth,
       cookiePrefix: payload.config.cookiePrefix,
       returnCookieAsObject: true,
     })
     const cookieStore = await cookies()
-    cookieStore.set(toResponseCookie(expired))
+    cookieStore.delete({ name, domain, path, secure })
   }
 }
 

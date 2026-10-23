@@ -46,16 +46,16 @@ grows should split its top level "into domain oriented modules which are interna
 
 ## Business areas
 
-| Module         | Owns                                                                       | Payload collections and globals                  | Routes                                              |
-| -------------- | -------------------------------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------- |
-| `events`       | Event listings, the "upcoming" rule, event types, calendar (Phase 2)       | `events`                                         | `/events`, `/events/[slug]`, events sitemap         |
-| `news`         | Posts, categories, authors, search, related and recent posts               | `posts`, `categories`, `search`                  | `/posts`, `/posts/[slug]`, `/search`, posts sitemap |
-| `contact`      | Public form safeguards, the robot check, form-email rules                  | `forms`, `form-submissions` (plugin)             | the form block on CMS pages                         |
-| `accounts`     | Who is signed in, sign-in and password flows, the role field               | `users`                                          | `/login`, `/account`                                |
-| `directory`    | FAQ, local resources, team members                                         | `faq`, `resources`, `team-members`               | `/faq`, `/resources`                                |
-| `site`         | CMS pages, page-builder blocks, heroes, header, footer, redirects          | `pages`, `redirects`, globals `header`, `footer` | `/[slug]`, home, pages sitemap                      |
-| `verification` | Confirming an email by link: the token, its expiry, the limits, the emails | `email-confirmations`                            | `/confirm-email`                                    |
-| `comments`     | Resident comments (future)                                                 | (future)                                         | (future)                                            |
+| Module         | Owns                                                                       | Payload collections and globals                  | Routes                                                      |
+| -------------- | -------------------------------------------------------------------------- | ------------------------------------------------ | ----------------------------------------------------------- |
+| `events`       | Event listings, the "upcoming" rule, event types, calendar (Phase 2)       | `events`                                         | `/events`, `/events/[slug]`, events sitemap                 |
+| `news`         | Posts, categories, authors, search, related and recent posts               | `posts`, `categories`, `search`                  | `/posts`, `/posts/[slug]`, `/search`, posts sitemap         |
+| `contact`      | Public form safeguards, the robot check, form-email rules                  | `forms`, `form-submissions` (plugin)             | the form block on CMS pages                                 |
+| `accounts`     | Who is signed in, sign-in and password flows, the role field               | `users`                                          | `/login`, `/account`, `/forgot-password`, `/reset-password` |
+| `directory`    | FAQ, local resources, team members                                         | `faq`, `resources`, `team-members`               | `/faq`, `/resources`                                        |
+| `site`         | CMS pages, page-builder blocks, heroes, header, footer, redirects          | `pages`, `redirects`, globals `header`, `footer` | `/[slug]`, home, pages sitemap                              |
+| `verification` | Confirming an email by link: the token, its expiry, the limits, the emails | `email-confirmations`                            | `/confirm-email`                                            |
+| `comments`     | Resident comments (future)                                                 | (future)                                         | (future)                                                    |
 
 `src/platform/` holds what every module uses, and imports no module:
 

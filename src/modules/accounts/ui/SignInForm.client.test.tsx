@@ -61,6 +61,12 @@ describe('SignInForm', () => {
     expect((await screen.findByRole('alert')).textContent).toMatch(/connection/)
   })
 
+  it('links to the page that sends a reset link', () => {
+    render(<SignInForm />)
+    const link = screen.getByRole('link', { name: 'Forgot your password?' })
+    expect(link.getAttribute('href')).toBe('/forgot-password')
+  })
+
   it('keeps an email typed before the page finished loading', async () => {
     mocks.signIn.mockResolvedValue({ ok: true })
     const container = document.body.appendChild(document.createElement('div'))
