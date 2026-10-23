@@ -60,7 +60,7 @@ Collection-specific hooks (e.g., `revalidatePage`, `revalidatePost`, `revalidate
 
 - Always accept and pass `req` from hook args
 - Guard revalidation with `if (context.disableRevalidate) return` to prevent loops
-- Use `revalidatePath()` or `revalidateTag()` for cache invalidation
+- Use `revalidatePath()` for paths, and expire cache tags with `expireCacheTag()` from `src/platform/payload/expireCacheTag.ts` rather than `revalidateTag()` (`docs/project.md`, Known Gotchas)
 
 ## Fields
 

@@ -47,7 +47,7 @@ When creating navigation links (header, footer, CTAs):
 All forms must use the UI kit's primitives — never raw HTML `<input>`, `<label>`, or `<button>` elements:
 
 - **Field**: `src/platform/ui/Field.client.tsx` — the label, required mark, hint and error around one control (`Field.Input`, `Field.TextArea`, `Field.Select`, `Field.Checkbox`), which it gives its id, `aria-describedby` and `aria-invalid`
-- **Form**: `src/platform/ui/Form.client.tsx` — react-hook-form with a Zod schema, the fields grid and the fixed success or error message
+- **Form**: `src/platform/ui/Form.client.tsx` — react-hook-form with a Zod schema, the fields grid and the fixed success or error message; for forms that submit data. A plain search box can use a `<form>` with `Field`
 - **Button**: `src/platform/ui/Button.tsx` — CVA variants (`primary`, `secondary`, `ghost`, etc.)
 
 For feedback messages (errors, success), use design tokens — never hardcoded Tailwind color classes. Always include ARIA live regions so screen readers announce state changes:

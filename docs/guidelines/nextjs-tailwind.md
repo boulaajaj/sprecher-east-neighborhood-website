@@ -45,8 +45,8 @@ Fetch data through the owning module's use cases (from its `server.ts`), whose `
 ## Caching
 
 - Use React `cache()` to deduplicate server-side fetches within a request
-- Use `revalidatePath()` or `revalidateTag()` in afterChange hooks for on-demand revalidation
-- Never call Route Handlers from Server Components — use the Payload Local API directly
+- In afterChange hooks, use `revalidatePath()` for paths, and expire cache tags with `expireCacheTag()` from `src/platform/payload/expireCacheTag.ts` rather than `revalidateTag()` (`docs/project.md`, Known Gotchas)
+- Never call Route Handlers from Server Components: fetch through the owning module's use cases
 - For site URL, use the shared `getServerSideURL()` from `src/platform/lib/getURL.ts` (see the DRY principle in [`development.md`](development.md#dry--dont-repeat-yourself))
 - Static pages use `revalidate = 600` (10 minutes) as default ISR interval
 
