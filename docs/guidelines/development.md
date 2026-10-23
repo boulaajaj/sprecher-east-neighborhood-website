@@ -10,23 +10,22 @@ order and stop at the first step that does the job:
 
 1. **Native features and configuration.** What Payload, Next.js and React already do, often with
    one config option: auth (`verify`, forgot and reset password, lockout), hooks, access control,
-   jobs, email adapters, routing, caching, server actions, metadata. Read the docs for the
-   version in `package.json` (Payload: https://payloadcms.com/llms-full.txt).
+   jobs, email adapters, routing, caching, server actions, metadata, images. Also the
+   dependencies we already have: Radix, `cva`, `clsx` and `tailwind-merge`, `react-hook-form`,
+   `lucide-react`. Read the docs for the version in `package.json` (Payload:
+   https://payloadcms.com/llms-full.txt).
 2. **Official plugins and adapters.** `@payloadcms/*` and the frameworks' own packages, including
    ones we don't use yet.
-3. **Well-established, free, open-source plugins or libraries.** Maintained (a release this year),
-   widely used, a permissive license, a clean `npm audit` ([security](security.md)). Prefer one
-   that does more than we need over a narrow one we'd have to extend.
+3. **Well-established, free, open-source plugins or libraries** that meet the package rules in
+   [security](security.md#before-adding-any-new-package). Prefer one that does more than we need
+   over a narrow one we'd have to extend.
 4. **Our own code**, only when nothing above fits because the need is specific to this site. It
    goes in the owning module's `domain/` and `use-cases/`
    ([architecture](../architecture/README.md)).
 
-Also ask whether the feature is needed at all, or whether a service we already use does it.
-
-**Write the findings down** before writing custom code: on the issue (or the PR's **How**), one
-line per step saying what was checked and why it doesn't fit, with links. A decision record
-([`docs/architecture/decisions/`](../architecture/decisions/)) is needed when step 4 replaces
-something steps 1–3 offer. A reviewer asks for changes when custom code lands without them.
+**Write the findings down** before writing custom code: on the issue, one line per step saying
+what was checked, with a link, and why it doesn't fit. A reviewer asks for changes when custom
+code lands without them.
 
 Using a plugin doesn't skip the architecture: its setup lives in the owning module's `cms/` and is
 composed in `payload.config.ts`, and the module's own types still face the rest of the site. The

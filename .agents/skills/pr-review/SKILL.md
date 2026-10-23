@@ -47,7 +47,7 @@ gh api "repos/{owner}/{repo}/stacks?pull_request=<number>" -H 'X-GitHub-Api-Vers
 - **Security:** no secrets in the diff. Input is validated at boundaries. Access control on
   Payload collections and endpoints is unchanged or intentionally changed.
 - **Native first, then plugins, then our code:** new custom code (a flow, a token, a limiter, a
-  service) comes with the issue's or PR's findings for each step of the
+  service) comes with the issue's findings for each step of the
   [ladder](../../../docs/guidelines/development.md#native-first-then-plugins-then-our-code):
   native Payload, Next.js and React, official plugins, open-source plugins. Check one or two
   claims yourself. Findings missing, or a step that does fit: **Changes requested**.

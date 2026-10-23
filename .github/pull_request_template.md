@@ -18,8 +18,8 @@ Closes #
 ## How
 
 <!-- The approach: key decisions, alternatives considered, anything a reviewer should know.
-New custom code: which native feature, official plugin and open-source plugin you checked, and
-why none fits (or link the issue comment that says so). AGENTS.md, "Native first". -->
+New custom code: link the issue comment with what each step of the ladder found
+(docs/guidelines/development.md#native-first-then-plugins-then-our-code). -->
 
 ## How to test
 
