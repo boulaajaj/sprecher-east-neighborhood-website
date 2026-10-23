@@ -24,8 +24,12 @@ order and stop at the first step that does the job:
    ([architecture](../architecture/README.md)).
 
 **Write the findings down** before writing custom code: on the issue, one line per step saying
-what was checked, with a link, and why it doesn't fit. A reviewer asks for changes when custom
-code lands without them.
+what was checked, with a link, and why it doesn't fit.
+
+**This is a guide for judgment, not a hard gate.** Be reasonable and proportionate: don't decide
+by reflex that a plugin always wins, or that our own code always does. When the choice between a
+plugin and our own code is a real trade-off, put it to the owner on the issue (label
+`needs owner`) with the findings and a recommendation, and let him decide.
 
 Using a plugin doesn't skip the architecture: its setup lives in the owning module's `cms/` and is
 composed in `payload.config.ts`, and the module's own types still face the rest of the site. The

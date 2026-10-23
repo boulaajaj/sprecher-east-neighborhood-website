@@ -50,7 +50,8 @@ gh api "repos/{owner}/{repo}/stacks?pull_request=<number>" -H 'X-GitHub-Api-Vers
   service) comes with the issue's findings for each step of the
   [ladder](../../../docs/guidelines/development.md#native-first-then-plugins-then-our-code):
   native Payload, Next.js and React, official plugins, open-source plugins. Check one or two
-  claims yourself. Findings missing, or a step that does fit: **Changes requested**.
+  claims yourself and use judgment, not a checklist. Findings missing, or a step that clearly
+  fits: **Changes requested**. A real trade-off the owner hasn't decided: **Waits for owner**.
 - **Guidelines and architecture:** the change follows the guidelines for what it touches
   ([`docs/guidelines/`](../../../docs/guidelines/README.md)) and puts code where
   [`docs/architecture/`](../../../docs/architecture/README.md) says it goes. For code under

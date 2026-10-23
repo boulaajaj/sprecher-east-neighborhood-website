@@ -16,7 +16,8 @@ change this file through the same workflow below.
   [security](docs/guidelines/security.md)).
 - **Native first, then plugins, then our code.** Before building a feature, check what Payload,
   Next.js and React do natively, then official plugins, then well-established free open-source
-  ones. Write custom code only when none fits, and record what each step found on the issue
+  ones. Write custom code only when none fits, and record what each step found on the issue.
+  It's a guide for judgment: real trade-offs go to the owner
   ([the ladder](docs/guidelines/development.md#native-first-then-plugins-then-our-code)).
 
 ## The only way code reaches `main` and production
