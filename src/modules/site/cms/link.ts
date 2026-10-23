@@ -1,6 +1,5 @@
 import type { Field, GroupField } from 'payload'
-
-import deepMerge from '@/platform/lib/deepMerge'
+import { deepMergeWithSourceArrays } from 'payload/shared'
 
 export type LinkAppearances = 'default' | 'outline'
 
@@ -135,5 +134,6 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
     })
   }
 
-  return deepMerge(linkResult, overrides)
+  // An array in the overrides (such as `fields`) replaces the default one instead of adding to it
+  return deepMergeWithSourceArrays<GroupField>(linkResult, overrides)
 }
