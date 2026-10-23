@@ -36,6 +36,11 @@ data/payload-build.db
 data/payload-build.db-shm
 data/payload-build.db-wal
 
+# Sitemap files the old next-sitemap build wrote. Never commit them; ops/restart-app.sh deletes any
+# left on the server, since Next serves public/ ahead of app/sitemap.ts and app/robots.ts (#267)
+public/sitemap*.xml
+public/robots.txt
+
 # Uploaded media (managed by Payload, preserved on VPS separately)
 public/media/
 

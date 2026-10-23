@@ -60,6 +60,18 @@ describe('sitemap', () => {
     ])
   })
 
+  it('escapes a URL for the XML, since Next writes it as it is', async () => {
+    mocks.listPageSlugs.mockResolvedValue([])
+    mocks.listPostSlugs.mockResolvedValue([
+      { slug: 'fish&chips', updatedAt: '2026-10-06T00:00:00.000Z' },
+    ])
+    mocks.listEventSlugs.mockResolvedValue([])
+
+    const urls = (await sitemap()).map(({ url }) => url)
+
+    expect(urls).toContain('https://sprechereast.example/posts/fish&amp;chips')
+  })
+
   it('caches each list under the tag its save hook expires', () => {
     for (const tag of ['pages-sitemap', 'posts-sitemap', 'events-sitemap']) {
       expect(mocks.cacheOptions).toHaveBeenCalledWith([tag], { tags: [tag] })

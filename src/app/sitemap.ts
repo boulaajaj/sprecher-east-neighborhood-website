@@ -7,6 +7,7 @@ import { POSTS_SITEMAP_CACHE_TAG } from '@/modules/news'
 import { listPostSlugs } from '@/modules/news/server'
 import { PAGES_SITEMAP_CACHE_TAG } from '@/modules/site'
 import { listPageSlugs } from '@/modules/site/server'
+import { escapeMarkup } from '@/platform/lib'
 import { getServerSideURL } from '@/platform/lib/getURL'
 import { documentHref } from '@/platform/payload/documentHref'
 
@@ -52,10 +53,16 @@ const eventEntries = cachedList(EVENTS_SITEMAP_CACHE_TAG, async () =>
   })),
 )
 
-/** `/sitemap.xml`: the listing pages, then every published page, post and event. */
+/**
+ * `/sitemap.xml`: the listing pages, then every published page, post and event. Next writes each
+ * URL into the XML as it is, so it's escaped here (a hand-typed slug could hold `&`).
+ */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getServerSideURL()
   const lists = await Promise.all([pageEntries(), postEntries(), eventEntries()])
 
-  return lists.flat().map(({ path, lastModified }) => ({ url: `${siteUrl}${path}`, lastModified }))
+  return lists.flat().map(({ path, lastModified }) => ({
+    url: escapeMarkup(`${siteUrl}${path}`),
+    lastModified,
+  }))
 }
