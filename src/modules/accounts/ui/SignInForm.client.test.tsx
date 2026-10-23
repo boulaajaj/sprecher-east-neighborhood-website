@@ -29,7 +29,12 @@ const fillAndSend = async () => {
 describe('SignInForm', () => {
   it('signs in with what was typed and opens the account page', async () => {
     mocks.signIn.mockResolvedValue({ ok: true })
-    render(<SignInForm />)
+    // In <main>, as on the page: the sign-up line sits outside the form's landmark
+    render(
+      <main>
+        <SignInForm />
+      </main>,
+    )
     await expectAccessible(document.body)
 
     await fillAndSend()
@@ -65,6 +70,12 @@ describe('SignInForm', () => {
     render(<SignInForm />)
     const link = screen.getByRole('link', { name: 'Forgot your password?' })
     expect(link.getAttribute('href')).toBe('/forgot-password')
+  })
+
+  it('links visitors without an account to the sign-up page (#296)', () => {
+    render(<SignInForm />)
+    const link = screen.getByRole('link', { name: 'Sign up' })
+    expect(link.getAttribute('href')).toBe('/sign-up')
   })
 
   it('keeps an email typed before the page finished loading', async () => {

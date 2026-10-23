@@ -7,7 +7,7 @@ import { Button, Field, Form, type FormStatus, Link } from '@/platform/ui'
 
 import { signIn } from '../actions'
 import { signInSchema, type SignInValues } from '../domain/credentials'
-import { ACCOUNT_PATH, FORGOT_PASSWORD_PATH } from '../domain/paths'
+import { ACCOUNT_PATH, FORGOT_PASSWORD_PATH, SIGN_UP_PATH } from '../domain/paths'
 import type { SignInFailure } from '../domain/types'
 import { toSignInErrorMessage } from './signInErrorMessage'
 
@@ -42,43 +42,52 @@ export function SignInForm() {
   }
 
   return (
-    <Form
-      aria-label="Log in"
-      schema={signInSchema}
-      defaultValues={{}} // keeps an email typed or autofilled before the page loaded
-      onSubmit={logIn}
-      status={status}
-      errorMessage={errorMessage}
-    >
-      {({ register, formState: { errors } }) => (
-        <>
-          <Field label="Email" required error={errors.email?.message}>
-            <Field.Input
-              type="email"
-              autoComplete="email"
-              placeholder="you@example.com"
-              {...register('email')}
-            />
-          </Field>
-          <Field label="Password" required error={errors.password?.message}>
-            <Field.Input
-              type="password"
-              autoComplete="current-password"
-              {...register('password')}
-            />
-          </Field>
-          <div className="-mt-4">
-            <Link href={FORGOT_PASSWORD_PATH} variant="action">
-              Forgot your password?
-            </Link>
-          </div>
-          <div>
-            <Button type="submit" loading={status === 'submitting'} fullWidth>
-              {status === 'submitting' ? 'Logging in' : 'Log In'}
-            </Button>
-          </div>
-        </>
-      )}
-    </Form>
+    <div className="space-y-6">
+      <Form
+        aria-label="Log in"
+        schema={signInSchema}
+        defaultValues={{}} // keeps an email typed or autofilled before the page loaded
+        onSubmit={logIn}
+        status={status}
+        errorMessage={errorMessage}
+      >
+        {({ register, formState: { errors } }) => (
+          <>
+            <Field label="Email" required error={errors.email?.message}>
+              <Field.Input
+                type="email"
+                autoComplete="email"
+                placeholder="you@example.com"
+                {...register('email')}
+              />
+            </Field>
+            <Field label="Password" required error={errors.password?.message}>
+              <Field.Input
+                type="password"
+                autoComplete="current-password"
+                {...register('password')}
+              />
+            </Field>
+            <div className="-mt-4">
+              <Link href={FORGOT_PASSWORD_PATH} variant="action">
+                Forgot your password?
+              </Link>
+            </div>
+            <div>
+              <Button type="submit" loading={status === 'submitting'} fullWidth>
+                {status === 'submitting' ? 'Logging in' : 'Log In'}
+              </Button>
+            </div>
+          </>
+        )}
+      </Form>
+      {/* The way in for visitors without an account (#296), as sign-up links back here */}
+      <p className="text-muted-foreground">
+        Don’t have an account?{' '}
+        <Link href={SIGN_UP_PATH} variant="inline">
+          Sign up
+        </Link>
+      </p>
+    </div>
   )
 }

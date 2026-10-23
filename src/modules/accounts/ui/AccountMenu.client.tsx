@@ -5,12 +5,12 @@ import React from 'react'
 
 import { Button, Link } from '@/platform/ui'
 
-import { ACCOUNT_PATH, SIGN_IN_PATH } from '../domain/paths'
+import { ACCOUNT_PATH, SIGN_IN_PATH, SIGN_UP_PATH } from '../domain/paths'
 import { useAccount } from './AccountProvider.client'
 
 /**
- * The header's account links: "Log In" for a visitor; the account's name and "Sign Out" when
- * signed in. `bar` is the desktop header, `drawer` the mobile menu.
+ * The header's account links: "Log In" and "Sign Up" for a visitor (#296); the account's name
+ * and "Sign Out" when signed in. `bar` is the desktop header, `drawer` the mobile menu.
  */
 export function AccountMenu({ variant }: { variant: 'bar' | 'drawer' }) {
   const { account, loading, signOut } = useAccount()
@@ -23,14 +23,32 @@ export function AccountMenu({ variant }: { variant: 'bar' | 'drawer' }) {
 
   if (!account) {
     return (
-      <Link
-        href={SIGN_IN_PATH}
-        variant="nav"
-        size={bar ? 'sm' : undefined}
-        current={pathname === SIGN_IN_PATH}
-      >
-        Log In
-      </Link>
+      <>
+        <Link
+          href={SIGN_IN_PATH}
+          variant="nav"
+          size={bar ? 'sm' : undefined}
+          current={pathname === SIGN_IN_PATH}
+        >
+          Log In
+        </Link>
+        {/* Outlined in the bar, so it stands out without competing with the Contact button */}
+        {bar ? (
+          <Button
+            href={SIGN_UP_PATH}
+            variant="secondary"
+            size="sm"
+            aria-current={pathname === SIGN_UP_PATH ? 'page' : undefined}
+            className="ml-2"
+          >
+            Sign Up
+          </Button>
+        ) : (
+          <Link href={SIGN_UP_PATH} variant="nav" current={pathname === SIGN_UP_PATH}>
+            Sign Up
+          </Link>
+        )}
+      </>
     )
   }
 
