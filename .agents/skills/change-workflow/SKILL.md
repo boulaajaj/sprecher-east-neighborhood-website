@@ -108,7 +108,8 @@ Open it as a draft (`--draft`) while work is incomplete.
    `git range-diff <old base>..<reviewed head> <new base>..<current head>`; it should show only `=`
    lines. Unless the PR waits for the owner (an issue or PR labeled `needs owner`, or a policy
    change he didn't ask for, `AGENTS.md` step 3), note the head SHA and go to step 6. If it waits
-   for him, label the PR `needs owner` and stop; he merges it or removes the label.
+   for him, label the PR `needs owner`, ask him one plain question, and stop
+   ([waits for owner](../../../docs/process/project-management.md#waits-for-owner)).
 5. **A PR below yours changed** (stacked PRs): rebase yours onto it and push, as in
    [`stacked-prs`](../stacked-prs/SKILL.md) step 4.
 
