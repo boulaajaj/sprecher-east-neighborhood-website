@@ -7,6 +7,23 @@ import { expectAccessible } from '@/platform/ui/testing/expectAccessible'
 
 const mocks = vi.hoisted(() => ({ signUp: vi.fn() }))
 vi.mock('../actions', () => ({ signUp: mocks.signUp }))
+// The robot check is on, and its widget hands out a fresh token after each reset
+vi.mock('@/platform/turnstile/TurnstileWidget.client', async () => {
+  const { useEffect } = await import('react')
+  return {
+    TURNSTILE_SITE_KEY: 'test-site-key',
+    TurnstileWidget: ({
+      onToken,
+      resetSignal = 0,
+    }: {
+      onToken: (token: string | null) => void
+      resetSignal?: number
+    }) => {
+      useEffect(() => onToken(`token-${resetSignal}`), [onToken, resetSignal])
+      return null
+    },
+  }
+})
 
 import { SignUpForm } from './SignUpForm.client'
 import { SIGN_UP_SENT } from './signUpMessages'
@@ -41,12 +58,15 @@ describe('SignUpForm', () => {
     await fill()
     await submit()
 
-    expect(mocks.signUp).toHaveBeenCalledExactlyOnceWith({
-      name: 'Ana',
-      email: 'ana@example.com',
-      newPassword: 'correct-horse',
-      confirmPassword: 'correct-horse',
-    })
+    expect(mocks.signUp).toHaveBeenCalledExactlyOnceWith(
+      {
+        name: 'Ana',
+        email: 'ana@example.com',
+        newPassword: 'correct-horse',
+        confirmPassword: 'correct-horse',
+      },
+      'token-0',
+    )
     const status = await screen.findByRole('status')
     expect(status.textContent).toBe(SIGN_UP_SENT)
     expect(screen.queryByRole('form')).toBeNull()
@@ -68,6 +88,18 @@ describe('SignUpForm', () => {
     await fill()
     await submit()
     expect((await screen.findByRole('alert')).textContent).toMatch(/connection/)
+  })
+
+  it('explains a failed robot check or limit, and retries with a fresh token', async () => {
+    mocks.signUp.mockResolvedValueOnce({ ok: false, failure: 'robot-check' })
+    mocks.signUp.mockResolvedValueOnce({ ok: false, failure: 'too-many' })
+    render(<SignUpForm email="ana@example.com" />)
+    await fill()
+    await submit()
+    expect((await screen.findByRole('alert')).textContent).toMatch(/spam check/)
+    await submit()
+    expect((await screen.findByRole('alert')).textContent).toMatch(/try again in an hour/)
+    expect(mocks.signUp.mock.calls.map((call) => call[1])).toEqual(['token-0', 'token-1'])
   })
 
   it('links to the sign-in page for people who already have an account', () => {

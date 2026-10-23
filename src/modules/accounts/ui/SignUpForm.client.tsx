@@ -3,6 +3,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import { Alert } from '@/platform/ui/Alert'
+import { TurnstileWidget } from '@/platform/turnstile/TurnstileWidget.client'
+import { useRobotCheck } from '@/platform/turnstile/useRobotCheck.client'
 import { Button, Field, Form, type FormStatus, Link } from '@/platform/ui'
 
 import { signUp } from '../actions'
@@ -18,13 +20,16 @@ import { SIGN_UP_SENT, toSignUpErrorMessage } from './signUpMessages'
 
 /**
  * Creates a resident account (#187). `email` fills in the address the confirm page sent, or is
- * `null`; it leaves the address bar and the history as soon as the form loads. Every sign-up that
- * parses gets the same answer, and the account can't sign in until Payload's link is opened.
+ * `null`; it leaves the address bar and the history as soon as the form loads. Past the robot
+ * check and the limits, every sign-up gets the same answer, and the account can't sign in until
+ * Payload's link is opened.
  */
 export function SignUpForm({ email }: { email: string | null }) {
   const [status, setStatus] = useState<FormStatus>('idle')
   const [errorMessage, setErrorMessage] = useState('')
   const doneRef = useRef<HTMLDivElement>(null)
+  // The same robot check as the contact form (decision 0007): only when a site key is configured
+  const robotCheck = useRobotCheck()
 
   useEffect(() => {
     // The browser's own history API; Next.js keeps its router in step with it
@@ -39,15 +44,26 @@ export function SignUpForm({ email }: { email: string | null }) {
     setStatus('error')
   }
 
+  // `Form` ignores a second submit while this runs, so one single-use token is sent once
   const send = async (values: SignUpValues) => {
+    const pending = robotCheck.pendingMessage()
+    if (pending) {
+      setErrorMessage(pending)
+      setStatus('error')
+      return
+    }
     setStatus('submitting')
     let result: Awaited<ReturnType<typeof signUp>>
     try {
-      result = await signUp(values)
+      result = await signUp(values, robotCheck.token)
     } catch {
+      robotCheck.resetAfterFailure()
       return fail('offline')
     }
-    if (!result.ok) return fail(result.failure)
+    if (!result.ok) {
+      robotCheck.resetAfterFailure()
+      return fail(result.failure)
+    }
     setStatus('success')
   }
 
@@ -105,6 +121,7 @@ export function SignUpForm({ email }: { email: string | null }) {
                 {...register('confirmPassword')}
               />
             </Field>
+            {robotCheck.enabled && <TurnstileWidget {...robotCheck.widgetProps} />}
             <div>
               <Button type="submit" loading={status === 'submitting'} fullWidth>
                 {status === 'submitting' ? 'Creating' : 'Create Account'}

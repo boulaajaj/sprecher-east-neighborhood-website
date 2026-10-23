@@ -4,6 +4,11 @@
 // (https://nextjs.org/docs/app/guides/data-security). Each one parses its input again and finds
 // the account from the session, never from what the caller sends.
 
+import { headers } from 'next/headers'
+
+import { parseClientIp } from '@/platform/lib'
+import { TurnstileVerifier } from '@/platform/turnstile/turnstileVerifier'
+
 import {
   forgotPasswordSchema,
   passwordChangeSchema,
@@ -71,16 +76,23 @@ export async function resetPassword(input: unknown): Promise<ActionResult<ResetP
   return resetPasswordFromLink(parsed.data)
 }
 
+const robotCheck = new TurnstileVerifier()
+
 /**
  * Creates a resident account and has Payload email its verification link (#187). The role is
- * always resident. The answer is the same whether or not an account already uses the email; only
- * input that doesn't parse is refused.
+ * always resident. `robotCheckToken` is the Turnstile token the form got (decision 0007). Input
+ * that doesn't parse, a failed robot check and too many sign-ups are refused; past those, the
+ * answer is the same whether or not an account already uses the email.
  */
-export async function signUp(input: unknown): Promise<ActionResult<SignUpFailure>> {
+export async function signUp(
+  input: unknown,
+  robotCheckToken?: unknown,
+): Promise<ActionResult<SignUpFailure>> {
   const parsed = signUpSchema.safeParse(input)
   if (!parsed.success) return { ok: false, failure: 'rejected' }
-  await signUpResident(parsed.data)
-  return { ok: true }
+  const token = typeof robotCheckToken === 'string' ? robotCheckToken : null
+  const ip = parseClientIp(await headers())
+  return signUpResident(parsed.data, { token, ip }, robotCheck)
 }
 
 /** Verifies an account from its link's token. Input that doesn't parse is a dead link. */

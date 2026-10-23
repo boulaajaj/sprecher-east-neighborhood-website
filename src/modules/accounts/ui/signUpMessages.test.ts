@@ -12,6 +12,8 @@ describe('sign-up messages', () => {
   it('has fixed texts for every failure', () => {
     expect(toSignUpErrorMessage('rejected')).toBe('Check the form and try again.')
     expect(toSignUpErrorMessage('offline')).toBe(FORM_MESSAGES.offline)
+    expect(toSignUpErrorMessage('robot-check')).toMatch(/spam check/)
+    expect(toSignUpErrorMessage('too-many')).toMatch(/try again in an hour/)
     expect(toVerifyAccountErrorMessage('invalid-link')).toMatch(/already used/)
     expect(toVerifyAccountErrorMessage('server-error')).toMatch(/try again/)
     expect(toVerifyAccountErrorMessage('offline')).toBe(FORM_MESSAGES.offline)

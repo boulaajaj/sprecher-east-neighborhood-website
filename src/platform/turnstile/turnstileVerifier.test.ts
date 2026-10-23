@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { TURNSTILE_ACTION } from '../domain/turnstile'
+import { TURNSTILE_ACTION } from '@/platform/lib/humanCheck'
 
 const REAL_SECRET = '0x4AAAAAAAexampleexampleexampleexample'
 const PASS_SECRET = '1x0000000000000000000000000000000AA' // Cloudflare test secret: always passes

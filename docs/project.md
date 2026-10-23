@@ -76,7 +76,7 @@ src/
     (payload)/         Payload admin and API routes (generated; leave alone)
   modules/             One folder per business area
     accounts/          Who is signed in, sign-in and password flows, the users collection
-    contact/           Form safeguards, the robot check, the form block
+    contact/           Form safeguards, the form block
     directory/         FAQ, local resources, team members
     events/            Events and the upcoming rule
     news/              Posts, categories, search
@@ -88,6 +88,7 @@ src/
     richtext/          The `RichText` renderer, the blocks inside rich text, plain-text conversion
     seo/               Page metadata and Open Graph helpers
     theme/             Light and dark mode: theme providers, `InitTheme`, `ThemeSelector`
+    turnstile/         The robot check (Cloudflare Turnstile): widget and server verifier
     ui/                The UI kit: `Button`, `Link`, `Media`, `CMSLink`, `JsonLd`, `Breadcrumbs`, `LoadMore`…
   endpoints/seed/      Seed data and script (exception)
   migrations/          Database migrations (generated)

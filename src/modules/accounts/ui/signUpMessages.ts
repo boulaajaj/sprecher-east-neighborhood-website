@@ -12,6 +12,10 @@ export const SIGN_UP_SENT =
 /** What a visitor reads when signing up fails. `offline`: no answer came back. */
 export function toSignUpErrorMessage(failure: SignUpFailure | 'offline'): string {
   if (failure === 'offline') return FORM_MESSAGES.offline
+  if (failure === 'robot-check') {
+    return 'The spam check didn’t pass. Please wait a moment and try again.'
+  }
+  if (failure === 'too-many') return 'Too many sign-ups right now. Please try again in an hour.'
   return 'Check the form and try again.'
 }
 

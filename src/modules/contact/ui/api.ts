@@ -1,6 +1,6 @@
 import { getClientSideURL } from '@/platform/lib/getURL'
 
-import { HUMAN_CHECK_TOKEN_HEADER } from '../domain/humanVerifier'
+import { HUMAN_CHECK_TOKEN_HEADER } from '@/platform/lib/humanCheck'
 
 /**
  * Sends a form submission to Payload's REST endpoint, where the safeguards run. The body holds

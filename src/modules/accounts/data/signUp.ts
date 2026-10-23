@@ -34,6 +34,30 @@ export async function createResidentAccount({
 }
 
 /**
+ * Deletes the unverified account `createResidentAccount` stored for `email` at or after `since`,
+ * when its verification email then failed (#187). Without it the address would be stuck: SQLite
+ * runs Payload's `create` without a transaction, so the account stays, a second sign-up is refused
+ * as a duplicate, and an unverified account gets no reset email. Verified accounts, and accounts
+ * older than this request, are never touched.
+ */
+export async function deleteFailedSignUp(email: string, since: Date): Promise<void> {
+  const payload = await getPayload({ config: configPromise })
+  await payload.delete({
+    collection: USERS,
+    where: {
+      and: [
+        { email: { equals: email } },
+        { _verified: { not_equals: true } },
+        { createdAt: { greater_than_equal: since.toISOString() } },
+      ],
+    },
+    depth: 0,
+    // Visitors can't delete accounts (`delete: isAdmin`); this undoes the server's own create
+    overrideAccess: true,
+  })
+}
+
+/**
  * Opens a verification link with Payload's `verifyEmail` operation, which marks the account
  * verified and clears the token, so the link works once. Throws Payload's error when it refuses
  * (403: unknown or used token). Payload's operation takes no `overrideAccess`: the token is the

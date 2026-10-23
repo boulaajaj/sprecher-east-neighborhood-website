@@ -9,7 +9,7 @@ import { guardFormEmails } from './guardFormEmails'
 import { limitSubmissionSize } from './limitSubmissionSize'
 import { rateLimitSubmissions } from './rateLimits'
 import { recordSenderEmail, requestSenderConfirmation, senderEmailFields } from './senderEmail'
-import { TurnstileVerifier } from './turnstileVerifier'
+import { TurnstileVerifier } from '@/platform/turnstile/turnstileVerifier'
 import { verifyHumanSubmission } from './verifyHumanSubmission'
 
 /**

@@ -73,6 +73,8 @@ grows should split its top level "into domain oriented modules which are interna
 - `richtext/`: the `RichText` renderer and the blocks that can sit inside rich text (banner, code
   and media; only a post's content offers them). Pages reuse the media block from here.
   `richTextToPlainText` turns rich text into plain text (Payload's converter) for JSON-LD.
+- `turnstile/`: the robot check (decision 0003), the widget and the server verifier, used by the
+  contact form and sign-up; its interface `HumanVerifier` is in `lib/`.
 - `email/` and `seo/`.
 
 Routes that serve no single area (`/api/version`, draft preview under `/next/`, the seed route)

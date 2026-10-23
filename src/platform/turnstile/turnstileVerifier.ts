@@ -8,8 +8,8 @@
 
 import { getServerSideURL } from '@/platform/lib/getURL'
 
-import type { HumanCheck, HumanVerifier } from '../domain/humanVerifier'
-import { TURNSTILE_ACTION } from '../domain/turnstile'
+import type { HumanCheck, HumanVerifier } from '@/platform/lib/humanCheck'
+import { TURNSTILE_ACTION } from '@/platform/lib/humanCheck'
 
 const SITEVERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
 

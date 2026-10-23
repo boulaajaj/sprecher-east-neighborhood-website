@@ -39,10 +39,12 @@ export type ResetPasswordFailure = 'invalid-link' | 'rejected' | 'server-error'
 export type ForgotPasswordFailure = 'rejected'
 
 /**
- * Why a sign-up failed (#187). Only input that doesn't parse: every request that does gets the
- * same "check your email" answer, whether or not an account already uses the email.
+ * Why a sign-up failed (#187): input that doesn't parse, a failed robot check, or too many
+ * sign-ups (from this connection or site-wide). None depends on the email: every request that
+ * gets past them gets the same "check your email" answer, whether or not an account already uses
+ * it.
  */
-export type SignUpFailure = 'rejected'
+export type SignUpFailure = 'rejected' | 'robot-check' | 'too-many'
 
 /**
  * Why opening a verification link failed: the link is unknown or already used (one code), or

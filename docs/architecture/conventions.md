@@ -69,7 +69,9 @@ Add an interface only where it pays:
 Name the interface after the capability and the adapter after the provider: `HumanVerifier`,
 `TurnstileVerifier`. The interface goes in the module's `domain/`; the adapter goes in the layer
 that calls it. A Payload hook's adapter sits in `cms/`, because the Payload CLI loads hooks
-outside Next.js, where `server-only` code can't run (`contact`'s `TurnstileVerifier`).
+outside Next.js, where `server-only` code can't run. Once two modules use them, both move to
+`platform/`: the interface to `lib/`, the adapter to a folder of its own (`HumanVerifier` and
+`platform/turnstile/`, used by `contact` and `accounts`).
 
 Don't wrap Payload collections in repository interfaces; the typed Local API plus a module's
 `data/` functions is the boundary ([decision 0002](decisions/0002-no-repository-layer.md)).
