@@ -29,12 +29,22 @@ import type {
 } from './domain/types'
 import { changeOwnPassword } from './use-cases/changeOwnPassword'
 import { getAccountSummary } from './use-cases/getAccountSummary'
+import type { PublicRequest } from './use-cases/guardPublicRequest'
 import { requestPasswordReset } from './use-cases/requestPasswordReset'
 import { resetPasswordFromLink } from './use-cases/resetPasswordFromLink'
 import { signInWithPassword } from './use-cases/signInWithPassword'
 import { signOutCurrentUser } from './use-cases/signOutCurrentUser'
 import { signUpResident } from './use-cases/signUpResident'
 import { verifyAccountFromLink } from './use-cases/verifyAccountFromLink'
+
+// The robot check on the public forms that send email (decision 0003)
+const robotCheck = new TurnstileVerifier()
+
+/** The robot-check token the form sent (anything else is none) and the connection's IP. */
+async function toPublicRequest(robotCheckToken: unknown): Promise<PublicRequest> {
+  const token = typeof robotCheckToken === 'string' ? robotCheckToken : null
+  return { token, ip: parseClientIp(await headers()) }
+}
 
 /** Signs in with an email and password. Input that doesn't parse reads like a wrong password. */
 export async function signIn(input: unknown): Promise<ActionResult<SignInFailure>> {
@@ -59,14 +69,17 @@ export async function changePassword(input: unknown): Promise<ActionResult<Passw
 }
 
 /**
- * Emails a link to reset a forgotten password. The answer is the same whether or not an account
- * uses the email; only input that doesn't parse is refused.
+ * Emails a link to reset a forgotten password. `robotCheckToken` is the Turnstile token the form
+ * got (#282). Input that doesn't parse, a failed robot check and too many requests are refused;
+ * past those, the answer is the same whether or not an account uses the email.
  */
-export async function forgotPassword(input: unknown): Promise<ActionResult<ForgotPasswordFailure>> {
+export async function forgotPassword(
+  input: unknown,
+  robotCheckToken?: unknown,
+): Promise<ActionResult<ForgotPasswordFailure>> {
   const parsed = forgotPasswordSchema.safeParse(input)
   if (!parsed.success) return { ok: false, failure: 'rejected' }
-  await requestPasswordReset(parsed.data)
-  return { ok: true }
+  return requestPasswordReset(parsed.data, await toPublicRequest(robotCheckToken), robotCheck)
 }
 
 /** Sets a new password from a reset link's token. Input that doesn't parse is refused. */
@@ -75,8 +88,6 @@ export async function resetPassword(input: unknown): Promise<ActionResult<ResetP
   if (!parsed.success) return { ok: false, failure: 'rejected' }
   return resetPasswordFromLink(parsed.data)
 }
-
-const robotCheck = new TurnstileVerifier()
 
 /**
  * Creates a resident account and has Payload email its verification link (#187). The role is
@@ -90,9 +101,7 @@ export async function signUp(
 ): Promise<ActionResult<SignUpFailure>> {
   const parsed = signUpSchema.safeParse(input)
   if (!parsed.success) return { ok: false, failure: 'rejected' }
-  const token = typeof robotCheckToken === 'string' ? robotCheckToken : null
-  const ip = parseClientIp(await headers())
-  return signUpResident(parsed.data, { token, ip }, robotCheck)
+  return signUpResident(parsed.data, await toPublicRequest(robotCheckToken), robotCheck)
 }
 
 /** Verifies an account from its link's token. Input that doesn't parse is a dead link. */

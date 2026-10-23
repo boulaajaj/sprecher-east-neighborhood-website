@@ -10,6 +10,8 @@ import { vi } from 'vitest'
 //   vi.mock('@payloadcms/next/auth', () => nextAuthWithEdges())
 //   vi.mock('@payload-config', () => ({ default: {} }))
 //   vi.mock('next/headers', () => nextHeadersWithEdges())
+//   vi.mock('next/server', async (importActual) => nextServerWithEdges(await importActual()))
+//   vi.mock('@/platform/turnstile/turnstileVerifier', () => robotCheckWithEdges())
 
 export const edges = {
   auth: vi.fn(),
@@ -59,6 +61,31 @@ export const nextHeadersWithEdges = () => ({
 
 export const nextAuthWithEdges = () => ({ login: edges.signInHelper })
 
+/** Work a use case gave Next's `after()`, to run once the response is sent: see `runAfterTasks` */
+export const afterTasks: Array<() => unknown> = []
+
+export const nextServerWithEdges = (actual: object) => ({
+  ...actual,
+  after: (task: () => unknown) => {
+    afterTasks.push(task)
+  },
+})
+
+/** Runs the work queued with `after()`, as Next does once the response is sent. */
+export async function runAfterTasks() {
+  for (const task of afterTasks.splice(0)) await task()
+}
+
+/** The robot check (Cloudflare Turnstile), replaced: on, and passing unless a test says otherwise */
+export const robotCheck = { enabled: true, verify: vi.fn() }
+
+export const robotCheckWithEdges = () => ({
+  TurnstileVerifier: class {
+    isEnabled = () => robotCheck.enabled
+    verify = (token: unknown) => robotCheck.verify(token)
+  },
+})
+
 /** The signed-in resident, as `payload.auth` returns it (with its session id) */
 export const resident = {
   id: 7,
@@ -72,5 +99,9 @@ export const resident = {
 export function resetEdges() {
   for (const fn of Object.values(edges)) fn.mockReset()
   requestHeaders.delete('x-forwarded-for')
+  afterTasks.length = 0
+  robotCheck.enabled = true
+  robotCheck.verify.mockReset().mockResolvedValue({ ok: true })
   vi.spyOn(console, 'error').mockImplementation(() => {})
+  vi.spyOn(console, 'warn').mockImplementation(() => {})
 }

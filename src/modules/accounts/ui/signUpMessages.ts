@@ -1,6 +1,7 @@
 import { FORM_MESSAGES } from '@/platform/ui'
 
 import type { SignUpFailure, VerifyAccountFailure } from '../domain/types'
+import { GUARD_MESSAGES } from './guardMessages'
 
 /**
  * What every sign-up that parses is told (#187). It never says whether an account already uses
@@ -12,10 +13,7 @@ export const SIGN_UP_SENT =
 /** What a visitor reads when signing up fails. `offline`: no answer came back. */
 export function toSignUpErrorMessage(failure: SignUpFailure | 'offline'): string {
   if (failure === 'offline') return FORM_MESSAGES.offline
-  if (failure === 'robot-check') {
-    return 'The spam check didn’t pass. Please wait a moment and try again.'
-  }
-  if (failure === 'too-many') return 'Too many sign-ups right now. Please try again in an hour.'
+  if (failure === 'robot-check' || failure === 'too-many') return GUARD_MESSAGES[failure]
   return 'Check the form and try again.'
 }
 

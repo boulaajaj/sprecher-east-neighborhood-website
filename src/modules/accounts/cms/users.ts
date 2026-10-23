@@ -12,6 +12,7 @@ import {
 import { toResetPasswordEmail, toResetPasswordLink } from '../domain/resetEmail'
 import { USERS } from '../domain/usersCollection'
 import { toVerifyAccountEmail, toVerifyAccountLink } from '../domain/verifyAccountEmail'
+import { forgotPasswordFromSiteOnly } from './forgotPasswordFromSiteOnly'
 import { noResetEmailWhileUnverified } from './noResetEmailWhileUnverified'
 import { requireCurrentPassword } from './requireCurrentPassword'
 
@@ -65,7 +66,8 @@ export const Users: CollectionConfig = {
     // Your own password changes only on /account, after your current one is checked (#233)
     beforeChange: [requireCurrentPassword],
     // No reset email to an account whose email isn't verified yet (#187)
-    beforeOperation: [noResetEmailWhileUnverified],
+    // The site-only check first: a refused request never reaches the account lookup
+    beforeOperation: [forgotPasswordFromSiteOnly, noResetEmailWhileUnverified],
   },
   fields: [
     {
