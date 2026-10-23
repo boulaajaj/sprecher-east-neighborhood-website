@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { FORGOT_PASSWORD_PATH } from '@/modules/accounts'
 import { isEventScope } from '@/modules/events'
 import { parsePageNumber } from '@/platform/lib'
+import { ADMIN_FORGOT_PATH } from '@/platform/payload/adminRoutes'
 
 /**
  * Answers 404 for malformed paging URLs (`/posts/page/zz`, `/events/list/x/1`) before Next
@@ -25,15 +26,10 @@ export function isValidPagingPath(pathname: string): boolean {
   return true
 }
 
-/**
- * The admin panel's "Forgot password?" page (Payload's `admin.routes.forgot`). Payload's own
- * forgot-password endpoint is closed (#282), so the page couldn't send anything.
- */
-export const ADMIN_FORGOT_PATH = '/admin/forgot'
-
 export function proxy(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl
-  // The site's page sends the same reset email, after the robot check and the limits
+  // The admin panel's "Forgot password?" page can't send anything since Payload's own endpoint
+  // was closed (#282); the site's page sends the same email, after the robot check and limits
   if (pathname === ADMIN_FORGOT_PATH) {
     return NextResponse.redirect(new URL(FORGOT_PASSWORD_PATH, request.url))
   }
@@ -42,7 +38,8 @@ export function proxy(request: NextRequest): NextResponse {
 }
 
 // `:path+` needs at least one segment after the prefix, so slug pages like `/posts/page` never
-// reach the proxy.
+// reach the proxy. Next reads the matcher statically, so the admin page's path is written out;
+// a test checks it is still `ADMIN_FORGOT_PATH` (#292).
 export const config = {
   matcher: ['/posts/page/:path+', '/events/list/:path+', '/admin/forgot'],
 }

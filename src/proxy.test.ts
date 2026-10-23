@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server'
 import { describe, expect, it } from 'vitest'
 
 import { MAX_PAGE } from '@/platform/lib'
+import { ADMIN_FORGOT_PATH } from '@/platform/payload/adminRoutes'
 
 import { config, isValidPagingPath, proxy } from './proxy'
 
@@ -58,6 +59,10 @@ describe('proxy', () => {
 })
 
 describe('matcher', () => {
+  it('lists the admin panel’s forgot-password path from the Payload config (#292)', () => {
+    expect(config.matcher).toContain(ADMIN_FORGOT_PATH)
+  })
+
   const runsOn = (path: string) =>
     unstable_doesMiddlewareMatch({ config, url: `https://sprechereast.example${path}` })
 

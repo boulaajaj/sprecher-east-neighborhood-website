@@ -39,6 +39,7 @@ import {
 import { getServerSideURL } from '@/platform/lib/getURL'
 import { emailAdapterFromEnv } from '@/platform/email/emailAdapter'
 import { restrictEditLocks } from '@/platform/payload/restrictEditLocks'
+import { ADMIN_FORGOT_ROUTE, ADMIN_ROUTE } from '@/platform/payload/adminRoutes'
 
 // Modules meet here (0008): the contact form joins the site's own page-builder blocks
 const Pages = createPagesCollection({ layoutBlocks: [...SITE_LAYOUT_BLOCKS, FormBlock] })
@@ -118,7 +119,10 @@ const dirname = path.dirname(filename)
 
 // Edit locks get staff-only access after Payload has added them (#147)
 export default buildConfig({
+  // Payload's defaults, from one place: the proxy redirects the forgot-password page (#282)
+  routes: { admin: ADMIN_ROUTE },
   admin: {
+    routes: { forgot: ADMIN_FORGOT_ROUTE },
     components: {
       beforeLogin: ['@/platform/payload/admin/BeforeLogin'],
       beforeDashboard: ['@/platform/payload/admin/BeforeDashboard'],
