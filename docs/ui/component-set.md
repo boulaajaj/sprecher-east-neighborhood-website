@@ -34,7 +34,7 @@ belong to one business area, what isn't needed yet, and the coverage table.
   errors announced, `aria-current` on the current page.
 
 In the tables, **Elements** lists the inventory IDs each component covers, and **Today** says
-what it replaces.
+what it replaces, with file paths as they were when the inventory was taken.
 
 ## Actions
 

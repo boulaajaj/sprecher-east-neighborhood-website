@@ -41,8 +41,8 @@ CMS pages, posts and events get this from `generateMeta()`. A custom route sets 
 ```tsx
 import type { Metadata } from 'next'
 
-import { getServerSideURL } from '@/utilities/getURL'
-import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+import { getServerSideURL } from '@/platform/lib/getURL'
+import { mergeOpenGraph } from '@/platform/seo/mergeOpenGraph'
 
 export const metadata: Metadata = {
   // Page name only: the layout's title template adds " — Sprecher East".
@@ -70,12 +70,14 @@ The root layout already sets `twitter.card` to `summary_large_image`.
 
 ### Sitemap
 
-- Auto-generated sitemap.xml at `/sitemap.xml`
+- Auto-generated sitemaps at `/pages-sitemap.xml`, `/posts-sitemap.xml` and `/events-sitemap.xml`
 - Include all public pages, published posts, published events
 - Update frequency hints: posts (weekly), events (daily), static pages (monthly)
 - Exclude admin, login, draft content
 
 ### robots.txt
+
+The target:
 
 ```
 User-agent: *
@@ -83,8 +85,11 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 Disallow: /login
-Sitemap: https://sprechereast.com/sitemap.xml
 ```
+
+plus a `Sitemap:` line for each sitemap the site serves. Today `src/app/robots.ts` serves only
+`Disallow: /admin/*` and the sitemap lines; whether to add the `/api/` and `/login` lines is an open
+question for the owner (#280).
 
 ### Performance (Core Web Vitals)
 

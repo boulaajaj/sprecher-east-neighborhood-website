@@ -5,6 +5,7 @@ import React from 'react'
 
 import { Button, Link } from '@/platform/ui'
 
+import { ACCOUNT_PATH, SIGN_IN_PATH } from '../domain/paths'
 import { useAccount } from './AccountProvider.client'
 
 /**
@@ -23,10 +24,10 @@ export function AccountMenu({ variant }: { variant: 'bar' | 'drawer' }) {
   if (!account) {
     return (
       <Link
-        href="/login"
+        href={SIGN_IN_PATH}
         variant="nav"
         size={bar ? 'sm' : undefined}
-        current={pathname === '/login'}
+        current={pathname === SIGN_IN_PATH}
       >
         Log In
       </Link>
@@ -38,10 +39,10 @@ export function AccountMenu({ variant }: { variant: 'bar' | 'drawer' }) {
     <>
       {/* A long name is cut short so the bar never overflows; the full name is the title */}
       <Link
-        href="/account"
+        href={ACCOUNT_PATH}
         variant="nav"
         size="sm"
-        current={pathname === '/account'}
+        current={pathname === ACCOUNT_PATH}
         title={account.name || undefined}
         className="max-w-40"
       >
@@ -53,7 +54,7 @@ export function AccountMenu({ variant }: { variant: 'bar' | 'drawer' }) {
     </>
   ) : (
     <>
-      <Link href="/account" variant="nav" current={pathname === '/account'}>
+      <Link href={ACCOUNT_PATH} variant="nav" current={pathname === ACCOUNT_PATH}>
         {label}
       </Link>
       <Button

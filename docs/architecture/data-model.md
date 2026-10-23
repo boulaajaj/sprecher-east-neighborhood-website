@@ -135,7 +135,7 @@ failed send (or a failed listener) is logged and never retried.
 
 What is kept: an unconfirmed record is deleted 7 days after its last link (whenever a link is
 requested or confirmed, until scheduled jobs run, #141). How long a confirmed record is kept is **not decided
-yet: it waits for the owner (#183)**. The proposal is to keep the address and the dates above
+yet: it waits for the owner (#274)**. The proposal is to keep the address and the dates above
 until the person asks for removal through the contact form, and an admin then deletes it in
 Admin. The site's privacy text should say the same once he decides. Until then nothing deletes
 confirmed records.

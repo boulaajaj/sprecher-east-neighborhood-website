@@ -46,16 +46,16 @@ grows should split its top level "into domain oriented modules which are interna
 
 ## Business areas
 
-| Module         | Owns                                                                       | Payload collections and globals                  | Routes                                                |
-| -------------- | -------------------------------------------------------------------------- | ------------------------------------------------ | ----------------------------------------------------- |
-| `events`       | Event listings, the "upcoming" rule, event types, calendar (Phase 2)       | `events`                                         | `/events`, `/events/[slug]`, sitemap entries          |
-| `news`         | Posts, categories, authors, search, related and recent posts               | `posts`, `categories`, `search`                  | `/posts`, `/posts/[slug]`, `/search`, sitemap entries |
-| `contact`      | Public form safeguards, the robot check, form-email rules                  | `forms`, `form-submissions` (plugin)             | the form block on CMS pages                           |
-| `accounts`     | Who is signed in, sign-in and password flows, the role field               | `users`                                          | `/login`, `/account`                                  |
-| `directory`    | FAQ, local resources, team members                                         | `faq`, `resources`, `team-members`               | `/faq`, `/resources`                                  |
-| `site`         | CMS pages, page-builder blocks, heroes, header, footer, redirects          | `pages`, `redirects`, globals `header`, `footer` | `/[slug]`, home, sitemap entries                      |
-| `verification` | Confirming an email by link: the token, its expiry, the limits, the emails | `email-confirmations`                            | `/confirm-email`                                      |
-| `comments`     | Resident comments (future)                                                 | (future)                                         | (future)                                              |
+| Module         | Owns                                                                       | Payload collections and globals                  | Routes                                                      |
+| -------------- | -------------------------------------------------------------------------- | ------------------------------------------------ | ----------------------------------------------------------- |
+| `events`       | Event listings, the "upcoming" rule, event types, calendar (Phase 2)       | `events`                                         | `/events`, `/events/[slug]`, sitemap entries                |
+| `news`         | Posts, categories, authors, search, related and recent posts               | `posts`, `categories`, `search`                  | `/posts`, `/posts/[slug]`, `/search`, sitemap entries       |
+| `contact`      | Public form safeguards, the robot check, form-email rules                  | `forms`, `form-submissions` (plugin)             | the form block on CMS pages                                 |
+| `accounts`     | Who is signed in, sign-in and password flows, the role field               | `users`                                          | `/login`, `/account`, `/forgot-password`, `/reset-password` |
+| `directory`    | FAQ, local resources, team members                                         | `faq`, `resources`, `team-members`               | `/faq`, `/resources`                                        |
+| `site`         | CMS pages, page-builder blocks, heroes, header, footer, redirects          | `pages`, `redirects`, globals `header`, `footer` | `/[slug]`, home, sitemap entries                            |
+| `verification` | Confirming an email by link: the token, its expiry, the limits, the emails | `email-confirmations`                            | `/confirm-email`                                            |
+| `comments`     | Resident comments (future)                                                 | (future)                                         | (future)                                                    |
 
 `src/platform/` holds what every module uses, and imports no module:
 
@@ -225,9 +225,6 @@ on purpose:
 
 ESLint skips the seed and the generated files, so they are also exempt from the 250-line limit.
 The seed script (`src/endpoints/seed/index.ts`) is the one hand-written file above it.
-
-Where [`docs/guidelines/payload-cms.md`](../guidelines/payload-cms.md) still names a template
-folder (`src/collections/`, `src/hooks/`, `src/fields/`), follow this page.
 
 ## More
 

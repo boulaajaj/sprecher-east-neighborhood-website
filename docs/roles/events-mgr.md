@@ -41,7 +41,7 @@ The goal: a resident opens the events page and immediately sees what's happening
 
 ## Event Data Model (Payload CMS)
 
-The fields of `src/collections/Events/index.ts`, and what to fill in for every event:
+The fields of `src/modules/events/cms/events.ts`, and what to fill in for every event:
 
 | Field                          | Fill in     | Notes                                                            |
 | ------------------------------ | ----------- | ---------------------------------------------------------------- |

@@ -26,5 +26,17 @@ export type SignInFailure = 'wrong-credentials' | 'server-error'
  */
 export type PasswordFailure = 'signed-out' | 'wrong-password' | 'rejected' | 'server-error'
 
+/**
+ * Why setting a password from a reset link failed: the link is unknown, used or expired (one
+ * code), Payload refused the new password, or something broke.
+ */
+export type ResetPasswordFailure = 'invalid-link' | 'rejected' | 'server-error'
+
+/**
+ * Why asking for a reset link failed. Only input that doesn't parse: every request that does
+ * gets the same answer, whether or not an account uses the email (no enumeration, #269).
+ */
+export type ForgotPasswordFailure = 'rejected'
+
 /** What a server action that changes something returns. Failures are fixed codes, never text. */
 export type ActionResult<Failure extends string> = { ok: true } | { ok: false; failure: Failure }

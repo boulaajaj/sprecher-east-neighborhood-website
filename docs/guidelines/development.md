@@ -77,19 +77,19 @@ All external input (API requests, form submissions, webhook payloads, URL parame
 
 The search order:
 
-1. **Shared utilities** (`src/utilities/`) — URL handling, metadata, formatting, data transforms
-2. **Shared components** (`src/components/`) — UI rendering, links, media, rich text, structured data
-3. **Reusable field configs** (`src/fields/`) — slug, link, hero field groups
-4. **Access control helpers** (`src/access/`) — auth and permission checks
+1. **Shared utilities** (`src/platform/lib/`, `src/platform/seo/`) — URL handling, metadata, formatting, data transforms
+2. **Shared components** (`src/platform/ui/`, `src/platform/richtext/`) — UI rendering, links, media, rich text, structured data
+3. **Reusable field configs** (`src/modules/site/cms/`, and Payload's `slugField()`) — slug, link, hero field groups
+4. **Access control helpers** (`src/platform/payload/`) — auth and permission checks
 
 If no abstraction exists for a pattern you need more than once, **create one first** as a shared utility or component, then use it everywhere. Never copy-paste logic between files.
 
 Examples of violations this rule prevents:
 
-- Reading `process.env.NEXT_PUBLIC_SERVER_URL` directly → use `getServerSideURL()` from `src/utilities/getURL.ts`
-- Writing `dangerouslySetInnerHTML={{ __html: JSON.stringify(...) }}` → use `JsonLd` from `src/components/JsonLd.tsx`
-- Duplicating Payload access control logic → use helpers from `src/access/`
-- Repeating OpenGraph defaults → use `mergeOpenGraph()` from `src/utilities/mergeOpenGraph.ts`
+- Reading `process.env.NEXT_PUBLIC_SERVER_URL` directly → use `getServerSideURL()` from `src/platform/lib/getURL.ts`
+- Writing `dangerouslySetInnerHTML={{ __html: JSON.stringify(...) }}` → use `JsonLd` from `src/platform/ui/JsonLd.tsx`
+- Duplicating Payload access control logic → use helpers from `src/platform/payload/roles.ts`
+- Repeating OpenGraph defaults → use `mergeOpenGraph()` from `src/platform/seo/mergeOpenGraph.ts`
 
 Constants, configuration, enum values, and type definitions used in multiple places must also be defined once and imported everywhere. Duplication across files leads to silent inconsistency.
 
