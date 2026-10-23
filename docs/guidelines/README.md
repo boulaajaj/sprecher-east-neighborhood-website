@@ -10,7 +10,7 @@ Guidelines say how things should be. Step-by-step procedures are Agent Skills in
 
 | Guideline                                           | Read it when                                                                   |
 | --------------------------------------------------- | ------------------------------------------------------------------------------ |
-| [Development](development.md)                       | Always: framework first, configuration over code, DRY, failing explicitly.     |
+| [Development](development.md)                       | Always: native first, configuration over code, DRY, failing explicitly.        |
 | [Security](security.md)                             | Always: packages, input, secrets, access control, roles, the server.           |
 | [Payload CMS](payload-cms.md)                       | You touch collections, blocks, heroes, hooks, fields, migrations or seed data. |
 | [Next.js and Tailwind](nextjs-tailwind.md)          | You touch routes, metadata, caching, styling, design tokens, dates or images.  |

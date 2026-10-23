@@ -24,11 +24,16 @@ Amine, 2026-10-20 and 2026-10-21 (in the Claude Code sessions that planned #127 
   and component written and tested once and reused, shared components instead of plain HTML
   elements.
 
+Amine, 2026-10-22 (Claude chat, #262): "check the native configuration, check the native
+features. And then if they are not there, look for the plugin that is official. If it's not there,
+look for a open source plugin [...] If none of it is there, only then we can write the code."
+
 ## 1. Find what exists first
 
 Before writing anything, search for it: this module, `src/platform/`, then the template folders
-that haven't moved yet. Then check whether Payload, Next.js or an established, maintained library
-already does it. Custom code is the last resort. How to search and when to move shared code:
+that haven't moved yet. Then go down the ladder: native Payload, Next.js and React features and
+config, official plugins, well-established free open-source plugins, and only then our own code.
+Record what each step found on the issue before writing custom code. How:
 [`references/reuse.md`](references/reuse.md).
 
 ## 2. Put it in the right place
