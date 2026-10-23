@@ -98,8 +98,7 @@ verdict is **Changes requested**: it's fixed first, so he gets a clean PR.
   owner's words. The author then merges ([`change-workflow`](../change-workflow/SKILL.md),
   step 6).
 - **Changes requested:** list them. The author fixes them and asks for a re-review.
-- **Waits for owner:** the PR or its issue is labeled `needs owner`, a real trade-off the owner
-  hasn't decided, or it changes policy he didn't ask for. The author labels the PR `needs owner`,
-  asks him one plain question, and stops
-  ([waits for owner](../../../docs/process/project-management.md#waits-for-owner)); the owner
-  merges it or removes the label.
+- **Waits for owner:** the PR or its issue is labeled `needs owner`, it rests on a trade-off the
+  owner hasn't decided, or it changes policy he didn't ask for. The author labels the PR
+  `needs owner`, asks him one plain question, and stops until he answers
+  ([waits for owner](../../../docs/process/project-management.md#waits-for-owner)).
