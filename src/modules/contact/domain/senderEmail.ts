@@ -26,14 +26,19 @@ export function findSenderEmail(
   return null
 }
 
+/** The fixed line a held message's emails get when they go out (#183, #287). */
+export const SENDER_CONFIRMED_NOTE = 'Sender’s email: confirmed.'
+
 /**
- * The fixed line the owner notification gets about the sender's address (#183), or `null` when
- * the submission has none. Contact messages reach the owner right away, marked, until he decides
- * otherwise (open question on #183).
+ * Whether a message's emails wait for its sender to confirm their address (#287). The owner
+ * decided on #274 that a contact message reaches him only after that click. A message from an
+ * address already confirmed, or from a form with no email field (nobody to ask), goes out at once.
  */
-export function toSenderEmailNote(senderEmail: unknown, confirmed: unknown): string | null {
-  if (typeof senderEmail !== 'string' || !senderEmail) return null
-  return confirmed === true
-    ? 'Sender’s email: confirmed.'
-    : 'Sender’s email: not confirmed yet (we ask them by email to confirm).'
+export function holdsForConfirmation(senderEmail: unknown, confirmed: unknown): boolean {
+  return typeof senderEmail === 'string' && senderEmail !== '' && confirmed !== true
+}
+
+/** The line added to a message's emails when they go out: `null` when it has no sender address. */
+export function toSenderEmailNote(senderEmail: unknown): string | null {
+  return typeof senderEmail === 'string' && senderEmail ? SENDER_CONFIRMED_NOTE : null
 }

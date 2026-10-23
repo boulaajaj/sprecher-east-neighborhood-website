@@ -3,14 +3,16 @@ import type { BeforeEmail } from '@payloadcms/plugin-form-builder/types'
 import type { FormSubmission } from '@/payload-types'
 
 import { toSafeFormEmail } from '../domain/formEmails'
-import { toSenderEmailNote } from '../domain/senderEmail'
+import { holdsForConfirmation } from '../domain/senderEmail'
+import { HELD_EMAILS, withSenderNote } from './heldEmails'
 import { capFormEmails } from './rateLimits'
 
 /**
  * The form builder's `beforeEmail`: applies the form-email rules (`domain/formEmails.ts`) to each
  * email a submission is about to send, then the site-wide hourly cap. The plugin formats the
  * emails in the order of the form's own email settings, so each is matched to its setting by
- * position. The submission is stored either way.
+ * position. An unconfirmed sender's emails are held instead of sent (#287). The submission is
+ * stored either way.
  */
 export const guardFormEmails: BeforeEmail<FormSubmission> = async (emails, { data, req }) => {
   const form = data?.form
@@ -43,11 +45,13 @@ export const guardFormEmails: BeforeEmail<FormSubmission> = async (emails, { dat
     return [decision.email]
   })
 
-  // Every email that goes out says whether the sender confirmed their address (#183)
-  const note = toSenderEmailNote(data?.senderEmail, data?.emailConfirmed)
-  const marked = note
-    ? allowed.map((email) => ({ ...email, html: `${email.html}<p>${note}</p>` }))
-    : allowed
-
-  return capFormEmails(marked, req.payload.logger)
+  // A message reaches the owner only once its sender confirms their address (#274, #287): until
+  // then its emails wait on the submission, and the confirmation sends them
+  if (holdsForConfirmation(data?.senderEmail, data?.emailConfirmed)) {
+    // The submission's id isn't known here; `requestSenderConfirmation` stores them right after.
+    // On the request's context: the hooks' own `context` argument isn't one shared object
+    req.context[HELD_EMAILS] = allowed
+    return []
+  }
+  return capFormEmails(withSenderNote(allowed, data?.senderEmail), req.payload.logger)
 }

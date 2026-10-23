@@ -88,19 +88,66 @@ describe('recordSenderEmail', () => {
   })
 })
 
-describe('requestSenderConfirmation', () => {
-  const run = (confirmer: EmailConfirmer, data: Record<string, unknown>, operation = 'create') =>
-    requestSenderConfirmation(confirmer)({
-      data,
-      doc: {},
-      operation,
-      req: {},
-    } as unknown as AfterArgs)
+const heldEmail = {
+  to: 'info@example.org',
+  from: 'Sprecher East <website@example.org>',
+  subject: 'Website message',
+  html: '<p>Hello</p>',
+}
 
-  it('asks an unconfirmed sender to confirm', async () => {
+describe('requestSenderConfirmation', () => {
+  const run = (
+    confirmer: EmailConfirmer,
+    data: Record<string, unknown>,
+    operation = 'create',
+    context: Record<string, unknown> = {},
+  ) => {
+    const updateOne = vi.fn(async () => {})
+    const req = { context, payload: { db: { updateOne }, logger: { error: vi.fn() } } }
+    return requestSenderConfirmation(confirmer)({
+      data,
+      doc: { id: 7 },
+      operation,
+      req,
+    } as unknown as AfterArgs).then(() => ({ req, updateOne }))
+  }
+
+  it('stores the held emails on the new message, then asks the sender to confirm (#287)', async () => {
     const confirmer = fakeConfirmer()
-    await run(confirmer, { senderEmail: 'ana@example.com', emailConfirmed: false })
-    expect(confirmer.request).toHaveBeenCalledWith('ana@example.com', {})
+    const { req, updateOne } = await run(
+      confirmer,
+      { senderEmail: 'ana@example.com', emailConfirmed: false },
+      'create',
+      { heldFormEmails: [heldEmail] },
+    )
+    expect(updateOne).toHaveBeenCalledExactlyOnceWith({
+      collection: 'form-submissions',
+      id: 7,
+      data: { heldEmails: [heldEmail] },
+      req,
+      returning: false,
+    })
+    expect(confirmer.request).toHaveBeenCalledWith('ana@example.com', req)
+  })
+
+  it('still asks the sender when storing the held emails fails, and logs it', async () => {
+    const confirmer = fakeConfirmer()
+    const updateOne = vi.fn(async () => {
+      throw new Error('locked')
+    })
+    const error = vi.fn()
+    const req = {
+      context: { heldFormEmails: [heldEmail] },
+      payload: { db: { updateOne }, logger: { error } },
+    }
+    await requestSenderConfirmation(confirmer)({
+      data: { senderEmail: 'ana@example.com', emailConfirmed: false },
+      doc: { id: 7 },
+      operation: 'create',
+      req,
+    } as unknown as AfterArgs)
+    expect(error).toHaveBeenCalledWith('Form emails could not be held for confirmation (Error)')
+    expect(confirmer.request).toHaveBeenCalled()
   })
 
   it('sends nothing to a confirmed sender, without an address, or on update', async () => {
@@ -113,11 +160,52 @@ describe('requestSenderConfirmation', () => {
 })
 
 describe('markSubmissionsConfirmed', () => {
-  it('marks every unconfirmed message from that address as confirmed', async () => {
-    const update = vi.fn(async () => ({ docs: [] }))
-    const req = { payload: { update } } as unknown as PayloadRequest
+  /** A Payload whose find returns these held messages */
+  const payloadWith = (docs: unknown[]) => ({
+    find: vi.fn(async () => ({ docs })),
+    update: vi.fn(async () => ({ docs: [] })),
+    sendEmail: vi.fn(async () => {}),
+    db: { updateOne: vi.fn(async () => {}) },
+    logger: { warn: vi.fn(), error: vi.fn() },
+  })
+
+  it('sends each held email once, marked confirmed, then marks the messages confirmed', async () => {
+    const payload = payloadWith([
+      { id: 7, heldEmails: [heldEmail] },
+      { id: 8, heldEmails: null },
+    ])
+    const req = { payload } as unknown as PayloadRequest
     await markSubmissionsConfirmed('ana@example.com', req)
-    expect(update).toHaveBeenCalledWith({
+
+    expect(payload.find).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection: 'form-submissions',
+        where: {
+          and: [
+            { senderEmail: { equals: 'ana@example.com' } },
+            { emailConfirmed: { not_equals: true } },
+          ],
+        },
+        overrideAccess: true,
+        showHiddenFields: true,
+      }),
+    )
+    // Cleared before it's sent, so a second confirmation finds nothing to send
+    expect(payload.db.updateOne).toHaveBeenCalledExactlyOnceWith({
+      collection: 'form-submissions',
+      id: 7,
+      data: { heldEmails: null },
+      req,
+      returning: false,
+    })
+    expect(payload.db.updateOne.mock.invocationCallOrder[0]).toBeLessThan(
+      payload.sendEmail.mock.invocationCallOrder[0] ?? 0,
+    )
+    expect(payload.sendEmail).toHaveBeenCalledExactlyOnceWith({
+      ...heldEmail,
+      html: '<p>Hello</p><p>Sender’s email: confirmed.</p>',
+    })
+    expect(payload.update).toHaveBeenCalledWith({
       collection: 'form-submissions',
       where: {
         and: [
@@ -130,5 +218,14 @@ describe('markSubmissionsConfirmed', () => {
       overrideAccess: true,
       req,
     })
+  })
+
+  it('logs a held email that fails to send, and still marks the messages', async () => {
+    const payload = payloadWith([{ id: 7, heldEmails: [heldEmail] }])
+    payload.sendEmail.mockRejectedValue(new Error('SMTP down for info@example.org'))
+    const req = { payload } as unknown as PayloadRequest
+    await markSubmissionsConfirmed('ana@example.com', req)
+    expect(payload.logger.error).toHaveBeenCalledWith('Held form email could not be sent (Error)')
+    expect(payload.update).toHaveBeenCalled()
   })
 })

@@ -4,6 +4,7 @@ import type { EmailConfirmedListener, EmailConfirmer } from '@/platform/payload/
 import { isAdminFieldAccess } from '@/platform/payload/roles'
 
 import { findSenderEmail, type SubmittedRow } from '../domain/senderEmail'
+import { holdEmails, releaseHeldEmails, takeHeldEmails } from './heldEmails'
 
 const FORM_SUBMISSIONS = 'form-submissions'
 
@@ -33,6 +34,13 @@ export const senderEmailFields: Field[] = [
       position: 'sidebar',
       description: 'Ticked once the sender clicks the confirmation link we email them.',
     },
+  },
+  {
+    // The message's emails, kept until the sender confirms their address, then sent (#287).
+    // Server-only: hidden from the API and the admin panel.
+    name: 'heldEmails',
+    type: 'json',
+    hidden: true,
   },
 ]
 
@@ -69,7 +77,9 @@ export const recordSenderEmail =
 
 /**
  * A hook that asks the sender of a new submission to confirm their address, unless it already
- * is. Runs after the owner notification went out; never throws, so the submission is kept.
+ * is. Runs after the form builder's email step, which left the message's emails in the context
+ * instead of sending them: it stores them on the submission first, for the confirmation to send
+ * (#287). Never throws, so the submission is kept.
  * Reads `data` (what `recordSenderEmail` set), not `doc`: a visitor's `doc` has been read with
  * their access, which hides both fields.
  */
@@ -77,13 +87,25 @@ export const requestSenderConfirmation =
   (confirmer: EmailConfirmer): CollectionAfterChangeHook =>
   async ({ data, doc, operation, req }) => {
     if (operation === 'create' && typeof data.senderEmail === 'string' && !data.emailConfirmed) {
+      const held = takeHeldEmails(req.context)
+      if (held.length > 0) {
+        await holdEmails(doc.id, held, req).catch((error: unknown) =>
+          req.payload.logger.error(
+            `Form emails could not be held for confirmation (${error instanceof Error ? error.name : 'error'})`,
+          ),
+        )
+      }
       await confirmer.request(data.senderEmail, req)
     }
     return doc
   }
 
-/** When an address is confirmed, marks the messages it sent as confirmed. */
+/**
+ * When an address is confirmed, sends the emails its messages were holding (#287), then marks
+ * those messages as confirmed.
+ */
 export const markSubmissionsConfirmed: EmailConfirmedListener = async (email, req) => {
+  await releaseHeldEmails(email, req)
   await req.payload.update({
     collection: FORM_SUBMISSIONS,
     where: { and: [{ senderEmail: { equals: email } }, { emailConfirmed: { not_equals: true } }] },

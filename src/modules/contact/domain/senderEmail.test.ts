@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { findSenderEmail, toSenderEmailNote } from './senderEmail'
+import { findSenderEmail, holdsForConfirmation, toSenderEmailNote } from './senderEmail'
 
 const FIELDS = [
   { blockType: 'text', name: 'name' },
@@ -45,16 +45,26 @@ describe('findSenderEmail', () => {
   })
 })
 
+describe('holdsForConfirmation', () => {
+  it('holds a message whose sender hasn’t confirmed their address yet (#287)', () => {
+    expect(holdsForConfirmation('ana@example.com', false)).toBe(true)
+    expect(holdsForConfirmation('ana@example.com', undefined)).toBe(true)
+  })
+
+  it('sends at once when the address is confirmed, or there is none to confirm', () => {
+    expect(holdsForConfirmation('ana@example.com', true)).toBe(false)
+    expect(holdsForConfirmation(null, false)).toBe(false)
+    expect(holdsForConfirmation('', false)).toBe(false)
+  })
+})
+
 describe('toSenderEmailNote', () => {
-  it('says whether the sender confirmed their address', () => {
-    expect(toSenderEmailNote('ana@example.com', true)).toBe('Sender’s email: confirmed.')
-    expect(toSenderEmailNote('ana@example.com', false)).toMatch(
-      /^Sender’s email: not confirmed yet/,
-    )
+  it('says the sender confirmed their address: emails only go out once they have', () => {
+    expect(toSenderEmailNote('ana@example.com')).toBe('Sender’s email: confirmed.')
   })
 
   it('says nothing when there is no sender address', () => {
-    expect(toSenderEmailNote(null, false)).toBeNull()
-    expect(toSenderEmailNote('', true)).toBeNull()
+    expect(toSenderEmailNote(null)).toBeNull()
+    expect(toSenderEmailNote('')).toBeNull()
   })
 })

@@ -147,24 +147,30 @@ describe('guardFormEmails', () => {
     expect((await send([email()], templates, 1, guards)).result).toHaveLength(1)
   })
 
-  it.each([
-    [true, '<p>Hello</p><p>Sender’s email: confirmed.</p>'],
-    [
-      false,
-      '<p>Hello</p><p>Sender’s email: not confirmed yet (we ask them by email to confirm).</p>',
-    ],
-  ])(
-    'says in each email whether the sender’s address is confirmed (%s)',
-    async (confirmed, html) => {
-      const g = await loadGuards()
-      const findByID = vi.fn(async () => ({ id: 1, emails: [{ emailTo: 'info@example.org' }] }))
-      const result = await g.guardFormEmails([email()], {
-        data: { form: 1, senderEmail: 'ana@example.com', emailConfirmed: confirmed },
-        req: { payload: { findByID, logger: { warn: vi.fn() } } },
-      } as unknown as BeforeEmailArgs[1])
-      expect(result[0]?.html).toMatch(html)
-    },
-  )
+  /** Runs the guard for a submission from this sender, with the request's context. */
+  async function sendFrom(confirmed: boolean) {
+    const g = await loadGuards()
+    const findByID = vi.fn(async () => ({ id: 1, emails: [{ emailTo: 'info@example.org' }] }))
+    const context: Record<string, unknown> = {}
+    const result = await g.guardFormEmails([email()], {
+      data: { form: 1, senderEmail: 'ana@example.com', emailConfirmed: confirmed },
+      req: { context, payload: { findByID, logger: { warn: vi.fn() } } },
+    } as unknown as BeforeEmailArgs[1])
+    return { result, context }
+  }
+
+  it('sends a confirmed sender’s message at once, marked confirmed', async () => {
+    const { result, context } = await sendFrom(true)
+    expect(result[0]?.html).toBe('<p>Hello</p><p>Sender’s email: confirmed.</p>')
+    expect(context.heldFormEmails).toBeUndefined()
+  })
+
+  it('holds an unconfirmed sender’s emails for the confirmation instead of sending (#287)', async () => {
+    const { result, context } = await sendFrom(false)
+    expect(result).toEqual([])
+    // As they'll go out later: after the safety rules, before the note and the cap
+    expect(context.heldFormEmails).toEqual([email()])
+  })
 
   it('adds no line when the submission has no sender address', async () => {
     const { result } = await send([email()], [{ emailTo: 'info@example.org' }])
