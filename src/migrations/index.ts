@@ -4,6 +4,7 @@ import * as migration_20260304_205039 from './20260304_205039'
 import * as migration_20261018_044131_payload_3_91_upgrade from './20261018_044131_payload_3_91_upgrade'
 import * as migration_20261021_233720_backfill_seo_image_versions from './20261021_233720_backfill_seo_image_versions'
 import * as migration_20261022_211619_email_confirmations from './20261022_211619_email_confirmations'
+import * as migration_20261022_213133_contact_sender_email from './20261022_213133_contact_sender_email'
 
 export const migrations = [
   {
@@ -35,5 +36,10 @@ export const migrations = [
     up: migration_20261022_211619_email_confirmations.up,
     down: migration_20261022_211619_email_confirmations.down,
     name: '20261022_211619_email_confirmations',
+  },
+  {
+    up: migration_20261022_213133_contact_sender_email.up,
+    down: migration_20261022_213133_contact_sender_email.down,
+    name: '20261022_213133_contact_sender_email',
   },
 ]

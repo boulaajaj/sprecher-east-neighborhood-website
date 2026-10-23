@@ -1,9 +1,8 @@
 import type { PayloadRequest } from 'payload'
 
-import { parseClientIp, SlidingWindowCounter } from '@/platform/lib'
+import { parseClientIp, parseEmailAddress, SlidingWindowCounter } from '@/platform/lib'
 import { getServerSideURL } from '@/platform/lib/getURL'
 
-import { parseEmailAddress } from '../domain/address'
 import { toConfirmationEmail, toConfirmationLink } from '../domain/emails'
 import { CONFIRMATION_LIMITS } from '../domain/limits'
 import { checkAddressLimit, toTokenExpiry, toUnconfirmedCutoff } from '../domain/rules'

@@ -12,7 +12,11 @@ import { fileURLToPath } from 'url'
 
 import type { Event, Page, Post } from '@/payload-types'
 import { Users } from '@/modules/accounts/cms'
-import { FormBlock, formBuilderOptions } from '@/modules/contact/cms'
+import {
+  createFormBuilderOptions,
+  FormBlock,
+  markSubmissionsConfirmed,
+} from '@/modules/contact/cms'
 import { FAQ, Resources, TeamMembers } from '@/modules/directory/cms'
 import { Events } from '@/modules/events/cms'
 import { Categories, Posts, searchOptions } from '@/modules/news/cms'
@@ -23,7 +27,7 @@ import {
   revalidateRedirects,
   SITE_LAYOUT_BLOCKS,
 } from '@/modules/site/cms'
-import { createEmailConfirmations } from '@/modules/verification/cms'
+import { createEmailConfirmations, emailConfirmer } from '@/modules/verification/cms'
 import { Media } from '@/platform/payload/media'
 import { defaultLexical } from '@/platform/payload/defaultLexical'
 import {
@@ -38,8 +42,8 @@ import { restrictEditLocks } from '@/platform/payload/restrictEditLocks'
 
 // Modules meet here (0008): the contact form joins the site's own page-builder blocks
 const Pages = createPagesCollection({ layoutBlocks: [...SITE_LAYOUT_BLOCKS, FormBlock] })
-// Email confirmation by link (#183): what other modules do once an address is confirmed
-const EmailConfirmations = createEmailConfirmations({ onConfirmed: [] })
+// Email confirmation by link (#183): once an address is confirmed, its contact messages are too
+const EmailConfirmations = createEmailConfirmations({ onConfirmed: [markSubmissionsConfirmed] })
 
 const generateTitle: GenerateTitle<Post | Page | Event> = ({ doc }) => {
   return doc?.title || 'Sprecher East'
@@ -102,8 +106,9 @@ const plugins: Plugin[] = [
     generateTitle,
     generateURL,
   }),
-  // Forms, submissions and their safeguards belong to the contact module
-  formBuilderPlugin(formBuilderOptions),
+  // Forms, submissions and their safeguards belong to the contact module; the sender's address
+  // is confirmed through the verification module's confirmer (#183)
+  formBuilderPlugin(createFormBuilderOptions({ emailConfirmer })),
   // Search belongs to news; it also indexes events, which the module doesn't name (0008)
   searchPlugin({ ...searchOptions, collections: ['posts', 'events'] }),
 ]
