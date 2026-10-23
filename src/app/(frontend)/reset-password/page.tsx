@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { parseResetToken } from '@/modules/accounts'
+import { parseLinkToken } from '@/modules/accounts'
 import { ResetPasswordForm } from '@/modules/accounts/server'
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ export default async function ResetPasswordPage({ searchParams }: Props) {
         <p className="mb-8 text-muted-foreground">
           Choose a new password for your account, then log in with it.
         </p>
-        <ResetPasswordForm token={parseResetToken(token)} />
+        <ResetPasswordForm token={parseLinkToken(token)} />
       </div>
     </div>
   )

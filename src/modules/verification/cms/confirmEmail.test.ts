@@ -38,14 +38,20 @@ describe('confirmEmail', () => {
     const { docs, sent, req, token } = withLink()
     const listener = vi.fn(async () => {})
 
-    expect(await confirmEmail(token, req, [listener])).toBe('confirmed')
+    expect(await confirmEmail(token, req, [listener])).toEqual({
+      outcome: 'confirmed',
+      email: 'ana@example.com',
+    })
     expect(docs[0]).toMatchObject({ confirmedAt: iso(NOW), welcomeSentAt: iso(NOW) })
     expect(listener).toHaveBeenCalledWith('ana@example.com', req)
     expect(sent.map((email) => [email.to, email.subject])).toEqual([
       ['ana@example.com', 'Welcome to Sprecher East'],
     ])
 
-    expect(await confirmEmail(token, req, [listener])).toBe('already-confirmed')
+    expect(await confirmEmail(token, req, [listener])).toEqual({
+      outcome: 'already-confirmed',
+      email: 'ana@example.com',
+    })
     expect(listener).toHaveBeenCalledOnce()
     expect(sent).toHaveLength(1)
   })
@@ -56,10 +62,12 @@ describe('confirmEmail', () => {
 
     // Both clicks read the record before either writes, so only the write's own condition
     // (confirmedAt still empty) can tell them apart
-    const outcomes = await Promise.all([
-      confirmEmail(token, req, [listener]),
-      confirmEmail(token, req, [listener]),
-    ])
+    const outcomes = (
+      await Promise.all([
+        confirmEmail(token, req, [listener]),
+        confirmEmail(token, req, [listener]),
+      ])
+    ).map((result) => result.outcome)
 
     expect(outcomes.sort()).toEqual(['already-confirmed', 'confirmed'])
     expect(listener).toHaveBeenCalledOnce()
@@ -75,16 +83,18 @@ describe('confirmEmail', () => {
 
   it('says a link expired 24 hours after it was sent, and changes nothing', async () => {
     const { docs, sent, req, token } = withLink(24 * HOUR)
-    expect(await confirmEmail(token, req, [])).toBe('expired')
+    expect(await confirmEmail(token, req, [])).toEqual({ outcome: 'expired' })
     expect(docs[0]?.confirmedAt).toBeNull()
     expect(sent).toEqual([])
   })
 
   it('says a link is not valid when its token is unknown or malformed', async () => {
     const { req } = withLink()
-    expect(await confirmEmail(newConfirmationToken().token, req, [])).toBe('invalid')
-    expect(await confirmEmail('not-a-token', req, [])).toBe('invalid')
-    expect(await confirmEmail(undefined, req, [])).toBe('invalid')
+    expect(await confirmEmail(newConfirmationToken().token, req, [])).toEqual({
+      outcome: 'invalid',
+    })
+    expect(await confirmEmail('not-a-token', req, [])).toEqual({ outcome: 'invalid' })
+    expect(await confirmEmail(undefined, req, [])).toEqual({ outcome: 'invalid' })
   })
 
   it('still confirms and welcomes when a listener fails, logging no address', async () => {
@@ -94,7 +104,7 @@ describe('confirmEmail', () => {
     })
     const after = vi.fn(async () => {})
 
-    expect(await confirmEmail(token, req, [failing, after])).toBe('confirmed')
+    expect(await confirmEmail(token, req, [failing, after])).toMatchObject({ outcome: 'confirmed' })
     expect(after).toHaveBeenCalled()
     expect(sent).toHaveLength(1)
     expect(payload.logger.error).toHaveBeenCalledWith(
@@ -105,7 +115,7 @@ describe('confirmEmail', () => {
   it('stays confirmed when the welcome email fails', async () => {
     const { docs, payload, req, token } = withLink()
     payload.sendEmail.mockRejectedValueOnce(new Error('SMTP down'))
-    expect(await confirmEmail(token, req, [])).toBe('confirmed')
+    expect(await confirmEmail(token, req, [])).toMatchObject({ outcome: 'confirmed' })
     expect(docs[0]?.confirmedAt).toBe(iso(NOW))
     expect(payload.logger.error).toHaveBeenCalledWith('Sending the welcome email failed (Error)')
   })

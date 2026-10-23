@@ -46,16 +46,16 @@ grows should split its top level "into domain oriented modules which are interna
 
 ## Business areas
 
-| Module         | Owns                                                                       | Payload collections and globals                  | Routes                                                      |
-| -------------- | -------------------------------------------------------------------------- | ------------------------------------------------ | ----------------------------------------------------------- |
-| `events`       | Event listings, the "upcoming" rule, event types, calendar (Phase 2)       | `events`                                         | `/events`, `/events/[slug]`, sitemap entries                |
-| `news`         | Posts, categories, authors, search, related and recent posts               | `posts`, `categories`, `search`                  | `/posts`, `/posts/[slug]`, `/search`, sitemap entries       |
-| `contact`      | Public form safeguards, the robot check, form-email rules                  | `forms`, `form-submissions` (plugin)             | the form block on CMS pages                                 |
-| `accounts`     | Who is signed in, sign-in and password flows, the role field               | `users`                                          | `/login`, `/account`, `/forgot-password`, `/reset-password` |
-| `directory`    | FAQ, local resources, team members                                         | `faq`, `resources`, `team-members`               | `/faq`, `/resources`                                        |
-| `site`         | CMS pages, page-builder blocks, heroes, header, footer, redirects          | `pages`, `redirects`, globals `header`, `footer` | `/[slug]`, home, sitemap entries                            |
-| `verification` | Confirming an email by link: the token, its expiry, the limits, the emails | `email-confirmations`                            | `/confirm-email`                                            |
-| `comments`     | Resident comments (future)                                                 | (future)                                         | (future)                                                    |
+| Module         | Owns                                                                                   | Payload collections and globals                  | Routes                                                                                     |
+| -------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| `events`       | Event listings, the "upcoming" rule, event types, calendar (Phase 2)                   | `events`                                         | `/events`, `/events/[slug]`, sitemap entries                                               |
+| `news`         | Posts, categories, authors, search, related and recent posts                           | `posts`, `categories`, `search`                  | `/posts`, `/posts/[slug]`, `/search`, sitemap entries                                      |
+| `contact`      | Public form safeguards, the robot check, form-email rules                              | `forms`, `form-submissions` (plugin)             | the form block on CMS pages                                                                |
+| `accounts`     | Who is signed in, sign-up and verification, sign-in and password flows, the role field | `users`                                          | `/login`, `/account`, `/forgot-password`, `/reset-password`, `/sign-up`, `/verify-account` |
+| `directory`    | FAQ, local resources, team members                                                     | `faq`, `resources`, `team-members`               | `/faq`, `/resources`                                                                       |
+| `site`         | CMS pages, page-builder blocks, heroes, header, footer, redirects                      | `pages`, `redirects`, globals `header`, `footer` | `/[slug]`, home, sitemap entries                                                           |
+| `verification` | Confirming an email by link: the token, its expiry, the limits, the emails             | `email-confirmations`                            | `/confirm-email`                                                                           |
+| `comments`     | Resident comments (future)                                                             | (future)                                         | (future)                                                                                   |
 
 `src/platform/` holds what every module uses, and imports no module:
 
@@ -65,7 +65,9 @@ grows should split its top level "into domain oriented modules which are interna
   collection, the default rich-text editor (`defaultLexical`), the `populatePublishedAt` hook and
   the admin dashboard components. Plugin setup is composed in `payload.config.ts`, because each
   module brings its own options.
-- `ui/`: primitives (`Button`, `Input`, `Media`, `Link`) with their variants.
+- `ui/`: primitives (`Button`, `Input`, `Media`, `Link`) with their variants, and
+  `ConfirmedEmailContext`: the address the confirm page just confirmed, which `verification`
+  provides to the slot `accounts` fills with its account offer (#187).
 - `theme/`: light and dark mode (the theme providers, `InitTheme`, `ThemeSelector`); the token
   contract (`tokens.ts`) and the Tailwind mapping join them with #146.
 - `richtext/`: the `RichText` renderer and the blocks that can sit inside rich text (banner, code
@@ -155,7 +157,7 @@ What this buys:
    `cms.ts` never reach anything server-only: the Payload CLI (migrations, seed) loads every hook
    outside Next.js, where `server-only` throws. Hooks use the `req.payload` they are given.
 5. **Client components** get DTOs as props and never import `data/`, `use-cases/` or `server.ts`.
-   To change something they call a server action (sign-in, sign-out and passwords in `accounts`),
+   To change something they call a server action (sign-up, sign-in, sign-out and passwords in `accounts`),
    or one of Payload's own REST endpoints through the owning module's browser client (`ui/api.ts`:
    form submissions in `contact`, where the robot check runs).
 6. **Payload at the edges.** Runtime imports of `payload`, `@payloadcms/*` or `@payload-config`

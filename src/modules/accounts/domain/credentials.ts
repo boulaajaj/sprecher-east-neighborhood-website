@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { parseEmailAddress } from '@/platform/lib'
+
 // One set of rules for the forms in the browser and the server actions, which check again
 // because anyone can call an action directly (https://nextjs.org/docs/app/guides/data-security).
 
@@ -8,7 +10,9 @@ export const MIN_PASSWORD_LENGTH = 8
 export const MAX_PASSWORD_LENGTH = 1024
 /** The longest an email address can be (RFC 5321: 64 + 1 + 255), with room to spare */
 export const MAX_EMAIL_LENGTH = 320
-/** Far above Payload's reset tokens (40 characters in 3.91) */
+/** Long enough for any real name, short enough for the header */
+export const MAX_NAME_LENGTH = 100
+/** Far above Payload's reset and verify tokens (40 characters in 3.91) */
 const MAX_TOKEN_LENGTH = 128
 
 /** The email field of the sign-in and forgot-password forms. */
@@ -75,3 +79,31 @@ export const resetPasswordSchema = z
   .refine(passwordsMatch.check, passwordsMatch.issue)
 
 export type ResetPasswordValues = z.output<typeof resetPasswordSchema>
+
+/**
+ * A new resident account (#187). The email must be one plain address, stored lowercase like every
+ * address the site keeps; the role is never a field, the server always sets it.
+ */
+export const signUpSchema = z
+  .strictObject({
+    name: z
+      .string()
+      .trim()
+      .min(1, 'Enter your name')
+      .max(MAX_NAME_LENGTH, `Use at most ${MAX_NAME_LENGTH} characters`),
+    email: email
+      .refine((value) => parseEmailAddress(value) !== null, 'Enter one email address')
+      .transform((value) => value.toLowerCase()),
+    ...newPasswordFields,
+  })
+  .refine(passwordsMatch.check, passwordsMatch.issue)
+
+export type SignUpInput = z.input<typeof signUpSchema>
+export type SignUpValues = z.output<typeof signUpSchema>
+
+/** The token from a verification link (#187); Payload checks it. */
+export const verifyAccountSchema = z.strictObject({
+  token: z.string().min(1).max(MAX_TOKEN_LENGTH),
+})
+
+export type VerifyAccountValues = z.output<typeof verifyAccountSchema>

@@ -3,6 +3,7 @@ import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { useConfirmedEmail } from '@/platform/ui/ConfirmedEmail.client'
 import { expectAccessible } from '@/platform/ui/testing/expectAccessible'
 
 import { ConfirmEmail } from './ConfirmEmail.client'
@@ -49,6 +50,30 @@ describe('ConfirmEmail', () => {
     expect(screen.queryByRole('button')).toBeNull()
     expect(screen.getByText('Account offer')).toBeTruthy()
     await expectAccessible(document.body)
+  })
+
+  it('gives what comes after the confirmed address the endpoint answered with', async () => {
+    answer(200, { outcome: 'confirmed', email: 'ana@example.com' })
+    const Slot = () => <p>Offer for {useConfirmedEmail() ?? 'nobody'}</p>
+    render(
+      <ConfirmEmail token={TOKEN} retryHref="/contact">
+        <Slot />
+      </ConfirmEmail>,
+    )
+    await clickConfirm()
+    expect(await screen.findByText('Offer for ana@example.com')).toBeTruthy()
+  })
+
+  it('gives no address when the answer has none, or not a plain one', async () => {
+    answer(200, { outcome: 'already-confirmed', email: 'a@b.co, c@d.co' })
+    const Slot = () => <p>Offer for {useConfirmedEmail() ?? 'nobody'}</p>
+    render(
+      <ConfirmEmail token={TOKEN} retryHref="/contact">
+        <Slot />
+      </ConfirmEmail>,
+    )
+    await clickConfirm()
+    expect(await screen.findByText('Offer for nobody')).toBeTruthy()
   })
 
   it('says a reused link is already confirmed, and shows what comes after', async () => {

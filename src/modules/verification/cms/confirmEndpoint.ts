@@ -23,7 +23,7 @@ async function readToken(json: (() => Promise<unknown>) | undefined): Promise<un
 
 /**
  * `POST /api/email-confirmations/confirm` with `{ token }`: follows a confirmation link and
- * answers `{ outcome }`. A POST, never the page load, because mail scanners open links and would
+ * answers `{ outcome }`, with the `email` once it is confirmed (`ConfirmResult`). A POST, never the page load, because mail scanners open links and would
  * use them up. Public on purpose: the token is the proof.
  */
 export const confirmEndpoint = (listeners: readonly EmailConfirmedListener[]): Endpoint => ({
@@ -38,8 +38,7 @@ export const confirmEndpoint = (listeners: readonly EmailConfirmedListener[]): E
       return Response.json({ error: 'Too many tries. Please wait and try again.' }, { status: 429 })
     }
     try {
-      const outcome = await confirmEmail(await readToken(req.json?.bind(req)), req, listeners)
-      return Response.json({ outcome })
+      return Response.json(await confirmEmail(await readToken(req.json?.bind(req)), req, listeners))
     } catch (error) {
       logFailure(req, 'Confirming an email', error)
       return Response.json({ error: 'Something went wrong.' }, { status: 500 })

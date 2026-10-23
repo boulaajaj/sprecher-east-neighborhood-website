@@ -7,13 +7,13 @@ import { Button, Field, Form, type FormStatus, Link } from '@/platform/ui'
 
 import { signIn } from '../actions'
 import { signInSchema, type SignInValues } from '../domain/credentials'
-import { ACCOUNT_PATH, FORGOT_PASSWORD_PATH } from '../domain/paths'
+import { ACCOUNT_PATH, FORGOT_PASSWORD_PATH, SIGN_UP_PATH } from '../domain/paths'
 import type { SignInFailure } from '../domain/types'
 import { toSignInErrorMessage } from './signInErrorMessage'
 
 /**
- * The sign-in form on /login, with the way to reset a forgotten password. On success it opens
- * /account.
+ * The sign-in form on /login, with the ways to reset a forgotten password and to create an
+ * account (#187). On success it opens /account.
  */
 export function SignInForm() {
   const router = useRouter()
@@ -77,6 +77,12 @@ export function SignInForm() {
               {status === 'submitting' ? 'Logging in' : 'Log In'}
             </Button>
           </div>
+          <p className="text-muted-foreground">
+            New here?{' '}
+            <Link href={SIGN_UP_PATH} variant="inline">
+              Create an account
+            </Link>
+          </p>
         </>
       )}
     </Form>

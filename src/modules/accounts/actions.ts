@@ -9,6 +9,8 @@ import {
   passwordChangeSchema,
   resetPasswordSchema,
   signInSchema,
+  signUpSchema,
+  verifyAccountSchema,
 } from './domain/credentials'
 import type {
   AccountSummary,
@@ -17,6 +19,8 @@ import type {
   PasswordFailure,
   ResetPasswordFailure,
   SignInFailure,
+  SignUpFailure,
+  VerifyAccountFailure,
 } from './domain/types'
 import { changeOwnPassword } from './use-cases/changeOwnPassword'
 import { getAccountSummary } from './use-cases/getAccountSummary'
@@ -24,6 +28,8 @@ import { requestPasswordReset } from './use-cases/requestPasswordReset'
 import { resetPasswordFromLink } from './use-cases/resetPasswordFromLink'
 import { signInWithPassword } from './use-cases/signInWithPassword'
 import { signOutCurrentUser } from './use-cases/signOutCurrentUser'
+import { signUpResident } from './use-cases/signUpResident'
+import { verifyAccountFromLink } from './use-cases/verifyAccountFromLink'
 
 /** Signs in with an email and password. Input that doesn't parse reads like a wrong password. */
 export async function signIn(input: unknown): Promise<ActionResult<SignInFailure>> {
@@ -63,6 +69,25 @@ export async function resetPassword(input: unknown): Promise<ActionResult<ResetP
   const parsed = resetPasswordSchema.safeParse(input)
   if (!parsed.success) return { ok: false, failure: 'rejected' }
   return resetPasswordFromLink(parsed.data)
+}
+
+/**
+ * Creates a resident account and has Payload email its verification link (#187). The role is
+ * always resident. The answer is the same whether or not an account already uses the email; only
+ * input that doesn't parse is refused.
+ */
+export async function signUp(input: unknown): Promise<ActionResult<SignUpFailure>> {
+  const parsed = signUpSchema.safeParse(input)
+  if (!parsed.success) return { ok: false, failure: 'rejected' }
+  await signUpResident(parsed.data)
+  return { ok: true }
+}
+
+/** Verifies an account from its link's token. Input that doesn't parse is a dead link. */
+export async function verifyAccount(input: unknown): Promise<ActionResult<VerifyAccountFailure>> {
+  const parsed = verifyAccountSchema.safeParse(input)
+  if (!parsed.success) return { ok: false, failure: 'invalid-link' }
+  return verifyAccountFromLink(parsed.data)
 }
 
 /**

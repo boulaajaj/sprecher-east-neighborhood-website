@@ -1,0 +1,124 @@
+'use client'
+
+import React, { useEffect, useRef, useState } from 'react'
+
+import { Alert } from '@/platform/ui/Alert'
+import { Button, Field, Form, type FormStatus, Link } from '@/platform/ui'
+
+import { signUp } from '../actions'
+import {
+  MIN_PASSWORD_LENGTH,
+  signUpSchema,
+  type SignUpInput,
+  type SignUpValues,
+} from '../domain/credentials'
+import { SIGN_IN_PATH } from '../domain/paths'
+import type { SignUpFailure } from '../domain/types'
+import { SIGN_UP_SENT, toSignUpErrorMessage } from './signUpMessages'
+
+/**
+ * Creates a resident account (#187). `email` fills in the address the confirm page sent, or is
+ * `null`; it leaves the address bar and the history as soon as the form loads. Every sign-up that
+ * parses gets the same answer, and the account can't sign in until Payload's link is opened.
+ */
+export function SignUpForm({ email }: { email: string | null }) {
+  const [status, setStatus] = useState<FormStatus>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
+  const doneRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    // The browser's own history API; Next.js keeps its router in step with it
+    if (window.location.search) window.history.replaceState(null, '', window.location.pathname)
+  }, [])
+  useEffect(() => {
+    if (status === 'success') doneRef.current?.focus()
+  }, [status])
+
+  const fail = (failure: SignUpFailure | 'offline') => {
+    setErrorMessage(toSignUpErrorMessage(failure))
+    setStatus('error')
+  }
+
+  const send = async (values: SignUpValues) => {
+    setStatus('submitting')
+    let result: Awaited<ReturnType<typeof signUp>>
+    try {
+      result = await signUp(values)
+    } catch {
+      return fail('offline')
+    }
+    if (!result.ok) return fail(result.failure)
+    setStatus('success')
+  }
+
+  if (status === 'success') {
+    return (
+      <div ref={doneRef} tabIndex={-1} className="space-y-6 outline-none">
+        <Alert variant="success">{SIGN_UP_SENT}</Alert>
+        <Link href={SIGN_IN_PATH} variant="action">
+          Go to log in
+        </Link>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      <Form<SignUpInput, SignUpValues>
+        aria-label="Create an account"
+        schema={signUpSchema}
+        // Only the email has a real default; the other fields keep what the browser autofills
+        defaultValues={email ? { email } : {}}
+        onSubmit={send}
+        status={status}
+        errorMessage={errorMessage}
+      >
+        {({ register, formState: { errors } }) => (
+          <>
+            <Field label="Name" required error={errors.name?.message}>
+              <Field.Input type="text" autoComplete="name" {...register('name')} />
+            </Field>
+            <Field label="Email" required error={errors.email?.message}>
+              <Field.Input
+                type="email"
+                autoComplete="email"
+                placeholder="you@example.com"
+                {...register('email')}
+              />
+            </Field>
+            <Field
+              label="Password"
+              required
+              hint={`At least ${MIN_PASSWORD_LENGTH} characters.`}
+              error={errors.newPassword?.message}
+            >
+              <Field.Input
+                type="password"
+                autoComplete="new-password"
+                {...register('newPassword')}
+              />
+            </Field>
+            <Field label="Confirm password" required error={errors.confirmPassword?.message}>
+              <Field.Input
+                type="password"
+                autoComplete="new-password"
+                {...register('confirmPassword')}
+              />
+            </Field>
+            <div>
+              <Button type="submit" loading={status === 'submitting'} fullWidth>
+                {status === 'submitting' ? 'Creating' : 'Create Account'}
+              </Button>
+            </div>
+          </>
+        )}
+      </Form>
+      <p className="text-muted-foreground">
+        Already have an account?{' '}
+        <Link href={SIGN_IN_PATH} variant="inline">
+          Log in
+        </Link>
+      </p>
+    </div>
+  )
+}

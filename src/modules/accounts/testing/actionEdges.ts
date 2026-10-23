@@ -17,6 +17,8 @@ export const edges = {
   login: vi.fn(),
   forgotPassword: vi.fn(),
   resetPassword: vi.fn(),
+  create: vi.fn(),
+  verifyEmail: vi.fn(),
   logoutOperation: vi.fn(),
   /** `login` from `@payloadcms/next/auth`: Payload's sign-in, which also sets the cookie */
   signInHelper: vi.fn(),
@@ -36,6 +38,8 @@ export const payloadWithEdges = (actual: typeof PayloadModule) => ({
     login: edges.login,
     forgotPassword: edges.forgotPassword,
     resetPassword: edges.resetPassword,
+    create: edges.create,
+    verifyEmail: edges.verifyEmail,
     collections: { users },
     config: { cookiePrefix: 'payload' },
   }),

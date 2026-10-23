@@ -29,3 +29,12 @@ export type RequestOutcome =
  * link (an unguessable token) can ask.
  */
 export type ConfirmOutcome = 'confirmed' | 'already-confirmed' | 'expired' | 'invalid'
+
+/**
+ * What a confirmation link's holder learns: the outcome, and the address once it is confirmed,
+ * so the confirm page can offer what comes next with it filled in (an account, #187). Only someone
+ * holding the link (sent to that address) can ask, so it tells them nothing new.
+ */
+export type ConfirmResult =
+  | { outcome: Extract<ConfirmOutcome, 'confirmed' | 'already-confirmed'>; email: string }
+  | { outcome: Extract<ConfirmOutcome, 'expired' | 'invalid'> }

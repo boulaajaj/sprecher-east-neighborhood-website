@@ -38,5 +38,17 @@ export type ResetPasswordFailure = 'invalid-link' | 'rejected' | 'server-error'
  */
 export type ForgotPasswordFailure = 'rejected'
 
+/**
+ * Why a sign-up failed (#187). Only input that doesn't parse: every request that does gets the
+ * same "check your email" answer, whether or not an account already uses the email.
+ */
+export type SignUpFailure = 'rejected'
+
+/**
+ * Why opening a verification link failed: the link is unknown or already used (one code), or
+ * something broke.
+ */
+export type VerifyAccountFailure = 'invalid-link' | 'server-error'
+
 /** What a server action that changes something returns. Failures are fixed codes, never text. */
 export type ActionResult<Failure extends string> = { ok: true } | { ok: false; failure: Failure }

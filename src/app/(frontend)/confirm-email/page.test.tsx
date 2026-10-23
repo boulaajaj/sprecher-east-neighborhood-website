@@ -1,15 +1,28 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from '@testing-library/react'
+import type React from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 // The module's component is replaced: this tests the page's wiring, not the module
 vi.mock('@/modules/verification/server', () => ({
-  ConfirmEmail: ({ token, retryHref }: { token: string | null; retryHref: string }) => (
-    <p>
-      token: {String(token)}, retry: {retryHref}
-    </p>
+  ConfirmEmail: ({
+    token,
+    retryHref,
+    children,
+  }: {
+    token: string | null
+    retryHref: string
+    children?: React.ReactNode
+  }) => (
+    <div>
+      <p>
+        token: {String(token)}, retry: {retryHref}
+      </p>
+      {children}
+    </div>
   ),
 }))
+vi.mock('@/modules/accounts/server', () => ({ AccountOffer: () => <p>Account offer</p> }))
 
 import ConfirmEmailPage, { metadata } from './page'
 
@@ -24,6 +37,11 @@ describe('/confirm-email', () => {
     await open(TOKEN)
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Confirm Your Email')
     expect(screen.getByText(`token: ${TOKEN}, retry: /contact`)).toBeTruthy()
+  })
+
+  it('puts the account offer in the slot that shows once the email is confirmed (#187)', async () => {
+    await open(TOKEN)
+    expect(screen.getByText('Account offer')).toBeTruthy()
   })
 
   it.each([[undefined], ['short'], [[TOKEN, TOKEN]]])('hands on no token for %j', async (token) => {
