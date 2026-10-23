@@ -70,6 +70,7 @@ grows should split its top level "into domain oriented modules which are interna
   contract (`tokens.ts`) and the Tailwind mapping join them with #146.
 - `richtext/`: the `RichText` renderer and the blocks that can sit inside rich text (banner, code
   and media; only a post's content offers them). Pages reuse the media block from here.
+  `richTextToPlainText` turns rich text into plain text (Payload's converter) for JSON-LD.
 - `email/` and `seo/`.
 
 Routes that serve no single area (`/api/version`, draft preview under `/next/`, the seed route)

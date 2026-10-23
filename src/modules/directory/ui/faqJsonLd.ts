@@ -1,4 +1,4 @@
-import { lexicalToPlainText } from './lexicalToPlainText'
+import { richTextToPlainText } from '@/platform/richtext/toPlainText'
 
 import type { FaqEntry } from '../domain/types'
 
@@ -12,7 +12,7 @@ export function faqJsonLd(entries: readonly FaqEntry[]): Record<string, unknown>
       name: question,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: lexicalToPlainText(answer),
+        text: richTextToPlainText(answer),
       },
     })),
   }
