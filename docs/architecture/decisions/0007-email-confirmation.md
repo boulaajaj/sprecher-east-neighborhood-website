@@ -25,10 +25,14 @@ The owner decided on 2026-10-21 (quoted on #168):
 - **An account is offered, not imposed:** after confirming, the person is asked whether they want
   an account. Yes leads to a read-only `resident` account; who may comment is decided later. No
   creates nothing, and the email stays verified.
+- **Verified emails can create an account later** without the confirmation step again. The account
+  is finished with one click on a link sent to that inbox, so nobody can claim someone else's
+  address (Claude's suggestion, which he accepted).
 - **Use what exists first:** Payload's built-ins or an established library.
 - **Accounts use Payload's own sign-in** (decided 2026-10-23, quoted on #266): sign-up is
   Payload's `create` with `auth.verify`, and password resets use its forgot and reset password.
-  How Yes connects to that sign-up is settled on #187.
+  How Yes and the one-click link fit with Payload's sign-in is an open question for the owner on
+  #187 (asked 2026-10-23).
 
 Contact-form senders aren't accounts, so their confirmation link uses the site's own token
 ([0009](0009-email-confirmation-token.md)): Payload's `auth.verify` only works for accounts.
