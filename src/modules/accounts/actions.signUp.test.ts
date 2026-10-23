@@ -5,17 +5,20 @@ import {
   edges,
   nextAuthWithEdges,
   nextHeadersWithEdges,
+  nextServerWithEdges,
   payloadWithEdges,
   requestHeaders,
   resetEdges,
   robotCheck,
   robotCheckWithEdges,
+  runAfterTasks,
 } from './testing/actionEdges'
 
 vi.mock('payload', async (importActual) => payloadWithEdges(await importActual()))
 vi.mock('@payloadcms/next/auth', () => nextAuthWithEdges())
 vi.mock('@payload-config', () => ({ default: {} }))
 vi.mock('next/headers', () => nextHeadersWithEdges())
+vi.mock('next/server', async (importActual) => nextServerWithEdges(await importActual()))
 vi.mock('@/platform/turnstile/turnstileVerifier', () => robotCheckWithEdges())
 
 import { signUp, verifyAccount } from './actions'
@@ -73,14 +76,20 @@ describe('signUp', () => {
     ])
   })
 
+  const duplicate = () =>
+    new ValidationError({
+      errors: [{ message: 'A user with the given email is already registered.', path: 'email' }],
+    })
+
   it('answers the same when an account already uses the email, and logs nothing', async () => {
-    edges.create.mockRejectedValue(
-      new ValidationError({
-        errors: [{ message: 'A user with the given email is already registered.', path: 'email' }],
-      }),
-    )
+    edges.create.mockRejectedValue(duplicate())
+    edges.find.mockResolvedValue({ docs: [{ id: 9, email: 'ana@example.com', _verified: true }] })
     expect(await signUp(input)).toEqual({ ok: true })
+    await runAfterTasks()
     expect(console.error).not.toHaveBeenCalled()
+    // A verified account gets nothing
+    expect(edges.sendEmail).not.toHaveBeenCalled()
+    expect(edges.dbUpdateOne).not.toHaveBeenCalled()
   })
 
   it('answers the same when it fails on our side, and logs only the error’s name', async () => {
@@ -109,10 +118,10 @@ describe('signUp', () => {
   })
 
   it('never removes an account when Payload refuses a duplicate email', async () => {
-    edges.create.mockRejectedValue(
-      new ValidationError({ errors: [{ message: 'Taken', path: 'email' }] }),
-    )
+    edges.create.mockRejectedValue(duplicate())
+    edges.find.mockResolvedValue({ docs: [] })
     await signUp(input)
+    await runAfterTasks()
     expect(edges.delete).not.toHaveBeenCalled()
   })
 

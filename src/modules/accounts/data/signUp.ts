@@ -1,12 +1,17 @@
 import 'server-only'
 
+import { randomBytes } from 'node:crypto'
+
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 
 import { ROLES } from '@/platform/lib'
+import { getServerSideURL } from '@/platform/lib/getURL'
 
 import type { SignUpValues, VerifyAccountValues } from '../domain/credentials'
 import { USERS } from '../domain/usersCollection'
+import { takeResend } from '../domain/verificationResends'
+import { toVerifyAccountEmail, toVerifyAccountLink } from '../domain/verifyAccountEmail'
 
 /**
  * Creates a resident account with Payload's `create` operation (#187). With `auth.verify` on the
@@ -55,6 +60,53 @@ export async function deleteFailedSignUp(email: string, since: Date): Promise<vo
     // Visitors can't delete accounts (`delete: isAdmin`); this undoes the server's own create
     overrideAccess: true,
   })
+}
+
+/** What a resend did: sent a new link, or nothing (no unverified account, or the cap is reached). */
+export type ResendOutcome = 'sent' | 'none' | 'capped'
+
+/**
+ * Sends a new verification link to the account that uses `email`, if it isn't verified yet and
+ * its resend count allows it (#289). Payload 3.91 has no resend: its `sendVerificationEmail`
+ * isn't exported. So this does what Payload's `create` does: a new token, the same way Payload
+ * makes it, then the same branded email, now with Payload's `sendEmail`. The old link stops
+ * working. Writes with `db.updateOne`, as Payload's own `verifyEmail` does: the token and the
+ * count are server-only fields, and no hook applies to them.
+ */
+export async function resendVerification(email: string, now: Date): Promise<ResendOutcome> {
+  const payload = await getPayload({ config: configPromise })
+  const { docs } = await payload.find({
+    collection: USERS,
+    where: { email: { equals: email } },
+    limit: 1,
+    depth: 0,
+    pagination: false,
+    // A visitor signing up may read no account: the server reads its verification state and
+    // resend count, and nothing about it reaches the visitor
+    overrideAccess: true,
+    showHiddenFields: true,
+  })
+  const account = docs[0]
+  if (!account || account._verified !== false) return 'none'
+
+  const since = account.verificationResendsSince ? new Date(account.verificationResendsSince) : null
+  const take = takeResend({ resends: account.verificationResends ?? 0, since }, now)
+  if (!take.allowed) return 'capped'
+
+  const token = randomBytes(20).toString('hex')
+  await payload.db.updateOne({
+    collection: USERS,
+    id: account.id,
+    data: {
+      _verificationToken: token,
+      verificationResends: take.next.resends,
+      verificationResendsSince: take.next.since?.toISOString() ?? null,
+    },
+    returning: false,
+  })
+  const message = toVerifyAccountEmail(toVerifyAccountLink(getServerSideURL(), token))
+  await payload.sendEmail({ to: account.email, subject: message.subject, html: message.html, text: message.text })
+  return 'sent'
 }
 
 /**

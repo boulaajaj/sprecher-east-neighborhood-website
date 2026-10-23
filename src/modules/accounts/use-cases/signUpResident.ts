@@ -1,9 +1,11 @@
 import 'server-only'
 
+import { after } from 'next/server'
+
 import type { HumanVerifier } from '@/platform/lib'
 
 import { isRefusal } from '../data/failures'
-import { createResidentAccount, deleteFailedSignUp } from '../data/signUp'
+import { createResidentAccount, deleteFailedSignUp, resendVerification } from '../data/signUp'
 import type { SignUpValues } from '../domain/credentials'
 import { SIGN_UP_LIMITS } from '../domain/requestLimits'
 import type { ActionResult, SignUpFailure } from '../domain/types'
@@ -18,6 +20,9 @@ const guard = createRequestGuard('Sign-up', SIGN_UP_LIMITS)
  * request gets the same answer: an email an account already uses is refused by Payload and
  * answered like a new one, and a failure is logged rather than shown, as for a reset link (#269),
  * so no answer says whether an account exists (docs/guidelines/security.md).
+ *
+ * When that account isn't verified yet, its link is sent again, up to the resend cap (#289),
+ * after the answer, so the reply takes no longer for it.
  */
 export async function signUpResident(
   values: SignUpValues,
@@ -31,8 +36,12 @@ export async function signUpResident(
   try {
     await createResidentAccount(values)
   } catch (error) {
-    // A refusal is an account that already uses the email: nothing to log or undo
-    if (isRefusal(error)) return { ok: true }
+    // A refusal is an account that already uses the email: nothing to log or undo, but if it
+    // isn't verified yet, its owner may have lost the first link
+    if (isRefusal(error)) {
+      after(() => resendLostLink(values.email))
+      return { ok: true }
+    }
     logServerFailure('Sign-up', error)
     // The account may be stored with its email unsent: remove it so the address isn't stuck
     await deleteFailedSignUp(values.email, startedAt).catch((cleanupError: unknown) =>
@@ -40,4 +49,14 @@ export async function signUpResident(
     )
   }
   return { ok: true }
+}
+
+/** Resends the verification link if the account is unverified and under its cap; logs the rest. */
+async function resendLostLink(email: string): Promise<void> {
+  try {
+    const outcome = await resendVerification(email, new Date())
+    if (outcome === 'capped') console.warn('Sign-up verification resend capped for an account')
+  } catch (error) {
+    logServerFailure('Sign-up verification resend', error)
+  }
 }
