@@ -109,8 +109,22 @@ another one. Read the parent epic too: it says what the issue is part of.
    - label it `needs owner`
    - add it to the checklist in the owner-actions epic (#169); its parent stays its own epic
    - mark the issues that depend on it as blocked by it
+   - stop: it waits for him
+     ([waits for owner](../../../docs/process/project-management.md#waits-for-owner))
 
-   Tell the owner in one line what you need from him.
+   Ask him on the issue, and in the chat too when he's there. Make it easy to answer:
+
+   ```markdown
+   **Question:** For the volunteer sign-up, use the form-builder plugin or build our own form?
+
+   - **A. Plugin (recommended):** editors change the fields in the admin; nothing to maintain.
+   - **B. Our own:** a custom layout; about 200 lines to write and keep working.
+
+   Reply A or B. Until then, this issue and #123 wait.
+   ```
+
+   One question per message, plain words, no code or file names unless he asks. When there are
+   several, ask the most important first and the next once he has answered.
 
 ## 4. While working
 

@@ -14,9 +14,9 @@ Where code goes: [`docs/architecture/`](../architecture/README.md).
 
 ## Development Principles
 
-### Framework First
+### Native First
 
-Before writing custom code, check whether Payload CMS or Next.js already provides the capability. Use official plugins, adapters, and built-in APIs. Custom code is a last resort.
+Follow [the ladder](../guidelines/development.md#native-first-then-plugins-then-our-code): native Payload and Next.js features, then official plugins, then established open-source ones, and only then custom code.
 
 - **Email**: Use Payload's `nodemailerAdapter` and `payload.sendEmail()` — never build a custom email module
 - **Forms**: Use `@payloadcms/plugin-form-builder` — it creates collections, stores submissions, sends notifications
@@ -93,7 +93,7 @@ The three roles (`admin`, `editor`, `resident`) and what each may do are in the
 - Auth is configured in `payload.config.ts` via the Users collection (`auth: true`)
 - Session managed by Payload JWT (delivered via httpOnly cookies)
 - Social login (OAuth) is not installed. Adding it starts with an issue; prefer a maintained Payload
-  plugin over custom code (framework first)
+  plugin over custom code (native first)
 
 ## Admin Setup
 

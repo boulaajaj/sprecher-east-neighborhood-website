@@ -23,9 +23,9 @@ Where code goes: [`docs/architecture/`](../architecture/README.md).
 
 ## Development Principles
 
-### Framework First
+### Native First
 
-Before writing custom code, check whether Next.js or Payload already provides the capability:
+Follow [the ladder](../guidelines/development.md#native-first-then-plugins-then-our-code). Before writing custom code, check whether Next.js, React or Payload already provides the capability:
 
 - **Routing**: Use Next.js App Router file-based routing — never build a custom router
 - **Data fetching**: Use Server Components with `async/await` — never use `useEffect` for initial data loads

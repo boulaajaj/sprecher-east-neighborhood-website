@@ -3,15 +3,37 @@
 Engineering principles for building and maintaining this codebase. They apply to everyone who
 changes it, human or AI agent.
 
-## Framework First
+## Native First, Then Plugins, Then Our Code
 
-Before writing custom code, check whether the framework already provides the capability. Payload CMS, Next.js, and their plugin ecosystems cover most common needs — authentication, email, forms, media, access control, search, SEO, redirects. Use official plugins, adapters, and built-in APIs. Custom code is a last resort, not a starting point.
+The owner's rule (#262): never reinvent the wheel. Before any feature, go down this ladder in
+order and stop at the first step that does the job:
 
-When evaluating whether to build vs. use:
+1. **Native features and configuration.** What Payload, Next.js and React already do, often with
+   one config option: auth (`verify`, forgot and reset password, lockout), hooks, access control,
+   jobs, email adapters, routing, caching, server actions, metadata, images. Also the
+   dependencies we already have: Radix, `cva`, `clsx` and `tailwind-merge`, `react-hook-form`,
+   `lucide-react`. Read the docs for the version in `package.json` (Payload:
+   https://payloadcms.com/llms-full.txt).
+2. **Official plugins and adapters.** `@payloadcms/*` and the frameworks' own packages, including
+   ones we don't use yet.
+3. **Well-established, free, open-source plugins or libraries** that meet the package rules in
+   [security](security.md#before-adding-any-new-package). Prefer one that does more than we need
+   over a narrow one we'd have to extend.
+4. **Our own code**, only when nothing above fits because the need is specific to this site. It
+   goes in the owning module's `domain/` and `use-cases/`
+   ([architecture](../architecture/README.md)).
 
-- Search the framework's documentation and plugin registry first
-- Check for official examples or templates that solve the problem
-- If a plugin exists, use it even if the custom solution seems simpler — the plugin will be maintained upstream
+**Write the findings down** before writing custom code: on the issue, one line per step saying
+what was checked, with a link, and why it doesn't fit.
+
+**This is a guide for judgment, not a hard gate.** Be reasonable and proportionate: don't decide
+by reflex that a plugin always wins, or that our own code always does. When the choice between a
+plugin and our own code is a real trade-off, put it to the owner on the issue (label
+`needs owner`) with the findings and a recommendation, and let him decide.
+
+Using a plugin doesn't skip the architecture: its setup lives in the owning module's `cms/` and is
+composed in `payload.config.ts`, and the module's own types still face the rest of the site. The
+enterprise layering is intentional.
 
 ## SOLID Principles
 
