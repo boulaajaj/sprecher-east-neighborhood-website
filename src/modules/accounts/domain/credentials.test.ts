@@ -4,7 +4,10 @@ import {
   MAX_EMAIL_LENGTH,
   MAX_PASSWORD_LENGTH,
   MIN_PASSWORD_LENGTH,
+  forgotPasswordSchema,
+  newPasswordSchema,
   passwordChangeSchema,
+  resetPasswordSchema,
   signInSchema,
 } from './credentials'
 
@@ -119,5 +122,41 @@ describe('passwordChangeSchema', () => {
     expect(passwordChangeSchema.safeParse({ ...values, email: 'b@example.com' }).success).toBe(
       false,
     )
+  })
+})
+
+describe('forgotPasswordSchema', () => {
+  it('takes a trimmed email and nothing else', () => {
+    expect(forgotPasswordSchema.parse({ email: ' ada@example.com ' })).toEqual({
+      email: 'ada@example.com',
+    })
+    expect(forgotPasswordSchema.safeParse({ email: '  ' }).success).toBe(false)
+    expect(forgotPasswordSchema.safeParse({ email: 'a@example.com', id: 1 }).success).toBe(false)
+  })
+})
+
+describe('resetPasswordSchema', () => {
+  const valid = { token: 'a'.repeat(40), newPassword: 'new-secret', confirmPassword: 'new-secret' }
+
+  it('takes the link’s token and a new password typed twice', () => {
+    expect(resetPasswordSchema.parse(valid)).toEqual(valid)
+  })
+
+  it('applies the same password rules as changing it', () => {
+    const short = 'p'.repeat(MIN_PASSWORD_LENGTH - 1)
+    for (const values of [
+      { ...valid, newPassword: short, confirmPassword: short },
+      { ...valid, confirmPassword: 'different' },
+    ]) {
+      expect(resetPasswordSchema.safeParse(values).success).toBe(false)
+      const { token: _token, ...fields } = values
+      expect(newPasswordSchema.safeParse(fields).success).toBe(false)
+    }
+  })
+
+  it('refuses a missing or oversized token, and any other field', () => {
+    expect(resetPasswordSchema.safeParse({ ...valid, token: '' }).success).toBe(false)
+    expect(resetPasswordSchema.safeParse({ ...valid, token: 'a'.repeat(129) }).success).toBe(false)
+    expect(resetPasswordSchema.safeParse({ ...valid, email: 'a@example.com' }).success).toBe(false)
   })
 })
