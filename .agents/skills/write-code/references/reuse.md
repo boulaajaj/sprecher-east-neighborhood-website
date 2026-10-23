@@ -21,19 +21,22 @@ Search for the idea, not only the name: a date rule may be called `isUpcoming`, 
 
 ## Framework and libraries before custom code
 
-Ask, in order:
+Follow the ladder in
+[`development.md`](../../../../docs/guidelines/development.md#native-first-then-plugins-then-our-code)
+and stop at the first step that does the job:
 
-1. Does Payload do it? Collections, hooks, access control, auth (verify, reset password),
-   the form builder, SEO, search, redirects. The whole manual is at
-   https://payloadcms.com/llms-full.txt.
-2. Does Next.js do it? Routing, caching, server actions, metadata, images.
-3. Does a dependency we already have do it? Radix, `cva`, `clsx` and `tailwind-merge`,
-   `react-hook-form`, `lucide-react`; dates through `src/utilities/timezone.ts` and
-   `formatDateTime.ts`.
-4. Is there an established, maintained library for it? Check downloads, the last release and open
-   issues, and run `npm audit` ([security](../../../../docs/guidelines/security.md)).
+1. **Native.** Payload: collections, hooks, access control, auth (`verify`, forgot and reset
+   password, lockout), jobs, email (manual: https://payloadcms.com/llms-full.txt). Next.js:
+   routing, caching, server actions, metadata, images. React. And the dependencies we already
+   have: Radix, `cva`, `clsx` and `tailwind-merge`, `react-hook-form`, `lucide-react`.
+2. **Official plugins:** `@payloadcms/*` and the frameworks' own packages, used or not yet.
+3. **Well-established, free, open-source plugins or libraries:** maintained, widely used,
+   permissive license, clean `npm audit` ([security](../../../../docs/guidelines/security.md)).
+   Prefer one that does more than we need.
+4. **Our code**, in the module's `domain/` and `use-cases/`, only when nothing above fits.
 
-Write custom code only when none fits, and say why on the issue.
+Before step 4, write one line per step on the issue: what you checked, the link, and why it
+doesn't fit. When step 4 replaces something steps 1–3 offer, add a decision record.
 
 ## When the same thing appears twice
 

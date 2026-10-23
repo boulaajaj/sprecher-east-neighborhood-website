@@ -17,7 +17,9 @@ Closes #
 
 ## How
 
-<!-- The approach: key decisions, alternatives considered, anything a reviewer should know. -->
+<!-- The approach: key decisions, alternatives considered, anything a reviewer should know.
+New custom code: which native feature, official plugin and open-source plugin you checked, and
+why none fits (or link the issue comment that says so). AGENTS.md, "Native first". -->
 
 ## How to test
 

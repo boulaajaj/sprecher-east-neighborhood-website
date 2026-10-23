@@ -46,8 +46,11 @@ gh api "repos/{owner}/{repo}/stacks?pull_request=<number>" -H 'X-GitHub-Api-Vers
   failure modes, and behavior when configuration is missing (local dev, CI).
 - **Security:** no secrets in the diff. Input is validated at boundaries. Access control on
   Payload collections and endpoints is unchanged or intentionally changed.
-- **Framework first:** uses Payload/Next.js features and official plugins rather than custom
-  code ([`docs/guidelines/development.md`](../../../docs/guidelines/development.md)).
+- **Native first, then plugins, then our code:** new custom code (a flow, a token, a limiter, a
+  service) comes with the issue's or PR's findings for each step of the
+  [ladder](../../../docs/guidelines/development.md#native-first-then-plugins-then-our-code):
+  native Payload, Next.js and React, official plugins, open-source plugins. Check one or two
+  claims yourself. Findings missing, or a step that does fit: **Changes requested**.
 - **Guidelines and architecture:** the change follows the guidelines for what it touches
   ([`docs/guidelines/`](../../../docs/guidelines/README.md)) and puts code where
   [`docs/architecture/`](../../../docs/architecture/README.md) says it goes. For code under

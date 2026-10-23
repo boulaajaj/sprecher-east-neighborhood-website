@@ -14,6 +14,10 @@ change this file through the same workflow below.
 - **The site is unofficial and AI-assisted**, and says so. Content is factual and inclusive.
 - **The repo is public.** Never commit secrets or real personal data (see
   [security](docs/guidelines/security.md)).
+- **Native first, then plugins, then our code.** Before building a feature, check what Payload,
+  Next.js and React do natively, then official plugins, then well-established free open-source
+  ones. Write custom code only when none fits, and record what each step found on the issue
+  ([the ladder](docs/guidelines/development.md#native-first-then-plugins-then-our-code)).
 
 ## The only way code reaches `main` and production
 
