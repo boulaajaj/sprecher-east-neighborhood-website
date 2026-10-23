@@ -18,6 +18,10 @@ cd "$APP_DIR"
 
 rollback_config="" # set once the app is about to be restarted with new arguments
 
+# Files the old next-sitemap build wrote into public/ (ignored by git, so a pull never removes them).
+# Next serves public/ ahead of app/sitemap.ts and app/robots.ts, so they'd hide the real ones (#267)
+rm -f public/sitemap.xml public/sitemap-[0-9]*.xml public/robots.txt
+
 # Any unexpected failure still ends with the app running, and says so: reloaded on the new build,
 # or, if it was already deleted for a fresh start, started again with the previous arguments.
 # Each action comes before its report, so a closed output can't stop the recovery.

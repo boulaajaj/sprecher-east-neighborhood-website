@@ -11,10 +11,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/admin/*'],
       },
     ],
-    sitemap: [
-      `${siteUrl}/pages-sitemap.xml`,
-      `${siteUrl}/posts-sitemap.xml`,
-      `${siteUrl}/events-sitemap.xml`,
-    ],
+    sitemap: `${siteUrl}/sitemap.xml`,
   }
 }

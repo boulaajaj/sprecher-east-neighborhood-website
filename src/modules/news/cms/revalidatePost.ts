@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache'
 import type { Post } from '@/payload-types'
 import { expireCacheTag } from '@/platform/payload/expireCacheTag'
 
+import { POSTS_SITEMAP_CACHE_TAG } from '../domain/cacheTags'
+
 /**
  * Refreshes every cached page that shows the post at `slug`, instead of waiting for the 10-minute
  * ISR window: its own page, /posts, its numbered no-JavaScript pages, the home page's "Recent
@@ -15,7 +17,7 @@ function revalidatePostPages(slug: string) {
   revalidatePath('/posts')
   revalidatePath('/(frontend)/posts/page/[pageNumber]', 'page')
   revalidatePath('/')
-  expireCacheTag('posts-sitemap')
+  expireCacheTag(POSTS_SITEMAP_CACHE_TAG)
 }
 
 export const revalidatePost: CollectionAfterChangeHook<Post> = ({

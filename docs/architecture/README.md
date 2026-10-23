@@ -48,12 +48,12 @@ grows should split its top level "into domain oriented modules which are interna
 
 | Module         | Owns                                                                       | Payload collections and globals                  | Routes                                                      |
 | -------------- | -------------------------------------------------------------------------- | ------------------------------------------------ | ----------------------------------------------------------- |
-| `events`       | Event listings, the "upcoming" rule, event types, calendar (Phase 2)       | `events`                                         | `/events`, `/events/[slug]`, events sitemap                 |
-| `news`         | Posts, categories, authors, search, related and recent posts               | `posts`, `categories`, `search`                  | `/posts`, `/posts/[slug]`, `/search`, posts sitemap         |
+| `events`       | Event listings, the "upcoming" rule, event types, calendar (Phase 2)       | `events`                                         | `/events`, `/events/[slug]`, sitemap entries                |
+| `news`         | Posts, categories, authors, search, related and recent posts               | `posts`, `categories`, `search`                  | `/posts`, `/posts/[slug]`, `/search`, sitemap entries       |
 | `contact`      | Public form safeguards, the robot check, form-email rules                  | `forms`, `form-submissions` (plugin)             | the form block on CMS pages                                 |
 | `accounts`     | Who is signed in, sign-in and password flows, the role field               | `users`                                          | `/login`, `/account`, `/forgot-password`, `/reset-password` |
 | `directory`    | FAQ, local resources, team members                                         | `faq`, `resources`, `team-members`               | `/faq`, `/resources`                                        |
-| `site`         | CMS pages, page-builder blocks, heroes, header, footer, redirects          | `pages`, `redirects`, globals `header`, `footer` | `/[slug]`, home, pages sitemap                              |
+| `site`         | CMS pages, page-builder blocks, heroes, header, footer, redirects          | `pages`, `redirects`, globals `header`, `footer` | `/[slug]`, home, sitemap entries                            |
 | `verification` | Confirming an email by link: the token, its expiry, the limits, the emails | `email-confirmations`                            | `/confirm-email`                                            |
 | `comments`     | Resident comments (future)                                                 | (future)                                         | (future)                                                    |
 
@@ -74,7 +74,9 @@ grows should split its top level "into domain oriented modules which are interna
 - `email/` and `seo/`.
 
 Routes that serve no single area (`/api/version`, draft preview under `/next/`, the seed route)
-belong to `platform`; `app/(payload)/` is Payload's generated admin and API.
+belong to `platform`; `app/(payload)/` is Payload's generated admin and API. `app/sitemap.ts`
+(`/sitemap.xml`, Next.js's native sitemap) and `app/robots.ts` compose the pages, posts and events
+modules' slug lists.
 
 ## Inside a module
 

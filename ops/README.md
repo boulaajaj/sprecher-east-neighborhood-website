@@ -4,14 +4,14 @@ Scripts the deploy workflow (`.github/workflows/deploy.yml`) runs on the VPS. No
 run by hand during a normal deploy. Changes to the server still follow `AGENTS.md`: an `infra`
 issue first, then a pull request.
 
-| Script            | What it does                                                                                      | Issue |
-| ----------------- | ------------------------------------------------------------------------------------------------- | ----- |
-| `backup.sh`       | Archives the database, uploaded media and `.env.local`; keeps 7 daily, 5 weekly, 5 pre-deploy     | #148  |
-| `backup-db.mjs`   | Copies the live SQLite database with `VACUUM INTO` and checks the copy                            | #148  |
-| `install-cron.sh` | Installs the daily backup job (08:15 UTC) in `/etc/cron.d/sprecher-east-backup`                   | #148  |
-| `restart-app.sh`  | Restarts the app so it listens on `127.0.0.1:3000` only; puts it back if the site stops answering | #118  |
-| `caddy-limits.sh` | Caps request bodies on the public form endpoints at Caddy (`caddy/form-limits.caddy`)             | #124  |
-| `lib.sh`          | Shared helpers: annotations, reading non-secret settings, checking the site through Caddy         |       |
+| Script            | What it does                                                                                                                                                                             | Issue      |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| `backup.sh`       | Archives the database, uploaded media and `.env.local`; keeps 7 daily, 5 weekly, 5 pre-deploy                                                                                            | #148       |
+| `backup-db.mjs`   | Copies the live SQLite database with `VACUUM INTO` and checks the copy                                                                                                                   | #148       |
+| `install-cron.sh` | Installs the daily backup job (08:15 UTC) in `/etc/cron.d/sprecher-east-backup`                                                                                                          | #148       |
+| `restart-app.sh`  | Restarts the app so it listens on `127.0.0.1:3000` only; puts it back if the site stops answering. First deletes old sitemap and robots files in `public/` that would hide the app's own | #118, #267 |
+| `caddy-limits.sh` | Caps request bodies on the public form endpoints at Caddy (`caddy/form-limits.caddy`)                                                                                                    | #124       |
+| `lib.sh`          | Shared helpers: annotations, reading non-secret settings, checking the site through Caddy                                                                                                |            |
 
 The scripts print `::notice` and `::warning` lines, which appear as annotations on the deploy run
 whether it succeeds or fails, so the result can be read without opening the logs. The deploy log
