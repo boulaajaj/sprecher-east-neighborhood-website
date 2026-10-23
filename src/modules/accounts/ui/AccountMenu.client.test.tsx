@@ -42,11 +42,13 @@ beforeEach(() => {
 afterEach(cleanup)
 
 describe('AccountMenu', () => {
-  it('offers a visitor the sign-in page', async () => {
+  it('offers a visitor the sign-in and sign-up pages in both menus (#296)', async () => {
     mocks.getSignedInAccount.mockResolvedValue(null)
     render(header())
 
     expect(await screen.findAllByRole('link', { name: 'Log In' })).toHaveLength(2)
+    const signUp = screen.getAllByRole('link', { name: 'Sign Up' })
+    expect(signUp.map((link) => link.getAttribute('href'))).toEqual(['/sign-up', '/sign-up'])
     expect(screen.queryByRole('button', { name: 'Sign Out' })).toBeNull()
   })
 
@@ -57,6 +59,8 @@ describe('AccountMenu', () => {
     const links = await screen.findAllByRole('link', { name: 'Ada' })
     expect(links.map((link) => link.getAttribute('href'))).toEqual(['/account', '/account'])
     expect(mocks.getSignedInAccount).toHaveBeenCalledTimes(1)
+    // No sign-up offer for someone who already has an account
+    expect(screen.queryByRole('link', { name: 'Sign Up' })).toBeNull()
   })
 
   it('calls an account without a name “Account”', async () => {
