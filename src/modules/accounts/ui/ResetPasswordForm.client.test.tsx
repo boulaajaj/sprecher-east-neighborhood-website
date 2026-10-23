@@ -27,6 +27,21 @@ const send = async (password = 'correct-horse', confirmation = password) => {
 const hrefOf = (name: string) => screen.getByRole('link', { name }).getAttribute('href')
 
 describe('ResetPasswordForm', () => {
+  it('clears the token from the address bar and the history as soon as it loads', () => {
+    render(<ResetPasswordForm token={TOKEN} />)
+    expect(window.location.pathname).toBe('/reset-password')
+    expect(window.location.search).toBe('')
+    expect(window.location.href).not.toContain(TOKEN)
+  })
+
+  it('keeps the link’s token when the page renders again from the cleaned address', async () => {
+    mocks.resetPassword.mockResolvedValue({ ok: true })
+    const { rerender } = render(<ResetPasswordForm token={TOKEN} />)
+    rerender(<ResetPasswordForm token={null} />)
+    await send()
+    expect(mocks.resetPassword).toHaveBeenCalledWith(expect.objectContaining({ token: TOKEN }))
+  })
+
   it('sends the link’s token with the new password, then offers to log in', async () => {
     mocks.resetPassword.mockResolvedValue({ ok: true })
     render(<ResetPasswordForm token={TOKEN} />)
@@ -41,8 +56,6 @@ describe('ResetPasswordForm', () => {
     })
     expect((await screen.findByRole('status')).textContent).toMatch(/new password is set/)
     expect(hrefOf('Log In')).toBe('/login')
-    // The used token leaves the address bar and the history
-    expect(window.location.search).toBe('')
   })
 
   it('checks the passwords match before sending', async () => {
@@ -58,11 +71,12 @@ describe('ResetPasswordForm', () => {
     await send()
     expect((await screen.findByRole('alert')).textContent).toMatch(/expired or was already used/)
     expect(hrefOf('Get a New Link')).toBe('/forgot-password')
-    expect(window.location.search).toBe('')
   })
 
   it('offers a new link straight away when the page has no usable token', async () => {
+    window.history.replaceState(null, '', '/reset-password?token=short')
     render(<ResetPasswordForm token={null} />)
+    expect(window.location.search).toBe('')
     expect(screen.getByRole('alert').textContent).toMatch(/expired or was already used/)
     expect(screen.queryByRole('form')).toBeNull()
     expect(hrefOf('Get a New Link')).toBe('/forgot-password')
@@ -77,6 +91,8 @@ describe('ResetPasswordForm', () => {
     await send()
     expect((await screen.findByRole('alert')).textContent).toMatch(message)
     expect(screen.getByRole('form', { name: 'Choose a new password' })).toBeTruthy()
-    expect(window.location.search).toBe(`?token=${TOKEN}`)
+    // The token is still in the form, so the person can try again
+    await send()
+    expect(mocks.resetPassword).toHaveBeenLastCalledWith(expect.objectContaining({ token: TOKEN }))
   })
 })

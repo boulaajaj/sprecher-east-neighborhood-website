@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 
+import { ACCOUNT_PATH } from '@/modules/accounts'
 import { getCurrentUser, SignInForm } from '@/modules/accounts/server'
 
 export const metadata: Metadata = {
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 
 export default async function LoginPage() {
   // Already signed in: nothing to do here
-  if (await getCurrentUser()) redirect('/account')
+  if (await getCurrentUser()) redirect(ACCOUNT_PATH)
 
   return (
     <div className="container flex min-h-[60vh] items-center py-16">

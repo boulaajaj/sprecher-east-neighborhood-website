@@ -9,7 +9,9 @@ import { CONFIRM_ON_ACCOUNT_PAGE, CURRENT_PASSWORD_CONFIRMED } from '../domain/p
  * marks the confirmed change in the request context, which no HTTP caller can set.
  *
  * Not affected: an admin setting another account's password, new accounts, server code that runs
- * without a user (the seed), and Payload's forgot and reset password, which don't run `update`.
+ * without a user (the seed), and Payload's forgot and reset password. In Payload 3.91, forgot
+ * password runs `update` with only the reset token and its expiry (no password, so this hook lets
+ * it through), and reset password writes to the database directly, without `beforeChange` hooks.
  * Payload reads the password before this hook runs, so the hook throws rather than strips it.
  */
 export const requireCurrentPassword: CollectionBeforeChangeHook = ({

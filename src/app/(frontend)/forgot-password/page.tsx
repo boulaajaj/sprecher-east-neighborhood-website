@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 
+import { ACCOUNT_PATH } from '@/modules/accounts'
 import { ForgotPasswordForm, getCurrentUser } from '@/modules/accounts/server'
 
 export const metadata: Metadata = {
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 /** Where a visitor asks for a link to reset a forgotten password (#269). */
 export default async function ForgotPasswordPage() {
   // Signed in: the password is changed on the account page instead
-  if (await getCurrentUser()) redirect('/account')
+  if (await getCurrentUser()) redirect(ACCOUNT_PATH)
 
   return (
     <div className="container flex min-h-[60vh] items-center py-16">

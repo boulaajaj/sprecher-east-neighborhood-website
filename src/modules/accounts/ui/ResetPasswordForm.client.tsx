@@ -17,10 +17,12 @@ import { toResetPasswordErrorMessage } from './resetErrorMessages'
 
 /**
  * Sets a new password from a reset link (#269). `token` is the link's, or `null` when it has none
- * or one that can't be a token. Once the password is set, or the link turns out dead, the token
- * leaves the address bar and the history.
+ * or one that can't be a token. As soon as the form loads, the token leaves the address bar and
+ * the history (#283); the form keeps the one it was first given, even if the page renders again
+ * from the cleaned address.
  */
-export function ResetPasswordForm({ token }: { token: string | null }) {
+export function ResetPasswordForm({ token: linkToken }: { token: string | null }) {
+  const [token] = useState(linkToken)
   const [status, setStatus] = useState<FormStatus>('idle')
   const [failure, setFailure] = useState<ResetPasswordFailure | 'offline' | null>(
     token ? null : 'invalid-link',
@@ -28,6 +30,10 @@ export function ResetPasswordForm({ token }: { token: string | null }) {
   const doneRef = useRef<HTMLDivElement>(null)
 
   const linkDone = status === 'success' || failure === 'invalid-link'
+  useEffect(() => {
+    // The browser's own history API; Next.js keeps its router in step with it
+    if (window.location.search) window.history.replaceState(null, '', window.location.pathname)
+  }, [])
   useEffect(() => {
     if (status === 'success') doneRef.current?.focus()
   }, [status])
@@ -48,9 +54,6 @@ export function ResetPasswordForm({ token }: { token: string | null }) {
     }
     if (result.ok) setStatus('success')
     else fail(result.failure)
-    if (result.ok || result.failure === 'invalid-link') {
-      window.history.replaceState(null, '', window.location.pathname)
-    }
   }
 
   if (status === 'success') {
