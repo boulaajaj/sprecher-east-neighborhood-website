@@ -1,4 +1,4 @@
-# Next.js 15 and Tailwind CSS v4 Patterns
+# Next.js 16 and Tailwind CSS v4 Patterns
 
 Technical patterns for Next.js App Router pages and Tailwind styling in this codebase.
 
@@ -6,9 +6,9 @@ Technical patterns for Next.js App Router pages and Tailwind styling in this cod
 
 The `src/app/(frontend)/[slug]/page.tsx` pattern:
 
-1. `generateStaticParams()` — queries all pages, returns `{ slug }` array
-2. `Page` component — resolves slug (default `'home'`), fetches page via cached query, renders `<RenderHero>` + `<RenderBlocks>`
-3. `generateMetadata()` — calls `generateMeta({ doc })` from `src/utilities/generateMeta.ts`
+1. `generateStaticParams()` — lists all pages (`listPageSlugs()` from `@/modules/site/server`), returns `{ slug }` array
+2. `Page` component — resolves slug (default `'home'`), fetches page via cached query (`getPageBySlug()`), renders `<RenderHero>` + `<RenderBlocks>`
+3. `generateMetadata()` — calls `generateMeta({ doc })` from `src/platform/seo/generateMeta.ts`
 
 All page queries use `cache()` from React to deduplicate fetches between Page and generateMetadata.
 
@@ -21,7 +21,7 @@ export const dynamic = 'force-static'
 export const revalidate = 600
 ```
 
-Fetch data directly with `payload.find()` (not Route Handlers). Use `select` to limit returned fields and `depth` to control relationship population.
+Fetch data through the owning module's use cases (from its `server.ts`), whose `data/` queries call the Payload Local API (not Route Handlers). Use `select` to limit returned fields and `depth` to control relationship population.
 
 ## Metadata and SEO
 
@@ -30,10 +30,10 @@ Fetch data directly with `payload.find()` (not Route Handlers). Use `select` to 
 - **Never append brand name** in `generateMeta()`, page metadata, or seed data `meta.title`
 - Set `meta.title` to the page name only: `'Home'`, `'About'`, `'Contact'`
 - The layout template handles branding — setting `title: 'About'` produces `'About — Sprecher East'`
-- Use `generateMeta()` from `src/utilities/generateMeta.ts` for CMS pages. Collection detail pages (`/posts/[slug]`, `/events/[slug]`) must override `openGraph.url` with the correct route prefix — `generateMeta` only produces generic `/${slug}`.
+- Use `generateMeta()` from `src/platform/seo/generateMeta.ts` for CMS pages. Collection detail pages (`/posts/[slug]`, `/events/[slug]`) must override `openGraph.url` with the correct route prefix — `generateMeta` only produces generic `/${slug}`.
 - For custom routes, return `{ title: 'Page Name', description: '...' }` directly
 - When writing fallback strings with template literals, always guard against null/undefined: `event?.title ? \`Details for ${event.title}\` : ''`— never`\`Details for ${event?.title}\``which produces`"Details for undefined"`
-- The SEO plugin `generateTitle` (`src/plugins/index.ts`) returns the page name only — never append brand name there either. Fallback should be `'Sprecher East'` (not empty string) so the admin UI pre-fill is useful
+- The SEO plugin `generateTitle` (`src/payload.config.ts`) returns the page name only — never append brand name there either. Fallback should be `'Sprecher East'` (not empty string) so the admin UI pre-fill is useful
 
 ## Server vs Client Components
 
@@ -47,7 +47,7 @@ Fetch data directly with `payload.find()` (not Route Handlers). Use `select` to 
 - Use React `cache()` to deduplicate server-side fetches within a request
 - Use `revalidatePath()` or `revalidateTag()` in afterChange hooks for on-demand revalidation
 - Never call Route Handlers from Server Components — use the Payload Local API directly
-- For site URL, use the shared `getServerSideURL()` from `src/utilities/getURL.ts` (see the DRY principle in [`development.md`](development.md#dry--dont-repeat-yourself))
+- For site URL, use the shared `getServerSideURL()` from `src/platform/lib/getURL.ts` (see the DRY principle in [`development.md`](development.md#dry--dont-repeat-yourself))
 - Static pages use `revalidate = 600` (10 minutes) as default ISR interval
 
 ## Styling Rules
@@ -76,13 +76,13 @@ Defined in `globals.css @theme`:
 
 ## Dates and Timezone
 
-The site timezone is configured via `SITE_TIMEZONE` env var (default: `America/Chicago`). All timezone logic lives in `src/utilities/timezone.ts` — never hardcode timezone strings elsewhere.
+The site timezone is configured via `SITE_TIMEZONE` env var (default: `America/Chicago`). All timezone logic lives in `src/platform/lib/timezone.ts` — never hardcode timezone strings elsewhere.
 
 - **All date comparisons** (e.g., "upcoming" vs "past" events) must use the site timezone, not server-local time. The VPS runs UTC — `new Date().setHours(0,0,0,0)` gives midnight UTC, not midnight site time.
-- Use `startOfToday()` from `src/utilities/timezone.ts` for "today" cutoffs in Payload queries
-- Use `SITE_TIMEZONE` from `src/utilities/timezone.ts` when you need the raw timezone string (e.g., for `toLocaleDateString`)
+- Use `startOfToday()` from `src/platform/lib/timezone.ts` for "today" cutoffs in Payload queries
+- Use `SITE_TIMEZONE` from `src/platform/lib/timezone.ts` when you need the raw timezone string (e.g., for `toLocaleDateString`)
 - **Day-only dates vs datetimes**: Payload stores day-only dates (`pickerAppearance: 'dayOnly'`) as midnight UTC (e.g., `2026-03-03T00:00:00.000Z`). When **displaying** these, use `timeZone: 'UTC'` so "March 3" doesn't render as "March 2". When displaying actual datetimes with time components, use `SITE_TIMEZONE`.
-- `formatDateTime()` and `formatDateShort()` in `src/utilities/formatDateTime.ts` handle this automatically — they detect day-only timestamps (ending in `T00:00:00.000Z`) and use UTC, otherwise use the site timezone.
+- `formatDateTime()` and `formatDateShort()` in `src/platform/lib/formatDateTime.ts` handle this automatically — they detect day-only timestamps (ending in `T00:00:00.000Z`) and use UTC, otherwise use the site timezone.
 - `startOfToday()` converts the current site-local date to midnight UTC to match Payload's day-only storage format for correct query comparisons.
 
 ## Images
@@ -90,7 +90,7 @@ The site timezone is configured via `SITE_TIMEZONE` env var (default: `America/C
 - Use `next/image` for all images — never raw `<img>` tags
 - Set `priority` on hero/above-fold images
 - Below-fold images use default lazy loading
-- Payload Media component (`src/components/Media/`) handles both image and video
+- Payload Media component (`src/platform/ui/Media.tsx`) handles both image and video
 
 ## Responsive Design — 6-Viewport Testing
 

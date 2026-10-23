@@ -70,20 +70,22 @@ The root layout already sets `twitter.card` to `summary_large_image`.
 
 ### Sitemap
 
-- Auto-generated sitemap.xml at `/sitemap.xml`
+- Auto-generated sitemaps at `/pages-sitemap.xml`, `/posts-sitemap.xml` and `/events-sitemap.xml`
 - Include all public pages, published posts, published events
 - Update frequency hints: posts (weekly), events (daily), static pages (monthly)
 - Exclude admin, login, draft content
 
 ### robots.txt
 
+`src/app/robots.ts` serves:
+
 ```
-User-agent: *
-Allow: /
-Disallow: /admin/
-Disallow: /api/
-Disallow: /login
-Sitemap: https://sprechereast.com/sitemap.xml
+User-Agent: *
+Disallow: /admin/*
+
+Sitemap: https://sprechereast.com/pages-sitemap.xml
+Sitemap: https://sprechereast.com/posts-sitemap.xml
+Sitemap: https://sprechereast.com/events-sitemap.xml
 ```
 
 ### Performance (Core Web Vitals)

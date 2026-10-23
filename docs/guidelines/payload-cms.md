@@ -4,9 +4,12 @@ Technical patterns for working with Payload CMS v3 Website Template in this code
 
 ## Collections
 
-Collection configs live in `src/collections/`. Every collection with public content uses:
+Collection configs live in the owning module's `cms/` folder (for example
+`src/modules/news/cms/posts.ts`), exported from its `cms.ts`; the shared `media` collection is
+`src/platform/payload/media.ts` ([architecture](../architecture/README.md#where-does-it-go)).
+Every collection with public content uses:
 
-- `access: draftContentAccess` from `src/access/draftContentAccess.ts` (published-only reads for non-staff, staff-only writes and version history; see [`security.md`](security.md))
+- `access: draftContentAccess` from `src/platform/payload/draftContentAccess.ts` (published-only reads for non-staff, staff-only writes and version history; see [`security.md`](security.md))
 - `versions: { drafts: true }` for draft/publish workflow (adds `_status` field)
 - `defaultPopulate` to limit fields returned in relationship queries (e.g., `{ title: true, slug: true }`)
 - `hooks.afterChange` for revalidation (pattern: check `context.disableRevalidate` guard first)
@@ -15,39 +18,43 @@ Slug fields use Payload's built-in `slugField()` (`import { slugField } from 'pa
 
 ## Blocks
 
-Each block in `src/blocks/` has two files:
+A page-builder block belongs to a module and has two parts:
 
-- `config.ts` — Payload Block config (`slug`, `interfaceName`, `fields`)
-- `Component.tsx` — React component receiving block data as props
+- the Payload `Block` config (`slug`, `interfaceName`, `fields`) in the module's `cms/`, for
+  example `src/modules/site/cms/callToActionBlock.ts`
+- the React component receiving the block data as props, in the module's `ui/` and exported from
+  its `server.ts`, for example `src/modules/site/ui/CallToActionBlock.tsx`
 
-**IMPORTANT**: Adding a new block requires TWO registration steps:
+**IMPORTANT**: Adding a new block requires THREE registration steps:
 
-1. Add the block config to the `blocks` array of the layout field in `src/collections/Pages/index.ts`
-2. Add the component to the `blockComponents` map in `src/blocks/RenderBlocks.tsx`
+1. Add the block config to the Pages layout: `SITE_LAYOUT_BLOCKS` in `src/modules/site/cms/layoutBlocks.ts` for a `site` block, or the `layoutBlocks` that `src/payload.config.ts` passes to `createPagesCollection` for another module's block (the form block from `contact`)
+2. Add a `case` for its `blockType` to `renderBlock` in `src/modules/site/ui/RenderBlocks.tsx`
+3. Add the component to the block registry, `pageBlocks` in `src/app/(frontend)/[slug]/pageBlocks.tsx`
 
-Missing either step will silently fail — the block won't render.
+Without step 1 editors can't add the block. Once the types are regenerated, a missing step 2 or 3
+fails `tsc`.
 
-Existing blocks: `archive`, `content`, `cta`, `formBlock`, `mediaBlock`, `banner`, `code`, `relatedPosts`.
+Page-builder blocks: `archive`, `content`, `cta`, `formBlock`, `mediaBlock`. Blocks inside rich
+text (`src/platform/richtext/`): `banner`, `code`, `mediaBlock`.
 
 ## Heroes
 
-Hero components live in `src/heros/`. Four types: `highImpact`, `mediumImpact`, `lowImpact`, `none`.
+Hero components live in `src/modules/site/ui/`. Four types: `highImpact`, `mediumImpact`, `lowImpact`, `none`.
 
-`src/heros/RenderHero.tsx` maps the `type` field to the correct component. Hero config fields are defined in `src/heros/config.ts` as a reusable field group.
+`src/modules/site/ui/RenderHero.tsx` maps the `type` field to the correct component. Hero config fields are defined in `src/modules/site/cms/hero.ts` as a reusable field group.
 
 **Two kinds of hero components:**
 
-- **CMS heroes** (`HighImpact`, `MediumImpact`, `LowImpact`) — registered in the `src/heros/config.ts` type selector and wired through `RenderHero.tsx`. Used by Pages via the layout builder.
-- **Standalone heroes** (`PostHero`, `EventHero`) — used directly by their detail pages, NOT registered in the CMS hero config. These are hardcoded per-collection detail pages and don't need CMS selection.
+- **CMS heroes** (`HighImpactHero`, `MediumImpactHero`, `LowImpactHero`) — registered in the `src/modules/site/cms/hero.ts` type selector and wired through `RenderHero.tsx`. Used by Pages via the layout builder.
+- **Standalone heroes** (`PostHero` in `src/modules/news/ui/`, `EventHero` in `src/modules/events/ui/`) — used directly by their detail pages, NOT registered in the CMS hero config. These are hardcoded per-collection detail pages and don't need CMS selection.
 
 ## Hooks
 
-Server-side hooks in `src/hooks/`:
+Shared server-side hooks are in `src/platform/payload/`:
 
 - `populatePublishedAt.ts` — Sets `publishedAt` on create if not set
-- `revalidateRedirects.ts` — Revalidates redirect cache
 
-Collection-specific hooks (e.g., `revalidatePage`, `revalidatePost`) live inside their collection directories.
+Collection-specific hooks (e.g., `revalidatePage`, `revalidatePost`, `revalidateRedirects`) live in the owning module's `cms/` folder.
 
 **Hook rules**:
 
@@ -57,15 +64,15 @@ Collection-specific hooks (e.g., `revalidatePage`, `revalidatePost`) live inside
 
 ## Fields
 
-Reusable field helpers in `src/fields/`:
+Reusable field helpers:
 
-- `link.ts` — `link()` creates a group field with `type` (reference/custom), `label`, `url`, `reference`, `newTab`, `appearance`
-- `linkGroup.ts` — `linkGroup()` creates an array of link fields
-- `defaultLexical.ts` — Standard Lexical editor config with toolbar features
+- `src/modules/site/cms/link.ts` — `link()` creates a group field with `type` (reference/custom), `label`, `url`, `reference`, `newTab`, `appearance`
+- `src/modules/site/cms/linkGroup.ts` — `linkGroup()` creates an array of link fields
+- `src/platform/payload/defaultLexical.ts` — Standard Lexical editor config with toolbar features
 
 ## SEO Plugin Type Gap
 
-Payload plugins (like `@payloadcms/plugin-seo`) can add fields at runtime that aren't reflected in generated types. When accessing plugin-injected fields, use safe type assertions and comment why. When plugin fields conflict with generic type parameters (e.g., `CollectionConfig<'posts'>`), drop the generic. Follow existing patterns in `Card`, `SidebarPosts`, `generateMeta`, and `Posts/index.ts`.
+Payload plugins (like `@payloadcms/plugin-seo`) can add fields at runtime that aren't reflected in generated types. When accessing plugin-injected fields, use safe type assertions and comment why. When plugin fields conflict with generic type parameters (e.g., `CollectionConfig<'posts'>`), drop the generic. Since #196 the SEO fields are typed (Pages, Posts and Events build their own SEO tab from the plugin's fields), so no code needs such an assertion today.
 
 ## Migrations
 

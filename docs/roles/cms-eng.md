@@ -79,7 +79,8 @@ patterns are in [`payload-cms.md`](../guidelines/payload-cms.md).
 | Users       | Accounts with the roles `admin`, `editor` and `resident`        |
 
 The exact fields are in [`docs/architecture/data-model.md`](../architecture/data-model.md) and the
-collection configs in `src/collections/`.
+collection configs in each module's `cms/` folder (`src/modules/<area>/cms/`; Media in
+`src/platform/payload/media.ts`).
 
 ## What's next
 

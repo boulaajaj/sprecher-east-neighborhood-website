@@ -5,12 +5,10 @@ Read this before writing a helper, a component or a query, and when you find a d
 ## Search before you write
 
 In this order (the [DRY search order](../../../../docs/guidelines/development.md#dry--dont-repeat-yourself)
-covers today's template folders):
+says what each shared folder holds):
 
 1. The module you're in: all its folders, imported directly.
-2. `src/platform/`: `lib/`, `ui/`, `payload/`, `email/`, `seo/`, `richtext/`.
-3. Template folders that haven't moved yet: `src/utilities/`, `src/components/` (and `ui/`),
-   `src/fields/`, `src/access/`, `src/hooks/`.
+2. `src/platform/`: `lib/`, `ui/`, `payload/`, `email/`, `seo/`, `richtext/`, `theme/`.
 
 ```bash
 grep -rn "functionName\|keyword" src --include=*.ts --include=*.tsx | grep -v payload-types
