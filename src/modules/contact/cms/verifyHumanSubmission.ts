@@ -2,7 +2,7 @@ import { APIError, type CollectionBeforeChangeHook } from 'payload'
 
 import { hasAdminOrEditor } from '@/platform/payload/roles'
 
-import { HUMAN_CHECK_TOKEN_HEADER, type HumanVerifier } from '../domain/humanVerifier'
+import { HUMAN_CHECK_TOKEN_HEADER, type HumanVerifier } from '@/platform/lib/humanCheck'
 
 /**
  * A hook that rejects public form submissions the robot check doesn't pass. Off while the

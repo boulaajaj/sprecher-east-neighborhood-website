@@ -15,10 +15,9 @@ import {
 import type { PasswordChangeValues, SignInValues } from '../domain/credentials'
 import { CURRENT_PASSWORD_CONFIRMED } from '../domain/passwordConfirmation'
 import type { CurrentUser } from '../domain/types'
+import { USERS } from '../domain/usersCollection'
 import { isRefusal } from './failures'
 import { toCurrentUser } from './mappers'
-
-const USERS = 'users'
 
 /** The Payload user this request's auth cookie belongs to, or null (Payload's own check). */
 async function getSessionPayloadUser(): Promise<TypedUser | null> {

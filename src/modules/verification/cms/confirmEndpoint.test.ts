@@ -43,6 +43,17 @@ describe('confirmEndpoint', () => {
     expect((await endpoint.handler(post({ token: 'x' }))).status).toBe(429)
   })
 
+  it('answers the address with a confirmed outcome, for the page’s next step', async () => {
+    vi.resetModules()
+    vi.doMock('./confirmEmail', () => ({
+      confirmEmail: async () => ({ outcome: 'confirmed', email: 'ana@example.com' }),
+    }))
+    const endpoint = (await import('./confirmEndpoint')).confirmEndpoint([])
+    const response = await endpoint.handler(post({ token: 'a'.repeat(43) }))
+    expect(await response.json()).toEqual({ outcome: 'confirmed', email: 'ana@example.com' })
+    vi.doUnmock('./confirmEmail')
+  })
+
   it('answers 500 with a fixed message when the database fails', async () => {
     const endpoint = await load()
     const fake = fakeRequest()

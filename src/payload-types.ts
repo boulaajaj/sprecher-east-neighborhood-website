@@ -444,6 +444,8 @@ export interface User {
   salt?: string | null
   hash?: string | null
   resetPasswordRequestedAt?: string | null
+  _verified?: boolean | null
+  _verificationToken?: string | null
   loginAttempts?: number | null
   lockUntil?: string | null
   sessions?:
@@ -1637,6 +1639,8 @@ export interface UsersSelect<T extends boolean = true> {
   salt?: T
   hash?: T
   resetPasswordRequestedAt?: T
+  _verified?: T
+  _verificationToken?: T
   loginAttempts?: T
   lockUntil?: T
   sessions?:

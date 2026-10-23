@@ -4,11 +4,18 @@
 // (https://nextjs.org/docs/app/guides/data-security). Each one parses its input again and finds
 // the account from the session, never from what the caller sends.
 
+import { headers } from 'next/headers'
+
+import { parseClientIp } from '@/platform/lib'
+import { TurnstileVerifier } from '@/platform/turnstile/turnstileVerifier'
+
 import {
   forgotPasswordSchema,
   passwordChangeSchema,
   resetPasswordSchema,
   signInSchema,
+  signUpSchema,
+  verifyAccountSchema,
 } from './domain/credentials'
 import type {
   AccountSummary,
@@ -17,6 +24,8 @@ import type {
   PasswordFailure,
   ResetPasswordFailure,
   SignInFailure,
+  SignUpFailure,
+  VerifyAccountFailure,
 } from './domain/types'
 import { changeOwnPassword } from './use-cases/changeOwnPassword'
 import { getAccountSummary } from './use-cases/getAccountSummary'
@@ -24,6 +33,8 @@ import { requestPasswordReset } from './use-cases/requestPasswordReset'
 import { resetPasswordFromLink } from './use-cases/resetPasswordFromLink'
 import { signInWithPassword } from './use-cases/signInWithPassword'
 import { signOutCurrentUser } from './use-cases/signOutCurrentUser'
+import { signUpResident } from './use-cases/signUpResident'
+import { verifyAccountFromLink } from './use-cases/verifyAccountFromLink'
 
 /** Signs in with an email and password. Input that doesn't parse reads like a wrong password. */
 export async function signIn(input: unknown): Promise<ActionResult<SignInFailure>> {
@@ -63,6 +74,32 @@ export async function resetPassword(input: unknown): Promise<ActionResult<ResetP
   const parsed = resetPasswordSchema.safeParse(input)
   if (!parsed.success) return { ok: false, failure: 'rejected' }
   return resetPasswordFromLink(parsed.data)
+}
+
+const robotCheck = new TurnstileVerifier()
+
+/**
+ * Creates a resident account and has Payload email its verification link (#187). The role is
+ * always resident. `robotCheckToken` is the Turnstile token the form got (decision 0007). Input
+ * that doesn't parse, a failed robot check and too many sign-ups are refused; past those, the
+ * answer is the same whether or not an account already uses the email.
+ */
+export async function signUp(
+  input: unknown,
+  robotCheckToken?: unknown,
+): Promise<ActionResult<SignUpFailure>> {
+  const parsed = signUpSchema.safeParse(input)
+  if (!parsed.success) return { ok: false, failure: 'rejected' }
+  const token = typeof robotCheckToken === 'string' ? robotCheckToken : null
+  const ip = parseClientIp(await headers())
+  return signUpResident(parsed.data, { token, ip }, robotCheck)
+}
+
+/** Verifies an account from its link's token. Input that doesn't parse is a dead link. */
+export async function verifyAccount(input: unknown): Promise<ActionResult<VerifyAccountFailure>> {
+  const parsed = verifyAccountSchema.safeParse(input)
+  if (!parsed.success) return { ok: false, failure: 'invalid-link' }
+  return verifyAccountFromLink(parsed.data)
 }
 
 /**

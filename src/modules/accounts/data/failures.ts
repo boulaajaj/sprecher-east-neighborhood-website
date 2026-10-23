@@ -2,7 +2,12 @@ import 'server-only'
 
 import { APIError } from 'payload'
 
-import type { PasswordFailure, ResetPasswordFailure, SignInFailure } from '../domain/types'
+import type {
+  PasswordFailure,
+  ResetPasswordFailure,
+  SignInFailure,
+  VerifyAccountFailure,
+} from '../domain/types'
 
 // Payload refuses with an APIError carrying an HTTP status; these turn it into the module's own
 // failure codes, the same split the sign-in and password forms made by status before (#204).
@@ -35,4 +40,9 @@ export function toResetPasswordFailure(error: unknown): ResetPasswordFailure {
   if (status === 403) return 'invalid-link'
   if (status === 400) return 'rejected'
   return 'server-error'
+}
+
+/** Any refusal (403: Payload doesn't know the token, or it was used) is a dead link. */
+export function toVerifyAccountFailure(error: unknown): VerifyAccountFailure {
+  return isRefusal(error) ? 'invalid-link' : 'server-error'
 }

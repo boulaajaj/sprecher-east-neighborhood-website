@@ -4,6 +4,7 @@ import { MailCheck } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 
 import { Alert } from '@/platform/ui/Alert'
+import { ConfirmedEmailContext } from '@/platform/ui/ConfirmedEmail.client'
 import { Button, Link } from '@/platform/ui'
 
 import { postConfirmation, type ConfirmAnswer } from './api'
@@ -16,7 +17,7 @@ type Answer = ConfirmAnswer | 'offline'
  * happens on page load, because mail scanners open links too. `token` is `null` when the link
  * has none, or one that can't be ours. `retryHref` is where a person with a dead link can ask
  * for a new one (the contact form). `children` shows once the email is confirmed (the account
- * offer, #187, will go there).
+ * offer, #187), and can read the confirmed address with `useConfirmedEmail`.
  */
 export function ConfirmEmail({
   token,
@@ -28,6 +29,7 @@ export function ConfirmEmail({
   children?: React.ReactNode
 }) {
   const [answer, setAnswer] = useState<Answer | null>(token ? null : 'invalid')
+  const [email, setEmail] = useState<string | null>(null)
   const [sending, setSending] = useState(false)
   // Counts answers to clicks, so focus moves to the message after each one (not on page load)
   const [answers, setAnswers] = useState(0)
@@ -44,7 +46,9 @@ export function ConfirmEmail({
     setSending(true)
     let next: Answer
     try {
-      next = await postConfirmation(token)
+      const reply = await postConfirmation(token)
+      next = reply.answer
+      setEmail(reply.email)
     } catch {
       next = 'offline'
     }
@@ -82,7 +86,7 @@ export function ConfirmEmail({
           {sending ? 'Confirming' : 'Confirm my email'}
         </Button>
       )}
-      {settled && children}
+      {settled && <ConfirmedEmailContext value={email}>{children}</ConfirmedEmailContext>}
     </div>
   )
 }

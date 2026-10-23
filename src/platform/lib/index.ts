@@ -8,3 +8,9 @@ export { toEmailHtml, type OutgoingEmail } from './emailLayout'
 export { MAX_PAGE, parsePageNumber, toPageNumbers, type FeedPage } from './paging'
 export { ROLES, type Role } from './roles'
 export { SlidingWindowCounter } from './slidingWindow'
+export {
+  HUMAN_CHECK_TOKEN_HEADER,
+  TURNSTILE_ACTION,
+  type HumanCheck,
+  type HumanVerifier,
+} from './humanCheck'

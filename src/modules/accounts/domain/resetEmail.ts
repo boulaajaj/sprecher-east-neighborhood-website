@@ -1,16 +1,11 @@
 import { type OutgoingEmail, toEmailHtml } from '@/platform/lib'
 
+import { toLinkWithToken } from './linkToken'
 import { RESET_PASSWORD_PATH } from './paths'
 
-/**
- * The link in a reset email: the site's own reset page, with Payload's token in the query string.
- * Built from the configured site address, never from the request's Host header.
- */
-export function toResetPasswordLink(siteUrl: string, token: string): string {
-  const url = new URL(RESET_PASSWORD_PATH, siteUrl)
-  url.searchParams.set('token', token)
-  return url.toString()
-}
+/** The link in a reset email: the site's own reset page, with Payload's token. */
+export const toResetPasswordLink = (siteUrl: string, token: string): string =>
+  toLinkWithToken(siteUrl, RESET_PASSWORD_PATH, token)
 
 /**
  * The email Payload's forgot-password operation sends (`auth.forgotPassword`). Payload sends

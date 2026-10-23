@@ -31,8 +31,9 @@ The owner decided on 2026-10-21 (quoted on #168):
 - **Use what exists first:** Payload's built-ins or an established library.
 - **Accounts use Payload's own sign-in** (decided 2026-10-23, quoted on #266): sign-up is
   Payload's `create` with `auth.verify`, and password resets use its forgot and reset password.
-  How Yes and the one-click link fit with Payload's sign-in is an open question for the owner on
-  #187 (asked 2026-10-23).
+  How Yes and the one-click link fit with it was settled on 2026-10-23 (option A, quoted on
+  #187): Yes opens the sign-up page with the email filled in, and Payload's verify link is the
+  one click, a second confirmation by design. No custom tokens.
 
 Contact-form senders aren't accounts, so their confirmation link uses the site's own token
 ([0009](0009-email-confirmation-token.md)): Payload's `auth.verify` only works for accounts.

@@ -102,7 +102,7 @@ describe('composition', () => {
 
     const response = await endpoint?.handler(req)
 
-    expect(await response?.json()).toEqual({ outcome: 'confirmed' })
+    expect(await response?.json()).toEqual({ outcome: 'confirmed', email: 'ana@example.com' })
     expect(update).toHaveBeenCalledWith(
       expect.objectContaining({
         collection: 'form-submissions',

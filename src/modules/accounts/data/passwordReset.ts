@@ -4,8 +4,7 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 
 import type { ForgotPasswordValues, ResetPasswordValues } from '../domain/credentials'
-
-const USERS = 'users'
+import { USERS } from '../domain/usersCollection'
 
 /**
  * Asks Payload's `forgotPassword` operation to email a reset link. Payload makes the token, sets

@@ -2,7 +2,7 @@
 import type { Form as FormType } from '@payloadcms/plugin-form-builder/types'
 
 import { useRouter } from 'next/navigation'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { RichText } from '@/platform/richtext/RichText'
 import { Button, Form, type FormStatus } from '@/platform/ui'
 import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
@@ -11,7 +11,8 @@ import { postFormSubmission } from './api'
 import { FormBuilderField, type FormValues } from './FormBuilderField.client'
 import { toDefaultValues, toFormSchema } from './formSchema'
 import { toSubmitErrorMessage } from './submitErrorMessage'
-import { TURNSTILE_SITE_KEY, TurnstileWidget } from './TurnstileWidget.client'
+import { TurnstileWidget } from '@/platform/turnstile/TurnstileWidget.client'
+import { useRobotCheck } from '@/platform/turnstile/useRobotCheck.client'
 
 export type FormBlockType = {
   blockName?: string
@@ -19,14 +20,6 @@ export type FormBlockType = {
   enableIntro: boolean
   form: FormType
   introContent?: DefaultTypedEditorState
-}
-
-const TURNSTILE_MESSAGES = {
-  blocked:
-    'The spam check couldn’t load, so this form can’t be sent. A content blocker may be stopping it: allow challenges.cloudflare.com for this site, or try another browser.',
-  failed: 'The spam check ran into a problem. Please reload the page and try again.',
-  running:
-    'One moment: the spam check is still running. If a checkbox appears above the Send button, tick it.',
 }
 
 export const FormBlock: React.FC<
@@ -53,20 +46,8 @@ export const FormBlock: React.FC<
   const [status, setStatus] = useState<FormStatus>('idle')
   const [errorMessage, setErrorMessage] = useState('')
   const router = useRouter()
-  // Spam check (Cloudflare Turnstile) — only when a site key is configured
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
-  const [turnstileReset, setTurnstileReset] = useState(0)
-  const [turnstileBlocked, setTurnstileBlocked] = useState(false)
-  const [turnstileFailed, setTurnstileFailed] = useState(false)
-  const onTurnstileToken = useCallback((token: string | null) => {
-    setTurnstileToken(token)
-    if (token) {
-      setTurnstileFailed(false)
-      setTurnstileBlocked(false)
-    }
-  }, [])
-  const onTurnstileBlocked = useCallback(() => setTurnstileBlocked(true), [])
-  const onTurnstileError = useCallback(() => setTurnstileFailed(true), [])
+  // Spam check (Cloudflare Turnstile): only when a site key is configured
+  const robotCheck = useRobotCheck()
 
   const fail = (message: string) => {
     setErrorMessage(message)
@@ -75,16 +56,15 @@ export const FormBlock: React.FC<
 
   // `Form` ignores a second submit while this runs, so one single-use token is sent once
   const onSubmit = async (values: FormValues) => {
-    if (TURNSTILE_SITE_KEY && !turnstileToken) {
-      fail(
-        TURNSTILE_MESSAGES[turnstileBlocked ? 'blocked' : turnstileFailed ? 'failed' : 'running'],
-      )
+    const pending = robotCheck.pendingMessage()
+    if (pending) {
+      fail(pending)
       return
     }
     setStatus('submitting')
     let succeeded = false
     try {
-      const response = await postFormSubmission(formID, values, turnstileToken)
+      const response = await postFormSubmission(formID, values, robotCheck.token)
       // The server's own message stays out of the page (#204); the server logs it
       if (!response.ok) {
         fail(toSubmitErrorMessage(response.status))
@@ -96,8 +76,7 @@ export const FormBlock: React.FC<
     } catch {
       fail(toSubmitErrorMessage(null))
     } finally {
-      // Tokens are single use: after a failed attempt, get a fresh one for the retry
-      if (TURNSTILE_SITE_KEY && !succeeded) setTurnstileReset((n) => n + 1)
+      if (!succeeded) robotCheck.resetAfterFailure()
     }
   }
 
@@ -131,14 +110,7 @@ export const FormBlock: React.FC<
                   <FormBuilderField key={index} field={field} form={form} />
                 ))}
                 <div className="flex flex-col gap-6">
-                  {TURNSTILE_SITE_KEY && (
-                    <TurnstileWidget
-                      onToken={onTurnstileToken}
-                      onLoadError={onTurnstileBlocked}
-                      onWidgetError={onTurnstileError}
-                      resetSignal={turnstileReset}
-                    />
-                  )}
+                  {robotCheck.enabled && <TurnstileWidget {...robotCheck.widgetProps} />}
                   <div>
                     <Button
                       fullWidth="mobile"

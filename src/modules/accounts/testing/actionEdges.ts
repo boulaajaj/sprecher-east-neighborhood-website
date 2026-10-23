@@ -17,6 +17,9 @@ export const edges = {
   login: vi.fn(),
   forgotPassword: vi.fn(),
   resetPassword: vi.fn(),
+  create: vi.fn(),
+  delete: vi.fn(),
+  verifyEmail: vi.fn(),
   logoutOperation: vi.fn(),
   /** `login` from `@payloadcms/next/auth`: Payload's sign-in, which also sets the cookie */
   signInHelper: vi.fn(),
@@ -36,6 +39,9 @@ export const payloadWithEdges = (actual: typeof PayloadModule) => ({
     login: edges.login,
     forgotPassword: edges.forgotPassword,
     resetPassword: edges.resetPassword,
+    create: edges.create,
+    delete: edges.delete,
+    verifyEmail: edges.verifyEmail,
     collections: { users },
     config: { cookiePrefix: 'payload' },
   }),
@@ -43,8 +49,11 @@ export const payloadWithEdges = (actual: typeof PayloadModule) => ({
   logoutOperation: edges.logoutOperation,
 })
 
+/** The request's headers; a test sets `x-forwarded-for` here to act as a connection */
+export const requestHeaders = new Headers({ cookie: 'payload-token=abc' })
+
 export const nextHeadersWithEdges = () => ({
-  headers: async () => new Headers({ cookie: 'payload-token=abc' }),
+  headers: async () => requestHeaders,
   cookies: async () => ({ delete: edges.deleteCookie }),
 })
 
@@ -62,5 +71,6 @@ export const resident = {
 /** Resets every edge and silences (and records) the server log. */
 export function resetEdges() {
   for (const fn of Object.values(edges)) fn.mockReset()
+  requestHeaders.delete('x-forwarded-for')
   vi.spyOn(console, 'error').mockImplementation(() => {})
 }

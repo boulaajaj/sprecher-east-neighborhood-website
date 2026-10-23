@@ -5,7 +5,7 @@ import {
   HUMAN_CHECK_TOKEN_HEADER,
   type HumanCheck,
   type HumanVerifier,
-} from '../domain/humanVerifier'
+} from '@/platform/lib/humanCheck'
 import { verifyHumanSubmission } from './verifyHumanSubmission'
 
 /** The test double: answers what the test says and records the tokens it was asked about. */

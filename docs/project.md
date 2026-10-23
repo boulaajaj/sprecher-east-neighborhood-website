@@ -20,7 +20,7 @@ It is an unofficial, AI-assisted initiative (ground rules in [`AGENTS.md`](../AG
 - **Framework**: Next.js 16 (App Router, TypeScript; Turbopack builds), React 19.2
 - **CSS**: Tailwind CSS v4 (design tokens in `src/app/(frontend)/globals.css @theme {}`)
 - **CMS**: Payload CMS v3 Website Template at `/admin` (self-hosted, SQLite `data/payload.db`)
-- **Auth**: Payload native auth (Users collection with `auth: true`); roles `admin`, `editor`, `resident`. Pages and server actions ask `src/modules/accounts/` who is signed in (`getCurrentUser`, `requireUser`, `requireRole`); sign-in (Payload's `login` helper from `@payloadcms/next/auth`), sign-out, password changes and forgot/reset password (Payload's `forgotPassword` and `resetPassword`, with a branded email linking to `/reset-password`, #269) are its server actions
+- **Auth**: Payload native auth (Users collection with `auth: true`); roles `admin`, `editor`, `resident`. Pages and server actions ask `src/modules/accounts/` who is signed in (`getCurrentUser`, `requireUser`, `requireRole`); sign-in (Payload's `login` helper from `@payloadcms/next/auth`), sign-out, password changes and forgot/reset password (Payload's `forgotPassword` and `resetPassword`, with a branded email linking to `/reset-password`, #269) are its server actions. Residents sign up on `/sign-up` (offered on `/confirm-email` after a contact sender confirms) through Payload's `create` with `auth.verify`: the branded verification email links to `/verify-account`, and an unverified account can't sign in or get a reset email (#187)
 - **Email**: `@payloadcms/email-nodemailer` over SMTP (Mailgun in production); logs to the console when `SMTP_HOST` is unset. Email addresses typed into public forms are confirmed by link (`src/modules/verification/`, #183)
 - **Spam protection**: Cloudflare Turnstile on public forms, plus size and rate limits (decision records in `docs/architecture/decisions/`)
 - **Tests**: Vitest unit tests next to the code (`*.test.ts`), run with `npm test` and in CI (#139). Component tests (`*.test.tsx`) run in jsdom with Testing Library and axe (`expectAccessible` in `src/platform/ui/testing/`)
@@ -76,7 +76,7 @@ src/
     (payload)/         Payload admin and API routes (generated; leave alone)
   modules/             One folder per business area
     accounts/          Who is signed in, sign-in and password flows, the users collection
-    contact/           Form safeguards, the robot check, the form block
+    contact/           Form safeguards, the form block
     directory/         FAQ, local resources, team members
     events/            Events and the upcoming rule
     news/              Posts, categories, search
@@ -88,6 +88,7 @@ src/
     richtext/          The `RichText` renderer, the blocks inside rich text, plain-text conversion
     seo/               Page metadata and Open Graph helpers
     theme/             Light and dark mode: theme providers, `InitTheme`, `ThemeSelector`
+    turnstile/         The robot check (Cloudflare Turnstile): widget and server verifier
     ui/                The UI kit: `Button`, `Link`, `Media`, `CMSLink`, `JsonLd`, `Breadcrumbs`, `LoadMore`…
   endpoints/seed/      Seed data and script (exception)
   migrations/          Database migrations (generated)

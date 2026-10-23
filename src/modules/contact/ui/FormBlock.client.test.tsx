@@ -4,13 +4,13 @@ import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { HUMAN_CHECK_TOKEN_HEADER } from '../domain/humanVerifier'
+import { HUMAN_CHECK_TOKEN_HEADER } from '@/platform/lib/humanCheck'
 
 // The robot check, replaced by a widget that hands out a token for each reset
 const turnstile = vi.hoisted(() => ({
   tokenFor: (reset: number): string | null => `token-${reset}`,
 }))
-vi.mock('./TurnstileWidget.client', async () => {
+vi.mock('@/platform/turnstile/TurnstileWidget.client', async () => {
   const { useEffect } = await import('react')
   return {
     TURNSTILE_SITE_KEY: 'test-site-key',

@@ -10,14 +10,21 @@ import {
 } from '@/platform/payload/roles'
 
 import { toResetPasswordEmail, toResetPasswordLink } from '../domain/resetEmail'
+import { USERS } from '../domain/usersCollection'
+import { toVerifyAccountEmail, toVerifyAccountLink } from '../domain/verifyAccountEmail'
+import { noResetEmailWhileUnverified } from './noResetEmailWhileUnverified'
 import { requireCurrentPassword } from './requireCurrentPassword'
 
 /** The reset email for a token Payload just made: its link opens the site's reset page. */
 const resetEmailFor = (token = '') =>
   toResetPasswordEmail(toResetPasswordLink(getServerSideURL(), token))
 
+/** The verification email for a new account's token: its link opens the site's verify page. */
+const verifyEmailFor = (token = '') =>
+  toVerifyAccountEmail(toVerifyAccountLink(getServerSideURL(), token))
+
 export const Users: CollectionConfig = {
-  slug: 'users',
+  slug: USERS,
   access: {
     admin: isAdminOrEditorBoolean,
     create: isAdmin,
@@ -46,10 +53,19 @@ export const Users: CollectionConfig = {
       generateEmailHTML: (args) => resetEmailFor(args?.token).html,
       generateEmailSubject: (args) => resetEmailFor(args?.token).subject,
     },
+    // A new account can't sign in until its email is verified through Payload's one-time link
+    // (#187), branded and linking to the site's /verify-account page instead of the admin.
+    // Accounts from before this are marked verified by the migration that turned it on.
+    verify: {
+      generateEmailHTML: (args) => verifyEmailFor(args?.token).html,
+      generateEmailSubject: (args) => verifyEmailFor(args?.token).subject,
+    },
   },
   hooks: {
     // Your own password changes only on /account, after your current one is checked (#233)
     beforeChange: [requireCurrentPassword],
+    // No reset email to an account whose email isn't verified yet (#187)
+    beforeOperation: [noResetEmailWhileUnverified],
   },
   fields: [
     {

@@ -8,6 +8,7 @@ import {
   isAdminOrSelf,
 } from '@/platform/payload/roles'
 
+import { noResetEmailWhileUnverified } from './noResetEmailWhileUnverified'
 import { requireCurrentPassword } from './requireCurrentPassword'
 import { Users } from './users'
 
@@ -23,7 +24,7 @@ describe('Users', () => {
     })
   })
 
-  it('keeps Payload’s auth defaults but the cookie’s Secure flag and the reset email', () => {
+  it('keeps Payload’s auth defaults but the cookie’s Secure flag, the emails and verification', () => {
     // Tests don't run in production, so the flag is off here; the tests below cover both
     expect(Users.auth).toEqual({
       cookies: { secure: false },
@@ -31,7 +32,27 @@ describe('Users', () => {
         generateEmailHTML: expect.any(Function),
         generateEmailSubject: expect.any(Function),
       },
+      verify: {
+        generateEmailHTML: expect.any(Function),
+        generateEmailSubject: expect.any(Function),
+      },
     })
+  })
+
+  it('sends a branded verification email whose link opens the site’s verify page (#187)', async () => {
+    vi.stubEnv('NEXT_PUBLIC_SERVER_URL', 'https://sprechereast.com')
+    const auth = typeof Users.auth === 'object' ? Users.auth.verify : undefined
+    const email = typeof auth === 'object' ? auth : undefined
+    // Payload passes the request and the new user too; the email reads only the token
+    const args = { token: 'abc123' } as Parameters<
+      NonNullable<NonNullable<typeof email>['generateEmailHTML']>
+    >[0]
+    const html = await email?.generateEmailHTML?.(args)
+    expect(html).toContain('href="https://sprechereast.com/verify-account?token=abc123"')
+    expect(html).not.toContain('/admin')
+    expect(await email?.generateEmailSubject?.(args)).toBe(
+      'Confirm your email to finish your Sprecher East account',
+    )
   })
 
   it('sends a branded reset email whose link opens the site’s reset page, not the admin', async () => {
@@ -45,8 +66,11 @@ describe('Users', () => {
     )
   })
 
-  it('asks for the current password before anyone changes their own (#233)', () => {
-    expect(Users.hooks).toEqual({ beforeChange: [requireCurrentPassword] })
+  it('asks for the current password before anyone changes their own (#233), and sends no reset email to an unverified account (#187)', () => {
+    expect(Users.hooks).toEqual({
+      beforeChange: [requireCurrentPassword],
+      beforeOperation: [noResetEmailWhileUnverified],
+    })
   })
 
   it('makes new accounts residents, and only admins may set a role', () => {

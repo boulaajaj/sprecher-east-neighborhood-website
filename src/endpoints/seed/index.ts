@@ -129,7 +129,11 @@ export const seed = async ({
         email: 'demo-author@example.com',
         password: seedPassword,
         role: ROLES.admin,
+        // The demo admin can sign in at once: with `auth.verify` on, Payload would otherwise
+        // store it unverified and email example.com a link (#187)
+        _verified: true,
       },
+      disableVerificationEmail: true,
     }),
     payload.create({
       collection: 'media',
