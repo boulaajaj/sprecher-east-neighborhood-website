@@ -7,6 +7,7 @@ import {
   nextHeadersWithEdges,
   nextServerWithEdges,
   payloadWithEdges,
+  afterTasks,
   resetEdges,
   robotCheckWithEdges,
   runAfterTasks,
@@ -75,7 +76,12 @@ describe('signUp: resending a lost verification link', () => {
     expect(update).toMatchObject({
       collection: 'users',
       id: 9,
-      data: { verificationResends: 1, verificationResendsSince: new Date().toISOString() },
+      data: {
+        verificationResends: 1,
+        verificationResendsSince: new Date().toISOString(),
+        // Whoever opens the new link chooses the password
+        verificationSetsPassword: true,
+      },
     })
     const token = update.data._verificationToken
     expect(token).toMatch(/^[0-9a-f]{40}$/)
@@ -116,5 +122,29 @@ describe('signUp: resending a lost verification link', () => {
     expect(console.error).toHaveBeenCalledExactlyOnceWith(
       'Sign-up verification resend failed on the server (Error)',
     )
+  })
+
+  it('runs resends for one address one after another, so two at once can’t pass the cap', async () => {
+    // The stored count, as the database holds it between the two resends
+    const account = {
+      id: 9,
+      email: 'ana@example.com',
+      _verified: false,
+      verificationResends: 2,
+      verificationResendsSince: new Date().toISOString(),
+    }
+    edges.find.mockImplementation(async () => ({ docs: [{ ...account }] }))
+    edges.dbUpdateOne.mockImplementation(async ({ data }) => {
+      Object.assign(account, data)
+    })
+    edges.sendEmail.mockResolvedValue(undefined)
+
+    await signUp(input)
+    await signUp(input)
+    // Next runs both pieces of after-work at once
+    await Promise.all(afterTasks.splice(0).map((task) => task()))
+
+    expect(edges.sendEmail).toHaveBeenCalledTimes(1)
+    expect(account.verificationResends).toBe(3)
   })
 })

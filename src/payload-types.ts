@@ -438,6 +438,7 @@ export interface User {
   role: 'admin' | 'editor' | 'resident'
   verificationResends?: number | null
   verificationResendsSince?: string | null
+  verificationSetsPassword?: boolean | null
   updatedAt: string
   createdAt: string
   email: string
@@ -1635,6 +1636,7 @@ export interface UsersSelect<T extends boolean = true> {
   role?: T
   verificationResends?: T
   verificationResendsSince?: T
+  verificationSetsPassword?: T
   updatedAt?: T
   createdAt?: T
   email?: T

@@ -99,6 +99,9 @@ export const Users: CollectionConfig = {
     // the server reads and writes them: hidden from the API and the admin panel.
     { name: 'verificationResends', type: 'number', defaultValue: 0, hidden: true },
     { name: 'verificationResendsSince', type: 'date', hidden: true },
+    // Set when a link is resent: the password from the first sign-up may not be this person's,
+    // so the verify page has them choose one before the account opens (#289)
+    { name: 'verificationSetsPassword', type: 'checkbox', defaultValue: false, hidden: true },
   ],
   timestamps: true,
 }

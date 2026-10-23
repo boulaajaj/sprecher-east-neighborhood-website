@@ -5,12 +5,9 @@ import React, { useState } from 'react'
 import { Button, Field, Form, type FormApi, type FormStatus } from '@/platform/ui'
 
 import { changePassword } from '../actions'
-import {
-  MIN_PASSWORD_LENGTH,
-  passwordChangeSchema,
-  type PasswordChangeValues,
-} from '../domain/credentials'
+import { passwordChangeSchema, type PasswordChangeValues } from '../domain/credentials'
 import type { PasswordFailure } from '../domain/types'
+import { NewPasswordFields } from './NewPasswordFields.client'
 import { toPasswordErrorMessage } from './passwordErrorMessage'
 
 /** Changes the signed-in account's password. The account comes from the session, not a prop. */
@@ -60,21 +57,12 @@ export function ChangePasswordForm() {
               {...register('currentPassword')}
             />
           </Field>
-          <Field
-            label="New password"
-            required
-            hint={`At least ${MIN_PASSWORD_LENGTH} characters.`}
-            error={errors.newPassword?.message}
-          >
-            <Field.Input type="password" autoComplete="new-password" {...register('newPassword')} />
-          </Field>
-          <Field label="Confirm new password" required error={errors.confirmPassword?.message}>
-            <Field.Input
-              type="password"
-              autoComplete="new-password"
-              {...register('confirmPassword')}
-            />
-          </Field>
+          <NewPasswordFields
+            password={register('newPassword')}
+            confirm={register('confirmPassword')}
+            passwordError={errors.newPassword?.message}
+            confirmError={errors.confirmPassword?.message}
+          />
           <div>
             <Button type="submit" loading={status === 'submitting'}>
               {status === 'submitting' ? 'Updating' : 'Update Password'}

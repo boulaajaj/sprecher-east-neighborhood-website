@@ -6,7 +6,7 @@ import * as migration_20261021_233720_backfill_seo_image_versions from './202610
 import * as migration_20261022_211619_email_confirmations from './20261022_211619_email_confirmations'
 import * as migration_20261022_213133_contact_sender_email from './20261022_213133_contact_sender_email'
 import * as migration_20261023_183632_account_verification from './20261023_183632_account_verification'
-import * as migration_20261023_204207_verification_resends from './20261023_204207_verification_resends'
+import * as migration_20261023_211151_verification_resends from './20261023_211151_verification_resends'
 
 export const migrations = [
   {
@@ -50,8 +50,8 @@ export const migrations = [
     name: '20261023_183632_account_verification',
   },
   {
-    up: migration_20261023_204207_verification_resends.up,
-    down: migration_20261023_204207_verification_resends.down,
-    name: '20261023_204207_verification_resends',
+    up: migration_20261023_211151_verification_resends.up,
+    down: migration_20261023_211151_verification_resends.down,
+    name: '20261023_211151_verification_resends',
   },
 ]

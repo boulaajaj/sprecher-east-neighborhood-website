@@ -70,7 +70,7 @@ export type ResendOutcome = 'sent' | 'none' | 'capped'
  * its resend count allows it (#289). Payload 3.91 has no resend: its `sendVerificationEmail`
  * isn't exported. So this does what Payload's `create` does: a new token, the same way Payload
  * makes it, then the same branded email, now with Payload's `sendEmail`. The old link stops
- * working. Writes with `db.updateOne`, as Payload's own `verifyEmail` does: the token and the
+ * working, and the new one asks for a password before it opens the account. Writes with `db.updateOne`, as Payload's own `verifyEmail` does: the token and the
  * count are server-only fields, and no hook applies to them.
  */
 export async function resendVerification(email: string, now: Date): Promise<ResendOutcome> {
@@ -101,12 +101,60 @@ export async function resendVerification(email: string, now: Date): Promise<Rese
       _verificationToken: token,
       verificationResends: take.next.resends,
       verificationResendsSince: take.next.since?.toISOString() ?? null,
+      // Whoever opens this link chooses the password: the first sign-up's may not be theirs
+      verificationSetsPassword: true,
     },
     returning: false,
   })
   const message = toVerifyAccountEmail(toVerifyAccountLink(getServerSideURL(), token))
-  await payload.sendEmail({ to: account.email, subject: message.subject, html: message.html, text: message.text })
+  await payload.sendEmail({
+    to: account.email,
+    subject: message.subject,
+    html: message.html,
+    text: message.text,
+  })
   return 'sent'
+}
+
+/**
+ * Whether the account a verification link belongs to was resent its link, so that whoever opens
+ * it must choose the password (#289). `null` when no account holds the token.
+ */
+export async function findPendingVerification(
+  token: string,
+): Promise<{ id: number; setsPassword: boolean } | null> {
+  const payload = await getPayload({ config: configPromise })
+  const { docs } = await payload.find({
+    collection: USERS,
+    where: { _verificationToken: { equals: token } },
+    limit: 1,
+    depth: 0,
+    pagination: false,
+    // The link's token is the proof, as for Payload's own verify; the server reads one flag
+    overrideAccess: true,
+    showHiddenFields: true,
+  })
+  const account = docs[0]
+  return account
+    ? { id: account.id, setsPassword: account.verificationSetsPassword === true }
+    : null
+}
+
+/**
+ * Sets the password the person chose on the verify page and clears the flag (#289), with
+ * Payload's `update`, which hashes it. No user runs this, so `requireCurrentPassword` lets it
+ * through, as it does for the seed.
+ */
+export async function setPasswordFromVerification(id: number, password: string): Promise<void> {
+  const payload = await getPayload({ config: configPromise })
+  await payload.update({
+    collection: USERS,
+    id,
+    data: { password, verificationSetsPassword: false },
+    depth: 0,
+    // Visitors can't update accounts; holding this account's link is the proof
+    overrideAccess: true,
+  })
 }
 
 /**
@@ -115,7 +163,9 @@ export async function resendVerification(email: string, now: Date): Promise<Rese
  * (403: unknown or used token). Payload's operation takes no `overrideAccess`: the token is the
  * proof, as on `POST /api/users/verify/<token>`.
  */
-export async function verifyAccountToken({ token }: VerifyAccountValues): Promise<void> {
+export async function verifyAccountToken({
+  token,
+}: Pick<VerifyAccountValues, 'token'>): Promise<void> {
   const payload = await getPayload({ config: configPromise })
   await payload.verifyEmail({ collection: USERS, token })
 }

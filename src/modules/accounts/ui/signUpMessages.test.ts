@@ -17,6 +17,7 @@ describe('sign-up messages', () => {
     expect(toSignUpErrorMessage('robot-check')).toMatch(/spam check/)
     expect(toSignUpErrorMessage('too-many')).toMatch(/try again in an hour/)
     expect(toVerifyAccountErrorMessage('invalid-link')).toMatch(/already used/)
+    expect(toVerifyAccountErrorMessage('needs-password')).toMatch(/^Choose a password to finish/)
     expect(toVerifyAccountErrorMessage('server-error')).toMatch(/try again/)
     expect(toVerifyAccountErrorMessage('offline')).toBe(FORM_MESSAGES.offline)
   })

@@ -51,8 +51,25 @@ export async function signUpResident(
   return { ok: true }
 }
 
-/** Resends the verification link if the account is unverified and under its cap; logs the rest. */
-async function resendLostLink(email: string): Promise<void> {
+// Resends for the same address run one after another, so two sign-ups at once can't both read
+// the count before either stores it and pass the cap together. In memory: the site runs as one
+// PM2 process.
+const resending = new Map<string, Promise<void>>()
+
+/**
+ * Resends the verification link if the account is unverified and under its cap; logs the rest.
+ * Waits for any resend already running for this address.
+ */
+function resendLostLink(email: string): Promise<void> {
+  const next = (resending.get(email) ?? Promise.resolve()).then(() => resendOnce(email))
+  resending.set(email, next)
+  void next.finally(() => {
+    if (resending.get(email) === next) resending.delete(email)
+  })
+  return next
+}
+
+async function resendOnce(email: string): Promise<void> {
   try {
     const outcome = await resendVerification(email, new Date())
     if (outcome === 'capped') console.warn('Sign-up verification resend capped for an account')

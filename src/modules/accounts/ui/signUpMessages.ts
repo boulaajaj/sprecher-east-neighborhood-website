@@ -23,6 +23,13 @@ export const ACCOUNT_VERIFIED =
   'Your email is confirmed and your account is ready. Log in with the password you chose.'
 
 /**
+ * What a visitor reads when the link was resent after a second sign-up (#289): the account opens
+ * with the password chosen here, not one from an earlier sign-up.
+ */
+export const CHOOSE_PASSWORD_TO_VERIFY =
+  'Choose a password to finish. This link was sent again after a new sign-up, so your account uses the password you choose now.'
+
+/**
  * What a visitor reads when a verification link doesn't work. Fixed texts only, never the
  * server's message (#204). `offline`: the request got no answer.
  */
@@ -31,5 +38,6 @@ export function toVerifyAccountErrorMessage(failure: VerifyAccountFailure | 'off
   if (failure === 'invalid-link') {
     return 'This link isn’t valid or was already used. If you already confirmed your account, log in.'
   }
+  if (failure === 'needs-password') return CHOOSE_PASSWORD_TO_VERIFY
   return 'We couldn’t confirm your account. Please try again in a few minutes.'
 }

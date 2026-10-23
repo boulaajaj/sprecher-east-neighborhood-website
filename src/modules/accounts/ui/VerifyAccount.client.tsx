@@ -4,12 +4,18 @@ import { MailCheck } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 
 import { Alert } from '@/platform/ui/Alert'
-import { Button } from '@/platform/ui'
+import { Button, Form } from '@/platform/ui'
 
 import { verifyAccount } from '../actions'
+import { newPasswordSchema, type NewPasswordValues } from '../domain/credentials'
 import { SIGN_IN_PATH } from '../domain/paths'
 import type { VerifyAccountFailure } from '../domain/types'
-import { ACCOUNT_VERIFIED, toVerifyAccountErrorMessage } from './signUpMessages'
+import { NewPasswordFields } from './NewPasswordFields.client'
+import {
+  ACCOUNT_VERIFIED,
+  CHOOSE_PASSWORD_TO_VERIFY,
+  toVerifyAccountErrorMessage,
+} from './signUpMessages'
 
 type Answer = 'verified' | VerifyAccountFailure | 'offline'
 
@@ -18,11 +24,16 @@ type Answer = 'verified' | VerifyAccountFailure | 'offline'
  * token. Nothing happens on page load, because mail scanners open links too and would use it up.
  * `token` is `null` when the link has none, or one that can't be a token. The token leaves the
  * address bar and the history as soon as the page loads; the component keeps the one it was given.
+ *
+ * A link resent after a second sign-up answers `needs-password` (#289): the person chooses the
+ * account's password here, and the same request then verifies the email.
  */
 export function VerifyAccount({ token: linkToken }: { token: string | null }) {
   const [token] = useState(linkToken)
   const [answer, setAnswer] = useState<Answer | null>(token ? null : 'invalid-link')
   const [sending, setSending] = useState(false)
+  // Once a password is asked for, the form stays until the account is verified
+  const [choosingPassword, setChoosingPassword] = useState(false)
   // Counts answers to clicks, so focus moves to the message after each one (not on page load)
   const [answers, setAnswers] = useState(0)
   const messageRef = useRef<HTMLDivElement>(null)
@@ -34,16 +45,17 @@ export function VerifyAccount({ token: linkToken }: { token: string | null }) {
     if (answers > 0) messageRef.current?.focus()
   }, [answers])
 
-  const verify = async () => {
+  const verify = async (password?: NewPasswordValues) => {
     if (!token || sending) return
     setSending(true)
     let next: Answer
     try {
-      const result = await verifyAccount({ token })
+      const result = await verifyAccount({ token, ...password })
       next = result.ok ? 'verified' : result.failure
     } catch {
       next = 'offline'
     }
+    if (next === 'needs-password') setChoosingPassword(true)
     setAnswer(next)
     setSending(false)
     setAnswers((n) => n + 1)
@@ -58,6 +70,8 @@ export function VerifyAccount({ token: linkToken }: { token: string | null }) {
         <div ref={messageRef} tabIndex={-1} className="outline-none">
           {answer === 'verified' ? (
             <Alert variant="success">{ACCOUNT_VERIFIED}</Alert>
+          ) : answer === 'needs-password' ? (
+            <p className="text-foreground">{CHOOSE_PASSWORD_TO_VERIFY}</p>
           ) : (
             <Alert variant="error">{toVerifyAccountErrorMessage(answer)}</Alert>
           )}
@@ -67,10 +81,35 @@ export function VerifyAccount({ token: linkToken }: { token: string | null }) {
         <Button href={SIGN_IN_PATH} fullWidth>
           Log In
         </Button>
+      ) : choosingPassword ? (
+        <Form<NewPasswordValues, NewPasswordValues>
+          aria-label="Choose your password"
+          schema={newPasswordSchema}
+          defaultValues={{}}
+          onSubmit={verify}
+          status={sending ? 'submitting' : 'idle'}
+        >
+          {({ register, formState: { errors } }) => (
+            <>
+              <NewPasswordFields
+                label="Password"
+                password={register('newPassword')}
+                confirm={register('confirmPassword')}
+                passwordError={errors.newPassword?.message}
+                confirmError={errors.confirmPassword?.message}
+              />
+              <div>
+                <Button type="submit" loading={sending} fullWidth>
+                  {sending ? 'Confirming' : 'Set Password and Confirm'}
+                </Button>
+              </div>
+            </>
+          )}
+        </Form>
       ) : (
         <Button
           type="button"
-          onClick={verify}
+          onClick={() => verify()}
           loading={sending}
           iconStart={<MailCheck aria-hidden />}
           fullWidth

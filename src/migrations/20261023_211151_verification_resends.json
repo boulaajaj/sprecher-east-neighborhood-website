@@ -4893,6 +4893,14 @@
           "notNull": false,
           "autoincrement": false
         },
+        "verification_sets_password": {
+          "name": "verification_sets_password",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
         "updated_at": {
           "name": "updated_at",
           "type": "text",
@@ -8413,6 +8421,6 @@
   "internal": {
     "indexes": {}
   },
-  "id": "80231590-be7c-43f0-86b2-ec4dac7dcecc",
+  "id": "195f3bd7-ed80-4c38-9bd2-7232cea8f7e4",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

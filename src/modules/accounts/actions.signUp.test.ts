@@ -21,10 +21,10 @@ vi.mock('next/headers', () => nextHeadersWithEdges())
 vi.mock('next/server', async (importActual) => nextServerWithEdges(await importActual()))
 vi.mock('@/platform/turnstile/turnstileVerifier', () => robotCheckWithEdges())
 
-import { signUp, verifyAccount } from './actions'
+import { signUp } from './actions'
 
 // Payload's real errors, as its operations throw them
-const { APIError, ValidationError } = await vi.importActual<typeof PayloadModule>('payload')
+const { ValidationError } = await vi.importActual<typeof PayloadModule>('payload')
 
 // Each test starts in a fresh hour, so the limits only count that test's sign-ups
 let hour = 0
@@ -199,37 +199,5 @@ describe('signUp', () => {
       expect(await signUp(values)).toEqual({ ok: false, failure: 'rejected' })
     }
     expect(edges.create).not.toHaveBeenCalled()
-  })
-})
-
-describe('verifyAccount', () => {
-  const token = '0123456789abcdef0123456789abcdef01234567'
-
-  it('verifies the account with Payload’s verifyEmail and the link’s token', async () => {
-    edges.verifyEmail.mockResolvedValue(true)
-    expect(await verifyAccount({ token })).toEqual({ ok: true })
-    expect(edges.verifyEmail).toHaveBeenCalledExactlyOnceWith({ collection: 'users', token })
-    expect(edges.signInHelper).not.toHaveBeenCalled()
-  })
-
-  it('reads an unknown or used token as a dead link', async () => {
-    edges.verifyEmail.mockRejectedValue(new APIError('Verification token is invalid.', 403))
-    expect(await verifyAccount({ token })).toEqual({ ok: false, failure: 'invalid-link' })
-    expect(console.error).not.toHaveBeenCalled()
-  })
-
-  it('logs only the error’s name when it fails on our side', async () => {
-    edges.verifyEmail.mockRejectedValue(new APIError('Database down', 500))
-    expect(await verifyAccount({ token })).toEqual({ ok: false, failure: 'server-error' })
-    expect(console.error).toHaveBeenCalledExactlyOnceWith(
-      'Account verification failed on the server (APIError)',
-    )
-  })
-
-  it('reads input that doesn’t parse as a dead link, without asking Payload', async () => {
-    for (const values of [null, { token: '' }, { token, email: 'a@example.com' }]) {
-      expect(await verifyAccount(values)).toEqual({ ok: false, failure: 'invalid-link' })
-    }
-    expect(edges.verifyEmail).not.toHaveBeenCalled()
   })
 })
