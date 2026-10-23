@@ -8,14 +8,10 @@ import { useRobotCheck } from '@/platform/turnstile/useRobotCheck.client'
 import { Button, Field, Form, type FormStatus, Link } from '@/platform/ui'
 
 import { signUp } from '../actions'
-import {
-  MIN_PASSWORD_LENGTH,
-  signUpSchema,
-  type SignUpInput,
-  type SignUpValues,
-} from '../domain/credentials'
+import { signUpSchema, type SignUpInput, type SignUpValues } from '../domain/credentials'
 import { SIGN_IN_PATH } from '../domain/paths'
 import type { SignUpFailure } from '../domain/types'
+import { NewPasswordFields } from './NewPasswordFields.client'
 import { SIGN_UP_SENT, toSignUpErrorMessage } from './signUpMessages'
 
 /**
@@ -102,25 +98,13 @@ export function SignUpForm({ email }: { email: string | null }) {
                 {...register('email')}
               />
             </Field>
-            <Field
+            <NewPasswordFields
               label="Password"
-              required
-              hint={`At least ${MIN_PASSWORD_LENGTH} characters.`}
-              error={errors.newPassword?.message}
-            >
-              <Field.Input
-                type="password"
-                autoComplete="new-password"
-                {...register('newPassword')}
-              />
-            </Field>
-            <Field label="Confirm password" required error={errors.confirmPassword?.message}>
-              <Field.Input
-                type="password"
-                autoComplete="new-password"
-                {...register('confirmPassword')}
-              />
-            </Field>
+              password={register('newPassword')}
+              confirm={register('confirmPassword')}
+              passwordError={errors.newPassword?.message}
+              confirmError={errors.confirmPassword?.message}
+            />
             {robotCheck.enabled && <TurnstileWidget {...robotCheck.widgetProps} />}
             <div>
               <Button type="submit" loading={status === 'submitting'} fullWidth>

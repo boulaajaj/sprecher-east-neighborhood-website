@@ -3,16 +3,13 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import { Alert } from '@/platform/ui/Alert'
-import { Button, Field, Form, type FormStatus } from '@/platform/ui'
+import { Button, Form, type FormStatus } from '@/platform/ui'
 
 import { resetPassword } from '../actions'
-import {
-  MIN_PASSWORD_LENGTH,
-  newPasswordSchema,
-  type NewPasswordValues,
-} from '../domain/credentials'
+import { newPasswordSchema, type NewPasswordValues } from '../domain/credentials'
 import { FORGOT_PASSWORD_PATH, SIGN_IN_PATH } from '../domain/paths'
 import type { ResetPasswordFailure } from '../domain/types'
+import { NewPasswordFields } from './NewPasswordFields.client'
 import { toResetPasswordErrorMessage } from './resetErrorMessages'
 
 /**
@@ -89,21 +86,12 @@ export function ResetPasswordForm({ token: linkToken }: { token: string | null }
     >
       {({ register, formState: { errors } }) => (
         <>
-          <Field
-            label="New password"
-            required
-            hint={`At least ${MIN_PASSWORD_LENGTH} characters.`}
-            error={errors.newPassword?.message}
-          >
-            <Field.Input type="password" autoComplete="new-password" {...register('newPassword')} />
-          </Field>
-          <Field label="Confirm new password" required error={errors.confirmPassword?.message}>
-            <Field.Input
-              type="password"
-              autoComplete="new-password"
-              {...register('confirmPassword')}
-            />
-          </Field>
+          <NewPasswordFields
+            password={register('newPassword')}
+            confirm={register('confirmPassword')}
+            passwordError={errors.newPassword?.message}
+            confirmError={errors.confirmPassword?.message}
+          />
           <div>
             <Button type="submit" loading={status === 'submitting'} fullWidth>
               {status === 'submitting' ? 'Saving' : 'Set New Password'}

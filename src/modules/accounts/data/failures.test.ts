@@ -72,9 +72,9 @@ describe('toPasswordFailure', () => {
 
 describe('toResetPasswordFailure', () => {
   it('reads Payload’s refusal of the token as a dead link', () => {
-    expect(toResetPasswordFailure(new APIError('Token is either invalid or has expired.', 403))).toBe(
-      'invalid-link',
-    )
+    expect(
+      toResetPasswordFailure(new APIError('Token is either invalid or has expired.', 403)),
+    ).toBe('invalid-link')
   })
 
   it('says the password was refused when Payload rejects the value', () => {

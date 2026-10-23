@@ -101,9 +101,23 @@ export const signUpSchema = z
 export type SignUpInput = z.input<typeof signUpSchema>
 export type SignUpValues = z.output<typeof signUpSchema>
 
-/** The token from a verification link (#187); Payload checks it. */
-export const verifyAccountSchema = z.strictObject({
-  token: z.string().min(1).max(MAX_TOKEN_LENGTH),
-})
+/**
+ * The token from a verification link (#187); Payload checks it. A link resent after a second
+ * sign-up also needs the password the person chooses on the verify page (#289): both fields or
+ * neither.
+ */
+export const verifyAccountSchema = z
+  .strictObject({
+    token: z.string().min(1).max(MAX_TOKEN_LENGTH),
+    newPassword: newPasswordFields.newPassword.optional(),
+    confirmPassword: newPasswordFields.confirmPassword.optional(),
+  })
+  .refine(
+    ({ newPassword, confirmPassword }) =>
+      newPassword === undefined
+        ? confirmPassword === undefined
+        : passwordsMatch.check({ newPassword, confirmPassword: confirmPassword ?? '' }),
+    passwordsMatch.issue,
+  )
 
 export type VerifyAccountValues = z.output<typeof verifyAccountSchema>

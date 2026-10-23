@@ -65,8 +65,9 @@ export const Users: CollectionConfig = {
   hooks: {
     // Your own password changes only on /account, after your current one is checked (#233)
     beforeChange: [requireCurrentPassword],
-    // No reset email to an account whose email isn't verified yet (#187)
-    // The site-only check first: a refused request never reaches the account lookup
+    // Forgot password only from the site's page (#282), then no reset email to an account whose
+    // email isn't verified yet (#187). The site-only check runs first, so a refused request never
+    // reaches the account lookup.
     beforeOperation: [forgotPasswordFromSiteOnly, noResetEmailWhileUnverified],
   },
   fields: [
@@ -94,6 +95,13 @@ export const Users: CollectionConfig = {
         description: 'Controls access level. Only admins can change roles.',
       },
     },
+    // How often this account's verification email was sent again, and since when (#289). Only
+    // the server reads and writes them: hidden from the API and the admin panel.
+    { name: 'verificationResends', type: 'number', defaultValue: 0, hidden: true },
+    { name: 'verificationResendsSince', type: 'date', hidden: true },
+    // Set when a link is resent: the password from the first sign-up may not be this person's,
+    // so the verify page has them choose one before the account opens (#289)
+    { name: 'verificationSetsPassword', type: 'checkbox', defaultValue: false, hidden: true },
   ],
   timestamps: true,
 }
