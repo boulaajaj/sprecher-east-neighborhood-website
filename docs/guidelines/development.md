@@ -41,7 +41,7 @@ enterprise layering is intentional.
 ## SOLID Principles
 
 - **Single Responsibility**: Each module, component, collection, and function does one thing well. A form handler validates and persists — it doesn't also send emails (that's a hook).
-- **Open/Closed**: Extend behavior through hooks, plugins, and composition — not by modifying existing modules. Payload hooks and Next.js middleware are the extension points.
+- **Open/Closed**: Extend behavior through hooks, plugins, and composition — not by modifying existing modules. Payload hooks and the Next.js proxy (`src/proxy.ts`, Next 16's name for middleware) are the extension points.
 - **Liskov Substitution**: Data access functions return consistent shapes regardless of the underlying source. Shared components are interchangeable without breaking layouts.
 - **Interface Segregation**: API responses and component props include only what the consumer needs. Use Payload's `select` and `depth` parameters. Don't pass entire objects when 3 fields suffice.
 - **Dependency Inversion**: Business logic depends on abstractions (Payload Local API, data layer interfaces), not concrete implementations (raw SQL, direct file reads).

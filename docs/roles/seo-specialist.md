@@ -137,7 +137,7 @@ question for the owner (#280).
 
 ## Payload SEO Plugin
 
-The project uses `@payloadcms/plugin-seo` which automatically adds SEO fields to configured collections:
+The project uses `@payloadcms/plugin-seo` without its `collections` option: Pages, Posts and Events each build their own SEO tab from the plugin's fields (#196). The tab has:
 
 - **meta.title** — Page title for search results (auto-generation function available)
 - **meta.description** — Meta description with character count
