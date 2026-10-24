@@ -12,7 +12,7 @@ const PAYLOAD = [
 ]
 
 // Pages and routes that still query Payload themselves. Each leaves this list when its area moves
-// to a module (#131 to #136); any other file in src/app/ that does it gets a warning.
+// to a module (#131 to #136); any other file in src/app/ that does it fails lint (#137).
 const STILL_QUERYING_PAYLOAD = [
   '(frontend)/next/preview/route.ts',
   '(frontend)/next/seed/route.ts',
