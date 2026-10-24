@@ -124,14 +124,18 @@ without the revert doesn't last: the next deploy adds them back.
 - **HSTS.** It copies `caddy/hsts.caddy` to `/etc/caddy/sprecher-east-hsts.caddy` and adds
   `import /etc/caddy/sprecher-east-hsts.caddy` to the site blocks for the domain and www (the host
   of `NEXT_PUBLIC_SERVER_URL`). No `includeSubDomains`, no `preload`.
-- **The IP.** In the one site block that serves plain HTTP for the IP (`:80` or `http://<IP>`), it
-  replaces the one-line `reverse_proxy` to the app with `redir https://<domain>{uri} 308`, so
-  sign-in and admin can't be reached over plain HTTP. If that block reaches the app any other way,
-  or there is more than one, it leaves the Caddyfile alone and warns.
+- **Plain HTTP.** In each site block that serves plain HTTP, for the IP (`:80`, `http://<IP>`) or
+  for the domain (`http://<domain>`, `<domain>:80`), it replaces the one-line `reverse_proxy` to
+  the app with `redir https://<domain>{uri} 308`, so sign-in and admin can't be reached over plain
+  HTTP. If such a block reaches the app any other way, or a block mixes the domain with other
+  addresses (on one line or several), it leaves the Caddyfile alone and warns.
 
-It validates, backs up (`Caddyfile.bak` and `Caddyfile.bak-<time>`), reloads, then checks the
-domain sends the header and the IP redirects to the same path. If not, the backup comes back. The
-deploy logs the `curl -I` results as annotations, from the server and from the internet.
+It validates, backs up (`Caddyfile.bak` and `Caddyfile.bak-<time>`), replaces the Caddyfile in one
+rename, and reloads. It then checks that the domain sends the header and that plain HTTP to the
+domain and to the IP redirects permanently to the same path on HTTPS. If not, or if anything fails
+while it changes the files, the backup comes back and the deploy fails. The same check runs when
+nothing needed changing. The deploy logs the `curl -I` results as annotations, from the server and
+from the internet.
 
 **Rollout.** The max-age is the one value in `caddy/hsts.caddy`: 300 (5 minutes) now, then
 604800 (1 week), then 31536000 (1 year), each after a day without problems, each a one-line pull
