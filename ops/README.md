@@ -130,12 +130,19 @@ without the revert doesn't last: the next deploy adds them back.
   `redir https://<domain>{uri} 308` as its first line. Caddy's default directive order runs
   `redir` before `reverse_proxy`, so the request is answered with the redirect and never reaches
   the app; the `reverse_proxy` line stays where it was. A global `order` option could change that
-  order, so a Caddyfile with one is left alone.
+  order, so a Caddyfile with one is left alone. A plain-HTTP block whose addresses are other hosts
+  (such as `http://srv1371281.hstgr.cloud`, alone or next to the IP) gets the redirect too when it
+  proxies to the app. A plain-HTTP block for another site that doesn't proxy to the app is left
+  as it is (#338).
 
 It leaves the Caddyfile alone when it can't read the layout safely (a heredoc, a site block on one
 line, unbalanced braces), when a block mixes the domain with other addresses (on one line or
-several), or when the Caddyfile sets `order`. Then it still checks plain HTTP to the IP: if that
-reaches the app, the deploy fails and says why, so the redirect can be added by hand.
+several), when a block that proxies to the app serves plain HTTP and HTTPS together, or when the
+Caddyfile sets `order`. Then it still checks plain HTTP to the IP: if that reaches the app, the
+deploy fails and says why, so the redirect can be added by hand.
+
+"Reaches the app" means the app answers `/api/version` with a build ID. A redirect, no answer, or
+Caddy's own empty 200 for a host no site serves doesn't count.
 
 Before changing anything it writes the backups (`Caddyfile.bak` and `Caddyfile.bak-<time>`) under a
 temporary name, compares them with the live file and only then renames them, so a backup cut short
@@ -144,7 +151,27 @@ reloads. It then checks that the domain sends the header and that plain HTTP to 
 the IP redirects permanently to the same path on HTTPS. If not, or if anything fails while it
 changes the files, it puts back only what it replaced, and the deploy fails. The same check runs
 when nothing needed changing. The deploy logs the `curl -I` results as annotations, from the
-server and from the internet.
+server and from the internet; the check from the internet runs even when the step before it
+failed.
+
+**Reading a failure without SSH (#338).** When the check fails, one annotation, "Caddy HTTPS
+details", holds everything needed to tell why:
+
+- every site block as the script read it: its addresses, what it took the block for, whether it
+  proxies to the app, and the line it added (`import`, `redir` or none)
+- the IP request: host and port, the status and `Location`, and whether the app answered
+- how Caddy itself reads the Caddyfile that was checked (`caddy adapt`, cut down to each server's
+  listen addresses and, per route, its host matchers and the handlers in order). It shows
+  handler names, hosts and upstream addresses only, never header values or other options.
+
+On success, one "Caddy HTTPS evidence" annotation holds the `curl -I` results and the same list of
+site blocks.
+
+**A failed HTTPS step turns the deploy red, on purpose.** By then the release is live and
+serving, the Caddy change has been rolled back, and the annotation says so. The step stays red
+because a rolled-back change means plain HTTP to the IP may still reach sign-in and admin: that's
+the gap the owner asked to close (#235). A green run would hide it until someone happened to read
+a warning. Each later deploy retries it, so the red goes away as soon as the fix is in.
 
 **Rollout.** The max-age is the one value in `caddy/hsts.caddy`: 300 (5 minutes) now, then
 86400 (1 day), then 31536000 (1 year), each after a day without problems, each a one-line pull
