@@ -237,4 +237,5 @@ The seed script (`src/endpoints/seed/index.ts`) is the one hand-written file abo
 - [Conventions](conventions.md): naming, entry files, interfaces, file size, tests.
 - [Glossary](glossary.md): business terms, defined once.
 - [Data model](data-model.md): every collection and global, its fields and its access rules.
+- [Review queue](review-queue.md): how suggested events and posts wait for staff.
 - [Decision records](decisions/README.md): why things are the way they are.

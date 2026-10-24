@@ -21,11 +21,13 @@ which module owns it).
 
 ## Content states
 
-| Term      | Meaning                                                                                                                                                                                            |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Draft     | Saved but not visible to visitors. Only staff should see drafts: normal reads use `authenticatedOrPublished`, but until #140 is fixed any signed-in user can read drafts through the versions API. |
-| Published | Visible to everyone. Stored as `_status: 'published'`.                                                                                                                                             |
-| Scheduled | Set in Admin to publish or unpublish at a later time. Changes within a minute of that time; visitors see it within 10 minutes (decision 0011, #141).                                               |
+| Term          | Meaning                                                                                                                                                                                            |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Draft         | Saved but not visible to visitors. Only staff should see drafts: normal reads use `authenticatedOrPublished`, but until #140 is fixed any signed-in user can read drafts through the versions API. |
+| Published     | Visible to everyone. Stored as `_status: 'published'`.                                                                                                                                             |
+| Scheduled     | Set in Admin to publish or unpublish at a later time. Changes within a minute of that time; visitors see it within 10 minutes (decision 0011, #141).                                               |
+| Suggestion    | An event or post not written by staff, held as a draft with review status `suggested` and its source, until staff publish (approve) or reject it ([review queue](review-queue.md), #123).          |
+| Review status | Where a suggestion is in review: `suggested`, `approved` or `rejected` (`moderationStatus`). Empty for content staff write.                                                                        |
 
 ## Events
 
@@ -36,7 +38,7 @@ which module owns it).
 | Upcoming event   | A published event whose date is today or later, where "today" is the date in the site timezone.                               | `inScope` in `src/modules/events/data/scope.ts`, with today from `startOfToday()` in `src/platform/lib/timezone.ts` |
 | Past event       | A published event whose date is before today in the site timezone.                                                            | same                                                                                                                |
 | Event category   | One of: Meeting, Social, Volunteer, Workshop, Sports & Recreation, Community, Other. Phase 2 will revise the list (#122).     | `EVENT_CATEGORIES` in `src/modules/events/domain/categories.ts`, also the collection's options                      |
-| Cancelled event  | Planned (#122): still listed, clearly marked as cancelled, never silently removed.                                            | not built yet                                                                                                       |
+| Cancelled event  | An event with `cancelled` set. Planned (#122): still listed, clearly marked as cancelled, never silently removed.             | `cancelled` in `src/modules/events/cms/events.ts`; the display is not built yet                                     |
 | Official meeting | Planned (#122): a city or county meeting, shown with a link to the official agenda.                                           | not built yet                                                                                                       |
 
 ## News

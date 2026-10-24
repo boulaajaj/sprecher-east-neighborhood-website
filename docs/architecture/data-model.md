@@ -1,6 +1,6 @@
 # Data model
 
-Everything is stored in one SQLite database (`DATABASE_URI`, default `file:./data/payload.db`); the schema is set up in `src/payload.config.ts` (collections, globals, plugins), each collection lives in its module's `cms/` (`src/modules/<area>/cms/`), media in `src/platform/payload/media.ts`, and plugin overrides are in `src/payload.config.ts` (the form builder's in `src/modules/contact/cms/formBuilder.ts`). Reflects `main` at `190cb3d` (Payload 3.91).
+Everything is stored in one SQLite database (`DATABASE_URI`, default `file:./data/payload.db`); the schema is set up in `src/payload.config.ts` (collections, globals, plugins), each collection lives in its module's `cms/` (`src/modules/<area>/cms/`), media in `src/platform/payload/media.ts`, and plugin overrides are in `src/payload.config.ts` (the form builder's in `src/modules/contact/cms/formBuilder.ts`). Reflects `main` at `190cb3d` (Payload 3.91), written from the configs, `src/payload-types.ts` and the Payload 3.91.0 package defaults. Update this page in the same PR as any schema or access change.
 
 Every collection also has `id` (number), `createdAt` and `updatedAt`. Draft-enabled collections also have `_status` (`draft` | `published`). `slugField()` (Payload built-in) adds a hidden `generateSlug` checkbox (default true) and a `slug` text field (required, unique, indexed) generated from `title`.
 
@@ -62,26 +62,28 @@ Also present, added by Payload or its plugins rather than defined here: `payload
 | `publishedAt`          | date (day and time)             | No        | Sidebar. Field hook sets it to now if `_status` is published and it is empty                                                            |
 | `authors`              | → users (many)                  | No        | Sidebar                                                                                                                                 |
 | `populatedAuthors`     | array of `id` text, `name` text | No        | Hidden. Filled by afterRead hook `populateAuthors`; `update` access is `() => false`                                                    |
+| review queue           | sidebar fields                  | No        | `moderationStatus`, `sourceName`, `sourceUrl`, `externalId`, `contentHash`, `audience` ([review queue](review-queue.md), #123)          |
 | `generateSlug`, `slug` | checkbox, text                  | slug: Yes | `slugField()`                                                                                                                           |
 
 ### events
 
-| Field                                        | Type                | Required  | Notes                                                                                             |
-| -------------------------------------------- | ------------------- | --------- | ------------------------------------------------------------------------------------------------- |
-| `title`                                      | text                | Yes       |                                                                                                   |
-| `date`                                       | date (day only)     | Yes       | Day-only picker (`pickerAppearance: 'dayOnly'`)                                                   |
-| `timeStart`, `timeEnd`                       | text                | No        | Free text, e.g. "6:00 PM"                                                                         |
-| `category`                                   | select              | No        | `meeting`, `social`, `volunteer`, `workshop`, `sports`, `community`, `other`; default `community` |
-| `featured`                                   | checkbox            | No        | Default false                                                                                     |
-| `locationType`                               | select              | No        | `in-person`, `virtual`, `hybrid`; default `in-person`                                             |
-| `locationName`, `locationAddress`, `mapsUrl` | text                | No        | Hidden in admin when `locationType` is `virtual`                                                  |
-| `registrationUrl`                            | text                | No        |                                                                                                   |
-| `heroImage`                                  | upload → media      | No        |                                                                                                   |
-| `description`                                | textarea            | No        | Short text for event cards                                                                        |
-| `content`                                    | richText            | No        | Lexical: headings h2-h4, toolbars, horizontal rule                                                |
-| `meta`                                       | group               | No        | meta (SEO plugin)                                                                                 |
-| `publishedAt`                                | date (day and time) | No        | Sidebar. Set by hook `populatePublishedAt`                                                        |
-| `generateSlug`, `slug`                       | checkbox, text      | slug: Yes | `slugField()`                                                                                     |
+| Field                                        | Type                | Required  | Notes                                                                                              |
+| -------------------------------------------- | ------------------- | --------- | -------------------------------------------------------------------------------------------------- |
+| `title`                                      | text                | Yes       |                                                                                                    |
+| `date`                                       | date (day only)     | Yes       | Day-only picker (`pickerAppearance: 'dayOnly'`)                                                    |
+| `timeStart`, `timeEnd`                       | text                | No        | Free text, e.g. "6:00 PM"                                                                          |
+| `category`                                   | select              | No        | `meeting`, `social`, `volunteer`, `workshop`, `sports`, `community`, `other`; default `community`  |
+| `featured`                                   | checkbox            | No        | Default false                                                                                      |
+| `locationType`                               | select              | No        | `in-person`, `virtual`, `hybrid`; default `in-person`                                              |
+| `locationName`, `locationAddress`, `mapsUrl` | text                | No        | Hidden in admin when `locationType` is `virtual`                                                   |
+| `registrationUrl`                            | text                | No        |                                                                                                    |
+| `heroImage`                                  | upload → media      | No        |                                                                                                    |
+| `description`                                | textarea            | No        | Short text for event cards                                                                         |
+| `content`                                    | richText            | No        | Lexical: headings h2-h4, toolbars, horizontal rule                                                 |
+| `meta`                                       | group               | No        | meta (SEO plugin)                                                                                  |
+| `publishedAt`                                | date (day and time) | No        | Sidebar. Set by hook `populatePublishedAt`                                                         |
+| `cancelled`, review queue                    | checkbox, sidebar   | No        | `cancelled` default false; the same review-queue fields as posts ([review queue](review-queue.md)) |
+| `generateSlug`, `slug`                       | checkbox, text      | slug: Yes | `slugField()`                                                                                      |
 
 ### categories
 
@@ -216,6 +218,7 @@ All revalidation hooks skip when `context.disableRevalidate` is set (seed script
 | users                         | `requireCurrentPassword` (beforeChange)                                                                    | update          | Refuses a new password on your own account unless the account page checked the current one first (#233)                                                                                                                                                                                                                                                                   |
 | users                         | `forgotPasswordFromSiteOnly` (beforeOperation)                                                             | forgot password | Refuses forgot password over REST and GraphQL with 403 (the same for every email), so only the site's `/forgot-password` action, with its robot check and limits, reaches it (#282). `/admin/forgot` redirects there (`src/proxy.ts`)                                                                                                                                     |
 | users                         | `noResetEmailWhileUnverified` (beforeOperation)                                                            | forgot password | Turns the reset email off (Payload's `disableEmail`) for an account with `_verified` false; the answer stays the same (#187)                                                                                                                                                                                                                                              |
+| posts, events                 | `holdSuggestions` (beforeChange, first)                                                                    | create, update  | A write not from staff is stored as a draft; a create also becomes `suggested` and must name its source. Staff publishing a suggestion approve it ([review queue](review-queue.md))                                                                                                                                                                                       |
 | pages, events, faq, resources | `populatePublishedAt` (beforeChange)                                                                       | create, update  | If the request body has no `publishedAt`, sets it to now. Reads `req.data`, not merged data. Posts do not use it: their `publishedAt` field has its own beforeChange hook that sets now when `_status` is `published` and the value is empty                                                                                                                              |
 | pages                         | `revalidatePage` (afterChange), `revalidateDelete` (afterDelete)                                           | save, delete    | If published (or deleted): `revalidatePath` of `/` (slug `home`) or `/<slug>`, plus `expireCacheTag('pages-sitemap')`. If it was published and no longer is: same for the old slug                                                                                                                                                                                        |
 | posts                         | `revalidatePost` (afterChange), `revalidateDelete` (afterDelete)                                           | save, delete    | If published (or deleted): paths `/posts/<slug>`, `/posts`, `/(frontend)/posts/page/[pageNumber]`, `/`, tag `posts-sitemap`. If unpublished: same for the old slug                                                                                                                                                                                                        |
@@ -243,7 +246,3 @@ All revalidation hooks skip when `context.disableRevalidate` is set (seed script
 - `form-submissions.senderEmail`, `form-submissions.emailConfirmed`: read `isAdminFieldAccess`, so the answer to a visitor's own submission doesn't say whether the address they typed is confirmed (#183).
 - `form-submissions.retentionHold`, `form-submissions.retentionHoldReason`: create `() => false`; read and update `isAdminFieldAccess` (#274).
 - No other field sets its own access.
-
-## Source
-
-Written from the collection, global and plugin configs on `main` at `190cb3d`, `src/payload-types.ts`, and the Payload 3.91.0 package defaults. Update this page in the same PR as any schema or access change.

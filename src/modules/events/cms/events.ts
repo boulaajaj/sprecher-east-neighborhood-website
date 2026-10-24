@@ -16,6 +16,11 @@ import {
 
 import { draftContentAccess } from '@/platform/payload/draftContentAccess'
 import { populatePublishedAt } from '@/platform/payload/populatePublishedAt'
+import {
+  holdSuggestions,
+  REVIEW_QUEUE_FIELDS,
+  SUGGESTIONS_FILTER,
+} from '@/platform/payload/reviewQueue'
 
 import { EVENT_CATEGORIES } from '../domain/categories'
 import { EVENT_LOCATION_TYPES } from '../domain/locationTypes'
@@ -40,7 +45,8 @@ export const Events: CollectionConfig<'events'> = {
     },
   },
   admin: {
-    defaultColumns: ['title', 'date', 'category', '_status', 'updatedAt'],
+    components: { beforeListTable: [SUGGESTIONS_FILTER] },
+    defaultColumns: ['title', 'date', 'category', '_status', 'moderationStatus', 'updatedAt'],
     useAsTitle: 'title',
   },
   fields: [
@@ -78,6 +84,12 @@ export const Events: CollectionConfig<'events'> = {
                   admin: { width: '33%', placeholder: '8:00 PM' },
                 },
               ],
+            },
+            {
+              name: 'cancelled',
+              type: 'checkbox',
+              defaultValue: false,
+              admin: { description: 'A cancelled event stays listed and is marked as cancelled.' },
             },
             {
               name: 'category',
@@ -193,10 +205,11 @@ export const Events: CollectionConfig<'events'> = {
       },
     },
     slugField(),
+    ...REVIEW_QUEUE_FIELDS,
   ],
   hooks: {
     afterChange: [revalidateEvent],
-    beforeChange: [populatePublishedAt],
+    beforeChange: [holdSuggestions, populatePublishedAt],
     afterDelete: [revalidateDelete],
   },
   versions: {

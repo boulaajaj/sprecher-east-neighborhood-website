@@ -184,7 +184,8 @@ jobs:
           ssh vps "bash /var/www/sprecher-east/releases/$RELEASE/ops/deploy-release.sh"
 
       - name: Check that port 3000 is closed to the internet (#118)
-        if: steps.order.outputs.skip != 'true'
+        # Also after a failed deploy step: the outside view is what tells a failure apart (#338).
+        if: ${{ !cancelled() && steps.order.outputs.skip != 'true' }}
         env:
           HOST: ${{ secrets.VPS_HOST }}
         run: |
@@ -198,7 +199,7 @@ jobs:
       # domain and to the server's SSH address (VPS_HOST, the IP or its hostname, which the `:80`
       # catch-all answers alike) redirected to HTTPS. GitHub masks the secret in the log.
       - name: Check HTTPS from the internet (#235)
-        if: steps.order.outputs.skip != 'true'
+        if: ${{ !cancelled() && steps.order.outputs.skip != 'true' }}
         env:
           URL: ${{ needs.preflight.outputs.server_url }}
           HOST: ${{ secrets.VPS_HOST }}
@@ -218,3 +219,10 @@ jobs:
           show "$URL/" "$URL/"
           show "${URL/https:/http:}/" "${URL/https:/http:}/"
           show "http://<VPS_HOST>/login" "http://$HOST/login"
+          # Whether plain HTTP to that address reaches the app itself (its /api/version answers
+          # with a build ID), as opposed to a redirect or Caddy's empty answer for an unknown host.
+          if curl -s --max-time 15 "http://$HOST/api/version" | grep -q '"buildId"'; then
+            echo "::warning title=HTTPS::plain HTTP to <VPS_HOST> reaches the app"
+          else
+            echo "::notice title=HTTPS::plain HTTP to <VPS_HOST> does not reach the app"
+          fi
