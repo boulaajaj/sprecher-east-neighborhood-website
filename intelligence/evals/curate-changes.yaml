@@ -1,0 +1,96 @@
+# Curate eval cases for items the CMS may already hold: duplicates, updates and cancellations,
+# with the runtime's `known` document. Hashes and CMS ids are placeholders.
+version: 1
+asOf: '2026-10-24'
+stage: curate
+cases:
+  - id: duplicate-same-hash
+    stage: curate
+    input:
+      sourceId: mpl-pinney-events
+      externalId: mpl-pinney-events:f893db74-0646-428d-8d98-4568227a4399
+      contentHash: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      title: Silent Book Club
+      startsAt: 2026-11-17T19:00:00-06:00
+      locationText: Pinney Library
+      change: unchanged
+    known:
+      collection: events
+      id: 41
+      externalId: 'mpl-pinney-events:f893db74-0646-428d-8d98-4568227a4399'
+      contentHash: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      status: active
+    expected:
+      {
+        decision: duplicate,
+        coverage: catchment,
+        route: none,
+        targetCollection: events,
+        targetId: 41,
+      }
+    why: Real UID from the 2026-10-24 check. A rerun must not suggest it again.
+  - id: update-new-time
+    stage: curate
+    input:
+      sourceId: mpl-pinney-events
+      externalId: mpl-pinney-events:f893db74-0646-428d-8d98-4568227a4399
+      contentHash: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      title: Silent Book Club
+      startsAt: 2026-11-17T18:00:00-06:00
+      locationText: Pinney Library
+      change: updated
+    known:
+      collection: events
+      id: 41
+      externalId: 'mpl-pinney-events:f893db74-0646-428d-8d98-4568227a4399'
+      contentHash: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      status: active
+    expected:
+      {
+        decision: update,
+        coverage: catchment,
+        route: reportItem,
+        targetCollection: events,
+        targetId: 41,
+      }
+    why: Same ID, new start time; the editor gets an update, not a second event.
+  - id: cancellation-board-of-health
+    stage: curate
+    input:
+      sourceId: legistar-events
+      externalId: legistar-events:28745
+      contentHash: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      title: BOARD OF HEALTH FOR MADISON AND DANE COUNTY
+      sourceText: Rescheduled to 10/28/2026
+      startsAt: 2026-11-03T17:30:00-06:00
+      locationText: null
+      sourceStatus: cancelled
+      change: updated
+    known:
+      collection: events
+      id: 57
+      externalId: 'legistar-events:28745'
+      contentHash: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+      status: active
+    expected:
+      decision: cancel
+      coverage: citywide
+      flags: [cancelled, rescheduled]
+      route: reportItem
+      targetCollection: events
+      targetId: 57
+    why: Real item (Legistar 28745, Cancelled, rescheduled as 29306).
+  - id: curate-cancel-unknown-item
+    ref: X4
+    stage: curate
+    tags: [cancellation]
+    input:
+      sourceId: legistar-events
+      externalId: legistar-events:29420
+      title: BOARD OF PARK COMMISSIONERS
+      startsAt: 2026-11-11T18:30:00-06:00
+      locationText: Virtual
+      sourceStatus: cancelled
+    known: null
+    expected: { decision: reject, coverage: citywide, flags: [cancelled], route: none }
+    why: Nothing in the CMS to cancel, so nothing is sent; the run log counts it as rejected.

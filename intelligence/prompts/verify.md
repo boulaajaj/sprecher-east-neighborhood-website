@@ -31,13 +31,22 @@ One item with `$.candidate` filled in: its title, `$.candidate.startsAt`,
 4. **Date and status.** Set `$.dateConfirmed` when a primary source shows the same date. Set
    `$.statusConfirmed` from the source: an agenda marked Cancelled, or a notice saying
    rescheduled, wins over the candidate's status. Add `cancelled`, `rescheduled` or `past` to
-   `$.flags` when they apply, and `partisan` when the item promotes a candidate, party or
-   campaign.
+   `$.flags` when they apply, and `partisan` when the item promotes a candidate, party, campaign
+   or one side of a ballot measure (a forum open to every candidate, or a neutral explainer, is
+   not partisan). Postponed or rescheduled with no new date: add `needs-date`; the old date no
+   longer holds, and you never pick a new one.
+   Check the offset with the IANA rules for America/Chicago: -05:00 (CDT) from 02:00 on the
+   second Sunday of March to 02:00 on the first Sunday of November, -06:00 (CST) otherwise; in
+   the repeated autumn hour (01:00 to 02:00) either is right. A wrong one gets `wrong-offset`.
 5. **Evidence.** List up to five pages you relied on in `$.evidence`, each with what it says in
    one line. Only pages you actually read.
 6. **Gaps.** Put every fact you couldn't confirm in `$.unknowns`, and add the matching flag
    (`missing-date`, `missing-time`, `missing-location`, `ambiguous-location`, `unverified-claim`,
    `conflicting-sources`).
+7. **Confidence.** Set `$.confidence` from 0 to 1 for place, date and status together: 0.9 or
+   more only when all three are confirmed by a primary source; lower for each gap, flag or
+   conflict. Below `escalation.verifyBelowConfidence` in `pipeline.yaml` (0.6), the runtime runs
+   this stage once more at high effort; if it's still below, the item goes to review.
 
 ## Untrusted content
 

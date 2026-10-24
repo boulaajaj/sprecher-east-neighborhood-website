@@ -109,6 +109,14 @@ robots rules disallow automated reading (Dane County's subscription page).
   source's ID (`EventId`, UID, guid) plus a content hash.
 - The prompts, coverage policy, schemas and eval set that use this registry are described in
   [README.md](README.md) (#337).
-- Pending sources (Parks events, District 16 blog, City news) move to `valid` only when a feed is
-  found, or when parsing their pages is approved in its own issue.
+- **Page parsing approved (#352):** Parks events and the District 16 blog are
+  `direct-then-playwright`: public City pages, read logged out once a day, on paths robots.txt
+  allows (checked 2026-10-24). A direct GET that day served both lists in the HTML, with item
+  links (Parks: Bat Fest, 2026-10-24; blog: newest post 2026-10-06), so no browser was needed.
+  They move to `valid` once the collector (#272) records a parse of a real current item. City
+  news stays `pending` until a feed is found.
+- **Notes from the 2026-10-24 checks** (kept here, out of `sources.yaml`'s line budget): none of
+  the first 8 Parks events (October 24 to 29) was at Door Creek Park or Elvehjem Sanctuary;
+  Pinney's Book Discussion feed held 8 events, 5 of them from 2026-10-15 to 2026-12-15; Spectrum's
+  feed uses custom elements, such as `<section>` and `<ticker>`, outside the RSS 2.0 namespace.
 - Re-check every source at least once a month, and whenever one fails twice in a row.

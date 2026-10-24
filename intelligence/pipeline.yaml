@@ -13,6 +13,19 @@ budgets:
   maxItemsPerSource: 50
   maxModelItemsPerRun: 40
   maxDraftsPerRun: 10
+# Verify reruns at high effort when its confidence is below this; still below, the item goes to
+# review (README.md, "The pipeline").
+escalation:
+  verifyBelowConfidence: 0.6
+  to: high
+# The MCP tool the submit stage calls for each curate decision (prompts/submit.md).
+routes:
+  accept: submitSuggestion
+  needs-review: reportItem
+  update: reportItem
+  cancel: reportItem
+  reject: none
+  duplicate: none
 sources: sources.yaml
 coverage: coverage.md
 stages:

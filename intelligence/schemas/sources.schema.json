@@ -70,7 +70,19 @@
             { "type": "null" }
           ]
         },
-        "notes": { "type": "string" }
+        "notes": { "type": "string" },
+        "fetchStrategy": { "$ref": "common.schema.json#/$defs/fetchStrategy" },
+        "robots": {
+          "description": "The robots.txt check for the paths this source reads.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["checked", "result", "url"],
+          "properties": {
+            "checked": { "$ref": "common.schema.json#/$defs/date" },
+            "result": { "enum": ["allowed", "disallowed"] },
+            "url": { "$ref": "common.schema.json#/$defs/httpUrl" }
+          }
+        }
       },
       "allOf": [
         {
@@ -83,8 +95,29 @@
           }
         },
         {
-          "if": { "properties": { "result": { "const": "valid" } } },
-          "then": { "properties": { "feedUrl": { "type": "string" } } }
+          "if": {
+            "properties": {
+              "result": { "const": "valid" },
+              "format": { "not": { "const": "html" } }
+            }
+          },
+          "then": { "properties": { "feedUrl": { "type": "string" } } },
+          "description": "A valid feed or API has a feedUrl; a valid HTML page is read at its canonicalUrl."
+        },
+        {
+          "description": "Playwright only for public HTML pages that robots.txt allows; never for restricted or invalid sources.",
+          "if": {
+            "required": ["fetchStrategy"],
+            "properties": { "fetchStrategy": { "const": "direct-then-playwright" } }
+          },
+          "then": {
+            "required": ["robots"],
+            "properties": {
+              "format": { "const": "html" },
+              "result": { "enum": ["valid", "pending"] },
+              "robots": { "properties": { "result": { "const": "allowed" } }, "type": "object" }
+            }
+          }
         }
       ]
     }

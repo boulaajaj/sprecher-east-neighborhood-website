@@ -24,6 +24,10 @@ One item with `$.candidate`, `$.verification` and `$.curation`. Use only facts t
    (Markdown, under 300 words: what, when, where, one action, a short "why this matters to
    Sprecher East" from `$.curation.whyItMatters`, and the official links). Follow the site's voice:
    friendly, direct, neutral, no hype. Name the place as "Sprecher East", never an abbreviation.
+   Summarize in your own words: no run of the source's wording longer than a short fact, and at
+   most 0.3 n-gram overlap with `$.candidate.sourceText`. Leave out private people's names, phone
+   numbers, emails and home addresses; point to the source instead. An official's own post is
+   attributed to them ("Alder O'Brien writes ...").
 3. For events, copy the confirmed facts: `$.startsAt`, `$.endsAt` and `$.allDay` (ISO 8601 with
    the America/Chicago offset) from `$.candidate`, and `$.venue` and `$.address` from
    `$.verification.location`. For posts, those are null.
@@ -32,7 +36,8 @@ One item with `$.candidate`, `$.verification` and `$.curation`. Use only facts t
    them in the body too.
 5. Set `$.confidence`: `high` when everything is confirmed, `medium` with minor gaps, `low`
    otherwise.
-6. List every missing or unconfirmed fact in `$.missing`, in plain words ("start time not
+6. Never state an end time, duration, address or price the input doesn't give. List every
+   missing or unconfirmed fact in `$.missing`, in plain words ("start time not
    published", "address not confirmed"), from `$.verification.unknowns`. The submit stage sends
    these to the editor as a review note.
 

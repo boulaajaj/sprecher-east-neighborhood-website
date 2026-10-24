@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/eval-parts.schema.json",
+  "title": "Eval case parts: earlier stages' output, expectations and graders",
+  "$defs": {
+    "given": {
+      "description": "Earlier stages' output and the run's state, as far as the case needs them.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "verification": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "location": { "$ref": "verification.schema.json#/properties/location" },
+            "coverage": { "$ref": "verification.schema.json#/properties/coverage" },
+            "coverageReason": { "$ref": "verification.schema.json#/properties/coverageReason" },
+            "confidence": { "$ref": "verification.schema.json#/properties/confidence" },
+            "dateConfirmed": { "$ref": "verification.schema.json#/properties/dateConfirmed" },
+            "statusConfirmed": { "$ref": "verification.schema.json#/properties/statusConfirmed" },
+            "evidence": { "$ref": "verification.schema.json#/properties/evidence" },
+            "unknowns": { "$ref": "verification.schema.json#/properties/unknowns" },
+            "flags": { "$ref": "verification.schema.json#/properties/flags" }
+          }
+        },
+        "curation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "decision": { "$ref": "curation.schema.json#/properties/decision" },
+            "reasons": { "$ref": "curation.schema.json#/properties/reasons" },
+            "scores": { "$ref": "curation.schema.json#/properties/scores" },
+            "audiences": { "$ref": "curation.schema.json#/properties/audiences" },
+            "whyItMatters": { "$ref": "curation.schema.json#/properties/whyItMatters" },
+            "residentAction": { "$ref": "curation.schema.json#/properties/residentAction" },
+            "targetCollection": { "$ref": "curation.schema.json#/properties/targetCollection" },
+            "targetId": { "$ref": "curation.schema.json#/properties/targetId" }
+          }
+        },
+        "draft": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "collection": { "$ref": "draft.schema.json#/properties/collection" },
+            "title": { "$ref": "draft.schema.json#/properties/title" },
+            "bodyMarkdown": { "$ref": "draft.schema.json#/properties/bodyMarkdown" },
+            "startsAt": { "$ref": "draft.schema.json#/properties/startsAt" },
+            "endsAt": { "$ref": "draft.schema.json#/properties/endsAt" },
+            "allDay": { "$ref": "draft.schema.json#/properties/allDay" },
+            "venue": { "$ref": "draft.schema.json#/properties/venue" },
+            "address": { "$ref": "draft.schema.json#/properties/address" },
+            "audience": { "$ref": "draft.schema.json#/properties/audience" },
+            "officialLinks": { "$ref": "draft.schema.json#/properties/officialLinks" },
+            "confidence": { "$ref": "draft.schema.json#/properties/confidence" },
+            "missing": { "$ref": "draft.schema.json#/properties/missing" }
+          }
+        },
+        "run": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "draftsSoFar": { "type": "integer", "minimum": 0 },
+            "mcpAnswers": {
+              "type": "array",
+              "items": { "enum": ["created", "duplicate", "transient-error"] },
+              "maxItems": 4
+            },
+            "modelAnswers": {
+              "description": "What the model stage returns on each try, for retry cases.",
+              "type": "array",
+              "maxItems": 3,
+              "items": { "enum": ["valid", "invalid"] }
+            }
+          }
+        },
+        "sources": {
+          "description": "Fixture-only overrides of a pending registry entry, to valid or pending (the check refuses any other). The real sources.yaml never changes.",
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "result"],
+            "properties": {
+              "id": { "$ref": "common.schema.json#/$defs/sourceId" },
+              "result": { "enum": ["valid", "pending"] },
+              "pilotRank": { "$ref": "sources.schema.json#/$defs/source/properties/pilotRank" },
+              "cadence": { "$ref": "sources.schema.json#/$defs/source/properties/cadence" }
+            }
+          }
+        }
+      }
+    },
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "decision": { "$ref": "common.schema.json#/$defs/decision" },
+        "coverage": { "$ref": "common.schema.json#/$defs/coverage" },
+        "flags": {
+          "description": "Flags the output must include.",
+          "$ref": "common.schema.json#/$defs/flags"
+        },
+        "flagsAbsent": {
+          "description": "Flags the output must not include.",
+          "$ref": "common.schema.json#/$defs/flags"
+        },
+        "route": {
+          "description": "The MCP tool the submit stage calls: accept \u2192 submitSuggestion; needs-review, update, cancel \u2192 reportItem; reject, duplicate \u2192 none.",
+          "enum": ["submitSuggestion", "reportItem", "none"]
+        },
+        "reportKind": { "$ref": "report.schema.json#/properties/kind" },
+        "targetCollection": { "$ref": "curation.schema.json#/properties/targetCollection" },
+        "targetId": { "$ref": "curation.schema.json#/properties/targetId" },
+        "escalated": { "description": "Verify was rerun at high effort.", "type": "boolean" },
+        "fetchStrategy": { "$ref": "common.schema.json#/$defs/fetchUsed" },
+        "runStatus": {
+          "enum": ["ok", "not-modified", "error", "skipped", "blocked"],
+          "description": "skipped: not polled (not valid or cadence); blocked: stopped at a gate (login, paywall, CAPTCHA, robots.txt); error: failed after its one retry."
+        },
+        "retries": { "type": "integer", "minimum": 0, "maximum": 1 },
+        "candidateCount": { "type": "integer", "minimum": 0 },
+        "deferred": {
+          "description": "Left for the next run, not marked as seen.",
+          "type": "boolean"
+        }
+      }
+    },
+    "grader": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["check", "field"],
+          "properties": {
+            "check": {
+              "enum": [
+                "equals",
+                "present",
+                "isNull",
+                "contains",
+                "notContains",
+                "notMatches",
+                "lessThan",
+                "maxNgramOverlap"
+              ]
+            },
+            "field": {
+              "description": "A field of the stage's input or output schema, written $.path; the check confirms it exists.",
+              "type": "string",
+              "pattern": "^\\$\\.[A-Za-z0-9_.\\[\\]]+$"
+            },
+            "value": {
+              "description": "What to compare with: a value, a substring, a regular expression, or a number."
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["check", "rubric"],
+          "properties": {
+            "check": { "const": "model" },
+            "rubric": { "type": "string", "minLength": 10, "maxLength": 600 }
+          }
+        }
+      ]
+    }
+  }
+}
