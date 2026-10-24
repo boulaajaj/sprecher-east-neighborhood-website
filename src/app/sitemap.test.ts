@@ -94,9 +94,9 @@ describe('sitemap', () => {
     expect(urls).toContain('https://sprechereast.example/posts/fish&amp;chips')
   })
 
-  it('caches each list under the tag its save hook expires', () => {
+  it('caches each list under the tag its save hook expires, for 10 minutes at most', () => {
     for (const tag of ['pages-sitemap', 'posts-sitemap', 'events-sitemap']) {
-      expect(mocks.cacheOptions).toHaveBeenCalledWith([tag], { tags: [tag] })
+      expect(mocks.cacheOptions).toHaveBeenCalledWith([tag], { tags: [tag], revalidate: 600 })
     }
   })
 

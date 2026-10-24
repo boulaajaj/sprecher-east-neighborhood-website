@@ -25,7 +25,7 @@ which module owns it).
 | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Draft         | Saved but not visible to visitors. Only staff should see drafts: normal reads use `authenticatedOrPublished`, but until #140 is fixed any signed-in user can read drafts through the versions API. |
 | Published     | Visible to everyone. Stored as `_status: 'published'`.                                                                                                                                             |
-| Scheduled     | Set in Admin to publish at a later time. Needs a job runner to actually publish (#141).                                                                                                            |
+| Scheduled     | Set in Admin to publish or unpublish at a later time. Changes within a minute of that time; visitors see it within 10 minutes (decision 0011, #141).                                               |
 | Suggestion    | An event or post not written by staff, held as a draft with review status `suggested` and its source, until staff publish (approve) or reject it ([review queue](review-queue.md), #123).          |
 | Review status | Where a suggestion is in review: `suggested`, `approved` or `rejected` (`moderationStatus`). Empty for content staff write.                                                                        |
 

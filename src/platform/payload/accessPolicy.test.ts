@@ -198,8 +198,11 @@ describe('jobs', () => {
     expect(await (access.run as AccessFn)(admin)).toBe(true)
   })
 
-  it('run only the retention queue in the app, where both retention tasks are scheduled (#274)', () => {
-    expect(config.jobs.autoRun).toEqual([{ cron: '*/10 * * * *', queue: 'retention' }])
+  it('run the retention queue and scheduled publishing in the app (#274, #141)', () => {
+    expect(config.jobs.autoRun).toEqual([
+      { cron: '*/10 * * * *', queue: 'retention' },
+      { cron: '* * * * *', queue: 'default', limit: 10, disableScheduling: true },
+    ])
     const scheduled = (config.jobs.tasks ?? [])
       .filter((task) => task.schedule?.some((schedule) => schedule.queue === 'retention'))
       .map((task) => task.slug)
@@ -207,6 +210,11 @@ describe('jobs', () => {
       'deleteExpiredContactMessages',
       'deleteExpiredEmailConfirmations',
     ])
+    // The every-minute runner only runs what editors scheduled: no task schedules itself there
+    const scheduleQueues = (config.jobs.tasks ?? []).flatMap((task) => task.schedule ?? [])
+    expect(new Set(scheduleQueues.map((schedule) => schedule.queue))).toEqual(
+      new Set(['retention']),
+    )
   })
 })
 
