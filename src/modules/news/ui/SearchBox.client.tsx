@@ -25,6 +25,8 @@ export const SearchBox: React.FC<{ initialQuery?: string }> = ({ initialQuery = 
     const query = value.trim()
     if (query === shownQuery.current) return
     const pause = setTimeout(() => {
+      // Enter during the pause already searched for it
+      if (query === shownQuery.current) return
       shownQuery.current = query
       router.push(toSearchHref(query))
     }, SEARCH_PAUSE_MS)

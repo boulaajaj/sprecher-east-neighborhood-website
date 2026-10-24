@@ -47,6 +47,9 @@ describe('SearchBox (#200)', () => {
     fireEvent.change(box(), { target: { value: 'park' } })
     fireEvent.submit(box())
     expect(push).toHaveBeenCalledWith('/search?q=park')
+    // The pause still running when Enter was pressed doesn't search again
+    act(() => vi.advanceTimersByTime(300))
+    expect(push).toHaveBeenCalledTimes(1)
   })
 
   it('doesn’t navigate, or undo the typing, for a space between words', () => {
