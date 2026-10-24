@@ -14,7 +14,7 @@ on the VPS. Nothing here is run by hand during a normal deploy. Changes to the s
 | `backup-db.mjs`     | VPS    | Copies the live SQLite database with `VACUUM INTO` and checks the copy                                                                                   | #148       |
 | `install-cron.sh`   | VPS    | Installs the daily backup job (08:15 UTC) in `/etc/cron.d/sprecher-east-backup`                                                                          | #148       |
 | `restart-app.sh`    | VPS    | Reloads the app under PM2; starts it fresh, with a way back, when its start settings change. Listens on `127.0.0.1:3000` only. Deletes old sitemap files | #118, #267 |
-| `caddy-limits.sh`   | VPS    | Caps request bodies on the public form endpoints at Caddy (`caddy/form-limits.caddy`)                                                                    | #124       |
+| `caddy-limits.sh`   | VPS    | Caps request bodies on the public form endpoints and `/api/mcp` at Caddy (`caddy/form-limits.caddy`)                                                     | #124       |
 | `caddy-https.sh`    | VPS    | Sends HSTS on the domain (`caddy/hsts.caddy`), and adds a redirect to HTTPS in the plain-HTTP site blocks                                                | #235       |
 | `lib.sh`            | VPS    | Shared helpers: annotations, reading non-secret settings, checking the site through Caddy, the `current` link                                            |            |
 

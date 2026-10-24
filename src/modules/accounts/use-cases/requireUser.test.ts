@@ -19,7 +19,7 @@ vi.mock('next/navigation', () => ({ redirect: edges.redirect, notFound: edges.no
 import { requireRole, requireUser } from './requireUser'
 
 const signedIn = (role: string | null) => ({
-  user: { id: 3, email: 'ada@example.com', name: 'Ada', role },
+  user: { id: 3, email: 'ada@example.com', name: 'Ada', role, collection: 'users' },
 })
 
 beforeEach(() => {
@@ -35,6 +35,12 @@ describe('requireUser', () => {
       name: 'Ada',
       role: 'resident',
     })
+  })
+
+  // An MCP API key sent as a header authenticates as the key document itself (#336)
+  it('counts an API key acting as itself as a visitor', async () => {
+    edges.auth.mockResolvedValue({ user: { id: 3, collection: 'payload-mcp-api-keys' } })
+    await expect(requireUser()).rejects.toThrow('redirect:/login')
   })
 
   it('sends a visitor to the sign-in page', async () => {

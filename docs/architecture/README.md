@@ -23,6 +23,7 @@ flowchart TD
     news[news]
     contact[contact]
     accounts[accounts]
+    agents[agents]
     directory[directory]
     site[site]
     verification[verification]
@@ -46,16 +47,17 @@ grows should split its top level "into domain oriented modules which are interna
 
 ## Business areas
 
-| Module         | Owns                                                                                   | Payload collections and globals                  | Routes                                                                                     |
-| -------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------ |
-| `events`       | Event listings, the "upcoming" rule, event types, calendar (Phase 2)                   | `events`                                         | `/events`, `/events/[slug]`, sitemap entries                                               |
-| `news`         | Posts, categories, authors, search, related and recent posts                           | `posts`, `categories`, `search`                  | `/posts`, `/posts/[slug]`, `/search`, sitemap entries                                      |
-| `contact`      | Public form safeguards, the robot check, form-email rules                              | `forms`, `form-submissions` (plugin)             | the form block on CMS pages                                                                |
-| `accounts`     | Who is signed in, sign-up and verification, sign-in and password flows, the role field | `users`                                          | `/login`, `/account`, `/forgot-password`, `/reset-password`, `/sign-up`, `/verify-account` |
-| `directory`    | FAQ, local resources, team members                                                     | `faq`, `resources`, `team-members`               | `/faq`, `/resources`                                                                       |
-| `site`         | CMS pages, page-builder blocks, heroes, header, footer, redirects                      | `pages`, `redirects`, globals `header`, `footer` | `/[slug]`, home, sitemap entries                                                           |
-| `verification` | Confirming an email by link: the token, its expiry, the limits, the emails             | `email-confirmations`                            | `/confirm-email`                                                                           |
-| `comments`     | Resident comments (future)                                                             | (future)                                         | (future)                                                                                   |
+| Module         | Owns                                                                                   | Payload collections and globals                                     | Routes                                                                                     |
+| -------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `events`       | Event listings, the "upcoming" rule, event types, calendar (Phase 2)                   | `events`                                                            | `/events`, `/events/[slug]`, sitemap entries                                               |
+| `news`         | Posts, categories, authors, search, related and recent posts                           | `posts`, `categories`, `search`                                     | `/posts`, `/posts/[slug]`, `/search`, sitemap entries                                      |
+| `contact`      | Public form safeguards, the robot check, form-email rules                              | `forms`, `form-submissions` (plugin)                                | the form block on CMS pages                                                                |
+| `accounts`     | Who is signed in, sign-up and verification, sign-in and password flows, the role field | `users`                                                             | `/login`, `/account`, `/forgot-password`, `/reset-password`, `/sign-up`, `/verify-account` |
+| `directory`    | FAQ, local resources, team members                                                     | `faq`, `resources`, `team-members`                                  | `/faq`, `/resources`                                                                       |
+| `site`         | CMS pages, page-builder blocks, heroes, header, footer, redirects                      | `pages`, `redirects`, globals `header`, `footer`                    | `/[slug]`, home, sitemap entries                                                           |
+| `agents`       | Agent access over MCP (keys, limits, what the model sees), the agents' run history     | `agent-runs`, `agent-review-items`, `payload-mcp-api-keys` (plugin) | `/api/mcp` (plugin)                                                                        |
+| `verification` | Confirming an email by link: the token, its expiry, the limits, the emails             | `email-confirmations`                                               | `/confirm-email`                                                                           |
+| `comments`     | Resident comments (future)                                                             | (future)                                                            | (future)                                                                                   |
 
 `src/platform/` holds what every module uses, and imports no module:
 
@@ -238,4 +240,5 @@ The seed script (`src/endpoints/seed/index.ts`) is the one hand-written file abo
 - [Glossary](glossary.md): business terms, defined once.
 - [Data model](data-model.md): every collection and global, its fields and its access rules.
 - [Review queue](review-queue.md): how suggested events and posts wait for staff.
+- [Agent access](agent-access.md): how agents read content and suggest it over MCP.
 - [Decision records](decisions/README.md): why things are the way they are.

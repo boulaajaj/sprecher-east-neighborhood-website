@@ -9,8 +9,9 @@ import {
   getPayload,
   logoutOperation,
   type Payload,
-  type TypedUser,
 } from 'payload'
+
+import type { User } from '@/payload-types'
 
 import type { PasswordChangeValues, SignInValues } from '../domain/credentials'
 import { CURRENT_PASSWORD_CONFIRMED } from '../domain/passwordConfirmation'
@@ -19,11 +20,18 @@ import { USERS } from '../domain/usersCollection'
 import { isRefusal } from './failures'
 import { toCurrentUser } from './mappers'
 
-/** The Payload user this request's auth cookie belongs to, or null (Payload's own check). */
-async function getSessionPayloadUser(): Promise<TypedUser | null> {
+/** An account from the users collection, as Payload's auth returns it. */
+type SessionAccount = User & { collection: typeof USERS }
+
+/**
+ * The Payload user this request's auth cookie belongs to, or null (Payload's own check). Only an
+ * account counts: an MCP API key sent as a header authenticates as the key itself (#336).
+ */
+async function getSessionPayloadUser(): Promise<SessionAccount | null> {
   const payload = await getPayload({ config: configPromise })
   const { user } = await payload.auth({ headers: await headers() })
-  return user
+  if (!user || user.collection !== USERS || !('email' in user)) return null
+  return { ...user, collection: USERS }
 }
 
 /** Who is signed in for this request, or null. */
@@ -112,7 +120,7 @@ export async function setOwnPassword({
  */
 async function isOwnPassword(
   payload: Payload,
-  user: TypedUser,
+  user: SessionAccount,
   password: string,
 ): Promise<boolean> {
   try {

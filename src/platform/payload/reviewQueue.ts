@@ -5,6 +5,7 @@ import {
   type TypedUser,
   type Field,
   type FieldHook,
+  Forbidden,
   ValidationError,
 } from 'payload'
 
@@ -27,6 +28,8 @@ import { hasAdminOrEditor } from './roles'
 
 const SIDEBAR = { position: 'sidebar' } as const
 const blankIsNull: FieldHook = ({ value }) => blankToNull(value)
+// Admin's Duplicate makes staff content: it must not copy a suggestion's status or identity
+const notCopied: FieldHook = () => null
 
 export const REVIEW_QUEUE_FIELDS: Field[] = [
   {
@@ -39,6 +42,7 @@ export const REVIEW_QUEUE_FIELDS: Field[] = [
       ...SIDEBAR,
       description: 'Set on suggestions from outside sources. Empty for content staff write.',
     },
+    hooks: { beforeDuplicate: [notCopied] },
   },
   {
     name: 'sourceName',
@@ -62,7 +66,7 @@ export const REVIEW_QUEUE_FIELDS: Field[] = [
     label: 'Source ID',
     unique: true,
     index: true,
-    hooks: { beforeValidate: [blankIsNull] },
+    hooks: { beforeValidate: [blankIsNull], beforeDuplicate: [notCopied] },
     admin: { ...SIDEBAR, description: 'The source’s own ID; the same one can’t be stored twice.' },
   },
   {
@@ -71,7 +75,7 @@ export const REVIEW_QUEUE_FIELDS: Field[] = [
     label: 'Content fingerprint',
     unique: true,
     index: true,
-    hooks: { beforeValidate: [blankIsNull] },
+    hooks: { beforeValidate: [blankIsNull], beforeDuplicate: [notCopied] },
     admin: { ...SIDEBAR, description: 'A fingerprint of the content; it can’t be stored twice.' },
   },
   {
@@ -110,10 +114,12 @@ export async function countSuggestions(
 export const SUGGESTIONS_FILTER = '@/platform/payload/admin/SuggestionsFilter'
 
 /**
- * Holds what doesn't come from staff: a write over REST, GraphQL or MCP, or a Local API call made
- * as a non-staff user, is stored as a draft, and a create also becomes a `suggested` item that
- * must name its source. Our own server code calling the Local API with no user (the seed) is left
- * alone. When staff publish a suggestion, it's approved.
+ * Holds what doesn't come from staff: a create over REST, GraphQL or MCP, or a Local API call made
+ * as a non-staff user, is stored as an unpublished draft with status `suggested`, and must name
+ * its source. Any other write from them is refused (collection access already refuses it; this
+ * keeps it so even if access is loosened), so live content is never unpublished or changed. Our
+ * own server code calling the Local API with no user (the seed) is left alone. When staff publish
+ * a suggestion, it's approved.
  */
 export const holdSuggestions: CollectionBeforeChangeHook = ({
   collection,
@@ -124,7 +130,7 @@ export const holdSuggestions: CollectionBeforeChangeHook = ({
 }) => {
   if (hasAdminOrEditor(req.user)) return approveOnPublish(data, originalDoc)
   if (req.payloadAPI === 'local' && !req.user) return data
-  if (operation !== 'create') return { ...data, _status: 'draft' }
+  if (operation !== 'create') throw new Forbidden(req.t)
 
   const held = toHeldSuggestion(data)
   if ('problems' in held) {

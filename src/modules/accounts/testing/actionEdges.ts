@@ -98,6 +98,7 @@ export const resident = {
   email: 'ada@example.com',
   name: 'Ada',
   role: 'resident',
+  collection: 'users',
   _sid: 's7',
 }
 

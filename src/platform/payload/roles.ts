@@ -1,32 +1,46 @@
-import type { Access, AccessArgs, FieldAccess } from 'payload'
+import type { Access, AccessArgs, FieldAccess, TypedUser } from 'payload'
 
 import type { User } from '@/payload-types'
 
-import { ROLES, type Role } from '../lib/roles'
+import { ACCOUNTS_COLLECTION, ROLES, type Role } from '../lib/roles'
+
+/** Who a request acts as: an account, an MCP API key authenticating as itself, or nobody. */
+type Principal = User | TypedUser | null
 
 /**
  * Extract role from the request user.
  * Returns 'resident' as the safe default if no role is set (e.g., pre-migration users).
+ * A principal from another collection (an MCP API key authenticating as itself, #336) has no
+ * role and counts as signed out.
  */
-const getRole = (user: User | null): Role | null => {
+const getRole = (user: Principal): Role | null => {
   if (!user) return null
+  if ('collection' in user && user.collection !== ACCOUNTS_COLLECTION) return null
+  if (!('role' in user)) return null
   return user.role || ROLES.resident
 }
 
 /** Check if user has admin role (also used by routes that only admins may call) */
-export const hasAdmin = (user: User | null): boolean => getRole(user) === ROLES.admin
+export const hasAdmin = (user: Principal): boolean => getRole(user) === ROLES.admin
 
 /** Whether a role is staff (admin or editor). Takes any value, so untyped data can be checked */
 export const isStaffRole = (role: unknown): boolean => role === ROLES.admin || role === ROLES.editor
 
 /** Check if user has admin or editor role (also used by hooks that exempt staff) */
-export const hasAdminOrEditor = (user: User | null): boolean => isStaffRole(getRole(user))
+export const hasAdminOrEditor = (user: Principal): boolean => isStaffRole(getRole(user))
+
+/** Check if user is an agent account: suggests content through MCP, publishes nothing (#336) */
+export const hasAgent = (user: Principal): boolean => getRole(user) === ROLES.agent
 
 /** Admin only — full access to everything */
 export const isAdmin: Access = ({ req: { user } }) => hasAdmin(user)
 
 /** Admin or editor — content management access */
 export const isAdminOrEditor: Access = ({ req: { user } }) => hasAdminOrEditor(user)
+
+/** Staff or an agent: who may create suggestible content (events, posts), held for review */
+export const isStaffOrAgent: Access = ({ req: { user } }) =>
+  hasAdminOrEditor(user) || hasAgent(user)
 
 /**
  * Admin or editor — for the `admin` collection access field.
@@ -38,7 +52,7 @@ export const isAdminOrEditorBoolean = ({ req: { user } }: AccessArgs): boolean =
 
 /** Admin sees all records; non-admins see only their own record (by id match) */
 export const isAdminOrSelf: Access = ({ req: { user }, id }) => {
-  if (!user) return false
+  if (!user || !getRole(user)) return false
   if (hasAdmin(user)) return true
   if (!id) return false
   return user.id === id

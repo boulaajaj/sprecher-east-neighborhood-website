@@ -4,12 +4,14 @@ import { describe, expect, it } from 'vitest'
 import type { User } from '@/payload-types'
 import {
   hasAdminOrEditor,
+  hasAgent,
   isAdmin,
   isAdminFieldAccess,
   isAdminOrEditor,
   isAdminOrEditorBoolean,
   isAdminOrEditorFieldAccess,
   isAdminOrSelf,
+  isStaffOrAgent,
   isStaffRole,
 } from './roles'
 
@@ -106,5 +108,26 @@ describe('field access', () => {
     expect(isAdminOrEditorFieldAccess(fieldArgs(editor))).toBe(true)
     expect(isAdminOrEditorFieldAccess(fieldArgs(resident))).toBe(false)
     expect(isAdminOrEditorFieldAccess(fieldArgs(null))).toBe(false)
+  })
+})
+
+describe('agents and API keys (#336)', () => {
+  const agent = user('agent', 8)
+  // An MCP API key can authenticate a REST request as the key document itself
+  const key = { id: 1, collection: 'payload-mcp-api-keys' } as unknown as User
+
+  it('knows an agent, which is neither staff nor admin', () => {
+    expect(hasAgent(agent)).toBe(true)
+    expect(hasAgent(resident)).toBe(false)
+    expect(hasAdminOrEditor(agent)).toBe(false)
+    expect(isStaffOrAgent(args(agent))).toBe(true)
+    expect(isStaffOrAgent(args(editor))).toBe(true)
+    expect(isStaffOrAgent(args(resident))).toBe(false)
+  })
+
+  it('treats a key acting as itself as signed out, even where its id matches an account', () => {
+    expect(hasAgent(key)).toBe(false)
+    expect(isStaffOrAgent(args(key))).toBe(false)
+    expect(isAdminOrSelf(args(key, 1))).toBe(false)
   })
 })

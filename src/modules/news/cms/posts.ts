@@ -15,7 +15,7 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 
-import { draftContentAccess } from '@/platform/payload/draftContentAccess'
+import { suggestibleContentAccess } from '@/platform/payload/draftContentAccess'
 import { RICH_TEXT_BLOCKS } from '@/platform/richtext/blockConfigs'
 import { generatePreviewPath } from '@/platform/payload/generatePreviewPath'
 import {
@@ -30,7 +30,7 @@ import { revalidateDelete, revalidatePost } from './revalidatePost'
 export const Posts: CollectionConfig<'posts'> = {
   slug: 'posts',
   defaultSort: '-publishedAt',
-  access: draftContentAccess,
+  access: suggestibleContentAccess,
   defaultPopulate: {
     title: true,
     slug: true,

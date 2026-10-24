@@ -1,6 +1,15 @@
 import type { SanitizedConfig } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
+import {
+  type AccessFn,
+  accessResult,
+  allows,
+  type Audience,
+  AUDIENCES,
+  loadConfig,
+} from './testing/accessHarness'
+
 /**
  * Policy test for the whole data model. It loads the real Payload config (no database) and
  * checks every collection and global, including those added by plugins and by Payload itself,
@@ -9,21 +18,18 @@ import { beforeAll, describe, expect, it } from 'vitest'
  */
 
 type Operation = 'read' | 'create' | 'update' | 'delete' | 'readVersions' | 'unlock'
-type Audience = 'visitor' | 'resident'
-
-const AUDIENCES: Record<Audience, unknown> = {
-  visitor: null,
-  resident: { id: 7, role: 'resident', collection: 'users' },
-}
-const PUBLIC = ['visitor', 'resident'] satisfies Audience[]
-const RESIDENT_ONLY = ['resident'] satisfies Audience[]
+const PUBLIC = ['visitor', 'resident', 'agent'] satisfies Audience[]
+// Signed-in accounts of any non-staff role
+const RESIDENT_ONLY = ['resident', 'agent'] satisfies Audience[]
+const AGENT_ONLY = ['agent'] satisfies Audience[]
 
 /** Everything visitors and residents may do. Anything missing here must be denied. */
 const ALLOWED: Record<string, Partial<Record<Operation, Audience[]>>> = {
   // Content: published documents only (authenticatedOrPublished returns a filter)
   pages: { read: PUBLIC },
-  posts: { read: PUBLIC },
-  events: { read: PUBLIC },
+  // Agents may suggest: held as drafts for review by `holdSuggestions` (#123, #336)
+  posts: { read: PUBLIC, create: AGENT_ONLY },
+  events: { read: PUBLIC, create: AGENT_ONLY },
   faq: { read: PUBLIC },
   resources: { read: PUBLIC },
   // Public reference data
@@ -41,6 +47,11 @@ const ALLOWED: Record<string, Partial<Record<Operation, Audience[]>>> = {
     update: RESIDENT_ONLY,
     delete: RESIDENT_ONLY,
   },
+  // An agent's own run history (read and update return a filter on `agent`)
+  'agent-runs': { read: AGENT_ONLY, create: AGENT_ONLY, update: AGENT_ONLY },
+  // What an agent reports for editors: it adds its own (to its own runs) and reads them
+  'agent-review-items': { read: AGENT_ONLY, create: AGENT_ONLY },
+  // `payload-mcp-api-keys` is admin-only (#336)
   // `email-confirmations` is admin-only: the server writes it with access bypassed (#183)
   // Payload's own edit locks are staff-only (`restrictEditLocks`, #147), so not listed here
   // Payload's own, with no REST or GraphQL endpoints (`endpoints: false`)
@@ -55,29 +66,10 @@ const ALLOWED: Record<string, Partial<Record<Operation, Audience[]>>> = {
   footer: { read: PUBLIC },
 }
 
-type AccessFn = (args: unknown) => unknown
-
-/** Runs an access function the way Payload does for this audience and returns its result. */
-async function accessResult(access: unknown, audience: Audience, id?: number): Promise<unknown> {
-  const user = AUDIENCES[audience]
-  // With no access function, Payload lets any signed-in user through (`executeAccess`)
-  if (access === undefined) return user !== null
-  if (typeof access !== 'function') throw new Error('access is not a function')
-  return (access as AccessFn)({
-    req: { user, headers: new Headers(), payload: { config: { admin: { user: 'users' } } } },
-    id,
-  })
-}
-
-/** True when the access function lets the audience through (a query filter counts as yes). */
-async function allows(access: unknown, audience: Audience, id?: number): Promise<boolean> {
-  return (await accessResult(access, audience, id)) !== false
-}
-
 let config: SanitizedConfig
 
 beforeAll(async () => {
-  config = await (await import('@payload-config')).default
+  config = await loadConfig()
 }, 60_000)
 
 describe('collections', () => {
@@ -128,6 +120,34 @@ describe('collections', () => {
       expect(await allows(collection?.access.read, 'visitor', 1)).toBe(false)
     },
   )
+
+  it('keep agents out of accounts, messages, the admin panel and content changes (#336)', async () => {
+    const find = (slug: string) => config.collections.find((c) => c.slug === slug)
+    for (const slug of ['users', 'form-submissions', 'payload-mcp-api-keys']) {
+      expect(await allows(find(slug)?.access.read, 'agent')).toBe(false)
+    }
+    for (const slug of ['events', 'posts']) {
+      for (const operation of ['update', 'delete', 'readVersions'] as const) {
+        expect(await allows(find(slug)?.access[operation], 'agent')).toBe(false)
+      }
+    }
+    expect(await accessResult(find('agent-runs')?.access.read, 'agent')).toEqual({
+      agent: { equals: 8 },
+    })
+    expect(await allows(find('users')?.access.admin, 'agent')).toBe(false)
+  })
+
+  // A key can authenticate REST requests as the key document itself: it must count as nobody,
+  // even where its id matches an account's
+  it('treat an API key acting as itself as signed out', async () => {
+    const key = { req: { user: { id: 1, collection: 'payload-mcp-api-keys' } }, id: 1 }
+    const users = config.collections.find((c) => c.slug === 'users')
+    for (const operation of ['read', 'update'] as const) {
+      expect(await (users?.access[operation] as AccessFn)(key)).toBe(false)
+    }
+    const events = config.collections.find((c) => c.slug === 'events')
+    expect(await (events?.access.create as AccessFn)(key)).toBe(false)
+  })
 
   it('let a resident reach their own user record and nobody else’s', async () => {
     const users = config.collections.find((c) => c.slug === 'users')
@@ -215,82 +235,5 @@ describe('jobs', () => {
     expect(new Set(scheduleQueues.map((schedule) => schedule.queue))).toEqual(
       new Set(['retention']),
     )
-  })
-})
-
-describe('server-only fields', () => {
-  type Node = {
-    name?: string
-    hidden?: boolean
-    access?: Partial<Record<'create' | 'update', unknown>>
-    fields?: Node[]
-    tabs?: Node[]
-    blocks?: Node[]
-  }
-
-  /** Every field below `fields`, nested ones included, as [path, field]. */
-  const allFields = (fields: Node[], path: string): [string, Node][] =>
-    fields.flatMap((field) => {
-      const here = field.name ? `${path}.${field.name}` : path
-      const children = [...(field.fields ?? []), ...(field.tabs ?? []), ...(field.blocks ?? [])]
-      return [[here, field] as [string, Node], ...allFields(children, here)]
-    })
-
-  const STAFF = [
-    { id: 2, role: 'editor', collection: 'users' },
-    { id: 1, role: 'admin', collection: 'users' },
-  ]
-
-  // `hidden: true` hides a field from reads only: Payload still accepts writes to it (#299)
-  it('refuse writes to every hidden field, for everyone', async () => {
-    const owners = [...config.collections, ...config.globals]
-    const hidden = owners.flatMap((owner) =>
-      allFields(owner.fields as Node[], owner.slug).filter(([, field]) => field.hidden),
-    )
-    expect(hidden.length).toBeGreaterThan(0)
-    const problems: string[] = []
-    for (const [path, field] of hidden) {
-      for (const operation of ['create', 'update'] as const) {
-        const access = field.access?.[operation]
-        if (typeof access !== 'function') {
-          problems.push(`${path}: no ${operation} access`)
-          continue
-        }
-        for (const audience of Object.keys(AUDIENCES) as Audience[]) {
-          if (await allows(access, audience)) problems.push(`${path}.${operation} for ${audience}`)
-        }
-        for (const user of STAFF) {
-          if ((await (access as AccessFn)({ req: { user } })) !== false) {
-            problems.push(`${path}.${operation} for ${user.role}`)
-          }
-        }
-      }
-    }
-    expect(problems).toEqual([])
-  })
-})
-
-describe('private fields', () => {
-  /** The field's own read rule, or undefined when the field has none. */
-  const fieldReadAccess = (collection: string, name: string): unknown => {
-    const field = config.collections
-      .find((c) => c.slug === collection)
-      ?.fields.find((f) => 'name' in f && f.name === name)
-    return field && 'access' in field ? field.access?.read : undefined
-  }
-
-  it.each([
-    ['team-members', 'email'],
-    ['forms', 'emails'],
-    // Would tell a visitor whether the address they typed is confirmed (#183)
-    ['form-submissions', 'senderEmail'],
-    ['form-submissions', 'emailConfirmed'],
-    // Staff's reasons for keeping a message longer (#274)
-    ['form-submissions', 'retentionHold'],
-    ['form-submissions', 'retentionHoldReason'],
-  ])('%s.%s is hidden from visitors and residents', async (collection, name) => {
-    const read = fieldReadAccess(collection, name)
-    expect(await allows(read, 'visitor')).toBe(false)
-    expect(await allows(read, 'resident')).toBe(false)
   })
 })

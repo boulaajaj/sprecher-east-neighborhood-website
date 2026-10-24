@@ -14,7 +14,7 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 
-import { draftContentAccess } from '@/platform/payload/draftContentAccess'
+import { suggestibleContentAccess } from '@/platform/payload/draftContentAccess'
 import { populatePublishedAt } from '@/platform/payload/populatePublishedAt'
 import {
   holdSuggestions,
@@ -28,7 +28,7 @@ import { revalidateDelete, revalidateEvent } from './revalidateEvent'
 
 export const Events: CollectionConfig<'events'> = {
   slug: 'events',
-  access: draftContentAccess,
+  access: suggestibleContentAccess,
   defaultPopulate: {
     title: true,
     slug: true,

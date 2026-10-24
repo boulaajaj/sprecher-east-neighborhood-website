@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Caps the request body on the public form endpoints at Caddy, so an oversized POST is cut off
-# at 256 KB instead of being read in full by Node (#124).
+# Caps the request body on the public form endpoints and the agents' MCP endpoint (#336) at
+# Caddy, so an oversized POST is cut off at 256 KB instead of being read in full by Node (#124).
 #
 # The limit lives in ops/caddy/form-limits.caddy, copied to /etc/caddy. Each Caddy site block
 # that proxies to the app gets one line importing it. Nothing else in the Caddyfile changes,
@@ -126,7 +126,7 @@ added=$(grep -c '^+' <<<"$changes" || true)
 
 limits_changed=no
 if ! cmp -s "$SOURCE" "$LIMITS_FILE"; then limits_changed=yes; fi
-limit_text="$(sed -n 's/^[[:space:]]*max_size[[:space:]]*//p' "$SOURCE") on the form endpoints, Caddy $(caddy_version)"
+limit_text="$(sed -n 's/^[[:space:]]*max_size[[:space:]]*//p' "$SOURCE") on the form and MCP endpoints, Caddy $(caddy_version)"
 
 if [ "$added" -eq 0 ] && [ "$limits_changed" = no ]; then
   report "Caddy request body limit already in place: $limit_text"

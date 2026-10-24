@@ -1,5 +1,6 @@
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
+import { mcpPlugin } from '@payloadcms/plugin-mcp'
 import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { searchPlugin } from '@payloadcms/plugin-search'
@@ -12,6 +13,7 @@ import { fileURLToPath } from 'url'
 
 import type { Event, Page, Post } from '@/payload-types'
 import { keepAccountEmails, noVerifyMutation, Users } from '@/modules/accounts/cms'
+import { AgentReviewItems, AgentRuns, mcpOptions } from '@/modules/agents/cms'
 import {
   contactRetentionTask,
   createFormBuilderOptions,
@@ -125,6 +127,8 @@ const plugins: Plugin[] = [
   formBuilderPlugin(createFormBuilderOptions({ emailConfirmer })),
   // Search belongs to news; it also indexes events, which the module doesn't name (0008)
   searchPlugin({ ...searchOptions, collections: ['posts', 'events'] }),
+  // Agents find content and suggest drafts at /api/mcp, as agent accounts (#336)
+  mcpPlugin(mcpOptions),
 ]
 
 const filename = fileURLToPath(import.meta.url)
@@ -185,6 +189,8 @@ export default buildConfig({
     Categories,
     Users,
     EmailConfirmations,
+    AgentRuns,
+    AgentReviewItems,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
