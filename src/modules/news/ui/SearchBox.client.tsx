@@ -13,16 +13,26 @@ import { toSearchHref } from '../domain/search'
 export const SearchBox: React.FC<{ initialQuery?: string }> = ({ initialQuery = '' }) => {
   const [value, setValue] = useState(initialQuery)
   const router = useRouter()
-  // The query the URL already shows, so arriving at /search?q=… doesn't navigate again
+  // The query the address shows (trimmed, as `parseSearchQuery` reads it), so arriving at
+  // /search?q=… doesn't navigate again, and a space typed between words doesn't either
   const shownQuery = useRef(initialQuery)
 
   const debouncedValue = useDebounce(value)
 
   useEffect(() => {
-    if (debouncedValue === shownQuery.current) return
-    shownQuery.current = debouncedValue
-    router.push(toSearchHref(debouncedValue))
+    const query = debouncedValue.trim()
+    if (query === shownQuery.current) return
+    shownQuery.current = query
+    router.push(toSearchHref(query))
   }, [debouncedValue, router])
+
+  // The address changed without the box (back, forward, a search link): show its query. The
+  // box's own navigation brings back the query it already shows, so typing is never undone.
+  useEffect(() => {
+    if (initialQuery === shownQuery.current) return
+    shownQuery.current = initialQuery
+    setValue(initialQuery)
+  }, [initialQuery])
 
   return (
     <form
@@ -30,7 +40,7 @@ export const SearchBox: React.FC<{ initialQuery?: string }> = ({ initialQuery = 
       onSubmit={(event) => {
         event.preventDefault()
         // Enter searches right away, without waiting for the pause
-        shownQuery.current = value
+        shownQuery.current = value.trim()
         router.push(toSearchHref(value))
       }}
     >

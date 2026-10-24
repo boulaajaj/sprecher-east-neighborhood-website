@@ -6,6 +6,7 @@ import { postJsonLd } from './postJsonLd'
 const post: PostDetail = {
   id: 7,
   slug: 'road-study',
+  href: '/posts/road-study',
   title: 'Road study hearings',
   publishedAt: '2026-10-01T12:00:00.000Z',
   categories: [],

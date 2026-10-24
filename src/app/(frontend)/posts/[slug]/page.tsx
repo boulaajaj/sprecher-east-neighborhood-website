@@ -114,7 +114,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
     ...meta,
     openGraph: {
       ...(meta.openGraph ?? {}),
-      url: `/posts/${post.slug}`,
+      url: post.href,
     },
   }
 }

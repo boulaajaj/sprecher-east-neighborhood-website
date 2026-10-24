@@ -10,7 +10,7 @@ export function postJsonLd(post: PostDetail): Record<string, unknown> {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: post.title,
-    url: `${siteUrl}/posts/${post.slug}`,
+    url: `${siteUrl}${post.href}`,
     datePublished: post.publishedAt || post.createdAt,
     dateModified: post.updatedAt,
     description: post.meta.description || '',

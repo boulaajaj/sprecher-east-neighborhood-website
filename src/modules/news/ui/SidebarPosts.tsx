@@ -20,7 +20,7 @@ export const SidebarPosts: React.FC<{
       <ul className="space-y-4">
         {posts.map((post) => (
           <li key={post.slug}>
-            <Link href={`/posts/${post.slug}`} className="group flex gap-3">
+            <Link href={post.href} className="group flex gap-3">
               <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-surface">
                 {post.image ? (
                   <Media
