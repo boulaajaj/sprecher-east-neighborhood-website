@@ -19,6 +19,11 @@ change this file through the same workflow below.
   ones. Write custom code only when none fits, and record what each step found on the issue.
   It's a guide for judgment: real trade-offs go to the owner
   ([the ladder](docs/guidelines/development.md#native-first-then-plugins-then-our-code)).
+- **Push back before building what's probably not the best way.** When the owner asks for
+  something that looks weaker than the standard approach (for example a security trade-off),
+  don't build it as asked. Explain the better option with sources, then stop and wait until he
+  has read it and decided. Building first wastes work on a change that may be thrown away (the
+  owner's rule, 2026-10-23, quoted on #305).
 
 ## The only way code reaches `main` and production
 
