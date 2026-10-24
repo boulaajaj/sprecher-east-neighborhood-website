@@ -52,8 +52,9 @@ gh api "repos/{owner}/{repo}/stacks?pull_request=<number>" -H 'X-GitHub-Api-Vers
   native Payload, Next.js and React, official plugins, open-source plugins. Check one or two
   claims yourself and use judgment, not a checklist. Findings missing, or a step that clearly
   fits: **Changes requested**. A technical trade-off is the author's to decide, with the reasoning
-  on the issue; only a product, cost, legal or privacy trade-off the owner hasn't decided is
-  **Waits for owner**.
+  on the issue. Only a genuine product trade-off, a meaningful cost, a legal or privacy
+  commitment, or a decision established best practice can't reasonably resolve, that the owner
+  hasn't decided, is **Waits for owner**.
 - **Guidelines and architecture:** the change follows the guidelines for what it touches
   ([`docs/guidelines/`](../../../docs/guidelines/README.md)) and puts code where
   [`docs/architecture/`](../../../docs/architecture/README.md) says it goes. For code under
@@ -100,7 +101,8 @@ verdict is **Changes requested**: it's fixed first, so he gets a clean PR.
   owner's words. The author then merges ([`change-workflow`](../change-workflow/SKILL.md),
   step 6).
 - **Changes requested:** list them. The author fixes them and asks for a re-review.
-- **Waits for owner:** the PR or its issue is labeled `needs owner`, it rests on a trade-off the
-  owner hasn't decided, or it changes policy he didn't ask for. The author labels the PR
-  `needs owner`, asks him one plain question, and stops until he answers
+- **Waits for owner:** the PR or its issue is labeled `needs owner`, it rests on a genuine product
+  trade-off, a meaningful cost, a legal or privacy commitment, or a decision established best
+  practice can't reasonably resolve, that the owner hasn't decided, or it changes policy he
+  didn't ask for. The author labels the PR `needs owner`, asks him one plain question, and stops until he answers
   ([waits for owner](../../../docs/process/project-management.md#waits-for-owner)).

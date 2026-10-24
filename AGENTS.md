@@ -23,10 +23,10 @@ change this file through the same workflow below.
   practice: built-in features and mature, maintained libraries over custom code, reuse what
   exists, don't duplicate work already underway, and follow security, privacy, accessibility
   and usability standards, with fast, simple interactions on mobile first. Add tests and get
-  the code reviewed. Record each decision briefly on its issue. Ask the owner only about product
-  trade-offs, meaningful costs, legal or privacy commitments, or what best practice can't
-  settle; several valid technical approaches are never a reason to wait for him (the owner's
-  rule, 2026-10-24, quoted on #315).
+  the code reviewed. Record each decision briefly on its issue. Ask the owner only about genuine
+  product trade-offs, meaningful costs, legal or privacy commitments, or decisions established
+  best practice can't reasonably resolve. Several valid technical approaches are never a reason
+  to wait for him (the owner's rule, 2026-10-24, quoted on #315).
 - **Test every finished flow as a resident would use it:** on a phone, with expired links,
   wrong input, and recovering from errors (#315).
 - **Push back before building what's probably not the best way.** When the owner asks for

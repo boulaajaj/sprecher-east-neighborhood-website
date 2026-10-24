@@ -29,7 +29,8 @@ what was checked, with a link, and why it doesn't fit.
 **This is a guide for judgment, not a hard gate.** Be reasonable and proportionate: don't decide
 by reflex that a plugin always wins, or that our own code always does. When the choice between a
 plugin and our own code is a technical trade-off, decide it yourself and record the reasoning on
-the issue. Only a product, cost, legal or privacy trade-off goes to the owner (label
+the issue. Only a genuine product trade-off, a meaningful cost, a legal or privacy commitment,
+or a decision established best practice can't reasonably resolve goes to the owner (label
 `needs owner`), with the findings and a recommendation
 ([`AGENTS.md`](../../AGENTS.md#ground-rules), #315).
 
