@@ -104,8 +104,12 @@ describe('the redirects collection', () => {
 })
 
 describe('the globals', () => {
-  it('are the site’s header and footer', () => {
-    expect(config.globals.map((global) => global.slug)).toEqual(['header', 'footer'])
+  it('are the site’s header and footer, plus the job stats Payload adds for scheduled tasks', () => {
+    expect(config.globals.map((global) => global.slug)).toEqual([
+      'header',
+      'footer',
+      'payload-jobs-stats',
+    ])
   })
 })
 

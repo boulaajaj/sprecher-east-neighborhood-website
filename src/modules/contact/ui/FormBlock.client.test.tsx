@@ -19,6 +19,7 @@ vi.mock('@/platform/richtext/RichText', () => ({
 
 import { fakeTurnstile } from '@/platform/turnstile/testing/fakeTurnstileWidget'
 
+import { CONFIRM_EMAIL_NOTE } from './confirmEmailNote'
 import { FormBlock } from './FormBlock.client'
 
 const form = {
@@ -77,9 +78,33 @@ describe('FormBlock', () => {
       ],
     })
     expect((await screen.findByRole('status')).textContent).toBe(
-      'Thanks, your message is on its way.',
+      `Thanks, your message is on its way.${CONFIRM_EMAIL_NOTE}`,
     )
     expect(screen.queryByRole('textbox')).toBeNull()
+  })
+
+  it('says nothing about a confirmation link when the form asks for no email (#274)', async () => {
+    fetchMock.mockResolvedValue(new Response('{}', { status: 201 }))
+    const noEmail = { ...form, fields: form.fields.filter((f) => f.blockType !== 'email') }
+    render(<FormBlock enableIntro={false} form={noEmail as FormType} />)
+
+    await userEvent.type(screen.getByRole('textbox', { name: /Name/ }), 'Ada')
+    await userEvent.click(screen.getByRole('button', { name: 'Send Message' }))
+
+    expect((await screen.findByRole('status')).textContent).toBe(
+      'Thanks, your message is on its way.',
+    )
+  })
+
+  it('still tells the sender to check their email when the form has no thank-you text', async () => {
+    fetchMock.mockResolvedValue(new Response('{}', { status: 201 }))
+    render(
+      <FormBlock enableIntro={false} form={{ ...form, confirmationMessage: undefined } as never} />,
+    )
+
+    await fillAndSend()
+
+    expect((await screen.findByRole('status')).textContent).toBe(CONFIRM_EMAIL_NOTE)
   })
 
   it('after a failure shows a fixed text, never the server’s, and retries with a fresh token', async () => {

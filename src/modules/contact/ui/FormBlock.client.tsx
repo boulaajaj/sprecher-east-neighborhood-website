@@ -8,6 +8,7 @@ import { Button, Form, type FormStatus } from '@/platform/ui'
 import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 
 import { postFormSubmission } from './api'
+import { CONFIRM_EMAIL_NOTE } from './confirmEmailNote'
 import { FormBuilderField, type FormValues } from './FormBuilderField.client'
 import { toDefaultValues, toFormSchema } from './formSchema'
 import { toSubmitErrorMessage } from './submitErrorMessage'
@@ -81,6 +82,12 @@ export const FormBlock: React.FC<
   }
 
   const sent = status === 'success'
+  // A message waits for its sender's click (#274), so a form that asks for an email says so
+  const asksForEmail = fields.some((field) => field.blockType === 'email')
+  const thanks =
+    confirmationType === 'message' && confirmationMessage ? (
+      <RichText data={confirmationMessage} enableGutter={false} enableProse={false} />
+    ) : null
 
   return (
     <div className="container py-10 md:py-14 lg:max-w-[48rem]">
@@ -96,8 +103,13 @@ export const FormBlock: React.FC<
           onSubmit={onSubmit}
           status={status}
           successMessage={
-            confirmationType === 'message' && confirmationMessage ? (
-              <RichText data={confirmationMessage} enableGutter={false} enableProse={false} />
+            thanks || asksForEmail ? (
+              <>
+                {thanks}
+                {asksForEmail && (
+                  <p className={thanks ? 'mt-2' : undefined}>{CONFIRM_EMAIL_NOTE}</p>
+                )}
+              </>
             ) : undefined
           }
           errorMessage={errorMessage}

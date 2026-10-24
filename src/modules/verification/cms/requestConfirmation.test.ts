@@ -115,24 +115,4 @@ describe('requestConfirmation', () => {
     vi.setSystemTime(NOW + HOUR)
     expect(await request('person32@example.com', req)).toBe('sent')
   })
-
-  it('deletes unconfirmed addresses 7 days after their last link, never confirmed ones', async () => {
-    const request = await load()
-    const { docs, req } = fakeRequest()
-    const old = new Date(NOW - 7 * DAY - 1).toISOString()
-    const recent = new Date(NOW - 7 * DAY + 1).toISOString()
-    docs.push(
-      { id: 1, email: 'stale@example.com', confirmedAt: null, lastSentAt: old },
-      { id: 2, email: 'recent@example.com', confirmedAt: null, lastSentAt: recent },
-      { id: 3, email: 'kept@example.com', confirmedAt: old, lastSentAt: old },
-    )
-
-    await request('ana@example.com', req)
-
-    expect(docs.map((doc) => doc.email)).toEqual([
-      'recent@example.com',
-      'kept@example.com',
-      'ana@example.com',
-    ])
-  })
 })

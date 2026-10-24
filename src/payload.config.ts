@@ -11,10 +11,12 @@ import { buildConfig, type Plugin } from 'payload'
 import { fileURLToPath } from 'url'
 
 import type { Event, Page, Post } from '@/payload-types'
-import { noVerifyMutation, Users } from '@/modules/accounts/cms'
+import { keepAccountEmails, noVerifyMutation, Users } from '@/modules/accounts/cms'
 import {
+  contactRetentionTask,
   createFormBuilderOptions,
   FormBlock,
+  keepSendersWithMessages,
   markSubmissionsConfirmed,
 } from '@/modules/contact/cms'
 import { FAQ, Resources, TeamMembers } from '@/modules/directory/cms'
@@ -27,7 +29,11 @@ import {
   revalidateRedirects,
   SITE_LAYOUT_BLOCKS,
 } from '@/modules/site/cms'
-import { createEmailConfirmations, emailConfirmer } from '@/modules/verification/cms'
+import {
+  createConfirmationRetentionTask,
+  createEmailConfirmations,
+  emailConfirmer,
+} from '@/modules/verification/cms'
 import { Media } from '@/platform/payload/media'
 import { defaultLexical } from '@/platform/payload/defaultLexical'
 import {
@@ -39,12 +45,19 @@ import {
 import { getServerSideURL } from '@/platform/lib/getURL'
 import { emailAdapterFromEnv } from '@/platform/email/emailAdapter'
 import { restrictEditLocks } from '@/platform/payload/restrictEditLocks'
+import { restrictJobStats } from '@/platform/payload/restrictJobStats'
 import { ADMIN_FORGOT_ROUTE, ADMIN_ROUTE } from '@/platform/payload/adminRoutes'
+import { RETENTION_QUEUE, RETENTION_RUNNER_CRON } from '@/platform/payload/retentionJobs'
 
 // Modules meet here (0008): the contact form joins the site's own page-builder blocks
 const Pages = createPagesCollection({ layoutBlocks: [...SITE_LAYOUT_BLOCKS, FormBlock] })
 // Email confirmation by link (#183): once an address is confirmed, its contact messages are too
 const EmailConfirmations = createEmailConfirmations({ onConfirmed: [markSubmissionsConfirmed] })
+// Retention (#274): a confirmed address stays while a message from it is kept, or an account
+// uses it
+const confirmationRetentionTask = createConfirmationRetentionTask({
+  keepers: [keepSendersWithMessages, keepAccountEmails],
+})
 
 const generateTitle: GenerateTitle<Post | Page | Event> = ({ doc }) => {
   return doc?.title || 'Sprecher East'
@@ -117,7 +130,8 @@ const plugins: Plugin[] = [
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-// Edit locks get staff-only access after Payload has added them (#147)
+// Edit locks get staff-only access after Payload has added them (#147), and the job stats
+// admin-only (#274)
 export default buildConfig({
   // Payload's defaults, from one place: the proxy redirects the forgot-password page (#282)
   routes: { admin: ADMIN_ROUTE },
@@ -197,6 +211,13 @@ export default buildConfig({
     // Payload's default lets any signed-in account run, queue or cancel jobs (#140). Editors
     // queue and cancel scheduled publishes from Admin; only admins may run the queue by hand.
     access: { cancel: isAdminOrEditorBoolean, queue: isAdminOrEditorBoolean, run: isAdminBoolean },
+    // The owner's retention rules (#274), scheduled every hour
+    tasks: [contactRetentionTask, confirmationRetentionTask],
+    // Runs the retention queue inside the app's one PM2 process (no separate worker). Payload
+    // starts it on the first request through its own routes (any /api/ request, the admin) after
+    // a start, and never during `next build`. Only this queue: scheduled publishing (#141) is
+    // a separate decision.
+    autoRun: [{ cron: RETENTION_RUNNER_CRON, queue: RETENTION_QUEUE }],
   },
   // Absolute links in emails (password reset). Without it Payload derives the origin from the
   // request and, behind the Caddy proxy (http upstream vs https allowlist), falls back to a
@@ -217,4 +238,6 @@ export default buildConfig({
     autoGenerate: process.env.NODE_ENV === 'development',
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-}).then(restrictEditLocks)
+})
+  .then(restrictEditLocks)
+  .then(restrictJobStats)

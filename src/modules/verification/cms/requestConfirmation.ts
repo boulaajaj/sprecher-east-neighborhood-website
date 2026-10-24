@@ -5,10 +5,10 @@ import { getServerSideURL } from '@/platform/lib/getURL'
 
 import { toConfirmationEmail, toConfirmationLink } from '../domain/emails'
 import { CONFIRMATION_LIMITS } from '../domain/limits'
-import { checkAddressLimit, toTokenExpiry, toUnconfirmedCutoff } from '../domain/rules'
+import { checkAddressLimit, toTokenExpiry } from '../domain/rules'
 import { newConfirmationToken } from './token'
 import type { RequestOutcome } from '../domain/types'
-import { deleteUnconfirmedBefore, getConfirmationByEmail, saveLinkSent } from './store'
+import { getConfirmationByEmail, saveLinkSent } from './store'
 
 // In memory, like the form limits: the site runs as one PM2 process.
 const connections = new SlidingWindowCounter(CONFIRMATION_LIMITS.connectionWindowMs)
@@ -18,8 +18,8 @@ const SITE_WIDE = 'site'
 /**
  * Sends a confirmation link to an address someone typed, within the limits, and says what
  * happened (for logs; the person always gets the same answer). The record is saved before the
- * email goes out; a failed send throws, and the address can ask again. Unconfirmed records
- * past their keep time are deleted first, as nothing runs scheduled jobs yet (#141).
+ * email goes out; a failed send throws, and the address can ask again. Records past their keep
+ * time are deleted by the retention task (`cms/retention.ts`, #274), not here.
  */
 export async function requestConfirmation(
   value: unknown,
@@ -29,8 +29,6 @@ export async function requestConfirmation(
   if (!email) return 'invalid-address'
 
   const now = Date.now()
-  await deleteUnconfirmedBefore(req, toUnconfirmedCutoff(now))
-
   const existing = await getConfirmationByEmail(req, email)
   if (existing?.confirmedAt) return 'already-confirmed'
 

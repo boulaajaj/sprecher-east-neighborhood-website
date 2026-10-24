@@ -3,10 +3,10 @@ import { vi } from 'vitest'
 
 // For the cms/ tests: a Payload request whose Local API keeps the `email-confirmations`
 // collection in memory. It understands only the queries this module makes (equals, exists,
-// less_than and `and`), and records every email instead of sending it.
+// less_than, in and `and`), and records every email instead of sending it.
 
 type Doc = Record<string, unknown> & { id: number }
-type Condition = { equals?: unknown; exists?: boolean; less_than?: string }
+type Condition = { equals?: unknown; exists?: boolean; less_than?: string; in?: unknown[] }
 
 function matches(doc: Doc, where: Where | undefined): boolean {
   if (!where) return true
@@ -16,6 +16,7 @@ function matches(doc: Doc, where: Where | undefined): boolean {
     const field = doc[key] ?? null
     if ('equals' in condition) return field === condition.equals
     if ('exists' in condition) return (field !== null) === condition.exists
+    if (condition.in) return condition.in.includes(field)
     if (condition.less_than !== undefined) {
       return typeof field === 'string' && field < condition.less_than
     }
@@ -66,7 +67,7 @@ export function fakeRequest({ ip = '203.0.113.7' as string | null } = {}) {
     sendEmail: vi.fn(async (email: (typeof sent)[number]) => {
       sent.push(email)
     }),
-    logger: { warn: vi.fn(), error: vi.fn() },
+    logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
   }
 
   const req = {

@@ -14,13 +14,15 @@ const MESSAGES: Record<ConfirmAnswer | 'offline', ConfirmMessage> = {
     variant: 'success',
     text: 'This email is already confirmed. There’s nothing more to do.',
   },
+  // A message waits for its sender's click; unconfirmed, it is deleted after 48 hours (#274), so
+  // these say what happened to it and how to get through
   expired: {
     variant: 'error',
-    text: 'This link has expired. Links work for 24 hours: send the form again to get a new one.',
+    text: 'This link has expired, so your message hasn’t been passed on. Links work for 24 hours: send the form again to get a new one.',
   },
   invalid: {
     variant: 'error',
-    text: 'This link isn’t valid. Check that you opened the whole link from the email, or send the form again to get a new one.',
+    text: 'This link isn’t valid, or it’s more than 2 days old. Check that you opened the whole link from the email, or send the form again to get a new one.',
   },
   'robot-check': {
     variant: 'error',
