@@ -85,7 +85,7 @@ When fixing transitive vulnerabilities:
 - Caddy handles SSL/TLS automatically when domain is configured
 - PM2 runs the app as a managed process (auto-restart on crash)
 - GitHub Actions secrets store VPS credentials (never in code)
-- **NEVER overwrite `/etc/caddy/Caddyfile`** — always read it first, then ADD new server blocks. The one automated exception is `ops/caddy-limits.sh`, run by every deploy: it adds an `import` line inside the site blocks that proxy to the app, and refuses any edit that changes more than that (#124)
+- **NEVER overwrite `/etc/caddy/Caddyfile`** — always read it first, then ADD new server blocks. The automated exceptions run by every deploy, each refusing any edit that changes more than its own: `ops/caddy-limits.sh` adds an `import` line inside the site blocks that proxy to the app (#124); `ops/caddy-https.sh` adds an HSTS `import` line to the domain and www blocks and, in the plain-HTTP IP block only, replaces the one-line `reverse_proxy` with a redirect to the HTTPS domain (#235)
 - Always back up before editing: `cp /etc/caddy/Caddyfile /etc/caddy/Caddyfile.bak`
 - Always validate before reloading: `caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy`
 - Live domains (`sprechereast.com`, `www.sprechereast.com`) must NEVER be removed from the Caddyfile

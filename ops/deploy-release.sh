@@ -11,7 +11,8 @@
 #      database on its first visit, then is cached as usual
 #   5. switch the `current` link atomically and reload the app under PM2 (ops/restart-app.sh)
 #   6. check the site answers through Caddy with this release's build; if not, switch back
-#   7. refresh the backup job and the Caddy limits, and keep the newest $KEEP_RELEASES releases
+#   7. refresh the backup job and the Caddy settings (request limits, HTTPS), and keep the newest
+#      $KEEP_RELEASES releases
 #
 # The first run moves the app from the old checkout in $APP_DIR to `current`; the checkout stays
 # untouched as the way back (ops/README.md, "Releases").
@@ -164,6 +165,7 @@ report "release $name is live (build $build_id)"
 failed=0
 bash "$RELEASE/ops/install-cron.sh" || failed=1
 bash "$RELEASE/ops/caddy-limits.sh" || failed=1
+bash "$RELEASE/ops/caddy-https.sh" || failed=1
 
 keep="$KEEP_RELEASES"
 [ "$keep" -ge 2 ] 2>/dev/null || keep=2

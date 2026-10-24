@@ -34,14 +34,6 @@ if ! command -v caddy >/dev/null || [ ! -f "$CADDYFILE" ]; then
   exit 0
 fi
 
-# Never print Caddy's own output: the Caddyfile could hold credentials and the deploy log is public.
-caddy_accepts() { caddy validate --config "$1" --adapter caddyfile >/dev/null 2>&1; }
-caddy_version() {
-  local v
-  v=$(caddy version 2>/dev/null | awk '{ print $1; exit }' || true)
-  echo "${v:-unknown}"
-}
-
 # Status code for a POST of the given body (read from stdin) to the form endpoint, through Caddy.
 post_status() {
   site_status /api/form-submissions -X POST -H 'Content-Type: application/json' --data-binary @-
