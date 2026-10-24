@@ -54,7 +54,10 @@ Four sources, all free, public and needing no key:
 2. **Pinney Library events** (local activities). The library publishes iCalendar feeds for
    subscription, per branch and per age group, with UIDs and modification times. Pinney is the
    branch nearest the area. The feed also holds past items and system-wide closures, so keep only
-   future events.
+   future events. The all-events file was too long for the check tool to read to its current
+   items; Pinney's Book Discussion feed, from the same generator, was read whole and lists events
+   to 2026-12-15 (for example Silent Book Club, 2026-11-17, UID `f893db74…`). The collector's
+   first run (#272) confirms a future event in the all-events feed.
 3. **City legislation, Legistar** (official civic). Items changed since the last run. Keep only
    those that name a place in the area (the coverage policy, #337); match the text on our side,
    because the API's text filter returned a server error.

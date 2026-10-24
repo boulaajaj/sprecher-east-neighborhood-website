@@ -70,13 +70,13 @@ sources:
       update. The feed also holds past items: keep only DTSTART from today on. Events have no URL
       property, so link the library's event page from DESCRIPTION when present.
     example:
-      title: Cardboard Community Building with Artist-in-Residence, Carrie Breunig (Pinney)
-      date: 2026-10-24
-      url: https://www.madisonpubliclibrary.org/new/events
+      title: Silent Book Club (UID f893db74-0646-428d-8d98-4568227a4399, 19:00 America/Chicago)
+      date: 2026-11-17
+      url: https://www.madisonpubliclibrary.org/events/calendar/library-type/1940/237/export.ics
     notes: >-
-      Valid iCalendar (iCalcreator 2.41.56, X-WR-TIMEZONE America/Chicago), 69 events. The check
-      tool truncated the response, so October 2026 items weren't visible in it; the library's page
-      listed Pinney events for 2026-10-24. Age feeds exist too (library-age/1940/2..9).
+      The all-events file (~89,000 characters, ordered from April 2026) was cut off by the check
+      tool in May 2026. Pinney's Book Discussion feed, same generator, was read whole: 5 of 8 events
+      fall 2026-10-15 to 2026-12-15. #272's first run must log a future UID from the all-events feed.
   - id: madison365-news
     name: Madison365 (RSS)
     owner: Madison365 (nonprofit newsroom)
