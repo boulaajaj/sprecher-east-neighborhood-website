@@ -18,30 +18,13 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "category", "decidedBy", "input", "expected", "why"],
+        "required": ["id", "decidedBy", "input", "expected", "why"],
         "additionalProperties": false,
         "properties": {
           "id": {
-            "$ref": "common.schema.json#/$defs/sourceId"
-          },
-          "category": {
-            "enum": [
-              "similar-name",
-              "outside",
-              "core",
-              "catchment",
-              "citywide-useful",
-              "citywide-noise",
-              "missing-address",
-              "missing-date",
-              "duplicate",
-              "update",
-              "cancellation",
-              "past",
-              "injection",
-              "partisan",
-              "unverified"
-            ]
+            "description": "Starts with the case's category, from #255's list: similar, outside, core, catchment, citywide-useful, citywide-noise, missing-address, missing-date, duplicate, update, cancellation, past, injection, partisan, unverified.",
+            "type": "string",
+            "pattern": "^(similar|outside|core|catchment|citywide-useful|citywide-noise|missing-address|missing-date|duplicate|update|cancellation|past|injection|partisan|unverified)(-[a-z0-9]+)*$"
           },
           "decidedBy": {
             "enum": ["scout", "verify", "curate", "draft", "submit"]
@@ -85,28 +68,7 @@
             }
           },
           "known": {
-            "description": "What the CMS already holds for this externalId, if anything.",
-            "anyOf": [
-              {
-                "type": "object",
-                "additionalProperties": false,
-                "required": ["externalId", "contentHash"],
-                "properties": {
-                  "externalId": {
-                    "$ref": "candidate.schema.json#/properties/externalId"
-                  },
-                  "contentHash": {
-                    "$ref": "candidate.schema.json#/properties/contentHash"
-                  },
-                  "status": {
-                    "enum": ["scheduled", "cancelled"]
-                  }
-                }
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "$ref": "item.schema.json#/properties/known"
           },
           "expected": {
             "type": "object",
@@ -129,6 +91,12 @@
               "route": {
                 "description": "The MCP tool the submit stage calls: accept \u2192 submitSuggestion; needs-review, update, cancel \u2192 reportItem; reject, duplicate \u2192 none.",
                 "enum": ["submitSuggestion", "reportItem", "none"]
+              },
+              "targetCollection": {
+                "$ref": "curation.schema.json#/properties/targetCollection"
+              },
+              "targetId": {
+                "$ref": "curation.schema.json#/properties/targetId"
               }
             }
           },

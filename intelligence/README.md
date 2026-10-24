@@ -50,7 +50,10 @@ can run the same folder. Its own configuration, schedule and keys stay outside t
 4. For each stage in order, give the model the stage's prompt, `coverage.md`, and the item as
    JSON; validate its answer against the stage's `output` schema. An answer that doesn't validate
    is retried once, then the item goes to review with the error.
-5. Feed URLs in `sources.yaml` can hold `{from}`, `{to}` and `{cursor}`; `prompts/scout.md` says
+5. Before curate, look each candidate's `externalId` up with the MCP find tool (runtime code, not
+   a model) and put the result in the item's `known` section: collection, id, hash and status,
+   or null.
+6. Feed URLs in `sources.yaml` can hold `{from}`, `{to}` and `{cursor}`; `prompts/scout.md` says
    what each becomes.
 
 ## Schedule and budgets
@@ -76,9 +79,10 @@ documents directly.
   unpublished draft with `moderationStatus: suggested`, refuses a duplicate, and answers
   `{ id, status: created | duplicate }`.
 - **`reportItem`** (`schemas/report.schema.json`) for everything an editor must look at without
-  a new draft: `needs-review` items, `update` and `cancel` of a known document (by `targetId`,
-  which is never changed), and `rejected-invalid` submissions. Each carries a summary, evidence,
-  flags and the source URL, and is stored on the run in `agent-runs`, visible in Admin.
+  a new draft: `needs-review` items, `update` and `cancel` of a known document (by
+  `targetCollection` and `targetId`; the document is never changed), and `rejected-invalid`
+  submissions. Each carries a summary, evidence, flags and the source URL, and is stored on the
+  run in `agent-runs`, visible in Admin.
 - **Provenance:** `sourceName`, `sourceUrl`, `externalId`, `contentHash` and
   `moderationStatus` are defined once, in
   [`schemas/provenance.schema.json`](schemas/provenance.schema.json), with the hash recipe; the
@@ -104,9 +108,14 @@ Until #336 is live, a run writes the same calls and its run log as a digest for 
 
 ## Safety
 
+- **Model stages are isolated.** Verify, curate and draft run with no MCP key, no CMS access, no
+  file or shell access and no other tools. Only verify may fetch, and only with GET, from the
+  source's own domain and official public domains (City of Madison, Dane County, Madison Public
+  Library, MMSD, the State of Wisconsin). The MCP key is used only by the submit code, which
+  takes no instructions from a model. So text injected into a page can't reach a secret or the CMS.
 - Fetched pages, feeds and PDFs are untrusted data, never instructions. Every prompt says so and
   flags injection attempts (`prompt-injection`).
-- Only `valid` sources in `sources.yaml` are fetched. No social networks, logins or paid gateways.
+- Only `valid` sources in `sources.yaml` are polled. No social networks, logins or paid gateways.
 - Unknown facts are flagged, never filled in.
 - The runtime has no GitHub write access and no server access. A change to prompts or sources is a
   pull request, reviewed and checked like any other.

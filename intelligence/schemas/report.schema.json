@@ -14,12 +14,20 @@
     "kind": {
       "enum": ["needs-review", "update", "cancel", "rejected-invalid"]
     },
+    "targetCollection": {
+      "anyOf": [
+        {
+          "$ref": "common.schema.json#/$defs/collection"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "targetId": {
       "anyOf": [
         {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 100
+          "$ref": "common.schema.json#/$defs/documentId"
         },
         {
           "type": "null"
@@ -49,11 +57,7 @@
       }
     },
     "flags": {
-      "type": "array",
-      "items": {
-        "$ref": "common.schema.json#/$defs/flag"
-      },
-      "uniqueItems": true
+      "$ref": "common.schema.json#/$defs/flags"
     },
     "sourceUrl": {
       "$ref": "provenance.schema.json#/properties/sourceUrl"
@@ -70,12 +74,31 @@
         }
       },
       "then": {
+        "required": ["targetCollection", "targetId"],
+        "properties": {
+          "targetCollection": {
+            "$ref": "common.schema.json#/$defs/collection"
+          },
+          "targetId": {
+            "$ref": "common.schema.json#/$defs/documentId"
+          }
+        }
+      }
+    },
+    {
+      "if": {
         "required": ["targetId"],
         "properties": {
           "targetId": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 100
+            "type": "integer"
+          }
+        }
+      },
+      "then": {
+        "required": ["targetCollection"],
+        "properties": {
+          "targetCollection": {
+            "$ref": "common.schema.json#/$defs/collection"
           }
         }
       }

@@ -32,11 +32,20 @@ for (const name of schemaFiles) {
     problem(file, `not a valid schema: ${error.message}`)
   }
 }
+// A schema that doesn't compile (a broken $ref, a bad keyword) is reported once, then left out.
+const compiled = {}
 for (const [name, id] of Object.entries(idOf)) {
   try {
-    ajv.getSchema(id)
+    compiled[name] = ajv.getSchema(id)
   } catch (error) {
     problem(path.join(dir, name), `does not compile: ${error.message}`)
+  }
+}
+const schemaAt = (ref) => {
+  try {
+    return ajv.getSchema(ref)?.schema
+  } catch {
+    return undefined
   }
 }
 
@@ -48,10 +57,15 @@ function validate(file, schemaName) {
   } catch (error) {
     return (problem(file, `not valid YAML: ${error.message}`), undefined)
   }
-  const check = idOf[schemaName] && ajv.getSchema(idOf[schemaName])
-  if (!check) return (problem(file, `schema ${schemaName} is missing`), undefined)
-  if (!check(data)) {
-    for (const e of check.errors) problem(file, `${e.instancePath || '/'} ${e.message}`)
+  const check = compiled[schemaName]
+  if (!check) return (problem(file, `schema ${schemaName} is missing or broken`), undefined)
+  try {
+    if (!check(data)) {
+      for (const e of check.errors) problem(file, `${e.instancePath || '/'} ${e.message}`)
+    }
+  } catch (error) {
+    // ajv compiles referenced schemas on first use, so a broken one can surface only here
+    problem(file, `${schemaName} or a schema it references is broken: ${error.message}`)
   }
   return data
 }
@@ -81,12 +95,19 @@ const ROUTE = {
   reject: 'none',
   duplicate: 'none',
 }
+const sourceIds = new Set(sources?.sources?.map((s) => s.id) ?? [])
+const casesFile = path.join(dir, 'evals', 'cases.yaml')
 for (const c of evals?.cases ?? []) {
+  if (!sourceIds.has(c.input?.sourceId))
+    problem(casesFile, `${c.id}: no source ${c.input?.sourceId}`)
+  // duplicate, update and cancel name the known document; nothing else names one
+  const known = ['duplicate', 'update', 'cancel'].includes(c.expected?.decision) ? c.known : null
+  if (c.expected && (c.expected.targetId ?? null) !== (known?.id ?? null))
+    problem(casesFile, `${c.id}: targetId must be ${known?.id ?? 'null'}`)
+  if (c.expected && (c.expected.targetCollection ?? null) !== (known?.collection ?? null))
+    problem(casesFile, `${c.id}: targetCollection must be ${known?.collection ?? 'null'}`)
   if (c.expected && ROUTE[c.expected.decision] !== c.expected.route)
-    problem(
-      path.join(dir, 'evals', 'cases.yaml'),
-      `${c.id}: ${c.expected.decision} routes to ${ROUTE[c.expected.decision]}`,
-    )
+    problem(casesFile, `${c.id}: ${c.expected.decision} routes to ${ROUTE[c.expected.decision]}`)
 }
 const pipeline = validate(path.join(dir, 'pipeline.yaml'), 'schemas/pipeline.schema.json')
 
@@ -95,7 +116,7 @@ function lookup(schema, segments, baseId) {
   if (!schema || typeof schema !== 'object') return false
   if (schema.$ref) {
     const target = new URL(schema.$ref, baseId).href
-    const resolved = ajv.getSchema(target)?.schema
+    const resolved = schemaAt(target)
     return lookup(resolved, segments, target.split('#')[0])
   }
   for (const key of ['anyOf', 'oneOf', 'allOf']) {
@@ -111,7 +132,7 @@ function lookup(schema, segments, baseId) {
 function items(schema, rest, baseId) {
   if (schema.$ref) {
     const target = new URL(schema.$ref, baseId).href
-    return items(ajv.getSchema(target)?.schema ?? {}, rest, target.split('#')[0])
+    return items(schemaAt(target) ?? {}, rest, target.split('#')[0])
   }
   if (schema.items) return lookup(schema.items, rest, baseId)
   return ['anyOf', 'oneOf'].some((key) =>
@@ -135,8 +156,11 @@ for (const stage of pipeline?.stages ?? []) {
       `front matter must say stage: ${stage.id}, input: ${stage.input}, output: ${stage.output}`,
     )
   }
-  if (!/^## Untrusted content$/m.test(text)) problem(file, 'needs a "## Untrusted content" section')
-  const schemas = [stage.input, stage.output].map((name) => idOf[name])
+  for (const section of ['Untrusted content', 'Unknowns']) {
+    if (!new RegExp(`^## ${section}$`, 'm').test(text))
+      problem(file, `needs a "## ${section}" section`)
+  }
+  const schemas = [stage.input, stage.output].map((name) => compiled[name] && idOf[name])
   if (schemas.includes(undefined)) {
     problem(file, `input or output schema is not in schemas/`)
     continue
@@ -145,7 +169,7 @@ for (const stage of pipeline?.stages ?? []) {
   if (paths.length === 0) problem(file, 'names no fields (`$.field`)')
   for (const fieldPath of new Set(paths)) {
     const segments = fieldPath.split('.')
-    if (!schemas.some((id) => lookup(ajv.getSchema(id).schema, segments, id))) {
+    if (!schemas.some((id) => lookup(schemaAt(id), segments, id))) {
       problem(file, `\`$.${fieldPath}\` is not a field of ${stage.input} or ${stage.output}`)
     }
   }

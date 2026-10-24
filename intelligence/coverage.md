@@ -72,8 +72,8 @@ Accept an item for an editor's review only when all of these hold:
 2. **It's here, or it serves people here.** Coverage is `core` or `catchment`; or it's `citywide`
    with a concrete use for residents (what they can do, by when).
 3. **Someone can act on it.** Attend, apply, comment, sign up, prepare, or know a change that
-   affects them. Name who benefits: families and kids, teens, older adults, residents in general,
-   volunteers, association leaders.
+   affects them. Name who benefits with the CMS's audience values: `everyone`,
+   `families`, `youth`, `seniors`, `volunteers`, `association-leaders`.
 4. **It's not noise.** Reject routine citywide meetings with nothing about the area, repeated
    announcements, general news and sports, and advertising.
 5. **It's neutral.** No partisan promotion, endorsements or campaign events. Civic process

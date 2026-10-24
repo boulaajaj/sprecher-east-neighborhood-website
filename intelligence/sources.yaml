@@ -10,7 +10,7 @@ sources:
     feedUrl: "https://webapi.legistar.com/v1/madison/events?$filter=EventDate%20ge%20datetime'{from}'%20and%20EventDate%20lt%20datetime'{to}'&$orderby=EventDate%20asc"
     format: json-api
     scope: Every public meeting of the Common Council, boards, commissions and committees
-    audiences: [residents, association-leaders, volunteers]
+    audiences: [everyone, association-leaders, volunteers]
     reliability: official
     access: Public records API, no key. One windowed request per run.
     cadence: daily
@@ -19,16 +19,16 @@ sources:
     pilotRank: 1
     treatment: >-
       Query a 14-day window. Dedupe on EventId; treat a newer EventLastModifiedUtc as an update.
-      EventAgendaStatusName "Cancelled" goes to the cancellation path. Most meetings are citywide:
-      keep only bodies and agenda items that affect the area (coverage.md).
+      EventAgendaStatusName "Cancelled" goes to the cancellation path. Pass Common Council
+      meetings and public hearings to curate; drop other bodies unless an agenda item names a
+      place in the area (coverage.md).
     example:
       title: TRANSPORTATION COMMISSION, 5:00 PM, Virtual
       date: '2026-10-28'
       url: https://madison.legistar.com/MeetingDetail.aspx?LEGID=28977&GID=205&G=D66739FE-4C3C-468C-A9F0-0198EFAA8EF8
     notes: >-
-      Unfiltered queries return placeholder meetings dated as far ahead as 2050: always filter by
-      date. Event 28745 (Board of Health, 2026-11-03) is Cancelled with the comment "Rescheduled to
-      10/28/2026", matching event 29306.
+      Unfiltered queries return placeholder meetings up to 2050: always filter by date. Event 28745
+      (2026-11-03) is Cancelled, "Rescheduled to 10/28/2026", matching event 29306.
   - id: legistar-matters
     name: City of Madison legislation (Legistar API)
     owner: City of Madison Clerk's Office (Legistar, by Granicus)
@@ -36,7 +36,7 @@ sources:
     feedUrl: "https://webapi.legistar.com/v1/madison/matters?$filter=MatterLastModifiedUtc%20gt%20datetime'{cursor}'&$orderby=MatterLastModifiedUtc%20desc"
     format: json-api
     scope: Ordinances, resolutions and other items before the Council and its committees
-    audiences: [residents, association-leaders]
+    audiences: [everyone, association-leaders]
     reliability: official
     access: Public records API, no key.
     cadence: daily
@@ -58,7 +58,7 @@ sources:
     feedUrl: https://www.madisonpubliclibrary.org/events/calendar/library/1940/export.ics
     format: ics
     scope: Programs at Pinney Library, the branch nearest the area, plus system-wide closures
-    audiences: [families, kids, teens, older-adults, residents]
+    audiences: [families, youth, seniors, everyone]
     reliability: official
     access: Published by the library for public calendar subscription; no terms stated for the feed.
     cadence: daily
@@ -84,7 +84,7 @@ sources:
     feedUrl: https://madison365.com/feed/
     format: rss
     scope: Madison community, culture and civic news
-    audiences: [residents]
+    audiences: [everyone]
     reliability: established-media
     access: Copyrighted news. Use the headline, link and our own summary; never copy the article.
     cadence: daily
@@ -106,7 +106,7 @@ sources:
     feedUrl: http://spectrumlocalnews.com/services/contentfeed.wi%7Cmadison%7Cnews.landing.rss
     format: rss
     scope: Madison and statewide news, sports and weather
-    audiences: [residents]
+    audiences: [everyone]
     reliability: established-media
     access: Copyrighted news. Headline, link and our own summary only.
     cadence: daily
@@ -128,7 +128,7 @@ sources:
     feedUrl: null
     format: html
     scope: Parks programs, nature events, golf, recreation centers
-    audiences: [families, kids, older-adults, residents, volunteers]
+    audiences: [families, youth, seniors, everyone, volunteers]
     reliability: official
     access: Public web page. No RSS or iCalendar found; email list only.
     cadence: none
@@ -149,7 +149,7 @@ sources:
     feedUrl: null
     format: html
     scope: The area's alder's weekly meeting highlights and local public meetings
-    audiences: [residents, association-leaders, volunteers]
+    audiences: [everyone, association-leaders, volunteers]
     reliability: official
     access: Public web page. No feed link found; email list only.
     cadence: none
@@ -170,7 +170,7 @@ sources:
     feedUrl: null
     format: html
     scope: Citywide announcements, road work, services
-    audiences: [residents]
+    audiences: [everyone]
     reliability: official
     access: Public web page. No feed link found on the news or planning pages; email list only.
     cadence: none
@@ -186,7 +186,7 @@ sources:
     feedUrl: null
     format: html
     scope: County Executive, Sheriff and departments
-    audiences: [residents]
+    audiences: [everyone]
     reliability: official
     access: Public web page. No RSS link; the subscription page disallows automated fetching (robots.txt).
     cadence: none
@@ -206,7 +206,7 @@ sources:
     feedUrl: https://madison.com/search/?f=rss&t=article
     format: rss
     scope: Madison news
-    audiences: [residents]
+    audiences: [everyone]
     reliability: established-media
     access: The feed URL redirects automated readers to tollbit.madison.com, a paid bot-access gateway.
     cadence: none
@@ -222,7 +222,7 @@ sources:
     feedUrl: https://captimes.com/feed
     format: rss
     scope: Madison politics and community news
-    audiences: [residents]
+    audiences: [everyone]
     reliability: established-media
     access: Unknown.
     cadence: none
@@ -238,7 +238,7 @@ sources:
     feedUrl: null
     format: html
     scope: Local news, public safety, weather
-    audiences: [residents]
+    audiences: [everyone]
     reliability: established-media
     access: The listed URL is an HTML page; the local-news feed it links to failed with a client error.
     cadence: none

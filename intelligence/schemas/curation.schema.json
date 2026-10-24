@@ -10,7 +10,7 @@
     "audiences",
     "whyItMatters",
     "residentAction",
-    "duplicateOf",
+    "targetCollection",
     "targetId"
   ],
   "additionalProperties": false,
@@ -91,10 +91,11 @@
         }
       ]
     },
-    "duplicateOf": {
+    "targetCollection": {
+      "description": "The collection of the existing document, for duplicate, update and cancel; otherwise null.",
       "anyOf": [
         {
-          "$ref": "provenance.schema.json#/properties/externalId"
+          "$ref": "common.schema.json#/$defs/collection"
         },
         {
           "type": "null"
@@ -102,17 +103,56 @@
       ]
     },
     "targetId": {
-      "description": "The existing CMS document's ID, for duplicate, update and cancel; otherwise null.",
+      "description": "The existing document's id in targetCollection; null exactly when targetCollection is.",
       "anyOf": [
         {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 100
+          "$ref": "common.schema.json#/$defs/documentId"
         },
         {
           "type": "null"
         }
       ]
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "targetId": {
+            "type": "integer"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "targetCollection": {
+            "type": "string"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "targetCollection": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "enum": ["duplicate", "update", "cancel"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "targetId": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  ]
 }

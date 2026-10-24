@@ -7,7 +7,7 @@
   "additionalProperties": false,
   "properties": {
     "collection": {
-      "enum": ["events", "posts"]
+      "$ref": "common.schema.json#/$defs/collection"
     },
     "title": {
       "type": "string",
@@ -115,5 +115,35 @@
     "officialLinks",
     "confidence",
     "missing"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "collection": {
+            "const": "posts"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "startsAt": {
+            "type": "null"
+          },
+          "endsAt": {
+            "type": "null"
+          },
+          "allDay": {
+            "type": "null"
+          },
+          "venue": {
+            "type": "null"
+          },
+          "address": {
+            "type": "null"
+          }
+        }
+      }
+    }
   ]
 }

@@ -15,8 +15,9 @@ README.md describes the contract.
 1. **Route each item** by `$.curation.decision`:
    - `accept` with a `$.draft`: one `submitSuggestion` call (`$.tool`).
    - `needs-review`: one `reportItem` call, `kind: needs-review`.
-   - `update` or `cancel`: one `reportItem` call with that kind and `targetId` set to
-     `$.curation.targetId`, the existing document. Never a new suggestion.
+   - `update` or `cancel`: one `reportItem` call with that kind, `targetCollection` set to
+     `$.curation.targetCollection` and `targetId` to `$.curation.targetId`. Never a new
+     suggestion.
    - `reject` and `duplicate`: no call; counted in the run log.
 2. **Build the whole envelope first**: `$.tool`, `$.action` set to `call`, `$.skipReason` set
    to null, `$.runId`, and `$.arguments` complete:
@@ -26,17 +27,20 @@ README.md describes the contract.
      `$.arguments.audience` from `$.draft`; `$.arguments.sourceName`, `$.arguments.sourceUrl`,
      `$.arguments.externalId` and `$.arguments.contentHash` from `$.candidate`; and
      `$.arguments.runId`.
-   - for `reportItem`: `$.arguments.kind`, `$.arguments.targetId`, `$.arguments.externalId`,
+   - for `reportItem`: `$.arguments.runId`, `$.arguments.kind`,
+     `$.arguments.targetCollection`, `$.arguments.targetId`, `$.arguments.externalId`,
      `$.arguments.sourceUrl`, a `$.arguments.summary` of the candidate (title, date, place,
      decision and reasons from `$.curation.reasons`), `$.arguments.evidence` from
      `$.verification.evidence`, and `$.arguments.flags` from `$.verification.flags`.
 3. **Validate** the envelope against `schemas/submission.schema.json`. If it fails, don't send
-   it: send a `reportItem` with `kind: rejected-invalid`, the validation errors in the summary,
-   and the candidate's source URL.
-4. **Send.** `submitSuggestion` answers `created` or `duplicate`; a duplicate sets `$.action` to
-   `skip` with a reason in the log. When the draft's `$.draft.missing` is not empty or
+   it: mark it `$.action` `skip` with the errors in `$.skipReason`, and send a `reportItem` with
+   `kind: rejected-invalid`, the validation errors in the summary, and the candidate's source URL.
+4. **Send.** `submitSuggestion` answers `created` or `duplicate`. The run log records the
+   result: a duplicate is logged as skipped, with the server's answer as the reason. The
+   envelope that was sent doesn't change. When the draft's `$.draft.missing` is not empty or
    `$.draft.confidence` is `low`, follow a created suggestion with a `reportItem`
-   (`kind: needs-review`, `targetId` = the new ID) listing what's missing.
+   (`kind: needs-review`, `targetCollection` and `targetId` = the new document) listing what's
+   missing.
 5. Stop at `maxDraftsPerRun` suggestions (`pipeline.yaml`); the rest wait for the next run.
 6. Write the run log to `agent-runs` at the start and the end of the run
    (`schemas/agent-run.schema.json`), with the repository commit the run loaded.

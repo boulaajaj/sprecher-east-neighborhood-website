@@ -106,11 +106,7 @@
       "uniqueItems": true
     },
     "flags": {
-      "type": "array",
-      "items": {
-        "$ref": "common.schema.json#/$defs/flag"
-      },
-      "uniqueItems": true
+      "$ref": "common.schema.json#/$defs/flags"
     }
   }
 }

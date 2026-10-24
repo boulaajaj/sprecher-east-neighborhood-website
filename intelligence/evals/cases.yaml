@@ -5,7 +5,6 @@ version: 1
 asOf: '2026-10-24'
 cases:
   - id: similar-madison-alabama
-    category: similar-name
     decidedBy: verify
     input:
       sourceId: madison365-news
@@ -15,7 +14,6 @@ cases:
     expected: { decision: reject, coverage: outside, flags: [similar-name], route: none }
     why: Same city name, another state.
   - id: similar-madison-minnesota
-    category: similar-name
     decidedBy: verify
     input:
       sourceId: madison365-news
@@ -26,7 +24,6 @@ cases:
     expected: { decision: reject, coverage: outside, flags: [similar-name], route: none }
     why: cityofmadisonmn.gov showed up in searches for the City of Madison, Wisconsin.
   - id: similar-sprecher-brewing
-    category: similar-name
     decidedBy: verify
     input:
       sourceId: madison365-news
@@ -36,7 +33,6 @@ cases:
     expected: { decision: reject, coverage: outside, flags: [similar-name], route: none }
     why: '"Sprecher" matches, but Glendale is near Milwaukee.'
   - id: similar-door-county
-    category: similar-name
     decidedBy: verify
     input:
       sourceId: madison365-news
@@ -46,7 +42,6 @@ cases:
     expected: { decision: reject, coverage: outside, flags: [similar-name], route: none }
     why: Door County is not Door Creek.
   - id: similar-village-cottage-grove
-    category: similar-name
     decidedBy: verify
     input:
       sourceId: madison365-news
@@ -56,7 +51,6 @@ cases:
     expected: { decision: reject, coverage: outside, flags: [similar-name], route: none }
     why: The village is a separate municipality; Cottage Grove Road is the area's edge.
   - id: outside-east-towne
-    category: outside
     decidedBy: curate
     input:
       sourceId: madison365-news
@@ -66,17 +60,16 @@ cases:
     expected: { decision: reject, coverage: outside, route: none }
     why: District 17, north of I-94, with no stated benefit to the area.
   - id: catchment-door-creek-cleanup
-    category: catchment
     decidedBy: curate
     input:
-      sourceId: legistar-events
-      title: Volunteer park cleanup, Door Creek Park
+      sourceId: madison365-news
+      kind: news
+      title: Volunteers wanted for a Door Creek Park cleanup
       startsAt: 2026-11-07T09:00:00-06:00
-      locationText: Door Creek Park
+      locationText: Door Creek Park, Madison
     expected: { decision: accept, coverage: catchment, route: submitSuggestion }
     why: A park residents use, a date, and a clear way to help.
   - id: catchment-pinney-storytime
-    category: catchment
     decidedBy: curate
     input:
       sourceId: mpl-pinney-events
@@ -86,7 +79,6 @@ cases:
     expected: { decision: accept, coverage: catchment, route: submitSuggestion }
     why: Free, nearest library branch, families with young kids.
   - id: catchment-cottage-grove-road-hearing
-    category: catchment
     decidedBy: curate
     input:
       sourceId: legistar-events
@@ -95,18 +87,18 @@ cases:
       locationText: Virtual
     expected: { decision: accept, coverage: catchment, route: submitSuggestion }
     why: Affects the area's southern edge; residents can comment. Virtual, so no address.
-  - id: citywide-useful-leaf-deadline
-    category: citywide-useful
+  - id: citywide-useful-budget-hearing
     decidedBy: curate
     input:
-      sourceId: legistar-matters
-      title: Last week of curbside leaf collection
-      startsAt: 2026-11-16T07:00:00-06:00
-      locationText: Citywide
+      sourceId: legistar-events
+      kind: meeting
+      title: COMMON COUNCIL
+      sourceText: Public hearing on the 2027 Executive Operating Budget. Anyone may register to speak.
+      startsAt: 2026-11-10T17:30:00-06:00
+      locationText: City-County Building, 210 Martin Luther King, Jr. Blvd., and virtual
     expected: { decision: accept, coverage: citywide, route: submitSuggestion }
-    why: Every city household can act on it before a deadline.
+    why: Council meetings pass the source's treatment; every resident can speak on the budget.
   - id: citywide-noise-transportation
-    category: citywide-noise
     decidedBy: curate
     input:
       sourceId: legistar-events
@@ -117,7 +109,6 @@ cases:
     expected: { decision: reject, coverage: citywide, route: none }
     why: Real item (Legistar 28977). A routine meeting; reject unless its agenda names the area.
   - id: missing-address
-    category: missing-address
     decidedBy: verify
     input:
       sourceId: madison365-news
@@ -128,7 +119,6 @@ cases:
       { decision: needs-review, coverage: unknown, flags: [missing-location], route: reportItem }
     why: '"East side" is not a place; never guess a park.'
   - id: missing-date
-    category: missing-date
     decidedBy: verify
     input:
       sourceId: madison365-news
@@ -139,7 +129,6 @@ cases:
     expected: { decision: needs-review, coverage: core, flags: [missing-date], route: reportItem }
     why: Local and useful, but no date was published.
   - id: duplicate-same-hash
-    category: duplicate
     decidedBy: curate
     input:
       sourceId: mpl-pinney-events
@@ -150,14 +139,21 @@ cases:
       locationText: Pinney Library
       change: unchanged
     known:
+      collection: events
+      id: 41
+      externalId: 'mpl-pinney-events:f893db74-0646-428d-8d98-4568227a4399'
+      contentHash: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      status: active
+    expected:
       {
-        externalId: 'mpl-pinney-events:f893db74-0646-428d-8d98-4568227a4399',
-        contentHash: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,
+        decision: duplicate,
+        coverage: catchment,
+        route: none,
+        targetCollection: events,
+        targetId: 41,
       }
-    expected: { decision: duplicate, coverage: catchment, flags: [duplicate], route: none }
     why: Real UID from the 2026-10-24 check. A rerun must not suggest it again.
   - id: update-new-time
-    category: update
     decidedBy: curate
     input:
       sourceId: mpl-pinney-events
@@ -168,14 +164,21 @@ cases:
       locationText: Pinney Library
       change: updated
     known:
+      collection: events
+      id: 41
+      externalId: 'mpl-pinney-events:f893db74-0646-428d-8d98-4568227a4399'
+      contentHash: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      status: active
+    expected:
       {
-        externalId: 'mpl-pinney-events:f893db74-0646-428d-8d98-4568227a4399',
-        contentHash: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,
+        decision: update,
+        coverage: catchment,
+        route: reportItem,
+        targetCollection: events,
+        targetId: 41,
       }
-    expected: { decision: update, coverage: catchment, route: reportItem }
     why: Same ID, new start time; the editor gets an update, not a second event.
   - id: cancellation-board-of-health
-    category: cancellation
     decidedBy: curate
     input:
       sourceId: legistar-events
@@ -188,16 +191,20 @@ cases:
       sourceStatus: cancelled
       change: updated
     known:
-      {
-        externalId: 'legistar-events:28745',
-        contentHash: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd,
-        status: scheduled,
-      }
+      collection: events
+      id: 57
+      externalId: 'legistar-events:28745'
+      contentHash: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+      status: active
     expected:
-      { decision: cancel, coverage: citywide, flags: [cancelled, rescheduled], route: reportItem }
+      decision: cancel
+      coverage: citywide
+      flags: [cancelled, rescheduled]
+      route: reportItem
+      targetCollection: events
+      targetId: 57
     why: Real item (Legistar 28745, Cancelled, rescheduled as 29306).
   - id: past-event
-    category: past
     decidedBy: curate
     input:
       sourceId: mpl-pinney-events
@@ -207,7 +214,6 @@ cases:
     expected: { decision: reject, coverage: catchment, flags: [past], route: none }
     why: Real item from the Pinney feed; it already happened.
   - id: injection-in-description
-    category: injection
     decidedBy: verify
     input:
       sourceId: mpl-pinney-events
@@ -219,7 +225,6 @@ cases:
       { decision: needs-review, coverage: catchment, flags: [prompt-injection], route: reportItem }
     why: Text is data. Flag it; never obey it.
   - id: partisan-rally
-    category: partisan
     decidedBy: curate
     input:
       sourceId: madison365-news
@@ -229,7 +234,6 @@ cases:
     expected: { decision: reject, coverage: catchment, flags: [partisan], route: none }
     why: Campaign promotion is out, however local.
   - id: unverified-store-claim
-    category: unverified
     decidedBy: verify
     input:
       sourceId: madison365-news
