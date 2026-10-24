@@ -30,9 +30,9 @@ look for a open source plugin [...] If none of it is there, only then we can wri
 
 ## 1. Find what exists first
 
-Before writing anything, search for it: this module, `src/platform/`, then the template folders
-that haven't moved yet. Then go down the ladder: native Payload, Next.js and React features and
-config, official plugins, well-established free open-source plugins, and only then our own code.
+Before writing anything, search for it: this module, then `src/platform/`. Then go down the
+ladder: native Payload, Next.js and React features and config, official plugins, well-established
+free open-source plugins, and only then our own code.
 Record what each step found on the issue before writing custom code. How:
 [`references/reuse.md`](references/reuse.md).
 
@@ -55,7 +55,7 @@ files, a new feature, a new module: [`references/placement.md`](references/place
 
 ## 3. Keep the dependencies pointing one way
 
-Lint warns on the first four ([`eslint.boundaries.config.mjs`](../../../eslint.boundaries.config.mjs); errors from
+Lint fails on the first four ([`eslint.boundaries.config.mjs`](../../../eslint.boundaries.config.mjs),
 #137). Check `overrideAccess`, DTOs, `server-only` and colors yourself; #146 adds a color check
 ([rules](../../../docs/architecture/README.md#dependency-rules)):
 
@@ -86,7 +86,7 @@ test Payload, Next.js or styling. How: [`references/tests.md`](references/tests.
   implementation, or a test double ([conventions](../../../docs/architecture/conventions.md#interfaces-and-adapters)).
 - A component takes props for its variants (`cva`) instead of being copied; a second use moves
   it to `src/platform/ui/`.
-- Use the shared primitives (`Button`, `Input`, `Label`, `Link`, `Media`), not raw `<button>`,
+- Use the shared primitives (`Button`, `Field`, `Form`, `Link`, `Media`), not raw `<button>`,
   `<input>` or `<img>`.
 
 ## 6. Before you hand it over

@@ -1,6 +1,6 @@
 # Placement: modules, layers and entry files
 
-Read this when you add a feature, start a module, or move template code into a module. The rules
+Read this when you add a feature, start a module, or move code into a module. The rules
 behind it are in the [architecture map](../../../../docs/architecture/README.md); naming is in the
 [conventions](../../../../docs/architecture/conventions.md).
 
@@ -61,12 +61,11 @@ Where two areas meet:
 - **In a shared layout (header, footer):** the layout in `src/app/` renders the other module's
   component and passes it into a slot (a prop such as `accountMenu`).
 
-## Moving template code into a module
+## Moving code into a module
 
 1. Move the files with `git mv` so history follows.
 2. Update the imports to the module's entry files; add exports there as needed.
 3. Update Payload admin component paths and run `npm run generate:importmap` if any moved.
 4. Remove the old file once nothing imports it; no re-export shims left behind.
-5. In `eslint.boundaries.config.mjs`, drop moved pages from `STILL_QUERYING_PAYLOAD` and emptied folders
-   from `TEMPLATE_FOLDERS`.
+5. In `eslint.boundaries.config.mjs`, drop moved pages from `STILL_QUERYING_PAYLOAD`.
 6. The site must look and behave the same: run the tests, and screenshot the affected pages.
