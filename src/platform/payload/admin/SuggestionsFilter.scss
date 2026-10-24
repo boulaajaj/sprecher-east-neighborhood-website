@@ -1,0 +1,14 @@
+@import '@payloadcms/ui/scss';
+
+.suggestions-filter {
+  margin-bottom: base(1);
+
+  & a {
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  & a:hover {
+    opacity: 0.85;
+  }
+}

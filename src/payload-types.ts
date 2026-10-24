@@ -282,6 +282,26 @@ export interface Post {
    */
   generateSlug?: boolean | null
   slug: string
+  /**
+   * Set on suggestions from outside sources. Empty for content staff write.
+   */
+  moderationStatus?: ('suggested' | 'approved' | 'rejected') | null
+  /**
+   * Who published this first, for example a city calendar.
+   */
+  sourceName?: string | null
+  sourceUrl?: string | null
+  /**
+   * The source’s own ID; the same one can’t be stored twice.
+   */
+  externalId?: string | null
+  /**
+   * A fingerprint of the content; it can’t be stored twice.
+   */
+  contentHash?: string | null
+  audience?:
+    | ('everyone' | 'families' | 'youth' | 'seniors' | 'volunteers' | 'association-leaders')[]
+    | null
   updatedAt: string
   createdAt: string
   _status?: ('draft' | 'published') | null
@@ -808,6 +828,10 @@ export interface Event {
   date: string
   timeStart?: string | null
   timeEnd?: string | null
+  /**
+   * A cancelled event stays listed and is marked as cancelled.
+   */
+  cancelled?: boolean | null
   category?:
     | ('meeting' | 'social' | 'volunteer' | 'workshop' | 'sports' | 'community' | 'other')
     | null
@@ -854,6 +878,26 @@ export interface Event {
    */
   generateSlug?: boolean | null
   slug: string
+  /**
+   * Set on suggestions from outside sources. Empty for content staff write.
+   */
+  moderationStatus?: ('suggested' | 'approved' | 'rejected') | null
+  /**
+   * Who published this first, for example a city calendar.
+   */
+  sourceName?: string | null
+  sourceUrl?: string | null
+  /**
+   * The source’s own ID; the same one can’t be stored twice.
+   */
+  externalId?: string | null
+  /**
+   * A fingerprint of the content; it can’t be stored twice.
+   */
+  contentHash?: string | null
+  audience?:
+    | ('everyone' | 'families' | 'youth' | 'seniors' | 'volunteers' | 'association-leaders')[]
+    | null
   updatedAt: string
   createdAt: string
   _status?: ('draft' | 'published') | null
@@ -1469,6 +1513,12 @@ export interface PostsSelect<T extends boolean = true> {
       }
   generateSlug?: T
   slug?: T
+  moderationStatus?: T
+  sourceName?: T
+  sourceUrl?: T
+  externalId?: T
+  contentHash?: T
+  audience?: T
   updatedAt?: T
   createdAt?: T
   _status?: T
@@ -1482,6 +1532,7 @@ export interface EventsSelect<T extends boolean = true> {
   date?: T
   timeStart?: T
   timeEnd?: T
+  cancelled?: T
   category?: T
   featured?: T
   locationType?: T
@@ -1502,6 +1553,12 @@ export interface EventsSelect<T extends boolean = true> {
   publishedAt?: T
   generateSlug?: T
   slug?: T
+  moderationStatus?: T
+  sourceName?: T
+  sourceUrl?: T
+  externalId?: T
+  contentHash?: T
+  audience?: T
   updatedAt?: T
   createdAt?: T
   _status?: T
