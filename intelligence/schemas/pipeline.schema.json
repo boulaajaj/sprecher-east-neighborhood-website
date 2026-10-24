@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/pipeline.schema.json",
+  "title": "Pipeline settings (pipeline.yaml)",
+  "type": "object",
+  "required": ["version", "enabled", "schedule", "budgets", "sources", "coverage", "stages"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "schedule": {
+      "type": "object",
+      "required": ["cron", "timezone"],
+      "additionalProperties": false,
+      "properties": {
+        "cron": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "timezone": {
+          "const": "America/Chicago"
+        }
+      }
+    },
+    "budgets": {
+      "type": "object",
+      "required": [
+        "maxUsdPerRun",
+        "maxUsdPerMonth",
+        "maxMinutesPerRun",
+        "maxItemsPerSource",
+        "maxModelItemsPerRun",
+        "maxDraftsPerRun"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "maxUsdPerRun": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maxUsdPerMonth": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maxMinutesPerRun": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maxItemsPerSource": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maxModelItemsPerRun": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maxDraftsPerRun": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "sources": {
+      "const": "sources.yaml"
+    },
+    "coverage": {
+      "const": "coverage.md"
+    },
+    "stages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "prompt", "input", "output", "model"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "enum": ["scout", "verify", "curate", "draft", "submit"]
+          },
+          "prompt": {
+            "type": "string",
+            "pattern": "^prompts/[a-z-]+\\.md$"
+          },
+          "input": {
+            "type": "string",
+            "pattern": "^schemas/[a-z-]+\\.schema\\.json$"
+          },
+          "output": {
+            "type": "string",
+            "pattern": "^schemas/[a-z-]+\\.schema\\.json$"
+          },
+          "model": {
+            "enum": ["none", "medium", "high"]
+          }
+        }
+      },
+      "minItems": 5,
+      "maxItems": 5
+    }
+  }
+}

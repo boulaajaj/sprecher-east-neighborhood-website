@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/item.schema.json",
+  "title": "One item as it moves through the stages",
+  "description": "Each stage reads the item and adds its own section; earlier sections are never changed.",
+  "type": "object",
+  "required": ["candidate"],
+  "additionalProperties": false,
+  "properties": {
+    "candidate": {
+      "$ref": "candidate.schema.json"
+    },
+    "known": {
+      "description": "The CMS document the runtime's find returned for this externalId before curate, or null.",
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["collection", "id", "externalId", "contentHash", "status"],
+          "properties": {
+            "collection": {
+              "$ref": "common.schema.json#/$defs/collection"
+            },
+            "id": {
+              "$ref": "common.schema.json#/$defs/documentId"
+            },
+            "externalId": {
+              "$ref": "provenance.schema.json#/properties/externalId"
+            },
+            "contentHash": {
+              "$ref": "provenance.schema.json#/properties/contentHash"
+            },
+            "status": {
+              "description": "active, or cancelled when the event's cancelled box is set.",
+              "enum": ["active", "cancelled"]
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "verification": {
+      "$ref": "verification.schema.json"
+    },
+    "curation": {
+      "$ref": "curation.schema.json"
+    },
+    "draft": {
+      "$ref": "draft.schema.json"
+    }
+  }
+}

@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/agent-run.schema.json",
+  "title": "Run log entry (agent-runs collection, #336)",
+  "type": "object",
+  "required": [
+    "runId",
+    "agentName",
+    "pipelineVersion",
+    "repoCommit",
+    "startedAt",
+    "finishedAt",
+    "status",
+    "sourcesChecked",
+    "counts",
+    "errors",
+    "cost"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "runId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "agentName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "pipelineVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "repoCommit": {
+      "description": "The commit of this repository whose intelligence/ folder the run loaded.",
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "startedAt": {
+      "$ref": "common.schema.json#/$defs/dateTime"
+    },
+    "finishedAt": {
+      "anyOf": [
+        {
+          "$ref": "common.schema.json#/$defs/dateTime"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "status": {
+      "enum": ["running", "succeeded", "partial", "failed", "stopped-budget", "disabled"]
+    },
+    "sourcesChecked": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["sourceId", "cursor", "status", "error"],
+        "additionalProperties": false,
+        "properties": {
+          "sourceId": {
+            "$ref": "common.schema.json#/$defs/sourceId"
+          },
+          "cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": ["ok", "not-modified", "error", "skipped"]
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "required": ["seen", "proposed", "updates", "rejected", "duplicates", "needsReview"],
+      "additionalProperties": false,
+      "properties": {
+        "seen": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "proposed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "updates": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rejected": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "duplicates": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "needsReview": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 500
+      },
+      "maxItems": 50
+    },
+    "cost": {
+      "type": "object",
+      "required": ["inputTokens", "outputTokens", "usd"],
+      "additionalProperties": false,
+      "properties": {
+        "inputTokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "outputTokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "usd": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

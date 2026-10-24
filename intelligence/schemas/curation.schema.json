@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/curation.schema.json",
+  "title": "Resident-value curator output",
+  "type": "object",
+  "required": [
+    "decision",
+    "reasons",
+    "scores",
+    "audiences",
+    "whyItMatters",
+    "residentAction",
+    "targetCollection",
+    "targetId"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "decision": {
+      "$ref": "common.schema.json#/$defs/decision"
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 300
+      },
+      "minItems": 1,
+      "maxItems": 5
+    },
+    "scores": {
+      "type": "object",
+      "required": ["evidence", "freshness", "relevance", "timeliness", "actionability"],
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "freshness": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "relevance": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "timeliness": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "actionability": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        }
+      }
+    },
+    "audiences": {
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/audience"
+      },
+      "uniqueItems": true
+    },
+    "whyItMatters": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "residentAction": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "targetCollection": {
+      "description": "The collection of the existing document, for duplicate, update and cancel; otherwise null.",
+      "anyOf": [
+        {
+          "$ref": "common.schema.json#/$defs/collection"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "targetId": {
+      "description": "The existing document's id in targetCollection; null exactly when targetCollection is.",
+      "anyOf": [
+        {
+          "$ref": "common.schema.json#/$defs/documentId"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "targetId": {
+            "type": "integer"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "targetCollection": {
+            "type": "string"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "targetCollection": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "enum": ["duplicate", "update", "cancel"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "targetId": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  ]
+}

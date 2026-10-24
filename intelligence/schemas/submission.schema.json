@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/submission.schema.json",
+  "title": "Submit stage output: one MCP tool call",
+  "description": "One call to #336's MCP tools, built in full before it is validated. The agent never calls create, update, delete or publish directly.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "tool": {
+      "enum": ["submitSuggestion", "reportItem"]
+    },
+    "action": {
+      "enum": ["call", "skip"]
+    },
+    "skipReason": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "arguments": {
+      "anyOf": [
+        {
+          "$ref": "suggestion.schema.json"
+        },
+        {
+          "$ref": "report.schema.json"
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "tool": {
+            "const": "submitSuggestion"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "arguments": {
+            "$ref": "suggestion.schema.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "tool": {
+            "const": "reportItem"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "arguments": {
+            "$ref": "report.schema.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "action": {
+            "const": "skip"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "skipReason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        }
+      }
+    }
+  ],
+  "required": ["tool", "action", "skipReason", "runId", "arguments"]
+}

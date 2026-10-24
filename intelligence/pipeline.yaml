@@ -1,0 +1,43 @@
+# Pipeline settings for the neighborhood intelligence agents (#337). A runtime reads this file
+# first; README.md explains each setting. Change it only through a PR.
+version: 1
+# Kill switch: false stops every run before it fetches anything. See README.md, "Turning it off".
+enabled: true
+schedule:
+  cron: '40 6 * * *'
+  timezone: America/Chicago
+budgets:
+  maxUsdPerRun: 0.5
+  maxUsdPerMonth: 15
+  maxMinutesPerRun: 15
+  maxItemsPerSource: 50
+  maxModelItemsPerRun: 40
+  maxDraftsPerRun: 10
+sources: sources.yaml
+coverage: coverage.md
+stages:
+  - id: scout
+    prompt: prompts/scout.md
+    input: schemas/sources.schema.json
+    output: schemas/candidate.schema.json
+    model: none
+  - id: verify
+    prompt: prompts/verify.md
+    input: schemas/item.schema.json
+    output: schemas/verification.schema.json
+    model: medium
+  - id: curate
+    prompt: prompts/curate.md
+    input: schemas/item.schema.json
+    output: schemas/curation.schema.json
+    model: medium
+  - id: draft
+    prompt: prompts/draft.md
+    input: schemas/item.schema.json
+    output: schemas/draft.schema.json
+    model: medium
+  - id: submit
+    prompt: prompts/submit.md
+    input: schemas/item.schema.json
+    output: schemas/submission.schema.json
+    model: none

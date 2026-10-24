@@ -59,7 +59,7 @@ Four sources, all free, public and needing no key:
    to 2026-12-15 (for example Silent Book Club, 2026-11-17, UID `f893db74…`). The collector's
    first run (#272) confirms a future event in the all-events feed.
 3. **City legislation, Legistar** (official civic). Items changed since the last run. Keep only
-   those that name a place in the area (the coverage policy, #337); match the text on our side,
+   those that name a place in the area ([coverage](coverage.md)); match the text on our side,
    because the API's text filter returned a server error.
 4. **Madison365** (local media). Standard RSS with a guid on every item. Low share of local
    items: none of the 10 items on 2026-10-24 named the area, so it tests the relevance filter.
@@ -93,7 +93,7 @@ NA_ID 146). The site describes it as I-94 to the north, Door Creek Park to the e
 to the west and Cottage Grove Road to the south. That matches the eastern half of the City's
 [Sprecher Neighborhood Development Plan](https://www.cityofmadison.com/dpced/planning/documents/Sprecher%20NDP_2012.pdf)
 area (I-90 to Door Creek valley, I-94 to Cottage Grove Road, bisected by Sprecher Road), which is
-partly in the Town of Blooming Grove. The coverage policy (#337) holds the working definition.
+partly in the Town of Blooming Grove. [coverage.md](coverage.md) holds the working definition.
 
 ## Out of scope
 
@@ -107,7 +107,8 @@ robots rules disallow automated reading (Dane County's subscription page).
 - **#272**, the daily read-only collector for the pilot sources, is blocked by this issue and by
   #141 (Payload jobs). It reads `sources.yaml`, keeps a cursor per source, and dedupes on each
   source's ID (`EventId`, UID, guid) plus a content hash.
-- **#337** adds the prompts, coverage policy, schemas and eval set that load this registry.
+- The prompts, coverage policy, schemas and eval set that use this registry are described in
+  [README.md](README.md) (#337).
 - Pending sources (Parks events, District 16 blog, City news) move to `valid` only when a feed is
   found, or when parsing their pages is approved in its own issue.
 - Re-check every source at least once a month, and whenever one fails twice in a row.
