@@ -15,6 +15,7 @@ on the VPS. Nothing here is run by hand during a normal deploy. Changes to the s
 | `install-cron.sh`   | VPS    | Installs the daily backup job (08:15 UTC) in `/etc/cron.d/sprecher-east-backup`                                                                          | #148       |
 | `restart-app.sh`    | VPS    | Reloads the app under PM2; starts it fresh, with a way back, when its start settings change. Listens on `127.0.0.1:3000` only. Deletes old sitemap files | #118, #267 |
 | `caddy-limits.sh`   | VPS    | Caps request bodies on the public form endpoints at Caddy (`caddy/form-limits.caddy`)                                                                    | #124       |
+| `caddy-https.sh`    | VPS    | Sends HSTS on the domain (`caddy/hsts.caddy`), and adds a redirect to HTTPS in the plain-HTTP site blocks                                                | #235       |
 | `lib.sh`            | VPS    | Shared helpers: annotations, reading non-secret settings, checking the site through Caddy, the `current` link                                            |            |
 
 The scripts print `::notice` and `::warning` lines, which appear as annotations on the deploy run
@@ -48,7 +49,8 @@ started by hand (Actions → Deploy to VPS → Run workflow, on `main`).
    - switches `current` to the release in one step and reloads PM2 (`restart-app.sh`)
    - checks the home page answers 200 through Caddy and `/api/version` reports the new build; if
      not, switches `current` back and reloads
-   - then installs the backup job, applies the Caddy limits, and keeps the newest 3 releases
+   - then installs the backup job, applies the Caddy limits and HTTPS settings, and keeps the
+     newest 3 releases
      (a release that failed is the first to go)
 
 Until the switch, a failure stops the deploy and the live release keeps serving. The reload is the
@@ -114,6 +116,44 @@ To change the limit, edit `caddy/form-limits.caddy` in a pull request. To remove
 pull request that added it (#152), then on the server delete the `import` lines and run
 `caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy`. Removing the lines
 without the revert doesn't last: the next deploy adds them back.
+
+## Caddy HTTPS: HSTS and the IP redirect
+
+`caddy-https.sh` only adds lines to `/etc/caddy/Caddyfile`, and refuses any other change:
+
+- **HSTS.** It copies `caddy/hsts.caddy` to `/etc/caddy/sprecher-east-hsts.caddy` and adds
+  `import /etc/caddy/sprecher-east-hsts.caddy` to the HTTPS site block for the domain (the host of
+  `NEXT_PUBLIC_SERVER_URL`). `www` only redirects, so it gets none. No `includeSubDomains`, no
+  `preload`.
+- **Plain HTTP.** Each site block that serves plain HTTP, for the IP (`:80`, `http://<IP>`,
+  `[::]:80`) or for the domain (`http://<domain>`, `<domain>:80`), gets
+  `redir https://<domain>{uri} 308` as its first line. Caddy's default directive order runs
+  `redir` before `reverse_proxy`, so the request is answered with the redirect and never reaches
+  the app; the `reverse_proxy` line stays where it was. A global `order` option could change that
+  order, so a Caddyfile with one is left alone.
+
+It leaves the Caddyfile alone when it can't read the layout safely (a heredoc, a site block on one
+line, unbalanced braces), when a block mixes the domain with other addresses (on one line or
+several), or when the Caddyfile sets `order`. Then it still checks plain HTTP to the IP: if that
+reaches the app, the deploy fails and says why, so the redirect can be added by hand.
+
+Before changing anything it writes the backups (`Caddyfile.bak` and `Caddyfile.bak-<time>`) under a
+temporary name, compares them with the live file and only then renames them, so a backup cut short
+by a full disk is never used. It validates the new Caddyfile, replaces it in one rename and
+reloads. It then checks that the domain sends the header and that plain HTTP to the domain and to
+the IP redirects permanently to the same path on HTTPS. If not, or if anything fails while it
+changes the files, it puts back only what it replaced, and the deploy fails. The same check runs
+when nothing needed changing. The deploy logs the `curl -I` results as annotations, from the
+server and from the internet.
+
+**Rollout.** The max-age is the one value in `caddy/hsts.caddy`: 300 (5 minutes) now, then
+86400 (1 day), then 31536000 (1 year), each after a day without problems, each a one-line pull
+request. **To undo HSTS,** set `max-age=0` in that file and keep it for at least the longest
+max-age that was live, so browsers forget the rule. Removing the import alone leaves browsers
+following it until it expires. **To undo the IP redirect,** revert the pull request that added
+it, then on the server delete the `redir https://<domain>{uri} 308` lines and run
+`caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy`. Deleting them without
+the revert doesn't last: the next deploy adds them back.
 
 ## Backups
 

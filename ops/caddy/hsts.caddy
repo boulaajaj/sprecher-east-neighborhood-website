@@ -1,0 +1,12 @@
+# Managed by the website repo (ops/caddy/hsts.caddy, #235). ops/caddy-https.sh copies it to
+# /etc/caddy and imports it into the site's HTTPS site block (the domain; www only redirects, so
+# it needs none). Change it in the repo, not on the server.
+#
+# HSTS tells browsers to use HTTPS for the site, before any request leaves them. The owner approved
+# a gradual rollout (2026-10-24), each stage after the previous one ran a day without problems:
+#   stage 1: max-age=300 (5 minutes)   stage 2: max-age=86400 (1 day)
+#   stage 3: max-age=31536000 (1 year)
+# No includeSubDomains and no preload: they would bind every subdomain and are hard to undo.
+# To withdraw it, set max-age=0 and keep it for at least the longest max-age used, so browsers
+# forget the rule; removing the line alone leaves them following it until it expires.
+header Strict-Transport-Security "max-age=300"
