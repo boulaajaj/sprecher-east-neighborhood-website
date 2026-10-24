@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 type Props = { searchParams: Promise<{ token?: string | string[] }> }
 
 /**
- * Where the link in Payload's verification email lands (#187). Confirming takes a click, not the
- * page load; then the person logs in.
+ * Where the link in Payload's verification email lands (#187). The page confirms the email as soon
+ * as it loads (#300); then the person logs in.
  */
 export default async function VerifyAccountPage({ searchParams }: Props) {
   const { token } = await searchParams
@@ -25,7 +25,8 @@ export default async function VerifyAccountPage({ searchParams }: Props) {
       <div className="mx-auto w-full max-w-md">
         <h1 className="mb-2 text-3xl font-bold text-foreground">Confirm Your Account</h1>
         <p className="mb-8 text-muted-foreground">
-          One click to confirm this email is yours. Then log in with the password you chose.
+          Thanks for opening the link. Once your email is confirmed, log in with the password you
+          chose.
         </p>
         <VerifyAccount token={parseLinkToken(token)} />
       </div>

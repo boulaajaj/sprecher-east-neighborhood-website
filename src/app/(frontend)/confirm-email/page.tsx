@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 type Props = { searchParams: Promise<{ token?: string | string[] }> }
 
 /**
- * Where a confirmation link lands (#183). Confirming takes a click, not the page load. Once the
+ * Where a confirmation link lands (#183). The page confirms the email as soon as it loads (#300). Once the
  * email is confirmed, the accounts module offers an account (#187): the two modules meet here.
  */
 export default async function ConfirmEmailPage({ searchParams }: Props) {
@@ -26,7 +26,8 @@ export default async function ConfirmEmailPage({ searchParams }: Props) {
       <div className="mx-auto w-full max-w-md">
         <h1 className="mb-2 text-3xl font-bold text-foreground">Confirm Your Email</h1>
         <p className="mb-8 text-muted-foreground">
-          One click to confirm this address is yours. Then we’ll send you a welcome email.
+          Thanks for opening the link. Once your address is confirmed, we’ll send you a welcome
+          email.
         </p>
         {/* A dead link offers the contact form, where sending again brings a new link */}
         <ConfirmEmail token={parseConfirmationToken(token)} retryHref="/contact">

@@ -34,6 +34,9 @@ The owner decided on 2026-10-21 (quoted on #168):
   How Yes and the one-click link fit with it was settled on 2026-10-23 (option A, quoted on
   #187): Yes opens the sign-up page with the email filled in, and Payload's verify link is the
   one click, a second confirmation by design. No custom tokens.
+- **Opening the link is enough** (decided 2026-10-23, quoted on #300): `/confirm-email` and
+  `/verify-account` confirm as soon as the page loads, with no button to press. The page's own
+  script posts the token, so a scanner that only fetches the link confirms nothing.
 
 Contact-form senders aren't accounts, so their confirmation link uses the site's own token
 ([0009](0009-email-confirmation-token.md)): Payload's `auth.verify` only works for accounts.
@@ -50,10 +53,13 @@ Contact-form senders aren't accounts, so their confirmation link uses the site's
 - Payload 3.91's forgot password emails an account whether or not it confirmed its address, so an
   unconfirmed sign-up could aim reset emails at someone else's inbox. #187 stops reset emails to
   unconfirmed accounts, with a test.
+- A mail scanner that runs the page's script (some workplace filters do) can now confirm on the
+  person's behalf. For a contact sender that only sends the welcome early. For a first sign-up
+  link it could open an account someone else started with that address (#290).
 - The technical rules are acceptance criteria in #183 and #187, checked in review.
 - Edit locks (#147) are fixed before any resident account exists.
 
 ## Links
 
-- Decision: #168, and #266 for the sign-in foundation. Build: #183, then #269 and #187. Later:
+- Decision: #168, and #266 for the sign-in foundation. Build: #183, then #269, #187 and #300. Later:
   sign in with Google, Apple and X (#188).

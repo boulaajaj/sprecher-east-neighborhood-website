@@ -133,7 +133,7 @@ Endpoint: `POST /api/email-confirmations/confirm` with `{ token }`, public (the 
 `expired` or `invalid`. The first valid click sets `confirmedAt` and `welcomeSentAt` in one
 conditional update through the database adapter (`UPDATE … WHERE confirmed_at IS NULL`, so two
 clicks at once confirm once), runs the `onConfirmed` listeners `payload.config.ts` passes in, then
-sends the welcome email. The page `/confirm-email` calls it on a button click, never on load.
+sends the welcome email. The page `/confirm-email` calls it as soon as it loads, and again on Try Again after a failure (#300).
 `welcomeSentAt` means the welcome was claimed, not delivered: it is set before the send, so a
 failed send (or a failed listener) is logged and never retried.
 

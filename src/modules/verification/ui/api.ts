@@ -4,7 +4,7 @@ import { parseEmailAddress } from '@/platform/lib'
 import { CONFIRM_API_PATH } from '../domain/paths'
 import type { ConfirmOutcome } from '../domain/types'
 
-/** What the browser learns from a click on "Confirm my email". */
+/** What the browser learns when the confirm page posts the link's token. */
 export type ConfirmAnswer = ConfirmOutcome | 'too-many-tries' | 'failed'
 
 /** The answer, with the confirmed address when the endpoint gave one (`ConfirmResult`). */
