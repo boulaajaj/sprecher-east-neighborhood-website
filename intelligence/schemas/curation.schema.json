@@ -10,7 +10,8 @@
     "audiences",
     "whyItMatters",
     "residentAction",
-    "duplicateOf"
+    "duplicateOf",
+    "targetId"
   ],
   "additionalProperties": false,
   "properties": {
@@ -94,6 +95,19 @@
       "anyOf": [
         {
           "$ref": "provenance.schema.json#/properties/externalId"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "targetId": {
+      "description": "The existing CMS document's ID, for duplicate, update and cancel; otherwise null.",
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
         },
         {
           "type": "null"

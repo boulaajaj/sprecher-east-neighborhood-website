@@ -72,6 +72,22 @@ if (sources?.sources) {
 const evals = validate(path.join(dir, 'evals', 'cases.yaml'), 'schemas/eval-cases.schema.json')
 for (const id of duplicates(evals?.cases?.map((c) => c.id) ?? []))
   problem(path.join(dir, 'evals', 'cases.yaml'), `duplicate case id ${id}`)
+// The submit stage's routing (prompts/submit.md): which MCP tool each decision leads to
+const ROUTE = {
+  accept: 'submitSuggestion',
+  'needs-review': 'reportItem',
+  update: 'reportItem',
+  cancel: 'reportItem',
+  reject: 'none',
+  duplicate: 'none',
+}
+for (const c of evals?.cases ?? []) {
+  if (c.expected && ROUTE[c.expected.decision] !== c.expected.route)
+    problem(
+      path.join(dir, 'evals', 'cases.yaml'),
+      `${c.id}: ${c.expected.decision} routes to ${ROUTE[c.expected.decision]}`,
+    )
+}
 const pipeline = validate(path.join(dir, 'pipeline.yaml'), 'schemas/pipeline.schema.json')
 
 // 2. Field paths: `$.a.b`, with `[]` stepping into an array's items

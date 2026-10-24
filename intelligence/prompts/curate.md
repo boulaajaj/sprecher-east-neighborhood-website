@@ -22,10 +22,13 @@ reason, the confirmed status in `$.verification.statusConfirmed`, and the gaps i
 1. **Duplicates and changes.** If the CMS already has this `$.candidate.externalId` with the same
    `$.candidate.contentHash`, the decision is `duplicate` and `$.duplicateOf` is that ID. Same ID
    with a new hash: `update`, or `cancel` when `$.verification.statusConfirmed` is `cancelled`.
-2. **Hard rejects.** Reject when the item is past, `outside`, partisan promotion, or from a
-   source that isn't `valid`.
+   In all three, `$.targetId` is the existing document's CMS ID; otherwise it is null.
+2. **Hard rejects.** Reject when the item is past, `outside`, partisan promotion, routine noise
+   (`coverage.md`, rule 4), or from a source that isn't `valid`.
 3. **Score** each from 0 to 3 in `$.scores`: `$.scores.evidence` (primary source, confirmed facts),
-   `$.scores.freshness`, `$.scores.relevance` (core 3, catchment 2, citywide with a clear use 1),
+   `$.scores.freshness`, `$.scores.relevance` (core 3; catchment 2; citywide with a direct use for
+   residents, such as a deadline, a service or a decision that affects them, 2; any other
+   citywide item 0 or 1),
    `$.scores.timeliness` (enough notice to act) and `$.scores.actionability` (one clear thing a
    resident can do).
 4. **Decide** in `$.decision`: `accept` when relevance and actionability are both 2 or more and

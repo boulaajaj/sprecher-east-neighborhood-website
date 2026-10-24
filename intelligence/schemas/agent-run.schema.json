@@ -7,6 +7,7 @@
     "runId",
     "agentName",
     "pipelineVersion",
+    "repoCommit",
     "startedAt",
     "finishedAt",
     "status",
@@ -30,6 +31,11 @@
     "pipelineVersion": {
       "type": "integer",
       "minimum": 1
+    },
+    "repoCommit": {
+      "description": "The commit of this repository whose intelligence/ folder the run loaded.",
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
     },
     "startedAt": {
       "$ref": "common.schema.json#/$defs/dateTime"

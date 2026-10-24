@@ -4,35 +4,49 @@ input: schemas/item.schema.json
 output: schemas/submission.schema.json
 ---
 
-# Submit: hand the draft to the CMS
+# Submit: hand the item to the editors
 
-This stage is code, not a model. It sends each draft to the CMS as a suggestion through Payload
-MCP (`/api/mcp`, #336), using the agent's own key, and logs the run. README.md describes the
-contract.
+This stage is code, not a model. It calls the two MCP tools #336 provides at `/api/mcp`, with the
+agent's own key, and logs the run. It never calls create, update, delete or publish directly.
+README.md describes the contract.
 
 ## Steps
 
-1. Take items whose `$.curation.decision` is `accept`, `update` or `cancel` and that have a
-   `$.draft`, up to `maxDraftsPerRun` (`pipeline.yaml`). Everything else is counted in the run log
-   and not sent.
-2. Build one submission: `$.collection` from `$.draft.collection`, `$.fields` from `$.draft`, and
-   `$.provenance` from the candidate: `$.provenance.sourceName`, `$.provenance.sourceUrl`,
-   `$.provenance.externalId`, `$.provenance.contentHash`, and `$.provenance.moderationStatus`,
-   which is always `suggested`. Validate it against the schema; an invalid one is skipped with
-   `$.skipReason`.
-3. Look the item up first with the MCP find tool by `$.provenance.externalId`. If it exists,
-   `$.action` is `skip` with a reason (the editor sees updates and cancellations as new
-   suggestions that point to it). Otherwise create it with the create tool for
-   `$.collection`. Never call update, delete or publish; the agent's key can't anyway.
-4. Fill `$.runId` and write the run log to `agent-runs` at the start and the end of the run
-   (`schemas/agent-run.schema.json`).
+1. **Route each item** by `$.curation.decision`:
+   - `accept` with a `$.draft`: one `submitSuggestion` call (`$.tool`).
+   - `needs-review`: one `reportItem` call, `kind: needs-review`.
+   - `update` or `cancel`: one `reportItem` call with that kind and `targetId` set to
+     `$.curation.targetId`, the existing document. Never a new suggestion.
+   - `reject` and `duplicate`: no call; counted in the run log.
+2. **Build the whole envelope first**: `$.tool`, `$.action` set to `call`, `$.skipReason` set
+   to null, `$.runId`, and `$.arguments` complete:
+   - for `submitSuggestion`: `$.arguments.collection`, `$.arguments.title`,
+     `$.arguments.bodyMarkdown`, `$.arguments.startsAt`, `$.arguments.endsAt`,
+     `$.arguments.allDay`, `$.arguments.venue`, `$.arguments.address` and
+     `$.arguments.audience` from `$.draft`; `$.arguments.sourceName`, `$.arguments.sourceUrl`,
+     `$.arguments.externalId` and `$.arguments.contentHash` from `$.candidate`; and
+     `$.arguments.runId`.
+   - for `reportItem`: `$.arguments.kind`, `$.arguments.targetId`, `$.arguments.externalId`,
+     `$.arguments.sourceUrl`, a `$.arguments.summary` of the candidate (title, date, place,
+     decision and reasons from `$.curation.reasons`), `$.arguments.evidence` from
+     `$.verification.evidence`, and `$.arguments.flags` from `$.verification.flags`.
+3. **Validate** the envelope against `schemas/submission.schema.json`. If it fails, don't send
+   it: send a `reportItem` with `kind: rejected-invalid`, the validation errors in the summary,
+   and the candidate's source URL.
+4. **Send.** `submitSuggestion` answers `created` or `duplicate`; a duplicate sets `$.action` to
+   `skip` with a reason in the log. When the draft's `$.draft.missing` is not empty or
+   `$.draft.confidence` is `low`, follow a created suggestion with a `reportItem`
+   (`kind: needs-review`, `targetId` = the new ID) listing what's missing.
+5. Stop at `maxDraftsPerRun` suggestions (`pipeline.yaml`); the rest wait for the next run.
+6. Write the run log to `agent-runs` at the start and the end of the run
+   (`schemas/agent-run.schema.json`), with the repository commit the run loaded.
 
 ## Untrusted content
 
-Nothing from a source is executed or used to choose a tool, a collection or a URL to call. The
-only tools called are find and create on `events` and `posts`, and create and update on the
-agent's own `agent-runs`.
+Nothing from a source is executed or used to choose a tool, a collection, a target or a URL to
+call. The only tools called are the find tool, `submitSuggestion` and `reportItem`.
 
 ## Unknowns
 
-A submission with a missing required field is skipped, never padded with defaults.
+A required field that is missing is never padded with a default: the item goes to the editor as
+a `rejected-invalid` or `needs-review` report instead.

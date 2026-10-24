@@ -2,26 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://sprechereast.com/intelligence/schemas/draft.schema.json",
   "title": "Editorial draft output",
-  "description": "Field names match the Events collection (src/modules/events/cms/events.ts); category and locationType values match src/modules/events/domain/. For posts, the date, time and location fields are null.",
+  "description": "The content of one suggestion. Field names follow #336's submitSuggestion tool; the server maps them to the Events or Posts fields and converts bodyMarkdown to rich text. For posts, the time and place fields are null.",
   "type": "object",
-  "required": [
-    "collection",
-    "title",
-    "description",
-    "body",
-    "date",
-    "timeStart",
-    "timeEnd",
-    "category",
-    "locationType",
-    "locationName",
-    "locationAddress",
-    "registrationUrl",
-    "officialLinks",
-    "whyItMatters",
-    "confidence",
-    "missing"
-  ],
   "additionalProperties": false,
   "properties": {
     "collection": {
@@ -32,70 +14,43 @@
       "minLength": 1,
       "maxLength": 120
     },
-    "description": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 300
-    },
-    "body": {
-      "description": "Short Markdown body: what, when, where, one action, official links.",
+    "bodyMarkdown": {
+      "description": "Under 300 words of Markdown: what, when, where, one action, why it matters to Sprecher East, official links.",
       "type": "string",
       "minLength": 1,
       "maxLength": 3000
     },
-    "date": {
+    "startsAt": {
       "anyOf": [
         {
-          "$ref": "common.schema.json#/$defs/date"
+          "$ref": "common.schema.json#/$defs/dateTime"
         },
         {
           "type": "null"
         }
       ]
     },
-    "timeStart": {
+    "endsAt": {
       "anyOf": [
         {
-          "type": "string",
-          "pattern": "^(1[0-2]|[1-9]):[0-5]\\d (AM|PM)$"
+          "$ref": "common.schema.json#/$defs/dateTime"
         },
         {
           "type": "null"
         }
       ]
     },
-    "timeEnd": {
+    "allDay": {
       "anyOf": [
         {
-          "type": "string",
-          "pattern": "^(1[0-2]|[1-9]):[0-5]\\d (AM|PM)$"
+          "type": "boolean"
         },
         {
           "type": "null"
         }
       ]
     },
-    "category": {
-      "anyOf": [
-        {
-          "enum": ["meeting", "social", "volunteer", "workshop", "sports", "community", "other"]
-        },
-        {
-          "type": "null"
-        }
-      ]
-    },
-    "locationType": {
-      "anyOf": [
-        {
-          "enum": ["in-person", "virtual", "hybrid"]
-        },
-        {
-          "type": "null"
-        }
-      ]
-    },
-    "locationName": {
+    "venue": {
       "anyOf": [
         {
           "type": "string",
@@ -107,7 +62,7 @@
         }
       ]
     },
-    "locationAddress": {
+    "address": {
       "anyOf": [
         {
           "type": "string",
@@ -119,15 +74,12 @@
         }
       ]
     },
-    "registrationUrl": {
-      "anyOf": [
-        {
-          "$ref": "common.schema.json#/$defs/httpUrl"
-        },
-        {
-          "type": "null"
-        }
-      ]
+    "audience": {
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/audience"
+      },
+      "uniqueItems": true
     },
     "officialLinks": {
       "type": "array",
@@ -136,11 +88,6 @@
       },
       "minItems": 1,
       "maxItems": 3
-    },
-    "whyItMatters": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 400
     },
     "confidence": {
       "enum": ["high", "medium", "low"]
@@ -154,5 +101,19 @@
       },
       "uniqueItems": true
     }
-  }
+  },
+  "required": [
+    "collection",
+    "title",
+    "bodyMarkdown",
+    "startsAt",
+    "endsAt",
+    "allDay",
+    "venue",
+    "address",
+    "audience",
+    "officialLinks",
+    "confidence",
+    "missing"
+  ]
 }

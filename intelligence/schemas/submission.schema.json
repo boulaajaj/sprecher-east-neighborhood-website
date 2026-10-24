@@ -1,17 +1,16 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://sprechereast.com/intelligence/schemas/submission.schema.json",
-  "title": "Submit stage output: one suggested draft",
-  "description": "Sent to the CMS over Payload MCP (#336). Never publishes: the CMS keeps it a draft with moderationStatus suggested.",
+  "title": "Submit stage output: one MCP tool call",
+  "description": "One call to #336's MCP tools, built in full before it is validated. The agent never calls create, update, delete or publish directly.",
   "type": "object",
-  "required": ["collection", "action", "skipReason", "fields", "provenance", "runId"],
   "additionalProperties": false,
   "properties": {
-    "collection": {
-      "enum": ["events", "posts"]
+    "tool": {
+      "enum": ["submitSuggestion", "reportItem"]
     },
     "action": {
-      "enum": ["create", "skip"]
+      "enum": ["call", "skip"]
     },
     "skipReason": {
       "anyOf": [
@@ -25,21 +24,55 @@
         }
       ]
     },
-    "fields": {
-      "description": "The draft's collection fields, written to the Events or Posts document.",
-      "$ref": "draft.schema.json"
-    },
-    "provenance": {
-      "description": "Written on the same document (#123 fields).",
-      "$ref": "provenance.schema.json"
-    },
     "runId": {
       "type": "string",
       "minLength": 1,
       "maxLength": 100
+    },
+    "arguments": {
+      "anyOf": [
+        {
+          "$ref": "suggestion.schema.json"
+        },
+        {
+          "$ref": "report.schema.json"
+        }
+      ]
     }
   },
   "allOf": [
+    {
+      "if": {
+        "properties": {
+          "tool": {
+            "const": "submitSuggestion"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "arguments": {
+            "$ref": "suggestion.schema.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "tool": {
+            "const": "reportItem"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "arguments": {
+            "$ref": "report.schema.json"
+          }
+        }
+      }
+    },
     {
       "if": {
         "properties": {
@@ -51,10 +84,13 @@
       "then": {
         "properties": {
           "skipReason": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
           }
         }
       }
     }
-  ]
+  ],
+  "required": ["tool", "action", "skipReason", "runId", "arguments"]
 }

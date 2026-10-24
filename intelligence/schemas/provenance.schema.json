@@ -7,8 +7,14 @@
   "required": ["sourceName", "sourceUrl", "externalId", "contentHash", "moderationStatus"],
   "additionalProperties": false,
   "properties": {
-    "sourceName": { "type": "string", "minLength": 1, "maxLength": 200 },
-    "sourceUrl": { "$ref": "common.schema.json#/$defs/httpUrl" },
+    "sourceName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "sourceUrl": {
+      "$ref": "common.schema.json#/$defs/httpUrl"
+    },
     "externalId": {
       "description": "The source's own stable ID, prefixed with the source id: legistar-events:28977.",
       "type": "string",
@@ -16,10 +22,12 @@
       "maxLength": 300
     },
     "contentHash": {
-      "description": "sha256 of the normalized source fields (title, start, location, status), lowercase hex.",
+      "description": "sha256, lowercase hex, of the candidate's substantive fields: title, sourceText, startsAt, endsAt, allDay, locationText and sourceStatus, each trimmed with whitespace collapsed (text also lowercased), null as an empty string, joined by newlines in that order. Retrieval metadata (retrievedAt, ETag, feed order) is never hashed.",
       "type": "string",
       "pattern": "^[a-f0-9]{64}$"
     },
-    "moderationStatus": { "const": "suggested" }
+    "moderationStatus": {
+      "const": "suggested"
+    }
   }
 }

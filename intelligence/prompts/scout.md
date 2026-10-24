@@ -30,10 +30,12 @@ The registry, `sources.yaml`. Read only entries whose `$.sources[].result` is `v
      one, else the source's canonical URL).
    - `$.externalId`: the source id, a colon, and the source's own stable ID (`EventId`, `UID`,
      `guid`, `MatterId`).
-   - `$.contentHash`: sha256 of the title, start, location text and status, trimmed and lowercased,
-     joined by newlines.
+   - `$.contentHash`: sha256 of the substantive fields, in this order: title, source text, start,
+     end, all-day, location text and status. Trim each and collapse whitespace, lowercase the
+     text, write null as an empty string, and join with newlines. Never hash retrieval
+     metadata such as `$.retrievedAt`, ETags or feed order (`schemas/provenance.schema.json`).
    - `$.title`, `$.startsAt`, `$.endsAt`, `$.allDay` and `$.locationText` exactly as the source
-     gives them, converted to ISO 8601 with an offset. A missing value is `null`.
+     gives them, converted to ISO 8601 with an offset. A missing value, including an unknown `$.allDay`, is `null`.
    - `$.sourceStatus`: `cancelled` or `rescheduled` only when the source says so; otherwise
      `scheduled`, or `unknown` when the source has no status.
    - `$.sourceText`: the item's text, stripped of markup, cut to 8,000 characters.

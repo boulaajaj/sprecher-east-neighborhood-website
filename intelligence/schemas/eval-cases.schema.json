@@ -110,7 +110,7 @@
           },
           "expected": {
             "type": "object",
-            "required": ["decision", "coverage"],
+            "required": ["decision", "coverage", "route"],
             "additionalProperties": false,
             "properties": {
               "decision": {
@@ -125,6 +125,10 @@
                   "$ref": "common.schema.json#/$defs/flag"
                 },
                 "uniqueItems": true
+              },
+              "route": {
+                "description": "The MCP tool the submit stage calls: accept \u2192 submitSuggestion; needs-review, update, cancel \u2192 reportItem; reject, duplicate \u2192 none.",
+                "enum": ["submitSuggestion", "reportItem", "none"]
               }
             }
           },

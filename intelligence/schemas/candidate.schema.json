@@ -75,7 +75,15 @@
       ]
     },
     "allDay": {
-      "type": "boolean"
+      "description": "null when the source doesn't say.",
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "locationText": {
       "anyOf": [
