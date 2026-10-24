@@ -1,25 +1,21 @@
 frontend:
   - changed-files:
-      - any-glob-to-any-file: ['src/app/**', 'src/components/**']
+      - any-glob-to-any-file:
+          ['src/app/**', 'src/modules/*/ui/**', 'src/platform/ui/**', 'src/platform/richtext/**']
 
 cms:
   - changed-files:
       - any-glob-to-any-file:
           [
             'src/payload.config.ts',
-            'src/collections/**',
-            'src/blocks/**',
-            'src/fields/**',
-            'src/globals/**',
-            'src/access/**',
-            'src/hooks/**',
-            'src/plugins/**',
+            'src/modules/*/cms/**',
+            'src/platform/payload/**',
             'src/app/(payload)/**',
           ]
 
 auth:
   - changed-files:
-      - any-glob-to-any-file: ['src/collections/Users/**', 'src/access/**']
+      - any-glob-to-any-file: ['src/modules/accounts/**', 'src/modules/verification/**']
 
 documentation:
   - changed-files:
