@@ -1,7 +1,7 @@
 import type { MCPAccessSettings, MCPPluginConfig } from '@payloadcms/plugin-mcp'
 import { APIError, type PayloadRequest, UnauthorizedError } from 'payload'
 
-import { SlidingWindowCounter } from '@/platform/lib'
+import { parseClientIp, SlidingWindowCounter } from '@/platform/lib'
 import { hasAgent } from '@/platform/payload/roles'
 
 import { toAgentAnswer } from '../domain/agentView'
@@ -25,21 +25,26 @@ const answerFor =
 
 // In memory: the site runs as one PM2 process
 const requests = new SlidingWindowCounter(MCP_LIMITS.windowMs, MCP_LIMITS.trackedKeys)
+const connections = new SlidingWindowCounter(MCP_LIMITS.windowMs, MCP_LIMITS.trackedConnections)
+
+const tooMany = () => new APIError('Too many requests. Try again in a minute.', 429, null, true)
 
 /**
- * The plugin's own key check, then two of ours: the key's account must still be an agent (a key
- * never acts as staff, even if the account's role changed), and each key gets a few requests a
- * minute, then 429.
+ * A per-connection limit counted before the key is looked up, so guessing keys is slow; then the
+ * plugin's own key check, and two of ours: the key's account must still be an agent (a key never
+ * acts as staff, even if the account's role changed), and each key gets a few requests a minute.
+ * Past a limit, 429.
  */
 const checkAgentKey = async (
-  _req: PayloadRequest,
+  req: PayloadRequest,
   defaultSettings: (apiKey?: null | string) => Promise<MCPAccessSettings>,
 ): Promise<MCPAccessSettings> => {
+  const now = Date.now()
+  const ip = parseClientIp(req.headers)
+  if (ip && !connections.tryTake(ip, MCP_LIMITS.perConnection, now)) throw tooMany()
   const settings = await defaultSettings()
   if (!hasAgent(settings.user)) throw new UnauthorizedError()
-  if (!requests.tryTake(String(settings.id), MCP_LIMITS.perKey, Date.now())) {
-    throw new APIError('Too many requests for this key. Try again in a minute.', 429, null, true)
-  }
+  if (!requests.tryTake(String(settings.id), MCP_LIMITS.perKey, now)) throw tooMany()
   return settings
 }
 

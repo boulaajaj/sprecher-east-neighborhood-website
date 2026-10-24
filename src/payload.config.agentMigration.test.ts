@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-import { down, up } from '@/migrations/20261024_191620_agent_mcp_access'
+import { down, up } from '@/migrations/20261024_194426_agent_mcp_access'
 import { bootPayload, createAccount } from '@/platform/payload/testing/inMemoryPayload'
 import { createMcpKey } from '@/platform/payload/testing/mcpRequest'
 

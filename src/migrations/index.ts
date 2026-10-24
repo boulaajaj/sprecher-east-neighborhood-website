@@ -11,7 +11,7 @@ import * as migration_20261023_214345_held_form_emails from './20261023_214345_h
 import * as migration_20261024_141700_contact_retention from './20261024_141700_contact_retention'
 import * as migration_20261024_164157_review_queue from './20261024_164157_review_queue'
 import * as migration_20261024_180000_cancel_missed_scheduled_publishes from './20261024_180000_cancel_missed_scheduled_publishes'
-import * as migration_20261024_191620_agent_mcp_access from './20261024_191620_agent_mcp_access'
+import * as migration_20261024_194426_agent_mcp_access from './20261024_194426_agent_mcp_access'
 
 export const migrations = [
   {
@@ -80,8 +80,8 @@ export const migrations = [
     name: '20261024_180000_cancel_missed_scheduled_publishes',
   },
   {
-    up: migration_20261024_191620_agent_mcp_access.up,
-    down: migration_20261024_191620_agent_mcp_access.down,
-    name: '20261024_191620_agent_mcp_access',
+    up: migration_20261024_194426_agent_mcp_access.up,
+    down: migration_20261024_194426_agent_mcp_access.down,
+    name: '20261024_194426_agent_mcp_access',
   },
 ]

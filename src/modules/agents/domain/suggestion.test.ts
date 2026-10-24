@@ -22,12 +22,8 @@ describe('toEventSchedule', () => {
     })
   })
 
-  it('gives no times for a day alone or an all-day event', () => {
+  it('gives no times for an all-day event', () => {
     const none = { timeStart: null, timeEnd: null }
-    expect(toEventSchedule({ startsAt: '2026-11-07' }, CHICAGO)).toEqual({
-      date: '2026-11-07T00:00:00.000Z',
-      ...none,
-    })
     expect(
       toEventSchedule({ startsAt: '2026-11-07T18:00:00-06:00', allDay: true }, CHICAGO),
     ).toEqual({ date: '2026-11-07T00:00:00.000Z', ...none })

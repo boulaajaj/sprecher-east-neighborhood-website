@@ -114,7 +114,13 @@ describe('an agent key over /api/mcp', () => {
       overrideAccess: false,
     })
     const sourcesChecked = [
-      { sourceId: 'city-calendar', cursor: '2026-10-24T10:00:00Z', status: 'ok', error: null },
+      {
+        sourceId: 'city-calendar',
+        fetchStrategy: 'direct',
+        cursor: '2026-10-24T10:00:00Z',
+        status: 'ok',
+        error: null,
+      },
     ]
     const created = await text('createAgentRuns', {
       ...RUN,

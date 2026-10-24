@@ -6,6 +6,12 @@
 export const MCP_LIMITS = {
   windowMs: 60 * 1000,
   perKey: 60,
-  /** Bounded memory: past this many keys, the oldest tracked one is forgotten. */
+  /**
+   * Requests per window from one connection (client IP), counted before the key is looked up,
+   * as the form limits count before the robot check: guessing keys costs a database lookup each.
+   */
+  perConnection: 120,
+  /** Bounded memory: past this many keys or connections, the oldest tracked one is forgotten. */
   trackedKeys: 200,
+  trackedConnections: 2000,
 } as const

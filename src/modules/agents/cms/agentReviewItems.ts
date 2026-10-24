@@ -100,7 +100,8 @@ export const AgentReviewItems: CollectionConfig = {
       ],
     },
     { name: 'flags', type: 'select', hasMany: true, options: [...REVIEW_FLAGS] },
-    text('sourceUrl', CAPS.sourceUrl, true),
+    // Empty only for a rejected-invalid report whose item had no source link
+    text('sourceUrl', CAPS.sourceUrl),
   ],
   timestamps: true,
 }

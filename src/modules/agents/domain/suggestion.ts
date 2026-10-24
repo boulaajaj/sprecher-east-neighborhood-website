@@ -45,6 +45,8 @@ export const REVIEW_FLAGS = [
   'past',
   'partisan',
   'prompt-injection',
+  'needs-date',
+  'wrong-offset',
 ] as const
 
 export const SUGGESTION_COLLECTIONS = ['events', 'posts'] as const
@@ -63,8 +65,6 @@ export type ReviewItemKind = (typeof REVIEW_ITEM_KINDS)[number]['value']
 /** An event's day and its times, as the events collection stores them. */
 export type EventSchedule = { date: string; timeStart: string | null; timeEnd: string | null }
 
-const DAY_ONLY = /^\d{4}-\d{2}-\d{2}$/
-
 /** The calendar day of an instant in a timezone, as `YYYY-MM-DD`. */
 const dayIn = (instant: Date, timeZone: string): string =>
   new Intl.DateTimeFormat('en-CA', { timeZone }).format(instant)
@@ -75,9 +75,8 @@ const timeIn = (instant: Date, timeZone: string): string =>
 
 /**
  * An event's day (midnight UTC, Payload's day-only format) and its start and end times in the
- * site timezone, from `startsAt` and `endsAt` (a day `YYYY-MM-DD`, or an ISO date-time with an
- * offset). A day alone, or `allDay`, gives no times; an end on another day is left out, since an
- * event has one date.
+ * site timezone, from `startsAt` and `endsAt` (date-times with a zone, as the contract requires).
+ * `allDay` gives no times; an end on another day is left out, since an event has one date.
  */
 export function toEventSchedule(
   {
@@ -87,14 +86,11 @@ export function toEventSchedule(
   }: { startsAt: string; endsAt?: string | null; allDay?: boolean | null },
   timeZone: string,
 ): EventSchedule {
-  if (DAY_ONLY.test(startsAt)) {
-    return { date: `${startsAt}T00:00:00.000Z`, timeStart: null, timeEnd: null }
-  }
   const start = new Date(startsAt)
   const day = dayIn(start, timeZone)
   const date = `${day}T00:00:00.000Z`
   if (allDay) return { date, timeStart: null, timeEnd: null }
-  const end = endsAt && !DAY_ONLY.test(endsAt) ? new Date(endsAt) : null
+  const end = endsAt ? new Date(endsAt) : null
   const sameDay = end !== null && dayIn(end, timeZone) === day
   return {
     date,

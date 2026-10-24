@@ -1059,8 +1059,9 @@ export interface AgentRun {
   sourcesChecked?:
     | {
         sourceId: string
+        fetchStrategy: 'direct' | 'playwright' | 'none'
         cursor?: string | null
-        status: 'ok' | 'not-modified' | 'error' | 'skipped'
+        status: 'ok' | 'not-modified' | 'error' | 'skipped' | 'blocked'
         error?: string | null
         id?: string | null
       }[]
@@ -1072,6 +1073,7 @@ export interface AgentRun {
     rejected?: number | null
     duplicates?: number | null
     needsReview?: number | null
+    deferred?: number | null
   }
   errors?: string[] | null
   cost?: {
@@ -1130,9 +1132,11 @@ export interface AgentReviewItem {
         | 'past'
         | 'partisan'
         | 'prompt-injection'
+        | 'needs-date'
+        | 'wrong-offset'
       )[]
     | null
-  sourceUrl: string
+  sourceUrl?: string | null
   updatedAt: string
   createdAt: string
 }
@@ -2007,6 +2011,7 @@ export interface AgentRunsSelect<T extends boolean = true> {
     | T
     | {
         sourceId?: T
+        fetchStrategy?: T
         cursor?: T
         status?: T
         error?: T
@@ -2021,6 +2026,7 @@ export interface AgentRunsSelect<T extends boolean = true> {
         rejected?: T
         duplicates?: T
         needsReview?: T
+        deferred?: T
       }
   errors?: T
   cost?:

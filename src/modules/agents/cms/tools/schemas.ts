@@ -68,7 +68,7 @@ export const reportItemShape = {
   summary: text(CAPS.summary).describe('What an editor should know or do, in a few sentences.'),
   evidence: z.array(evidence).max(CAPS.evidenceItems),
   flags: z.array(z.enum(REVIEW_FLAGS)).max(CAPS.flags).refine(unique, 'Each flag once'),
-  sourceUrl: webAddress,
+  sourceUrl: webAddress.nullable().describe('Null only for rejected-invalid with no source link.'),
 }
 
 export const submitSuggestionInput = z
@@ -89,6 +89,10 @@ export const reportItemInput = z
   .refine((r) => !['update', 'cancel'].includes(r.kind) || isSet(r.targetId), {
     message: 'An update or a cancellation names its targetId',
     path: ['targetId'],
+  })
+  .refine((r) => r.kind === 'rejected-invalid' || isSet(r.sourceUrl), {
+    message: 'Only a rejected-invalid report may have no sourceUrl',
+    path: ['sourceUrl'],
   })
 
 export type SubmitSuggestionInput = z.infer<typeof submitSuggestionInput>

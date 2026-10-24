@@ -24,7 +24,10 @@ Markdown conversion and the duplicate answer. No update, publish or delete of co
 `users`, `form-submissions` or other collection.
 
 The arguments are the agents' contract in `intelligence/schemas/` (`suggestion.schema.json`,
-`report.schema.json`, #344); `cms/tools/schemas.ts` checks the same names, formats and caps.
+`report.schema.json`, #344, #355); `cms/tools/schemas.ts` checks the same names, formats and caps.
+`cms/tools/schemas.contract.test.ts` gives samples (the submit evals' items among them) to both
+the JSON Schemas and the Zod schemas and expects the same verdict, and checks that the lists of
+values and the run fields match, so the two can't drift apart silently.
 
 ### `submitSuggestion`
 
@@ -46,7 +49,7 @@ Arguments: `runId`, `kind` (`needs-review`, `update`, `cancel`, `rejected-invali
 `targetCollection` and `targetId` (an integer; ids are per collection, so the collection is
 required with an id, and an `update` or `cancel` names both), `externalId`, `summary`,
 `evidence[]` (`url`, `says`, `retrievedAt`), `flags[]` (the contract's flag values) and
-`sourceUrl`. Each report is its own document in `agent-review-items`, linked to the run, so two
+`sourceUrl` (null only for a `rejected-invalid` report whose item had no link). Each report is its own document in `agent-review-items`, linked to the run, so two
 reports at once both land. Staff read and filter them in Admin (Agents → Agent Review Items, and
 under each run); the agent reads its own, can't change or delete them, and only reports on its
 own runs.
@@ -63,7 +66,8 @@ own runs.
   an allowlist of fields per collection (`cms/agentViews.ts`, checked against the generated
   types, so a renamed field fails `tsc`); related documents become ids; no authors, emails or
   rich text. The two tools answer only a status and an id.
-- **Limits**: 60 requests a minute per key (`domain/mcpLimits.ts`), then 429. Caddy caps request
+- **Limits** (`domain/mcpLimits.ts`): 120 requests a minute per connection, counted before the
+  key is looked up, so guessing keys is slow; then 60 a minute per key. Past either, 429. Caddy caps request
   bodies at 256 KB (`ops/caddy/form-limits.caddy`).
 - **No password**: agent accounts can't sign in with a password
   (`accounts/cms/noPasswordSignInForAgents.ts`), so the key is their only credential.
@@ -76,8 +80,11 @@ own runs.
 The fields of `intelligence/schemas/agent-run.schema.json`: `runId` (unique), `agentName`,
 `pipelineVersion`, `repoCommit` (40 hex), `startedAt`, `finishedAt`, `status` (`running`,
 `succeeded`, `partial`, `failed`, `stopped-budget`, `disabled`), `sourcesChecked` (`sourceId`,
-`cursor`, `status`, `error`), `counts` (`seen`, `proposed`, `updates`, `rejected`, `duplicates`,
-`needsReview`), `errors` and `cost` (`inputTokens`, `outputTokens`, `usd`). Ours on top: `agent`,
+`fetchStrategy` (`direct`, `playwright`, `none`), `cursor`, `status` (`ok`, `not-modified`,
+`error`, `skipped`, `blocked`), `error`), `counts` (`seen`, `proposed`, `updates`, `rejected`,
+`duplicates`, `needsReview`, `deferred`), `errors` and `cost` (`inputTokens`, `outputTokens`,
+`usd`). A run's identity (`runId`, `agentName`, `pipelineVersion`, `repoCommit`, `startedAt`) is
+written once: an agent's later updates keep the stored values. Ours on top: `agent`,
 set by the server to the agent that created the run, and `reviewItems`, a join showing the run's
 items from `agent-review-items`. Admins read every run in Admin (Agents → Agent Runs); an agent reads only its own,
 to pick up its cursors. Runs, keys and suggestions are in the Payload database, so the backups

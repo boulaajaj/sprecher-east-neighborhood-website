@@ -224,52 +224,32 @@ describe('reportItem', () => {
   })
 })
 
-describe('every argument', () => {
-  const tooLong = (n: number) => 'x'.repeat(n + 1)
-  const evidenceItem = { url: 'https://e.com/a', says: 'Said', retrievedAt: '2026-10-24T10:00:00Z' }
-  const report = {
-    runId: RUN_ID,
-    kind: 'needs-review',
-    summary: 'Check',
-    evidence: [],
-    flags: [],
-    sourceUrl: 'https://e.com',
-  }
+// Every cap and format is checked against the contract in `tools/schemas.contract.test.ts`; these
+// show a refused call stores nothing
+describe('an oversized or invalid argument', () => {
+  it('stores no suggestion', async () => {
+    const before = await payload.count({ collection: 'events', overrideAccess: true })
+    for (const bad of [{ title: 'x'.repeat(121) }, { externalId: 'no-source-prefix' }]) {
+      expect((await call('submitSuggestion', suggestion(bad))).isError).toBe(true)
+    }
+    expect(await payload.count({ collection: 'events', overrideAccess: true })).toEqual(before)
+  })
 
-  it.each([
-    ['title', tooLong(120)],
-    ['bodyMarkdown', tooLong(3_000)],
-    ['venue', tooLong(200)],
-    ['address', tooLong(300)],
-    ['sourceName', tooLong(200)],
-    ['sourceUrl', `https://example.com/${tooLong(2_048)}`],
-    ['externalId', `mpl:${tooLong(200)}`],
-    ['externalId', 'no-prefix'],
-    ['contentHash', 'f'.repeat(65)],
-    ['runId', tooLong(100)],
-    ['audience', ['families', 'families']],
-  ])(
-    'submitSuggestion refuses an oversized or invalid %s and stores nothing',
-    async (name, value) => {
-      const before = await payload.count({ collection: 'events', overrideAccess: true })
-      const result = await call('submitSuggestion', suggestion({ [name]: value }))
-      expect(result.isError).toBe(true)
-      expect(await payload.count({ collection: 'events', overrideAccess: true })).toEqual(before)
-    },
-  )
-
-  it.each([
-    ['summary', tooLong(1_000)],
-    ['externalId', `mpl:${tooLong(200)}`],
-    ['evidence', Array.from({ length: 6 }, () => evidenceItem)],
-    ['evidence', [{ ...evidenceItem, says: tooLong(500) }]],
-    ['flags', ['not-a-flag']],
-    ['flags', ['past', 'past']],
-    ['sourceUrl', 'not a link'],
-  ])('reportItem refuses an oversized or invalid %s', async (name, value) => {
+  it('stores no report', async () => {
     const before = (await items()).length
-    const result = await call('reportItem', { ...report, [name]: value })
-    expect(result.isError).toBe(true)
+    const report = { runId: RUN_ID, kind: 'needs-review', evidence: [], flags: [] }
+    for (const bad of [
+      { summary: 'x'.repeat(1_001), sourceUrl: 'https://e.com' },
+      { summary: 'Check', sourceUrl: null },
+    ]) {
+      expect((await call('reportItem', { ...report, ...bad })).isError).toBe(true)
+    }
     expect(await items()).toHaveLength(before)
+  })
+
+  it('accepts a rejection without a source link', async () => {
+    const rejected = { runId: RUN_ID, kind: 'rejected-invalid', summary: 'No date anywhere.' }
+    const args = { ...rejected, evidence: [], flags: ['needs-date'], sourceUrl: null }
+    expect(await answer('reportItem', args)).toMatchObject({ status: 'reported' })
   })
 })

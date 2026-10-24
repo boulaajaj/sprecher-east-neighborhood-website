@@ -8,7 +8,7 @@ import type {
 
 import { hasAdmin, hasAgent, isAdmin } from '@/platform/payload/roles'
 
-import { RUN_STATUSES, SOURCE_CHECK_STATUSES } from '../domain/runs'
+import { FETCH_USED, RUN_IDENTITY, RUN_STATUSES, SOURCE_CHECK_STATUSES } from '../domain/runs'
 import { SUGGESTION_CAPS as CAPS } from '../domain/suggestion'
 
 /**
@@ -29,12 +29,19 @@ const adminOrOwnRuns: Access = ({ req: { user } }) => {
   return false
 }
 
-/** The run's agent is whoever created it, set by the server and never changed afterwards. */
+/**
+ * The run's agent is whoever created it, set by the server and never changed afterwards. Its
+ * identity (`RUN_IDENTITY`: run id, agent name, pipeline version, commit, start) is written once:
+ * an agent's later updates keep the stored values, so a run log can't be rewritten after the fact.
+ */
 const recordRunAgent: CollectionBeforeChangeHook = ({ data, operation, originalDoc, req }) => {
   if (operation === 'create') {
     return { ...data, agent: hasAgent(req.user) ? req.user?.id : (data.agent ?? null) }
   }
-  return { ...data, agent: originalDoc?.agent ?? null }
+  const kept = hasAdmin(req.user)
+    ? {}
+    : Object.fromEntries(RUN_IDENTITY.map((field) => [field, originalDoc?.[field]]))
+  return { ...data, ...kept, agent: originalDoc?.agent ?? null }
 }
 
 const COMMIT = /^[a-f0-9]{40}$/
@@ -93,6 +100,7 @@ export const AgentRuns: CollectionConfig = {
       maxRows: 200,
       fields: [
         matching(text('sourceId', 100, true), SOURCE_ID, 'A source id from the registry.'),
+        { name: 'fetchStrategy', type: 'select', required: true, options: [...FETCH_USED] },
         text('cursor', 300),
         { name: 'status', type: 'select', required: true, options: [...SOURCE_CHECK_STATUSES] },
         text('error', 500),
@@ -101,7 +109,15 @@ export const AgentRuns: CollectionConfig = {
     {
       name: 'counts',
       type: 'group',
-      fields: ['seen', 'proposed', 'updates', 'rejected', 'duplicates', 'needsReview'].map(count),
+      fields: [
+        'seen',
+        'proposed',
+        'updates',
+        'rejected',
+        'duplicates',
+        'needsReview',
+        'deferred',
+      ].map(count),
     },
     { name: 'errors', type: 'text', hasMany: true, maxRows: 50, maxLength: 500 },
     {

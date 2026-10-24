@@ -5615,6 +5615,13 @@
           "notNull": true,
           "autoincrement": false
         },
+        "fetch_strategy": {
+          "name": "fetch_strategy",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "cursor": {
           "name": "cursor",
           "type": "text",
@@ -5772,6 +5779,14 @@
         },
         "counts_needs_review": {
           "name": "counts_needs_review",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
+        },
+        "counts_deferred": {
+          "name": "counts_deferred",
           "type": "numeric",
           "primaryKey": false,
           "notNull": false,
@@ -6111,7 +6126,7 @@
           "name": "source_url",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "updated_at": {
@@ -9787,6 +9802,6 @@
   "internal": {
     "indexes": {}
   },
-  "id": "e92b6c8e-2994-407a-a86e-e9640cf1c52f",
+  "id": "f5d51bf1-f8b9-42e1-a853-502b23bd9cad",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }
