@@ -5,6 +5,8 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import { Alert } from '@/platform/ui/Alert'
 import { Button, Form } from '@/platform/ui'
+import { TurnstileWidget } from '@/platform/turnstile/TurnstileWidget.client'
+import { useRobotCheck } from '@/platform/turnstile/useRobotCheck.client'
 
 import { verifyAccount } from '../actions'
 import { newPasswordSchema, type NewPasswordValues } from '../domain/credentials'
@@ -21,7 +23,9 @@ type Answer = 'verified' | VerifyAccountFailure | 'offline'
 
 /**
  * The verify page's action (#187): one button that opens Payload's verification for the link's
- * token. Nothing happens on page load, because mail scanners open links too and would use it up.
+ * token. Nothing happens on page load, because mail scanners open links too and would use it up,
+ * and some run the page's script (#303). The button also needs the robot check (Turnstile,
+ * decision 0003) to pass, so a scanner that presses it verifies nothing.
  * `token` is `null` when the link has none, or one that can't be a token. The token leaves the
  * address bar and the history as soon as the page loads; the component keeps the one it was given.
  *
@@ -37,7 +41,14 @@ export function VerifyAccount({ token: linkToken }: { token: string | null }) {
   // Counts answers to clicks, so focus moves to the message after each one (not on page load)
   const [answers, setAnswers] = useState(0)
   const messageRef = useRef<HTMLDivElement>(null)
+  // Why the button can't send yet (the robot check is still running or couldn't load)
+  const [waitMessage, setWaitMessage] = useState<string | null>(null)
+  const robotCheck = useRobotCheck()
 
+  useEffect(() => {
+    // The check finished after a press that had to wait: the reason no longer holds
+    if (robotCheck.token) setWaitMessage(null)
+  }, [robotCheck.token])
   useEffect(() => {
     if (window.location.search) window.history.replaceState(null, '', window.location.pathname)
   }, [])
@@ -47,14 +58,19 @@ export function VerifyAccount({ token: linkToken }: { token: string | null }) {
 
   const verify = async (password?: NewPasswordValues) => {
     if (!token || sending) return
+    const pending = robotCheck.pendingMessage()
+    setWaitMessage(pending)
+    if (pending) return
     setSending(true)
     let next: Answer
     try {
-      const result = await verifyAccount({ token, ...password })
+      // Turnstile tokens are single use: each press sends one, then asks for a fresh one
+      const result = await verifyAccount({ token, ...password }, robotCheck.token)
       next = result.ok ? 'verified' : result.failure
     } catch {
       next = 'offline'
     }
+    robotCheck.renewToken()
     if (next === 'needs-password') setChoosingPassword(true)
     setAnswer(next)
     setSending(false)
@@ -77,6 +93,8 @@ export function VerifyAccount({ token: linkToken }: { token: string | null }) {
           )}
         </div>
       )}
+      {!done && waitMessage && <Alert variant="error">{waitMessage}</Alert>}
+      {!done && robotCheck.enabled && <TurnstileWidget {...robotCheck.widgetProps} />}
       {done ? (
         <Button href={SIGN_IN_PATH} fullWidth>
           Log In

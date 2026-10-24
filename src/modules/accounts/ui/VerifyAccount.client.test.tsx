@@ -3,16 +3,22 @@ import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { fakeTurnstile } from '@/platform/turnstile/testing/fakeTurnstileWidget'
 import { expectAccessible } from '@/platform/ui/testing/expectAccessible'
 
 const mocks = vi.hoisted(() => ({ verifyAccount: vi.fn() }))
 vi.mock('../actions', () => ({ verifyAccount: mocks.verifyAccount }))
+vi.mock(
+  '@/platform/turnstile/TurnstileWidget.client',
+  () => import('@/platform/turnstile/testing/fakeTurnstileWidget'),
+)
 
 import { VerifyAccount } from './VerifyAccount.client'
 
 const TOKEN = '0123456789abcdef0123456789abcdef01234567'
 
 beforeEach(() => {
+  fakeTurnstile.tokenFor = (reset) => `token-${reset}`
   mocks.verifyAccount.mockReset()
   window.history.replaceState(null, '', `/verify-account?token=${TOKEN}`)
 })
@@ -35,7 +41,7 @@ describe('VerifyAccount', () => {
 
     await clickConfirm()
 
-    expect(mocks.verifyAccount).toHaveBeenCalledExactlyOnceWith({ token: TOKEN })
+    expect(mocks.verifyAccount).toHaveBeenCalledExactlyOnceWith({ token: TOKEN }, 'token-0')
     const status = await screen.findByRole('status')
     expect(status.textContent).toMatch(/account is ready/)
     expect(status.parentElement?.contains(document.activeElement)).toBe(true)
@@ -78,11 +84,10 @@ describe('VerifyAccount', () => {
     await userEvent.type(screen.getByLabelText(/Confirm password/), 'correct-horse')
     await userEvent.click(screen.getByRole('button', { name: 'Set Password and Confirm' }))
 
-    expect(mocks.verifyAccount).toHaveBeenLastCalledWith({
-      token: TOKEN,
-      newPassword: 'correct-horse',
-      confirmPassword: 'correct-horse',
-    })
+    expect(mocks.verifyAccount).toHaveBeenLastCalledWith(
+      { token: TOKEN, newPassword: 'correct-horse', confirmPassword: 'correct-horse' },
+      'token-1', // a fresh robot-check token for the second request
+    )
     expect((await screen.findByRole('status')).textContent).toMatch(/account is ready/)
     expect(screen.getByRole('link', { name: 'Log In' }).getAttribute('href')).toBe('/login')
   })
@@ -96,6 +101,22 @@ describe('VerifyAccount', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Set Password and Confirm' }))
     expect(await screen.findByText('The passwords don’t match')).toBeTruthy()
     expect(mocks.verifyAccount).toHaveBeenCalledTimes(1)
+  })
+
+  it('sends nothing while the robot check is still running, and says why (#303)', async () => {
+    fakeTurnstile.tokenFor = () => null
+    render(<VerifyAccount token={TOKEN} />)
+    await clickConfirm()
+    expect(mocks.verifyAccount).not.toHaveBeenCalled()
+    expect(screen.getByRole('alert').textContent).toMatch(/spam check is still running/)
+  })
+
+  it('says when the robot check fails, and keeps the button to try again', async () => {
+    mocks.verifyAccount.mockResolvedValue({ ok: false, failure: 'robot-check' })
+    render(<VerifyAccount token={TOKEN} />)
+    await clickConfirm()
+    expect((await screen.findByRole('alert')).textContent).toMatch(/spam check didn’t pass/)
+    expect(screen.getByRole('button', { name: 'Confirm My Account' })).toBeTruthy()
   })
 
   it('shows a link with no token as dead, without asking the server', () => {

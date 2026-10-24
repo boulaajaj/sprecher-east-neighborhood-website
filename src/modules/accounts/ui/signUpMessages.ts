@@ -39,5 +39,6 @@ export function toVerifyAccountErrorMessage(failure: VerifyAccountFailure | 'off
     return 'This link isn’t valid or was already used. If you already confirmed your account, log in.'
   }
   if (failure === 'needs-password') return CHOOSE_PASSWORD_TO_VERIFY
+  if (failure === 'robot-check') return GUARD_MESSAGES['robot-check']
   return 'We couldn’t confirm your account. Please try again in a few minutes.'
 }

@@ -9,3 +9,6 @@ export const CONFIRM_ENDPOINT_PATH = '/confirm'
 
 /** The endpoint's full path, for the browser. */
 export const CONFIRM_API_PATH = `/api/${EMAIL_CONFIRMATIONS}${CONFIRM_ENDPOINT_PATH}`
+
+/** The `error` the endpoint answers (400) when the robot check fails, so the page can say so. */
+export const ROBOT_CHECK_ERROR = 'robot-check'

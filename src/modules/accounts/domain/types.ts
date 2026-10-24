@@ -52,7 +52,11 @@ export type SignUpFailure = 'rejected' | 'robot-check' | 'too-many'
  * link was resent after a second sign-up and needs the person to choose a password first (#289),
  * or something broke.
  */
-export type VerifyAccountFailure = 'invalid-link' | 'needs-password' | 'server-error'
+export type VerifyAccountFailure =
+  | 'invalid-link'
+  | 'needs-password'
+  | 'robot-check'
+  | 'server-error'
 
 /** What a server action that changes something returns. Failures are fixed codes, never text. */
 export type ActionResult<Failure extends string> = { ok: true } | { ok: false; failure: Failure }
