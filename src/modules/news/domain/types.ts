@@ -10,6 +10,8 @@ export type PostCategory = {
 export type PostSummary = {
   id: number
   slug: string
+  /** Where the card links: the post's page, or the event's for an event in search results */
+  href: string
   title: string
   publishedAt: string | null
   categories: PostCategory[]

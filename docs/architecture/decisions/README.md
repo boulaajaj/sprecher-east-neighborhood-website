@@ -16,6 +16,7 @@ that supersedes the old one; don't edit history.
 | [0008](0008-compose-modules-at-the-app-level.md)  | Modules don't import each other; the app composes them         | 2026-10-21 | Accepted |
 | [0009](0009-email-confirmation-token.md)          | Confirmation links use our own hashed token, not `auth.verify` | 2026-10-22 | Accepted |
 | [0010](0010-contact-data-retention.md)            | Contact data is deleted on a schedule by Payload's jobs queue  | 2026-10-24 | Accepted |
+| [0011](0011-scheduled-publishing-runner.md)       | Scheduled publishing runs in the app; pages refresh in 10 min  | 2026-10-24 | Accepted |
 
 Template for a new record: **Context** (the problem and the forces), **Decision**, **Consequences**
 (what gets easier, what gets harder), **Links** (issues, PRs, sources).

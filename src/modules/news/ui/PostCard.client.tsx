@@ -17,7 +17,7 @@ export const PostCard: React.FC<{
   className?: string
 }> = ({ post, className }) => {
   const { card, link } = useClickableCard({})
-  const { slug, categories, description, image, publishedAt, title } = post
+  const { href, categories, description, image, publishedAt, title } = post
 
   const hasCategories = categories.length > 0
   const sanitizedDescription = description?.replace(/\u00A0/g, ' ') // non-breaking spaces to spaces
@@ -73,11 +73,7 @@ export const PostCard: React.FC<{
         )}
         {title && (
           <h3 className="text-lg leading-snug font-semibold text-foreground">
-            <Link
-              className="transition-colors hover:text-primary"
-              href={`/posts/${slug}`}
-              ref={link.ref}
-            >
+            <Link className="transition-colors hover:text-primary" href={href} ref={link.ref}>
               {title}
             </Link>
           </h3>

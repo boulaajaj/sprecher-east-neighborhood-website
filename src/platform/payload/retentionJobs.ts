@@ -1,8 +1,8 @@
 import type { TaskConfig, Where } from 'payload'
 
 /**
- * The jobs queue the retention tasks run in (#274). `payload.config.ts` runs only this queue in
- * the app's own process (`jobs.autoRun`); scheduled publishing's queue is left alone (#141).
+ * The jobs queue the retention tasks run in (#274), apart from scheduled publishing's (#141).
+ * Its runner is in `jobRunners.ts`.
  */
 export const RETENTION_QUEUE = 'retention'
 

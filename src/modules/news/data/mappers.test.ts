@@ -50,6 +50,7 @@ describe('toPostSummary', () => {
     expect(toPostSummary(doc)).toEqual({
       id: 7,
       slug: 'road-study',
+      href: '/posts/road-study',
       title: 'Road study hearings',
       publishedAt: '2026-10-01T12:00:00.000Z',
       categories: [
@@ -65,6 +66,7 @@ describe('toPostSummary', () => {
     expect(toPostSummary({ id: 3, slug: 'hello', title: 'Hello' })).toEqual({
       id: 3,
       slug: 'hello',
+      href: '/posts/hello',
       title: 'Hello',
       publishedAt: null,
       categories: [],
@@ -147,8 +149,9 @@ describe('toPickedPosts', () => {
 })
 
 describe('toSearchResult', () => {
-  const hit: Pick<Search, 'id' | 'title' | 'slug' | 'categories' | 'meta'> = {
+  const hit: Pick<Search, 'id' | 'doc' | 'title' | 'slug' | 'categories' | 'meta'> = {
     id: 12,
+    doc: { relationTo: 'posts', value: 7 },
     title: 'Road study hearings',
     slug: 'road-study',
     categories: [
@@ -162,6 +165,7 @@ describe('toSearchResult', () => {
     expect(toSearchResult(hit)).toEqual({
       id: 12,
       slug: 'road-study',
+      href: '/posts/road-study',
       title: 'Road study hearings',
       publishedAt: null,
       categories: [
@@ -173,10 +177,20 @@ describe('toSearchResult', () => {
     })
   })
 
+  it('links an event to the event’s page, not a post’s (#200)', () => {
+    const event = { ...hit, doc: { relationTo: 'events' as const, value: 3 }, slug: 'council' }
+    expect(toSearchResult(event)?.href).toBe('/events/council')
+  })
+
+  it('leaves out an entry without a slug: it has no page to link to', () => {
+    expect(toSearchResult({ ...hit, slug: null })).toBeNull()
+  })
+
   it('turns missing fields into empty text, null and an empty category list', () => {
-    expect(toSearchResult({ id: 13 })).toEqual({
+    expect(toSearchResult({ id: 13, doc: { relationTo: 'events', value: 3 }, slug: 'x' })).toEqual({
       id: 13,
-      slug: '',
+      slug: 'x',
+      href: '/events/x',
       title: '',
       publishedAt: null,
       categories: [],

@@ -143,8 +143,10 @@ export async function findSearchResults(query: string): Promise<PostSummary[]> {
     pagination: false,
     overrideAccess: false,
     select: SEARCH_RESULT_FIELDS,
+    // Only which collection the entry copies is read, not the post or event itself
+    populate: { posts: { slug: true }, events: { slug: true } },
     where: searchMatch(query),
   })
 
-  return result.docs.map(toSearchResult)
+  return result.docs.flatMap((doc) => toSearchResult(doc) ?? [])
 }

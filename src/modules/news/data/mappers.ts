@@ -1,6 +1,7 @@
 import 'server-only'
 
 import type { ArchiveBlock, Post, Search } from '@/payload-types'
+import { documentHref } from '@/platform/payload/documentHref'
 import { toImageRef } from '@/platform/payload/imageRef'
 
 import type { PostCategory, PostDetail, PostSummary } from '../domain/types'
@@ -33,6 +34,7 @@ export function toPostSummary(doc: SummaryDoc): PostSummary {
   return {
     id: doc.id,
     slug: doc.slug,
+    href: documentHref('posts', doc.slug),
     title: doc.title,
     publishedAt: doc.publishedAt ?? null,
     categories: toCategories(doc.categories),
@@ -78,6 +80,7 @@ export function toPickedPosts(selected: ArchiveBlock['selectedDocs'] | undefined
 
 /** The fields `toSearchResult` reads; the search query selects exactly these. */
 export const SEARCH_RESULT_FIELDS = {
+  doc: true,
   title: true,
   slug: true,
   categories: true,
@@ -85,17 +88,21 @@ export const SEARCH_RESULT_FIELDS = {
 } as const
 
 /**
- * A search entry (a post or an event, as the search plugin copied it) as a post card shows it.
- * The entry keeps no date, and its categories are copies with the category's id as text.
+ * A search entry (a post or an event, as the search plugin copied it) as a post card shows it,
+ * linking to the post's or the event's own page (#200). The entry keeps no date, and its
+ * categories are copies with the category's id as text. An entry without a slug has no page to
+ * link to, so it gives `null`.
  */
 export function toSearchResult(
   doc: Pick<Search, 'id' | keyof typeof SEARCH_RESULT_FIELDS>,
-): PostSummary {
+): PostSummary | null {
+  if (!doc.slug) return null
   return {
     // The search entry's id, not a post's: the entry may be an event (#200). Don't use it to
     // exclude or deduplicate posts.
     id: doc.id,
-    slug: doc.slug ?? '',
+    slug: doc.slug,
+    href: documentHref(doc.doc.relationTo, doc.slug),
     title: doc.title ?? '',
     publishedAt: null,
     categories: (doc.categories ?? []).map(({ categoryID, title }) =>

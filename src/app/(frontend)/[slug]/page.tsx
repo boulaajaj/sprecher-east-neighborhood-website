@@ -17,6 +17,10 @@ import { LivePreviewListener } from '@/platform/ui/LivePreviewListener.client'
 import PageClient from './page.client'
 import { pageBlocks } from './pageBlocks'
 
+// A scheduled publish or unpublish runs outside a request, where Next can't refresh the cache, so
+// the page also re-renders every 10 minutes (#141, decision 0011)
+export const revalidate = 600
+
 export async function generateStaticParams() {
   try {
     const pages = await listPageSlugs()

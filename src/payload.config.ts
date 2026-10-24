@@ -49,7 +49,7 @@ import { emailAdapterFromEnv } from '@/platform/email/emailAdapter'
 import { restrictEditLocks } from '@/platform/payload/restrictEditLocks'
 import { restrictJobStats } from '@/platform/payload/restrictJobStats'
 import { ADMIN_FORGOT_ROUTE, ADMIN_ROUTE } from '@/platform/payload/adminRoutes'
-import { RETENTION_QUEUE, RETENTION_RUNNER_CRON } from '@/platform/payload/retentionJobs'
+import { JOB_RUNNERS } from '@/platform/payload/jobRunners'
 
 // Modules meet here (0008): the contact form joins the site's own page-builder blocks
 const Pages = createPagesCollection({ layoutBlocks: [...SITE_LAYOUT_BLOCKS, FormBlock] })
@@ -218,11 +218,9 @@ export default buildConfig({
     access: { cancel: isAdminOrEditorBoolean, queue: isAdminOrEditorBoolean, run: isAdminBoolean },
     // The owner's retention rules (#274), scheduled every hour
     tasks: [contactRetentionTask, confirmationRetentionTask],
-    // Runs the retention queue inside the app's one PM2 process (no separate worker). Payload
-    // starts it on the first request through its own routes (any /api/ request, the admin) after
-    // a start, and never during `next build`. Only this queue: scheduled publishing (#141) is
-    // a separate decision.
-    autoRun: [{ cron: RETENTION_RUNNER_CRON, queue: RETENTION_QUEUE }],
+    // Runs the retention queue (#274) and scheduled publishing (#141) inside the app's one PM2
+    // process: no separate worker
+    autoRun: JOB_RUNNERS,
   },
   // Absolute links in emails (password reset). Without it Payload derives the origin from the
   // request and, behind the Caddy proxy (http upstream vs https allowlist), falls back to a
