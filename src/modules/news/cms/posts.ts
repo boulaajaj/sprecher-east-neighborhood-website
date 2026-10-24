@@ -18,6 +18,11 @@ import {
 import { draftContentAccess } from '@/platform/payload/draftContentAccess'
 import { RICH_TEXT_BLOCKS } from '@/platform/richtext/blockConfigs'
 import { generatePreviewPath } from '@/platform/payload/generatePreviewPath'
+import {
+  holdSuggestions,
+  REVIEW_QUEUE_FIELDS,
+  SUGGESTIONS_FILTER,
+} from '@/platform/payload/reviewQueue'
 
 import { populateAuthors } from './populateAuthors'
 import { revalidateDelete, revalidatePost } from './revalidatePost'
@@ -37,7 +42,8 @@ export const Posts: CollectionConfig<'posts'> = {
     },
   },
   admin: {
-    defaultColumns: ['title', 'slug', 'updatedAt'],
+    components: { beforeListTable: [SUGGESTIONS_FILTER] },
+    defaultColumns: ['title', 'slug', '_status', 'moderationStatus', 'updatedAt'],
     livePreview: {
       url: ({ data, req }) =>
         generatePreviewPath({
@@ -204,9 +210,11 @@ export const Posts: CollectionConfig<'posts'> = {
       ],
     },
     slugField(),
+    ...REVIEW_QUEUE_FIELDS,
   ],
   hooks: {
     afterChange: [revalidatePost],
+    beforeChange: [holdSuggestions],
     afterRead: [populateAuthors],
     afterDelete: [revalidateDelete],
   },

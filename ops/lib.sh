@@ -22,6 +22,17 @@ report() {
   esac
 }
 
+# One annotation spanning several lines (read from stdin), so details don't use up the few
+# annotations GitHub shows per step. Level: notice, warning or error.
+report_lines() { # <level> <title>
+  local text
+  text=$(cat)
+  text=${text//'%'/'%25'}
+  text=${text//$'\r'/'%0D'}
+  text=${text//$'\n'/'%0A'}
+  echo "::$1 title=$2::$text"
+}
+
 # The value of a setting in .env.local (last one wins; `export`, quotes and a trailing
 # ` # comment` removed). Prints nothing if unset.
 # Only for non-secret settings: the value must never be printed.
