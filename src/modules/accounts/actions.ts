@@ -114,7 +114,7 @@ export async function verifyAccount(
 ): Promise<ActionResult<VerifyAccountFailure>> {
   const parsed = verifyAccountSchema.safeParse(input)
   if (!parsed.success) return { ok: false, failure: 'invalid-link' }
-  const { token } = await toPublicRequest(robotCheckToken)
+  const token = typeof robotCheckToken === 'string' ? robotCheckToken : null
   return verifyAccountFromLink(parsed.data, token, robotCheck)
 }
 

@@ -13,6 +13,7 @@ import { toResetPasswordEmail, toResetPasswordLink } from '../domain/resetEmail'
 import { USERS } from '../domain/usersCollection'
 import { toVerifyAccountEmail, toVerifyAccountLink } from '../domain/verifyAccountEmail'
 import { forgotPasswordFromSiteOnly } from './forgotPasswordFromSiteOnly'
+import { verifyEndpointFromSiteOnly } from './verifyFromSiteOnly'
 import { noResetEmailWhileUnverified } from './noResetEmailWhileUnverified'
 import { requireCurrentPassword } from './requireCurrentPassword'
 
@@ -35,6 +36,9 @@ export const Users: CollectionConfig = {
     unlock: isAdmin,
     update: isAdminOrSelf,
   },
+  // Payload's REST verify answers 403: accounts are verified only from the site's page, after the
+  // robot check (#303). The GraphQL mutation is refused in payload.config.ts (`noVerifyMutation`).
+  endpoints: [verifyEndpointFromSiteOnly],
   admin: {
     defaultColumns: ['name', 'email', 'role'],
     useAsTitle: 'name',

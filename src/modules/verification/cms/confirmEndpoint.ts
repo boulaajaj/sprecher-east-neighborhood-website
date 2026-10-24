@@ -4,7 +4,7 @@ import { HUMAN_CHECK_TOKEN_HEADER, type HumanVerifier } from '@/platform/lib/hum
 import { parseClientIp, SlidingWindowCounter } from '@/platform/lib'
 import type { EmailConfirmedListener } from '@/platform/payload/emailConfirmer'
 
-import { CONFIRM_ENDPOINT_PATH } from '../domain/paths'
+import { CONFIRM_ENDPOINT_PATH, ROBOT_CHECK_ERROR } from '../domain/paths'
 import { CONFIRMATION_LIMITS } from '../domain/limits'
 import { confirmEmail } from './confirmEmail'
 import { logFailure } from './logFailure'
@@ -21,9 +21,6 @@ async function readToken(json: (() => Promise<unknown>) | undefined): Promise<un
     return null
   }
 }
-
-/** What the endpoint answers when the robot check fails, so the page can say so. */
-export const ROBOT_CHECK_ERROR = 'robot-check'
 
 /**
  * `POST /api/email-confirmations/confirm` with `{ token }`: follows a confirmation link and

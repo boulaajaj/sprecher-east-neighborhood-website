@@ -11,7 +11,7 @@ import { buildConfig, type Plugin } from 'payload'
 import { fileURLToPath } from 'url'
 
 import type { Event, Page, Post } from '@/payload-types'
-import { Users } from '@/modules/accounts/cms'
+import { noVerifyMutation, Users } from '@/modules/accounts/cms'
 import {
   createFormBuilderOptions,
   FormBlock,
@@ -205,6 +205,10 @@ export default buildConfig({
   plugins,
   secret: process.env.PAYLOAD_SECRET,
   sharp,
+  graphQL: {
+    // Accounts are verified only from the site's page, after the robot check (#303)
+    validationRules: () => [noVerifyMutation],
+  },
   typescript: {
     // Regenerate types only under `next dev`. Payload otherwise rewrites this file whenever
     // NODE_ENV isn't 'production' — including `payload migrate` in the deploy — which left the

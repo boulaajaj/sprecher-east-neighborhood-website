@@ -2,7 +2,7 @@ import { getClientSideURL } from '@/platform/lib/getURL'
 import { parseEmailAddress } from '@/platform/lib'
 import { HUMAN_CHECK_TOKEN_HEADER } from '@/platform/lib/humanCheck'
 
-import { CONFIRM_API_PATH } from '../domain/paths'
+import { CONFIRM_API_PATH, ROBOT_CHECK_ERROR } from '../domain/paths'
 import type { ConfirmOutcome } from '../domain/types'
 
 /** What the browser learns from a click on "Confirm my email". */
@@ -30,7 +30,7 @@ export async function postConfirmation(
     method: 'POST',
   })
   if (response.status === 429) return { answer: 'too-many-tries', email: null }
-  if (response.status === 400 && (await readError(response)) === 'robot-check') {
+  if (response.status === 400 && (await readError(response)) === ROBOT_CHECK_ERROR) {
     return { answer: 'robot-check', email: null }
   }
   if (!response.ok) return { answer: 'failed', email: null }
