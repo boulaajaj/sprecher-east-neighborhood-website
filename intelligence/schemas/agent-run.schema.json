@@ -57,11 +57,14 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["sourceId", "cursor", "status", "error"],
+        "required": ["sourceId", "fetchStrategy", "cursor", "status", "error"],
         "additionalProperties": false,
         "properties": {
           "sourceId": {
             "$ref": "common.schema.json#/$defs/sourceId"
+          },
+          "fetchStrategy": {
+            "$ref": "common.schema.json#/$defs/fetchUsed"
           },
           "cursor": {
             "anyOf": [
@@ -76,7 +79,8 @@
             ]
           },
           "status": {
-            "enum": ["ok", "not-modified", "error", "skipped"]
+            "enum": ["ok", "not-modified", "error", "skipped", "blocked"],
+            "description": "skipped: not polled (not valid or cadence); blocked: stopped at a gate (login, paywall, CAPTCHA, robots.txt); error: failed after its one retry."
           },
           "error": {
             "anyOf": [
@@ -95,7 +99,15 @@
     },
     "counts": {
       "type": "object",
-      "required": ["seen", "proposed", "updates", "rejected", "duplicates", "needsReview"],
+      "required": [
+        "seen",
+        "proposed",
+        "updates",
+        "rejected",
+        "duplicates",
+        "needsReview",
+        "deferred"
+      ],
       "additionalProperties": false,
       "properties": {
         "seen": {
@@ -119,6 +131,11 @@
           "minimum": 0
         },
         "needsReview": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "deferred": {
+          "description": "Items left for the next run (draft cap reached, CMS unreachable). They aren't marked as seen.",
           "type": "integer",
           "minimum": 0
         }
