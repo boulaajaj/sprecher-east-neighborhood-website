@@ -18,56 +18,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.run(
     sql`CREATE INDEX \`agent_runs_sources_checked_parent_id_idx\` ON \`agent_runs_sources_checked\` (\`_parent_id\`);`,
   )
-  await db.run(sql`CREATE TABLE \`agent_runs_review_items_evidence\` (
-  	\`_order\` integer NOT NULL,
-  	\`_parent_id\` text NOT NULL,
-  	\`id\` text PRIMARY KEY NOT NULL,
-  	\`url\` text NOT NULL,
-  	\`says\` text NOT NULL,
-  	\`retrieved_at\` text NOT NULL,
-  	FOREIGN KEY (\`_parent_id\`) REFERENCES \`agent_runs_review_items\`(\`id\`) ON UPDATE no action ON DELETE cascade
-  );
-  `)
-  await db.run(
-    sql`CREATE INDEX \`agent_runs_review_items_evidence_order_idx\` ON \`agent_runs_review_items_evidence\` (\`_order\`);`,
-  )
-  await db.run(
-    sql`CREATE INDEX \`agent_runs_review_items_evidence_parent_id_idx\` ON \`agent_runs_review_items_evidence\` (\`_parent_id\`);`,
-  )
-  await db.run(sql`CREATE TABLE \`agent_runs_review_items_flags\` (
-  	\`order\` integer NOT NULL,
-  	\`parent_id\` text NOT NULL,
-  	\`value\` text,
-  	\`id\` integer PRIMARY KEY NOT NULL,
-  	FOREIGN KEY (\`parent_id\`) REFERENCES \`agent_runs_review_items\`(\`id\`) ON UPDATE no action ON DELETE cascade
-  );
-  `)
-  await db.run(
-    sql`CREATE INDEX \`agent_runs_review_items_flags_order_idx\` ON \`agent_runs_review_items_flags\` (\`order\`);`,
-  )
-  await db.run(
-    sql`CREATE INDEX \`agent_runs_review_items_flags_parent_idx\` ON \`agent_runs_review_items_flags\` (\`parent_id\`);`,
-  )
-  await db.run(sql`CREATE TABLE \`agent_runs_review_items\` (
-  	\`_order\` integer NOT NULL,
-  	\`_parent_id\` integer NOT NULL,
-  	\`id\` text PRIMARY KEY NOT NULL,
-  	\`kind\` text NOT NULL,
-  	\`target_collection\` text,
-  	\`target_id\` numeric,
-  	\`external_id\` text,
-  	\`summary\` text NOT NULL,
-  	\`source_url\` text NOT NULL,
-  	\`reported_at\` text,
-  	FOREIGN KEY (\`_parent_id\`) REFERENCES \`agent_runs\`(\`id\`) ON UPDATE no action ON DELETE cascade
-  );
-  `)
-  await db.run(
-    sql`CREATE INDEX \`agent_runs_review_items_order_idx\` ON \`agent_runs_review_items\` (\`_order\`);`,
-  )
-  await db.run(
-    sql`CREATE INDEX \`agent_runs_review_items_parent_id_idx\` ON \`agent_runs_review_items\` (\`_parent_id\`);`,
-  )
   await db.run(sql`CREATE TABLE \`agent_runs\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
   	\`agent_id\` integer,
@@ -108,6 +58,67 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.run(
     sql`CREATE INDEX \`agent_runs_texts_order_parent\` ON \`agent_runs_texts\` (\`order\`,\`parent_id\`);`,
   )
+  await db.run(sql`CREATE TABLE \`agent_review_items_evidence\` (
+  	\`_order\` integer NOT NULL,
+  	\`_parent_id\` integer NOT NULL,
+  	\`id\` text PRIMARY KEY NOT NULL,
+  	\`url\` text NOT NULL,
+  	\`says\` text NOT NULL,
+  	\`retrieved_at\` text NOT NULL,
+  	FOREIGN KEY (\`_parent_id\`) REFERENCES \`agent_review_items\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  );
+  `)
+  await db.run(
+    sql`CREATE INDEX \`agent_review_items_evidence_order_idx\` ON \`agent_review_items_evidence\` (\`_order\`);`,
+  )
+  await db.run(
+    sql`CREATE INDEX \`agent_review_items_evidence_parent_id_idx\` ON \`agent_review_items_evidence\` (\`_parent_id\`);`,
+  )
+  await db.run(sql`CREATE TABLE \`agent_review_items_flags\` (
+  	\`order\` integer NOT NULL,
+  	\`parent_id\` integer NOT NULL,
+  	\`value\` text,
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	FOREIGN KEY (\`parent_id\`) REFERENCES \`agent_review_items\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  );
+  `)
+  await db.run(
+    sql`CREATE INDEX \`agent_review_items_flags_order_idx\` ON \`agent_review_items_flags\` (\`order\`);`,
+  )
+  await db.run(
+    sql`CREATE INDEX \`agent_review_items_flags_parent_idx\` ON \`agent_review_items_flags\` (\`parent_id\`);`,
+  )
+  await db.run(sql`CREATE TABLE \`agent_review_items\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`run_id\` integer NOT NULL,
+  	\`agent_id\` integer,
+  	\`kind\` text NOT NULL,
+  	\`target_collection\` text,
+  	\`target_id\` numeric,
+  	\`external_id\` text,
+  	\`summary\` text NOT NULL,
+  	\`source_url\` text NOT NULL,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	FOREIGN KEY (\`run_id\`) REFERENCES \`agent_runs\`(\`id\`) ON UPDATE no action ON DELETE set null,
+  	FOREIGN KEY (\`agent_id\`) REFERENCES \`users\`(\`id\`) ON UPDATE no action ON DELETE set null
+  );
+  `)
+  await db.run(
+    sql`CREATE INDEX \`agent_review_items_run_idx\` ON \`agent_review_items\` (\`run_id\`);`,
+  )
+  await db.run(
+    sql`CREATE INDEX \`agent_review_items_agent_idx\` ON \`agent_review_items\` (\`agent_id\`);`,
+  )
+  await db.run(
+    sql`CREATE INDEX \`agent_review_items_kind_idx\` ON \`agent_review_items\` (\`kind\`);`,
+  )
+  await db.run(
+    sql`CREATE INDEX \`agent_review_items_updated_at_idx\` ON \`agent_review_items\` (\`updated_at\`);`,
+  )
+  await db.run(
+    sql`CREATE INDEX \`agent_review_items_created_at_idx\` ON \`agent_review_items\` (\`created_at\`);`,
+  )
   await db.run(sql`CREATE TABLE \`payload_mcp_api_keys\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
   	\`user_id\` integer NOT NULL,
@@ -142,10 +153,16 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
     sql`ALTER TABLE \`payload_locked_documents_rels\` ADD \`agent_runs_id\` integer REFERENCES agent_runs(id);`,
   )
   await db.run(
+    sql`ALTER TABLE \`payload_locked_documents_rels\` ADD \`agent_review_items_id\` integer REFERENCES agent_review_items(id);`,
+  )
+  await db.run(
     sql`ALTER TABLE \`payload_locked_documents_rels\` ADD \`payload_mcp_api_keys_id\` integer REFERENCES payload_mcp_api_keys(id);`,
   )
   await db.run(
     sql`CREATE INDEX \`payload_locked_documents_rels_agent_runs_id_idx\` ON \`payload_locked_documents_rels\` (\`agent_runs_id\`);`,
+  )
+  await db.run(
+    sql`CREATE INDEX \`payload_locked_documents_rels_agent_review_items_id_idx\` ON \`payload_locked_documents_rels\` (\`agent_review_items_id\`);`,
   )
   await db.run(
     sql`CREATE INDEX \`payload_locked_documents_rels_payload_mcp_api_keys_id_idx\` ON \`payload_locked_documents_rels\` (\`payload_mcp_api_keys_id\`);`,
@@ -159,14 +176,17 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
-  await db.run(sql`DROP TABLE \`agent_runs_sources_checked\`;`)
-  await db.run(sql`DROP TABLE \`agent_runs_review_items_evidence\`;`)
-  await db.run(sql`DROP TABLE \`agent_runs_review_items_flags\`;`)
-  await db.run(sql`DROP TABLE \`agent_runs_review_items\`;`)
-  await db.run(sql`DROP TABLE \`agent_runs\`;`)
-  await db.run(sql`DROP TABLE \`agent_runs_texts\`;`)
-  await db.run(sql`DROP TABLE \`payload_mcp_api_keys\`;`)
-  await db.run(sql`PRAGMA foreign_keys=OFF;`)
+  // Under foreign-key enforcement nothing may still point at the tables this drops, and SQLite
+  // ignores PRAGMA foreign_keys inside the migration's transaction. So, in order: forget edit
+  // locks and preferences that point at runs, review items or keys (their rel rows go with them,
+  // ON DELETE cascade), rebuild the two rels tables without those columns, then drop the tables,
+  // children before the tables they reference.
+  await db.run(
+    sql`DELETE FROM \`payload_locked_documents\` WHERE \`id\` IN (SELECT \`parent_id\` FROM \`payload_locked_documents_rels\` WHERE \`agent_runs_id\` IS NOT NULL OR \`agent_review_items_id\` IS NOT NULL OR \`payload_mcp_api_keys_id\` IS NOT NULL);`,
+  )
+  await db.run(
+    sql`DELETE FROM \`payload_preferences\` WHERE \`id\` IN (SELECT \`parent_id\` FROM \`payload_preferences_rels\` WHERE \`payload_mcp_api_keys_id\` IS NOT NULL);`,
+  )
   await db.run(sql`CREATE TABLE \`__new_payload_locked_documents_rels\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
   	\`order\` integer,
@@ -212,7 +232,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   await db.run(
     sql`ALTER TABLE \`__new_payload_locked_documents_rels\` RENAME TO \`payload_locked_documents_rels\`;`,
   )
-  await db.run(sql`PRAGMA foreign_keys=ON;`)
   await db.run(
     sql`CREATE INDEX \`payload_locked_documents_rels_order_idx\` ON \`payload_locked_documents_rels\` (\`order\`);`,
   )
@@ -296,4 +315,11 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   await db.run(
     sql`CREATE INDEX \`payload_preferences_rels_users_id_idx\` ON \`payload_preferences_rels\` (\`users_id\`);`,
   )
+  await db.run(sql`DROP TABLE \`agent_review_items_flags\`;`)
+  await db.run(sql`DROP TABLE \`agent_review_items_evidence\`;`)
+  await db.run(sql`DROP TABLE \`agent_review_items\`;`)
+  await db.run(sql`DROP TABLE \`agent_runs_sources_checked\`;`)
+  await db.run(sql`DROP TABLE \`agent_runs_texts\`;`)
+  await db.run(sql`DROP TABLE \`agent_runs\`;`)
+  await db.run(sql`DROP TABLE \`payload_mcp_api_keys\`;`)
 }

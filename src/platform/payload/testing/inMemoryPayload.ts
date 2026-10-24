@@ -11,9 +11,15 @@ import type { User } from '@/payload-types'
 /** Saving published content refreshes cached pages, which needs Next.js. */
 export const NO_REVALIDATE = { disableRevalidate: true }
 
-/** Boots Payload with the real config on a fresh in-memory database. */
-export async function bootPayload(): Promise<{ payload: Payload; config: SanitizedConfig }> {
-  vi.stubEnv('DATABASE_URI', 'file::memory:')
+/**
+ * Boots Payload with the real config on a fresh in-memory database, or on `databaseUri` (a
+ * temporary file) for a test that needs transactions: libsql opens a new, empty in-memory database
+ * for each connection, and a transaction takes the client's connection.
+ */
+export async function bootPayload(
+  databaseUri = 'file::memory:',
+): Promise<{ payload: Payload; config: SanitizedConfig }> {
+  vi.stubEnv('DATABASE_URI', databaseUri)
   vi.stubEnv('PAYLOAD_SECRET', 'in-memory-test-secret-0123456789abcdef')
   vi.stubEnv('SMTP_HOST', '')
   const { getPayload } = await import('payload')

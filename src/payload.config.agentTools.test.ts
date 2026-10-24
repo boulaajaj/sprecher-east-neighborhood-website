@@ -19,6 +19,7 @@ import { createMcpKey, mcpClient } from '@/platform/payload/testing/mcpRequest'
 let payload: Payload
 let mcp: ReturnType<typeof mcpClient>
 let runDocId = 0
+let agent: Account
 
 const KEY = 'tools-key-for-tests-0123456789abcdef'
 const RUN_ID = 'scout-2026-10-24'
@@ -31,9 +32,7 @@ const suggestion = (extra: Record<string, unknown> = {}) => ({
   bodyMarkdown: '## Story time\n\nBring a **blanket**. [Details](https://example.com/e/1)',
   startsAt: '2026-11-07T16:00:00-06:00',
   endsAt: '2026-11-07T17:00:00-06:00',
-  allDay: false,
   venue: 'Pinney Library',
-  address: null,
   externalId: `mpl:${next}`,
   contentHash: next.toString(16).padStart(64, 'a'),
   audience: ['families'],
@@ -45,7 +44,19 @@ const suggestion = (extra: Record<string, unknown> = {}) => ({
 const call = (name: string, args: Record<string, unknown>) => mcp.tool(name, args, KEY)
 const answer = async (name: string, args: Record<string, unknown>) =>
   JSON.parse((await call(name, args)).text) as { status: string; id: number }
-const run = () => payload.findByID({ collection: 'agent-runs', id: runDocId, overrideAccess: true })
+const run = () =>
+  payload.findByID({ collection: 'agent-runs', id: runDocId, depth: 0, overrideAccess: true })
+/** The review items stored for the test's run, oldest first. */
+const items = async () =>
+  (
+    await payload.find({
+      collection: 'agent-review-items',
+      where: { run: { equals: runDocId } },
+      sort: 'createdAt',
+      depth: 0,
+      overrideAccess: true,
+    })
+  ).docs
 const createRun = (user: Account, runId: string) =>
   payload.create({
     collection: 'agent-runs',
@@ -59,7 +70,7 @@ beforeAll(async () => {
   payload = booted.payload
   mcp = mcpClient(booted.config)
   const admin = await createAccount(payload, 'admin', 'ana')
-  const agent = await createAccount(payload, 'agent', 'scout')
+  agent = await createAccount(payload, 'agent', 'scout')
   await createMcpKey(payload, admin, agent.id, KEY)
   runDocId = (await createRun(agent, RUN_ID)).id
 }, 60_000)
@@ -165,7 +176,8 @@ describe('reportItem', () => {
       overrideAccess: true,
     })
     expect(after).toEqual(target)
-    expect((await run()).reviewItems?.at(-1)).toMatchObject({
+    expect((await items()).at(-1)).toMatchObject({
+      run: runDocId,
       kind: 'cancel',
       targetCollection: 'events',
       targetId: target.id,
@@ -179,13 +191,36 @@ describe('reportItem', () => {
     expect((await call('reportItem', { ...report, kind: 'cancel' })).isError).toBe(true)
   })
 
-  it('can’t be rewritten or removed by the agent updating its run', async () => {
-    const before = (await run()).reviewItems?.length ?? 0
-    expect(before).toBeGreaterThan(0)
-    await call('updateAgentRuns', { id: runDocId, reviewItems: [], status: 'succeeded' })
-    const after = await run()
-    expect(after.status).toBe('succeeded')
-    expect(after.reviewItems?.length).toBe(before)
+  it('keeps both of two reports sent at the same time', async () => {
+    const before = (await items()).length
+    const results = await Promise.all([
+      answer('reportItem', { ...report, summary: 'First at once.' }),
+      answer('reportItem', { ...report, summary: 'Second at once.' }),
+    ])
+    expect(results.map((r) => r.status)).toEqual(['reported', 'reported'])
+    const summaries = (await items()).map((item) => item.summary)
+    expect(summaries).toHaveLength(before + 2)
+    expect(summaries).toEqual(expect.arrayContaining(['First at once.', 'Second at once.']))
+  })
+
+  it('can’t be changed or removed by the agent, even through its run', async () => {
+    const [item] = await items()
+    const as = { user: agent, overrideAccess: false }
+    await expect(
+      payload.update({
+        collection: 'agent-review-items',
+        id: item.id,
+        data: { summary: 'x' },
+        ...as,
+      }),
+    ).rejects.toThrow()
+    await expect(
+      payload.delete({ collection: 'agent-review-items', id: item.id, ...as }),
+    ).rejects.toThrow()
+    await call('updateAgentRuns', { id: runDocId, reviewItems: [] })
+    await call('updateAgentRuns', { id: runDocId, status: 'succeeded' })
+    expect((await run()).status).toBe('succeeded')
+    expect((await items())[0]).toMatchObject({ id: item.id, summary: item.summary })
   })
 })
 
@@ -232,9 +267,9 @@ describe('every argument', () => {
     ['flags', ['past', 'past']],
     ['sourceUrl', 'not a link'],
   ])('reportItem refuses an oversized or invalid %s', async (name, value) => {
-    const before = (await run()).reviewItems?.length
+    const before = (await items()).length
     const result = await call('reportItem', { ...report, [name]: value })
     expect(result.isError).toBe(true)
-    expect((await run()).reviewItems?.length).toBe(before)
+    expect(await items()).toHaveLength(before)
   })
 })

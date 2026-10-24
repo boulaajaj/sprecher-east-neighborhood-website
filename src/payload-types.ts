@@ -79,6 +79,7 @@ export interface Config {
     users: User
     'email-confirmations': EmailConfirmation
     'agent-runs': AgentRun
+    'agent-review-items': AgentReviewItem
     redirects: Redirect
     forms: Form
     'form-submissions': FormSubmission
@@ -92,6 +93,9 @@ export interface Config {
     'payload-migrations': PayloadMigration
   }
   collectionsJoins: {
+    'agent-runs': {
+      reviewItems: 'agent-review-items'
+    }
     'payload-folders': {
       documentsAndFolders: 'payload-folders' | 'media'
     }
@@ -108,6 +112,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>
     'email-confirmations': EmailConfirmationsSelect<false> | EmailConfirmationsSelect<true>
     'agent-runs': AgentRunsSelect<false> | AgentRunsSelect<true>
+    'agent-review-items': AgentReviewItemsSelect<false> | AgentReviewItemsSelect<true>
     redirects: RedirectsSelect<false> | RedirectsSelect<true>
     forms: FormsSelect<false> | FormsSelect<true>
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>
@@ -1078,44 +1083,56 @@ export interface AgentRun {
     usd?: number | null
   }
   /**
-   * What the agent asks an editor to look at. It never changed the content.
+   * What the agent asked an editor to look at during this run.
    */
-  reviewItems?:
+  reviewItems?: {
+    docs?: (number | AgentReviewItem)[]
+    hasNextPage?: boolean
+    totalDocs?: number
+  }
+  updatedAt: string
+  createdAt: string
+}
+/**
+ * What the agents ask an editor to look at. They never changed the content.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "agent-review-items".
+ */
+export interface AgentReviewItem {
+  id: number
+  run: number | AgentRun
+  agent?: (number | null) | User
+  kind: 'needs-review' | 'update' | 'cancel' | 'rejected-invalid'
+  targetCollection?: ('events' | 'posts') | null
+  targetId?: number | null
+  externalId?: string | null
+  summary: string
+  evidence?:
     | {
-        kind: 'needs-review' | 'update' | 'cancel' | 'rejected-invalid'
-        targetCollection?: ('events' | 'posts') | null
-        targetId?: number | null
-        externalId?: string | null
-        summary: string
-        evidence?:
-          | {
-              url: string
-              says: string
-              retrievedAt: string
-              id?: string | null
-            }[]
-          | null
-        flags?:
-          | (
-              | 'missing-date'
-              | 'missing-time'
-              | 'missing-location'
-              | 'ambiguous-location'
-              | 'similar-name'
-              | 'unverified-claim'
-              | 'conflicting-sources'
-              | 'cancelled'
-              | 'rescheduled'
-              | 'past'
-              | 'partisan'
-              | 'prompt-injection'
-            )[]
-          | null
-        sourceUrl: string
-        reportedAt?: string | null
+        url: string
+        says: string
+        retrievedAt: string
         id?: string | null
       }[]
     | null
+  flags?:
+    | (
+        | 'missing-date'
+        | 'missing-time'
+        | 'missing-location'
+        | 'ambiguous-location'
+        | 'similar-name'
+        | 'unverified-claim'
+        | 'conflicting-sources'
+        | 'cancelled'
+        | 'rescheduled'
+        | 'past'
+        | 'partisan'
+        | 'prompt-injection'
+      )[]
+    | null
+  sourceUrl: string
   updatedAt: string
   createdAt: string
 }
@@ -1472,6 +1489,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'agent-runs'
         value: number | AgentRun
+      } | null)
+    | ({
+        relationTo: 'agent-review-items'
+        value: number | AgentReviewItem
       } | null)
     | ({
         relationTo: 'redirects'
@@ -2009,27 +2030,32 @@ export interface AgentRunsSelect<T extends boolean = true> {
         outputTokens?: T
         usd?: T
       }
-  reviewItems?:
+  reviewItems?: T
+  updatedAt?: T
+  createdAt?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "agent-review-items_select".
+ */
+export interface AgentReviewItemsSelect<T extends boolean = true> {
+  run?: T
+  agent?: T
+  kind?: T
+  targetCollection?: T
+  targetId?: T
+  externalId?: T
+  summary?: T
+  evidence?:
     | T
     | {
-        kind?: T
-        targetCollection?: T
-        targetId?: T
-        externalId?: T
-        summary?: T
-        evidence?:
-          | T
-          | {
-              url?: T
-              says?: T
-              retrievedAt?: T
-              id?: T
-            }
-        flags?: T
-        sourceUrl?: T
-        reportedAt?: T
+        url?: T
+        says?: T
+        retrievedAt?: T
         id?: T
       }
+  flags?: T
+  sourceUrl?: T
   updatedAt?: T
   createdAt?: T
 }

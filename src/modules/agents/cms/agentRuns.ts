@@ -3,20 +3,21 @@ import type {
   CollectionBeforeChangeHook,
   CollectionConfig,
   Field,
-  FieldHook,
   TextField,
 } from 'payload'
 
 import { hasAdmin, hasAgent, isAdmin } from '@/platform/payload/roles'
 
 import { RUN_STATUSES, SOURCE_CHECK_STATUSES } from '../domain/runs'
-import { REVIEW_FLAGS, REVIEW_ITEM_KINDS, SUGGESTION_CAPS as CAPS } from '../domain/suggestion'
+import { SUGGESTION_CAPS as CAPS } from '../domain/suggestion'
 
 /**
  * The run history of the neighborhood agents (#336, #255): one document per run, with the fields
- * of `intelligence/schemas/agent-run.schema.json` (#344), plus the review items `reportItem` adds.
+ * of `intelligence/schemas/agent-run.schema.json` (#344), and the review items `reportItem` adds
+ * (stored in their own collection, so two reports never overwrite each other).
  */
 export const AGENT_RUNS = 'agent-runs' as const
+export const AGENT_REVIEW_ITEMS = 'agent-review-items' as const
 
 /** Admins and agents start runs. */
 const isAdminOrAgent: Access = ({ req: { user } }) => hasAdmin(user) || hasAgent(user)
@@ -34,18 +35,6 @@ const recordRunAgent: CollectionBeforeChangeHook = ({ data, operation, originalD
     return { ...data, agent: hasAgent(req.user) ? req.user?.id : (data.agent ?? null) }
   }
   return { ...data, agent: originalDoc?.agent ?? null }
-}
-
-/** Set in a request's context by `reportItem`, the one way an agent adds review items. */
-export const APPENDING_REVIEW_ITEM = 'appendingReviewItem'
-
-/**
- * Review items are for editors: an agent adds them only through `reportItem`, and can't rewrite
- * or remove them by updating its run.
- */
-const keepReviewItems: FieldHook = ({ context, originalDoc, req, value }) => {
-  if (!hasAgent(req.user) || context[APPENDING_REVIEW_ITEM]) return value
-  return originalDoc?.reviewItems ?? []
 }
 
 const COMMIT = /^[a-f0-9]{40}$/
@@ -66,27 +55,6 @@ const matching = (field: TextField, pattern: RegExp, message: string): TextField
       : message,
 })
 const count = (name: string): Field => ({ name, type: 'number', min: 0, defaultValue: 0 })
-
-const REVIEW_ITEM_FIELDS: Field[] = [
-  { name: 'kind', type: 'select', required: true, options: [...REVIEW_ITEM_KINDS] },
-  { name: 'targetCollection', type: 'select', options: ['events', 'posts'] },
-  { name: 'targetId', type: 'number', min: 1 },
-  text('externalId', CAPS.externalId),
-  { name: 'summary', type: 'textarea', maxLength: CAPS.summary, required: true },
-  {
-    name: 'evidence',
-    type: 'array',
-    maxRows: CAPS.evidenceItems,
-    fields: [
-      text('url', CAPS.sourceUrl, true),
-      text('says', CAPS.evidenceSays, true),
-      { name: 'retrievedAt', type: 'date', required: true, admin: DAY_AND_TIME },
-    ],
-  },
-  { name: 'flags', type: 'select', hasMany: true, options: [...REVIEW_FLAGS] },
-  text('sourceUrl', CAPS.sourceUrl, true),
-  { name: 'reportedAt', type: 'date', admin: DAY_AND_TIME },
-]
 
 export const AgentRuns: CollectionConfig = {
   slug: AGENT_RUNS,
@@ -147,13 +115,10 @@ export const AgentRuns: CollectionConfig = {
     },
     {
       name: 'reviewItems',
-      type: 'array',
-      maxRows: 200,
-      hooks: { beforeChange: [keepReviewItems] },
-      admin: {
-        description: 'What the agent asks an editor to look at. It never changed the content.',
-      },
-      fields: REVIEW_ITEM_FIELDS,
+      type: 'join',
+      collection: AGENT_REVIEW_ITEMS,
+      on: 'run',
+      admin: { description: 'What the agent asked an editor to look at during this run.' },
     },
   ],
   timestamps: true,

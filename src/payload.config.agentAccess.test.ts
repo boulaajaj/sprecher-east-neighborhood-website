@@ -113,11 +113,31 @@ describe('an agent key over /api/mcp', () => {
       user: other,
       overrideAccess: false,
     })
-    const created = await text('createAgentRuns', { ...RUN, runId: 'scout-1', agent: admin.id })
+    const sourcesChecked = [
+      { sourceId: 'city-calendar', cursor: '2026-10-24T10:00:00Z', status: 'ok', error: null },
+    ]
+    const created = await text('createAgentRuns', {
+      ...RUN,
+      runId: 'scout-1',
+      sourcesChecked,
+      agent: admin.id,
+    })
     expect(created).toContain(`"agent":${agent.id}`)
     const runs = await text('findAgentRuns', { limit: 50 })
-    expect(runs).toContain('Scout')
     expect(runs).not.toContain('Other')
+    // A restarted run finds where it stopped: its run id, commit and source cursors
+    const [mine] = runs
+      .split('\n')
+      .filter((line) => line.startsWith('{'))
+      .map((line) => JSON.parse(line) as Record<string, unknown>)
+    expect(mine).toMatchObject({
+      runId: 'scout-1',
+      pipelineVersion: 1,
+      repoCommit: RUN.repoCommit,
+      sourcesChecked: [
+        expect.objectContaining({ sourceId: 'city-calendar', cursor: '2026-10-24T10:00:00Z' }),
+      ],
+    })
   })
 })
 

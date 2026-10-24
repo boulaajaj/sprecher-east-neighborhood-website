@@ -49,6 +49,8 @@ const ALLOWED: Record<string, Partial<Record<Operation, Audience[]>>> = {
   },
   // An agent's own run history (read and update return a filter on `agent`)
   'agent-runs': { read: AGENT_ONLY, create: AGENT_ONLY, update: AGENT_ONLY },
+  // What an agent reports for editors: it adds its own (to its own runs) and reads them
+  'agent-review-items': { read: AGENT_ONLY, create: AGENT_ONLY },
   // `payload-mcp-api-keys` is admin-only (#336)
   // `email-confirmations` is admin-only: the server writes it with access bypassed (#183)
   // Payload's own edit locks are staff-only (`restrictEditLocks`, #147), so not listed here

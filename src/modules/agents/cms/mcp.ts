@@ -7,6 +7,7 @@ import { hasAgent } from '@/platform/payload/roles'
 import { toAgentAnswer } from '../domain/agentView'
 import { MCP_LIMITS } from '../domain/mcpLimits'
 import { AGENT_RUNS } from './agentRuns'
+import { AGENT_VIEWS } from './agentViews'
 import { adminOnlyApiKeys } from './apiKeys'
 import { reportItemTool } from './tools/reportItem'
 import { submitSuggestionTool } from './tools/submitSuggestion'
@@ -18,7 +19,7 @@ const answerFor =
   (collection: string) =>
   (response: Answer, doc: Record<string, unknown>): Answer => {
     const heading = response.content[0]?.text.split('\n')[0] ?? ''
-    const text = toAgentAnswer(collection, heading, doc)
+    const text = toAgentAnswer(AGENT_VIEWS, collection, heading, doc)
     return text === null ? response : { content: [{ type: 'text', text }] }
   }
 

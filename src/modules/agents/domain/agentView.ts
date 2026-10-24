@@ -1,56 +1,8 @@
 /**
- * What an agent sees of a document over MCP (#336): an allowlist per collection, so nothing
- * personal reaches the model (no authors, no rich text, nothing from users or form submissions).
- * Related documents are reduced to their ids.
+ * What an agent sees of a document over MCP (#336): only the allowlisted fields of its
+ * collection (`cms/agentViews.ts`), so nothing personal reaches the model. Related documents are
+ * reduced to their ids.
  */
-
-const REVIEW_QUEUE = [
-  '_status',
-  'moderationStatus',
-  'sourceName',
-  'sourceUrl',
-  'externalId',
-  'contentHash',
-  'audience',
-  'createdAt',
-  'updatedAt',
-] as const
-
-export const AGENT_VIEWS: Readonly<Record<string, readonly string[]>> = {
-  events: [
-    'id',
-    'title',
-    'slug',
-    'date',
-    'timeStart',
-    'timeEnd',
-    'cancelled',
-    'category',
-    'locationType',
-    'locationName',
-    'locationAddress',
-    'mapsUrl',
-    'registrationUrl',
-    'description',
-    ...REVIEW_QUEUE,
-  ],
-  posts: ['id', 'title', 'slug', 'categories', 'publishedAt', 'meta', ...REVIEW_QUEUE],
-  categories: ['id', 'title', 'slug', 'parent'],
-  'agent-runs': [
-    'id',
-    'agent',
-    'agentName',
-    'status',
-    'startedAt',
-    'finishedAt',
-    'sources',
-    'counts',
-    'errorMessages',
-    'cost',
-    'createdAt',
-    'updatedAt',
-  ],
-}
 
 type Plain = null | boolean | number | string | Plain[] | { [key: string]: Plain }
 
@@ -74,9 +26,16 @@ function toPlain(value: unknown): Plain {
   return null
 }
 
-/** The fields of one document an agent may see; a collection with no view shows nothing. */
-export function toAgentView(collection: string, doc: Record<string, unknown>): Plain {
-  const allowed = AGENT_VIEWS[collection] ?? []
+/** What an agent may see of each collection: the allowed fields; any other collection shows nothing. */
+export type AgentViews = Readonly<Record<string, readonly string[]>>
+
+/** The fields of one document an agent may see. */
+export function toAgentView(
+  views: AgentViews,
+  collection: string,
+  doc: Record<string, unknown>,
+): Plain {
+  const allowed = views[collection] ?? []
   const view: Record<string, Plain> = {}
   for (const key of allowed) {
     if (key in doc) view[key] = toPlain(doc[key])
@@ -95,16 +54,17 @@ export function toAgentView(collection: string, doc: Record<string, unknown>): P
  * document (an error answer, which carries no document data and is kept as it is).
  */
 export function toAgentAnswer(
+  views: AgentViews,
   collection: string,
   heading: string,
   result: Record<string, unknown>,
 ): string | null {
   if (Array.isArray(result.docs)) {
-    const docs = result.docs.filter(isRecord).map((doc) => toAgentView(collection, doc))
+    const docs = result.docs.filter(isRecord).map((doc) => toAgentView(views, collection, doc))
     const total = `Total: ${String(result.totalDocs ?? docs.length)} documents`
     const page = `Page: ${String(result.page ?? 1)} of ${String(result.totalPages ?? 1)}`
     return [heading, total, page, ...docs.map((doc) => JSON.stringify(doc))].join('\n')
   }
-  if ('id' in result) return `${heading}\n${JSON.stringify(toAgentView(collection, result))}`
+  if ('id' in result) return `${heading}\n${JSON.stringify(toAgentView(views, collection, result))}`
   return null
 }

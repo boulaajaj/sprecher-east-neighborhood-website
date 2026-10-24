@@ -46,8 +46,10 @@ Arguments: `runId`, `kind` (`needs-review`, `update`, `cancel`, `rejected-invali
 `targetCollection` and `targetId` (an integer; ids are per collection, so the collection is
 required with an id, and an `update` or `cancel` names both), `externalId`, `summary`,
 `evidence[]` (`url`, `says`, `retrievedAt`), `flags[]` (the contract's flag values) and
-`sourceUrl`. It appends the item to the run's `reviewItems`, which editors read and filter in
-Admin. An agent can't rewrite or remove review items by updating its run.
+`sourceUrl`. Each report is its own document in `agent-review-items`, linked to the run, so two
+reports at once both land. Staff read and filter them in Admin (Agents → Agent Review Items, and
+under each run); the agent reads its own, can't change or delete them, and only reports on its
+own runs.
 
 **Size caps** (`SUGGESTION_CAPS` in `domain/suggestion.ts`; the tool refuses anything larger):
 `runId` 100, title 120, body 3,000, venue 200, address 300, source name 200, links 2,048,
@@ -58,7 +60,8 @@ Admin. An agent can't rewrite or remove review items by updating its run.
 - **Keys** (`cms/apiKeys.ts`): admin-only, and bound only to `agent` accounts. A key stops
   working when its account is no longer an agent (`checkAgentKey` in `cms/mcp.ts`).
 - **No personal data to the model** (`domain/agentView.ts`): every find answer is rebuilt from
-  an allowlist of fields per collection; related documents become ids; no authors, emails or
+  an allowlist of fields per collection (`cms/agentViews.ts`, checked against the generated
+  types, so a renamed field fails `tsc`); related documents become ids; no authors, emails or
   rich text. The two tools answer only a status and an id.
 - **Limits**: 60 requests a minute per key (`domain/mcpLimits.ts`), then 429. Caddy caps request
   bodies at 256 KB (`ops/caddy/form-limits.caddy`).
@@ -75,8 +78,8 @@ The fields of `intelligence/schemas/agent-run.schema.json`: `runId` (unique), `a
 `succeeded`, `partial`, `failed`, `stopped-budget`, `disabled`), `sourcesChecked` (`sourceId`,
 `cursor`, `status`, `error`), `counts` (`seen`, `proposed`, `updates`, `rejected`, `duplicates`,
 `needsReview`), `errors` and `cost` (`inputTokens`, `outputTokens`, `usd`). Ours on top: `agent`,
-set by the server to the agent that created the run, and `reviewItems` (up to 200, from
-`reportItem`). Admins read every run in Admin (Agents → Agent Runs); an agent reads only its own,
+set by the server to the agent that created the run, and `reviewItems`, a join showing the run's
+items from `agent-review-items`. Admins read every run in Admin (Agents → Agent Runs); an agent reads only its own,
 to pick up its cursors. Runs, keys and suggestions are in the Payload database, so the backups
 (#148) cover them.
 

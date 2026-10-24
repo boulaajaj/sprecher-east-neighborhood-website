@@ -13,7 +13,7 @@ import { fileURLToPath } from 'url'
 
 import type { Event, Page, Post } from '@/payload-types'
 import { keepAccountEmails, noVerifyMutation, Users } from '@/modules/accounts/cms'
-import { AgentRuns, mcpOptions } from '@/modules/agents/cms'
+import { AgentReviewItems, AgentRuns, mcpOptions } from '@/modules/agents/cms'
 import {
   contactRetentionTask,
   createFormBuilderOptions,
@@ -190,6 +190,7 @@ export default buildConfig({
     Users,
     EmailConfirmations,
     AgentRuns,
+    AgentReviewItems,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
