@@ -37,7 +37,8 @@ It is an unofficial, AI-assisted initiative (ground rules in [`AGENTS.md`](../AG
 - **Domain**: sprechereast.com (live since 2026-10-17, see #103)
 - **OS**: Ubuntu 24.04 with Docker
 - **Plan**: KVM 1 (1 CPU, 4 GB RAM, 50 GB disk)
-- **Deploy path**: /var/www/sprecher-east
+- **Deploy path**: /var/www/sprecher-east: the shared `.env.local`, `data/` and `public/media`,
+  one folder per build in `releases/`, and `current`, the link to the live one (#245)
 - **Process manager**: PM2 (process `sprecher-east`, config `ecosystem.config.cjs`); Next listens on
   `127.0.0.1:3000` only (#118), so visitors reach it through Caddy
 - **Web server**: Caddy (HTTPS on 443 and HTTP on 80, reverse proxy → `127.0.0.1:3000`); request
@@ -48,8 +49,10 @@ It is an unofficial, AI-assisted initiative (ground rules in [`AGENTS.md`](../AG
   - API base: `https://developers.hostinger.com`
   - Snapshot endpoint: `POST /api/vps/v1/virtual-machines/1371281/snapshot`
 - **SSH**: User `root`, port 22, key at `~/.ssh/id_ed25519_sprecher`
-- **CI/CD**: every merge to `main` runs `.github/workflows/deploy.yml`: SSH to the VPS, pull, `npm ci`,
-  backup, migrate, build, restart (`ops/restart-app.sh`), Caddy limits (`ops/caddy-limits.sh`).
+- **CI/CD**: every merge to `main` runs `.github/workflows/deploy.yml` from CI, once the required
+  checks pass: GitHub Actions builds the release with the server's Node version, uploads it to
+  `releases/<commit>`, and the VPS backs up, migrates, switches `current`, reloads PM2 and checks
+  the site, switching back if it doesn't answer (#245). Rollback by hand: `ops/rollback.sh`.
   The server scripts are in [`ops/`](../ops/README.md)
 - **Caddy config**: `/etc/caddy/Caddyfile`. Rules for editing it (never overwrite, back up,
   validate) are in [`guidelines/security.md`](guidelines/security.md#infrastructure-security)
@@ -171,7 +174,8 @@ System-level env vars (not in .env.local):
 - **`overrideAccess`**: Set it on every Local API call: `false` for what a visitor may see, `true` only where access must be bypassed, with a comment saying why. The seed's writes don't set it yet, and the header and footer are read with `overrideAccess: true` (#251)
 - **`server-only`**: Server code outside the CMS config that queries Payload or reads cookies (utilities, `data/`, `use-cases/`, `server.ts`) starts with `import 'server-only'`, so a client component importing it fails the build. Collections, hooks and plugins never import it: the Payload CLI (`migrate`, seed) loads them outside Next.js, where it throws. Hooks use the `req.payload` they are given
 - **Cache tags**: Expire them with `expireCacheTag()` from `src/platform/payload/expireCacheTag.ts`. Since Next 16, `revalidateTag` needs a second argument; the helper passes `{ expire: 0 }`, so the next visitor gets fresh content
-- **`next build` skips the type check**: `next.config.js` sets `typescript.ignoreBuildErrors`, because CI's required `tsc --noEmit` already checks types and the step timed out the deploy on the server (#246). Run `npx tsc --noEmit` locally; a green build alone doesn't mean the types are right
+- **`next build` skips the type check**: `next.config.js` sets `typescript.ignoreBuildErrors`, because CI's required Type-check step already checks types and the step timed out the deploy on the server (#246). CI runs `npx next typegen` before `npx tsc --noEmit`, so the route types in `.next/types` (page, layout and route handler exports) are checked too (#248). Run both locally; a green build alone doesn't mean the types are right
+- **The release is built without content**: the deploy builds in CI against an empty database, so the server drops the prerendered pages before the switch and each page renders from the live database on its first visit (#245). `NEXT_PUBLIC_*` values come from the server's `.env.local` at build time; after changing one there, redeploy (Actions → Deploy to VPS → Run workflow)
 - **Proxy**: `src/proxy.ts` (Next 16's name for middleware) answers 404 for junk paging URLs before they render (#119)
 - **Upload URLs stay relative**: `getMediaUrl()` turns Payload's upload URLs (prefixed with `serverURL`) back into `/api/media/file/...`, so next/image treats them as local; since Next 16 it refuses remote URLs on private IPs such as localhost
 - **Sign-in cookie is Secure in production**: the Users collection sets `auth.cookies.secure` when `NODE_ENV` is `production` (#234), so signing in (site and `/admin`) works over HTTPS only. Over plain http, such as the IP on port 80, the browser drops the cookie. `next dev` on `http://localhost` is unaffected
