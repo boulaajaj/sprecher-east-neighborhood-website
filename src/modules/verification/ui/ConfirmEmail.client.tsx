@@ -1,11 +1,10 @@
 'use client'
 
-import { RotateCw } from 'lucide-react'
+import { MailCheck } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 
 import { Alert } from '@/platform/ui/Alert'
 import { ConfirmedEmailContext } from '@/platform/ui/ConfirmedEmail.client'
-import { PendingStatus } from '@/platform/ui/PendingStatus'
 import { Button, Link } from '@/platform/ui'
 
 import { postConfirmation, type ConfirmAnswer } from './api'
@@ -14,13 +13,11 @@ import { isLinkDone, isSettled, toConfirmMessage } from './confirmMessages'
 type Answer = ConfirmAnswer | 'offline'
 
 /**
- * The confirm page's action: it confirms the email the link was sent to as soon as the page
- * loads, with no button to press (#300). The page's own script posts the token, so a scanner that
- * only fetches the link confirms nothing. A Try Again button shows only when the confirmation can
- * still work (too many tries, a server error, no connection). `token` is `null` when the link has
- * none, or one that can't be ours. `retryHref` is where a person with a dead link can ask for a
- * new one (the contact form). `children` shows once the email is confirmed (the account offer,
- * #187), and can read the confirmed address with `useConfirmedEmail`.
+ * The confirm page's action: one button that confirms the email the link was sent to. Nothing
+ * happens on page load, because mail scanners open links too. `token` is `null` when the link
+ * has none, or one that can't be ours. `retryHref` is where a person with a dead link can ask
+ * for a new one (the contact form). `children` shows once the email is confirmed (the account
+ * offer, #187), and can read the confirmed address with `useConfirmedEmail`.
  */
 export function ConfirmEmail({
   token,
@@ -33,101 +30,60 @@ export function ConfirmEmail({
 }) {
   const [answer, setAnswer] = useState<Answer | null>(token ? null : 'invalid')
   const [email, setEmail] = useState<string | null>(null)
-  const [sending, setSending] = useState(token !== null)
-  // Counts answers to Try Again, so focus moves to the message after each one (not on page load)
-  const [retries, setRetries] = useState(0)
+  const [sending, setSending] = useState(false)
+  // Counts answers to clicks, so focus moves to the message after each one (not on page load)
+  const [answers, setAnswers] = useState(0)
   const messageRef = useRef<HTMLDivElement>(null)
-  // React runs effects twice in development: confirm once per page load
-  const started = useRef(false)
-  // An answer that comes back after the person left the page changes nothing
-  const mounted = useRef(true)
 
-  const confirm = async (link: string) => {
+  useEffect(() => {
+    // The button that had focus is gone or reset: put keyboard and screen reader users on the
+    // answer instead of the top of the page
+    if (answers > 0) messageRef.current?.focus()
+  }, [answers])
+
+  const confirm = async () => {
+    if (!token || sending) return
     setSending(true)
     let next: Answer
     try {
-      const reply = await postConfirmation(link)
+      const reply = await postConfirmation(token)
       next = reply.answer
       setEmail(reply.email)
     } catch {
       next = 'offline'
     }
-    if (!mounted.current) return
     // The link is done with: keep its token out of the address bar and the history
     if (isLinkDone(next)) window.history.replaceState(null, '', window.location.pathname)
     setAnswer(next)
     setSending(false)
+    setAnswers((n) => n + 1)
   }
 
-  useEffect(() => {
-    mounted.current = true
-    return () => {
-      mounted.current = false
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!token || started.current) return
-    started.current = true
-    void confirm(token)
-  }, [token])
-
-  useEffect(() => {
-    // The Try Again button is gone or reset: put keyboard and screen reader users on the answer
-    if (retries > 0 && !sending) messageRef.current?.focus()
-  }, [retries, sending])
-
-  const retry = () => {
-    if (!token || sending) return
-    setRetries((n) => n + 1)
-    void confirm(token)
-  }
-
-  const message = answer && !sending ? toConfirmMessage(answer) : null
+  const message = answer ? toConfirmMessage(answer) : null
   const settled = isSettled(answer)
-  const canRetry = token !== null && answer !== null && !isLinkDone(answer)
+  const canConfirm = token !== null && !isLinkDone(answer)
 
   return (
     <div className="space-y-6">
-      {/* One live region from the first render, so the answer that replaces "Confirming" is
-          announced; an error keeps its own alert */}
-      <div
-        ref={messageRef}
-        tabIndex={-1}
-        role="status"
-        aria-live="polite"
-        className="space-y-3 outline-none"
-      >
-        {sending && (
-          <>
-            <PendingStatus>Confirming your email…</PendingStatus>
-            <noscript>
-              <p className="text-foreground">
-                Confirming needs JavaScript. Turn it on, then open the link again.
-              </p>
-            </noscript>
-          </>
-        )}
-        {message && (
-          <Alert variant={message.variant} quiet={message.variant === 'success'}>
-            {message.text}
-          </Alert>
-        )}
-        {isLinkDone(answer) && !settled && (
-          <Link href={retryHref} variant="action">
-            Go to the contact form
-          </Link>
-        )}
-      </div>
-      {canRetry && !sending && (
+      {message && (
+        <div ref={messageRef} tabIndex={-1} className="space-y-3 outline-none">
+          <Alert variant={message.variant}>{message.text}</Alert>
+          {isLinkDone(answer) && !settled && (
+            <Link href={retryHref} variant="action">
+              Go to the contact form
+            </Link>
+          )}
+        </div>
+      )}
+      {canConfirm && (
         <Button
           type="button"
-          variant="secondary"
-          onClick={retry}
-          iconStart={<RotateCw aria-hidden />}
+          onClick={confirm}
+          loading={sending}
+          iconStart={<MailCheck aria-hidden />}
           fullWidth="mobile"
         >
-          Try Again
+          {sending ? 'Confirming' : 'Confirm my email'}
         </Button>
       )}
       {settled && <ConfirmedEmailContext value={email}>{children}</ConfirmedEmailContext>}
