@@ -18,7 +18,7 @@ Where code goes: [`docs/architecture/`](../architecture/README.md).
 - **Client Components**: Use Payload REST API at `/api/{collection}` only when client-side interactivity requires it
 - **Live Preview**: Use `useLivePreview()` hook from `@payloadcms/live-preview-react` for real-time admin preview
 - **Draft Preview**: Use Next.js draft mode with Payload's preview URL feature
-- **On-demand Revalidation**: `afterChange` hooks call `revalidatePath()` / `revalidateTag()` for instant cache updates
+- **On-demand Revalidation**: `afterChange` hooks call `revalidatePath()` for paths and `expireCacheTag()` from `src/platform/payload/expireCacheTag.ts` for cache tags (since Next 16, `revalidateTag()` needs a second argument; the helper passes it)
 - **Select and Depth**: Always use `select` and `depth` parameters to minimize response size
 
 ## Development Principles

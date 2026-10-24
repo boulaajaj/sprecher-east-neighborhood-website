@@ -117,6 +117,6 @@ The three roles (`admin`, `editor`, `resident`) and what each may do are in the
 - [ ] No secrets in code (check every staged file)
 - [ ] Input validation on all new endpoints
 - [ ] Error handling returns safe messages (no stack traces)
-- [ ] Auth-protected routes use middleware properly
+- [ ] Auth-protected pages and server actions check the user with `requireUser` or `requireRole` from `src/modules/accounts/`
 - [ ] Email templates have unsubscribe links
 - [ ] Rate limiting configured on public endpoints
