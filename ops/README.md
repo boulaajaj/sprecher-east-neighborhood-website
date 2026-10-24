@@ -132,8 +132,11 @@ without the revert doesn't last: the next deploy adds them back.
   the app; the `reverse_proxy` line stays where it was. A global `order` option could change that
   order, so a Caddyfile with one is left alone. A plain-HTTP block whose addresses are other hosts
   (such as `http://srv1371281.hstgr.cloud`, alone or next to the IP) gets the redirect too when it
-  proxies to the app. A plain-HTTP block for another site that doesn't proxy to the app is left
-  as it is (#338).
+  proxies to the app: `reverse_proxy localhost:3000`, or the block form with a `to` line naming
+  it. A plain-HTTP block for another site that doesn't proxy to the app is left as it is. When
+  the script can't tell, because the block's `reverse_proxy` points somewhere else (a placeholder,
+  say) or it imports a file the script can't see into, it changes nothing and fails the deploy:
+  that block may serve sign-in over plain HTTP, and its host can't be checked from here (#338).
 
 It leaves the Caddyfile alone when it can't read the layout safely (a heredoc, a site block on one
 line, unbalanced braces), when a block mixes the domain with other addresses (on one line or

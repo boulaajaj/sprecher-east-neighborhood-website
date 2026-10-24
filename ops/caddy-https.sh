@@ -37,6 +37,7 @@ RELOAD_CADDY="${RELOAD_CADDY:-systemctl reload caddy}"
 APP_PORT="${APP_PORT:-3000}" # the app's port behind Caddy (ecosystem.config.cjs)
 SOURCE="$CODE_DIR/ops/caddy/hsts.caddy"
 IMPORT_LINE="import $HSTS_FILE"
+LIMITS_IMPORT_LINE="import ${LIMITS_FILE:-/etc/caddy/sprecher-east-form-limits.caddy}" # caddy-limits.sh's own line
 
 url=$(site_url)
 host="${url#https://}"
@@ -87,7 +88,8 @@ trap 'rm -f "$candidate" "$original" "$ip_address_file" "$layout_file"' EXIT
 # serve the app is left alone.
 rewrite() {
   awk -v host="$host" -v imp="$IMPORT_LINE" -v redir="$REDIR_LINE" -v port="$APP_PORT" \
-    -v side="$ip_address_file" -v layout="$layout_file" '
+    -v side="$ip_address_file" -v layout="$layout_file" -v limits="$LIMITS_IMPORT_LINE" \
+    -v app_addr="(^|[[:space:]])(http://)?(localhost|127[.]0[.]0[.]1)?:$APP_PORT([[:space:]{]|\$)" '
     function clean(s) { sub(/(^|[[:space:]])#.*$/, "", s); gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); return s }
     function ours(t) { return t == host || t == "www." host }
     # Counts the block'"'"'s addresses by kind into the g_* globals, and collects the plain-HTTP
@@ -124,6 +126,10 @@ rewrite() {
         label = "plain http"; if (!has_redir) action = "redir"
         if (b_caught != "" && ipaddr == "") ipaddr = b_caught
       }
+      else if (plain_all && !proxies && (rp || unknown_import)) {
+        label = "UNCLEAR: plain http for another host, may serve the app (" (rp ? "a reverse_proxy to another address" : "an import this script cannot read") ")"
+        unclear = 1
+      }
       else if (plain_all && !b_https_other) label = "plain http, another host, not the app"
       else if (plain_all && proxies) { label = "MIXED: plain http and https, serves the app"; mixed_plain = 1 }
       else label = "another site"
@@ -141,13 +147,20 @@ rewrite() {
       if (depth == 0 && s ~ /\{.*\}/ && s !~ /^&?\(/) { bad = 3; t = s; sub(/[[:space:]]*\{.*$/, "", t); print t " | a site block on one line, not read | ? | adds: none" > layout }
       if (depth == 0 && s ~ /\{$/ && s !~ /^\{/ && s !~ /^&?\(/) {
         classify(pending " " substr(s, 1, length(s) - 1)); pending = ""
-        start = NR; has_imp = has_redir = proxies = 0
+        start = NR; has_imp = has_redir = proxies = rp = unknown_import = 0
         b_apex = g_apex; b_www = g_www; b_plain = g_plain; b_plain_other = g_plain_other
         b_https_other = g_https_other; b_caught = caught; b_addrs = addrs
       }
       if (start && depth == 1 && s == imp) has_imp = 1
       if (start && depth == 1 && s == redir) has_redir = 1
-      if (start && depth >= 1 && s ~ ("^reverse_proxy([[:space:]].*)?[[:space:]](http://)?(localhost|127\\.0\\.0\\.1)?:" port "([[:space:]{]|$)")) proxies = 1
+      # Proxies to the app: `reverse_proxy <loopback>:<port>`, or in block form a `to` line naming
+      # it. Unsure: a reverse_proxy to anything else (a placeholder, another upstream), or an
+      # import this script cannot see into (its own two snippets aside).
+      if (start && depth >= 1) {
+        if (s ~ /^reverse_proxy([[:space:]{]|$)/) { rp = 1; if (s ~ app_addr) proxies = 1 }
+        else if (s ~ /^to[[:space:]]/ && s ~ app_addr) proxies = 1
+        else if (s ~ /^import[[:space:]]/ && s != imp && s != limits) unknown_import = 1
+      }
       t = s; opens = gsub(/\{/, "", t)
       t = s; closes = gsub(/\}/, "", t)
       depth += opens - closes
@@ -166,6 +179,7 @@ rewrite() {
       if (order) exit 8
       if (mixed) exit 7
       if (mixed_plain) exit 9
+      if (unclear) exit 10
       if (!domains) exit 4
       if (ipaddr != "") { gsub(/^[[:space:]]+|[[:space:]]+$/, "", ipaddr); print ipaddr > side }
       for (i = 1; i <= NR; i++) {
@@ -285,13 +299,15 @@ problem_now() {
 # Everything needed to tell from the deploy run why the check failed, without SSH, in one
 # annotation: the site blocks as the script read them, the IP request and its answer, and how
 # Caddy reads the Caddyfile that was live when the check ran.
-report_details() { # <level> <caddyfile that was checked> <IP request line>
+# The IP request line and the `caddy adapt` summary are passed in, so that after a change they
+# can be captured while the change, and the files it imports, are still in place.
+report_details() { # <level> <IP request line> <caddy adapt summary>
   {
     echo "Site blocks in $CADDYFILE (addresses | taken for | proxies to the app | adds):"
     if [ -s "$layout_file" ]; then sed 's/^/  /' "$layout_file"; else echo "  (none read)"; fi
-    echo "$3"
+    echo "$2"
     echo "How Caddy reads the checked Caddyfile (caddy adapt; automatic HTTP->HTTPS redirects are added at runtime and not shown):"
-    caddy_summary "$2" | sed 's/^/  /'
+    sed 's/^/  /' <<<"$3"
   } | report_lines "$1" "Caddy HTTPS details"
 }
 
@@ -303,17 +319,25 @@ if [ "$status" -ne 0 ]; then
     7) why="a Caddy site block serves $host together with other addresses" ;;
     8) why="the Caddyfile sets a global 'order', which can run reverse_proxy before redir" ;;
     9) why="a Caddy site block that proxies to the app serves plain HTTP and HTTPS together" ;;
+    10) why="a plain-HTTP Caddy site block for another host may serve the app (its proxy target or an import can't be read)" ;;
     *) why="the Caddyfile's layout wasn't recognised (a heredoc, a site block on one line, or unbalanced braces)" ;;
   esac
+  # A block that may serve sign-in over plain HTTP can't be checked from here (its host isn't
+  # known), so it fails rather than pass on the IP check alone.
+  if [ "$status" -eq 10 ]; then
+    report "ERROR: $why, so the Caddyfile was left alone; check that block, and add the redirect by hand if it serves the app (ops/README.md, Caddy HTTPS)"
+    report_details error "$(ip_probe_text)" "$(caddy_summary "$CADDYFILE")"
+    exit 1
+  fi
   # Left alone, but the IP must still not reach the app.
   problem=$(ip_problem)
   if [ -n "$problem" ]; then
     report "ERROR: $why, so it was left alone, and $problem; add the redirect by hand (ops/README.md, Caddy HTTPS)"
-    report_details error "$CADDYFILE" "$(ip_probe_text)"
+    report_details error "$(ip_probe_text)" "$(caddy_summary "$CADDYFILE")"
     exit 1
   fi
   report "WARNING: $why, so the Caddyfile was left alone (plain HTTP to the IP does not reach the app)"
-  report_details warning "$CADDYFILE" "$(ip_probe_text)"
+  report_details warning "$(ip_probe_text)" "$(caddy_summary "$CADDYFILE")"
   exit 0
 fi
 ip_address=$(cat "$ip_address_file" 2>/dev/null || true)
@@ -405,7 +429,7 @@ if [ "$caddyfile_changed" = no ] && [ "$hsts_changed" = no ]; then
   problem=$(problem_now)
   if [ -n "$problem" ]; then
     report "ERROR: Caddy's HTTPS settings look in place, but $problem; nothing was changed"
-    report_details error "$CADDYFILE" "$(ip_probe_text)"
+    report_details error "$(ip_probe_text)" "$(caddy_summary "$CADDYFILE")"
     exit 1
   fi
   report "Caddy HTTPS settings already in place (HSTS $hsts_value, Caddy $(caddy_version))"
@@ -450,12 +474,15 @@ else
     # site still answers, so a site that is down isn't kept down while it's measured).
     probe="IP request: not made (the site did not answer)"
     case "$problem" in *"the site does not answer"* | *"would not reload"*) ;; *) probe=$(ip_probe_text) ;; esac
+    # How Caddy reads the changed Caddyfile, while it and the files it imports (the new HSTS
+    # snippet included) are still in place: `caddy adapt` only reads files, so this is quick.
+    summary=$(caddy_summary "$CADDYFILE")
     if detail=$(restore_all); then
       report "ERROR: $problem; the previous Caddy config is back"
     else
       report "ERROR: $problem. $detail"
     fi
-    report_details error "$candidate" "$probe"
+    report_details error "$probe" "$summary"
     exit 1
   fi
   trap - ERR
