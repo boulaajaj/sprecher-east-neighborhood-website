@@ -4,7 +4,7 @@ import { APIError, type PayloadRequest, type RichTextField, ValidationError } fr
 import { SITE_TIMEZONE } from '@/platform/lib/timezone'
 
 import { toEventSchedule, toSuggestionSlug } from '../../domain/suggestion'
-import { countOnRun, findOwnRun, toToolAnswer } from './runs'
+import { findOwnRun, toToolAnswer } from './runs'
 import { submitSuggestionInput, submitSuggestionShape, type SubmitSuggestionInput } from './schemas'
 
 type Outcome = { status: 'created' | 'duplicate'; id: number }
@@ -72,17 +72,15 @@ const isUniqueRefusal = (error: unknown) =>
  * Stores a suggestion as an unpublished draft with status `suggested` and its source, as the
  * agent (its own access applies, and `holdSuggestions` holds it whatever it sends). The same
  * source ID or fingerprint answers `duplicate` with the stored item's id instead of an error.
+ * The run's counts are the agent's own to keep in its run log, so this tool doesn't touch them.
  */
 export async function submitSuggestion(
   req: PayloadRequest,
   input: SubmitSuggestionInput,
 ): Promise<Outcome> {
-  const run = await findOwnRun(req, input.runId)
+  await findOwnRun(req, input.runId)
   const existing = await findDuplicate(req, input)
-  if (existing !== null) {
-    await countOnRun(req, run, 'duplicates')
-    return { status: 'duplicate', id: existing }
-  }
+  if (existing !== null) return { status: 'duplicate', id: existing }
   try {
     const doc = await req.payload.create({
       collection: input.collection,
@@ -92,13 +90,11 @@ export async function submitSuggestion(
       overrideAccess: false,
       user: req.user,
     })
-    await countOnRun(req, run, 'proposed')
     return { status: 'created', id: doc.id }
   } catch (error) {
     // Another call stored the same item between the check and the create
     const raced = isUniqueRefusal(error) ? await findDuplicate(req, input) : null
     if (raced === null) throw error
-    await countOnRun(req, run, 'duplicates')
     return { status: 'duplicate', id: raced }
   }
 }

@@ -1033,7 +1033,7 @@ export interface EmailConfirmation {
   createdAt: string
 }
 /**
- * What each neighborhood agent run checked and suggested (read-only history).
+ * What each neighborhood agent run checked, suggested and asks editors to review.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "agent-runs".
@@ -1044,42 +1044,39 @@ export interface AgentRun {
    * Set from the API key.
    */
   agent?: (number | null) | User
+  runId: string
   agentName: string
-  /**
-   * The commit of the agents’ prompts and code this run used.
-   */
+  pipelineVersion: number
   repoCommit: string
-  status?: ('running' | 'succeeded' | 'failed') | null
   startedAt: string
   finishedAt?: string | null
-  /**
-   * Each source checked, with the cursor to resume from next time.
-   */
-  sources?:
+  status: 'running' | 'succeeded' | 'partial' | 'failed' | 'stopped-budget' | 'disabled'
+  sourcesChecked?:
     | {
-        name: string
-        url?: string | null
+        sourceId: string
         cursor?: string | null
-        checkedAt?: string | null
+        status: 'ok' | 'not-modified' | 'error' | 'skipped'
+        error?: string | null
         id?: string | null
       }[]
     | null
   counts?: {
     seen?: number | null
     proposed?: number | null
+    updates?: number | null
     rejected?: number | null
     duplicates?: number | null
+    needsReview?: number | null
   }
-  errorMessages?:
-    | {
-        message: string
-        id?: string | null
-      }[]
-    | null
-  /**
-   * In US dollars.
-   */
-  cost?: number | null
+  errors?: string[] | null
+  cost?: {
+    inputTokens?: number | null
+    outputTokens?: number | null
+    /**
+     * In US dollars.
+     */
+    usd?: number | null
+  }
   /**
    * What the agent asks an editor to look at. It never changed the content.
    */
@@ -1090,8 +1087,30 @@ export interface AgentRun {
         targetId?: number | null
         externalId?: string | null
         summary: string
-        evidence?: string[] | null
-        flags?: string[] | null
+        evidence?:
+          | {
+              url: string
+              says: string
+              retrievedAt: string
+              id?: string | null
+            }[]
+          | null
+        flags?:
+          | (
+              | 'missing-date'
+              | 'missing-time'
+              | 'missing-location'
+              | 'ambiguous-location'
+              | 'similar-name'
+              | 'unverified-claim'
+              | 'conflicting-sources'
+              | 'cancelled'
+              | 'rescheduled'
+              | 'past'
+              | 'partisan'
+              | 'prompt-injection'
+            )[]
+          | null
         sourceUrl: string
         reportedAt?: string | null
         id?: string | null
@@ -1956,18 +1975,20 @@ export interface EmailConfirmationsSelect<T extends boolean = true> {
  */
 export interface AgentRunsSelect<T extends boolean = true> {
   agent?: T
+  runId?: T
   agentName?: T
+  pipelineVersion?: T
   repoCommit?: T
-  status?: T
   startedAt?: T
   finishedAt?: T
-  sources?:
+  status?: T
+  sourcesChecked?:
     | T
     | {
-        name?: T
-        url?: T
+        sourceId?: T
         cursor?: T
-        checkedAt?: T
+        status?: T
+        error?: T
         id?: T
       }
   counts?:
@@ -1975,16 +1996,19 @@ export interface AgentRunsSelect<T extends boolean = true> {
     | {
         seen?: T
         proposed?: T
+        updates?: T
         rejected?: T
         duplicates?: T
+        needsReview?: T
       }
-  errorMessages?:
+  errors?: T
+  cost?:
     | T
     | {
-        message?: T
-        id?: T
+        inputTokens?: T
+        outputTokens?: T
+        usd?: T
       }
-  cost?: T
   reviewItems?:
     | T
     | {
@@ -1993,7 +2017,14 @@ export interface AgentRunsSelect<T extends boolean = true> {
         targetId?: T
         externalId?: T
         summary?: T
-        evidence?: T
+        evidence?:
+          | T
+          | {
+              url?: T
+              says?: T
+              retrievedAt?: T
+              id?: T
+            }
         flags?: T
         sourceUrl?: T
         reportedAt?: T

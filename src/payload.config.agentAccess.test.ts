@@ -26,7 +26,13 @@ let mcp: ReturnType<typeof mcpClient>
 
 const KEY = 'agent-key-for-tests-0123456789abcdef'
 const SOURCE = { sourceName: 'City of Madison', sourceUrl: 'https://www.cityofmadison.com/e/7' }
-const RUN = { agentName: 'Scout', repoCommit: 'abc1234', startedAt: '2026-10-24T11:00:00.000Z' }
+const RUN = {
+  agentName: 'Scout',
+  pipelineVersion: 1,
+  repoCommit: 'a'.repeat(40),
+  startedAt: '2026-10-24T11:00:00.000Z',
+  status: 'running' as const,
+}
 
 beforeAll(async () => {
   ;({ payload, config } = await bootPayload())
@@ -103,11 +109,11 @@ describe('an agent key over /api/mcp', () => {
     const other = await createAccount(payload, 'agent', 'other-agent')
     await payload.create({
       collection: 'agent-runs',
-      data: { ...RUN, agentName: 'Other' },
+      data: { ...RUN, runId: 'other-1', agentName: 'Other' },
       user: other,
       overrideAccess: false,
     })
-    const created = await text('createAgentRuns', { ...RUN, agent: admin.id })
+    const created = await text('createAgentRuns', { ...RUN, runId: 'scout-1', agent: admin.id })
     expect(created).toContain(`"agent":${agent.id}`)
     const runs = await text('findAgentRuns', { limit: 50 })
     expect(runs).toContain('Scout')

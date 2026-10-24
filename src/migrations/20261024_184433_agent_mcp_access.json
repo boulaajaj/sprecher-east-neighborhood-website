@@ -5584,8 +5584,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "agent_runs_sources": {
-      "name": "agent_runs_sources",
+    "agent_runs_sources_checked": {
+      "name": "agent_runs_sources_checked",
       "columns": {
         "_order": {
           "name": "_order",
@@ -5608,18 +5608,11 @@
           "notNull": true,
           "autoincrement": false
         },
-        "name": {
-          "name": "name",
+        "source_id": {
+          "name": "source_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
-        },
-        "url": {
-          "name": "url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
           "autoincrement": false
         },
         "cursor": {
@@ -5629,8 +5622,15 @@
           "notNull": false,
           "autoincrement": false
         },
-        "checked_at": {
-          "name": "checked_at",
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "error": {
+          "name": "error",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -5638,21 +5638,21 @@
         }
       },
       "indexes": {
-        "agent_runs_sources_order_idx": {
-          "name": "agent_runs_sources_order_idx",
+        "agent_runs_sources_checked_order_idx": {
+          "name": "agent_runs_sources_checked_order_idx",
           "columns": ["_order"],
           "isUnique": false
         },
-        "agent_runs_sources_parent_id_idx": {
-          "name": "agent_runs_sources_parent_id_idx",
+        "agent_runs_sources_checked_parent_id_idx": {
+          "name": "agent_runs_sources_checked_parent_id_idx",
           "columns": ["_parent_id"],
           "isUnique": false
         }
       },
       "foreignKeys": {
-        "agent_runs_sources_parent_id_fk": {
-          "name": "agent_runs_sources_parent_id_fk",
-          "tableFrom": "agent_runs_sources",
+        "agent_runs_sources_checked_parent_id_fk": {
+          "name": "agent_runs_sources_checked_parent_id_fk",
+          "tableFrom": "agent_runs_sources_checked",
           "tableTo": "agent_runs",
           "columnsFrom": ["_parent_id"],
           "columnsTo": ["id"],
@@ -5664,8 +5664,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "agent_runs_error_messages": {
-      "name": "agent_runs_error_messages",
+    "agent_runs_review_items_evidence": {
+      "name": "agent_runs_review_items_evidence",
       "columns": {
         "_order": {
           "name": "_order",
@@ -5676,7 +5676,7 @@
         },
         "_parent_id": {
           "name": "_parent_id",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -5688,8 +5688,22 @@
           "notNull": true,
           "autoincrement": false
         },
-        "message": {
-          "name": "message",
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "says": {
+          "name": "says",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "retrieved_at": {
+          "name": "retrieved_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -5697,23 +5711,82 @@
         }
       },
       "indexes": {
-        "agent_runs_error_messages_order_idx": {
-          "name": "agent_runs_error_messages_order_idx",
+        "agent_runs_review_items_evidence_order_idx": {
+          "name": "agent_runs_review_items_evidence_order_idx",
           "columns": ["_order"],
           "isUnique": false
         },
-        "agent_runs_error_messages_parent_id_idx": {
-          "name": "agent_runs_error_messages_parent_id_idx",
+        "agent_runs_review_items_evidence_parent_id_idx": {
+          "name": "agent_runs_review_items_evidence_parent_id_idx",
           "columns": ["_parent_id"],
           "isUnique": false
         }
       },
       "foreignKeys": {
-        "agent_runs_error_messages_parent_id_fk": {
-          "name": "agent_runs_error_messages_parent_id_fk",
-          "tableFrom": "agent_runs_error_messages",
-          "tableTo": "agent_runs",
+        "agent_runs_review_items_evidence_parent_id_fk": {
+          "name": "agent_runs_review_items_evidence_parent_id_fk",
+          "tableFrom": "agent_runs_review_items_evidence",
+          "tableTo": "agent_runs_review_items",
           "columnsFrom": ["_parent_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "agent_runs_review_items_flags": {
+      "name": "agent_runs_review_items_flags",
+      "columns": {
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "agent_runs_review_items_flags_order_idx": {
+          "name": "agent_runs_review_items_flags_order_idx",
+          "columns": ["order"],
+          "isUnique": false
+        },
+        "agent_runs_review_items_flags_parent_idx": {
+          "name": "agent_runs_review_items_flags_parent_idx",
+          "columns": ["parent_id"],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "agent_runs_review_items_flags_parent_fk": {
+          "name": "agent_runs_review_items_flags_parent_fk",
+          "tableFrom": "agent_runs_review_items_flags",
+          "tableTo": "agent_runs_review_items",
+          "columnsFrom": ["parent_id"],
           "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -5841,9 +5914,23 @@
           "notNull": false,
           "autoincrement": false
         },
+        "run_id": {
+          "name": "run_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "agent_name": {
           "name": "agent_name",
           "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "pipeline_version": {
+          "name": "pipeline_version",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -5854,14 +5941,6 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "status": {
-          "name": "status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "'running'"
         },
         "started_at": {
           "name": "started_at",
@@ -5877,6 +5956,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "counts_seen": {
           "name": "counts_seen",
           "type": "numeric",
@@ -5887,6 +5973,14 @@
         },
         "counts_proposed": {
           "name": "counts_proposed",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
+        },
+        "counts_updates": {
+          "name": "counts_updates",
           "type": "numeric",
           "primaryKey": false,
           "notNull": false,
@@ -5909,8 +6003,32 @@
           "autoincrement": false,
           "default": 0
         },
-        "cost": {
-          "name": "cost",
+        "counts_needs_review": {
+          "name": "counts_needs_review",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
+        },
+        "cost_input_tokens": {
+          "name": "cost_input_tokens",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
+        },
+        "cost_output_tokens": {
+          "name": "cost_output_tokens",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
+        },
+        "cost_usd": {
+          "name": "cost_usd",
           "type": "numeric",
           "primaryKey": false,
           "notNull": false,
@@ -5938,6 +6056,11 @@
           "name": "agent_runs_agent_idx",
           "columns": ["agent_id"],
           "isUnique": false
+        },
+        "agent_runs_run_id_idx": {
+          "name": "agent_runs_run_id_idx",
+          "columns": ["run_id"],
+          "isUnique": true
         },
         "agent_runs_updated_at_idx": {
           "name": "agent_runs_updated_at_idx",
@@ -9610,6 +9733,6 @@
   "internal": {
     "indexes": {}
   },
-  "id": "d511eaa8-2338-4cc1-ac57-ff14122807e9",
+  "id": "36e85735-080c-4c52-8e4a-ac27f6c027e8",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

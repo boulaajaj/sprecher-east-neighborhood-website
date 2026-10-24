@@ -70,7 +70,7 @@ export const mcpOptions: MCPPluginConfig = {
     [AGENT_RUNS]: {
       enabled: { find: true, create: true, update: true },
       description:
-        'Your run history: create one run per run (its id goes to submitSuggestion and ' +
+        'Your run history: create one run per run (its runId goes to submitSuggestion and ' +
         'reportItem), update it as you go, and find your last runs to resume from their ' +
         'source cursors. You see only your own runs.',
       overrideResponse: answerFor(AGENT_RUNS),

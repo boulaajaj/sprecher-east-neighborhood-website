@@ -1,36 +1,52 @@
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-sqlite'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
-  await db.run(sql`CREATE TABLE \`agent_runs_sources\` (
+  await db.run(sql`CREATE TABLE \`agent_runs_sources_checked\` (
   	\`_order\` integer NOT NULL,
   	\`_parent_id\` integer NOT NULL,
   	\`id\` text PRIMARY KEY NOT NULL,
-  	\`name\` text NOT NULL,
-  	\`url\` text,
+  	\`source_id\` text NOT NULL,
   	\`cursor\` text,
-  	\`checked_at\` text,
+  	\`status\` text NOT NULL,
+  	\`error\` text,
   	FOREIGN KEY (\`_parent_id\`) REFERENCES \`agent_runs\`(\`id\`) ON UPDATE no action ON DELETE cascade
   );
   `)
   await db.run(
-    sql`CREATE INDEX \`agent_runs_sources_order_idx\` ON \`agent_runs_sources\` (\`_order\`);`,
+    sql`CREATE INDEX \`agent_runs_sources_checked_order_idx\` ON \`agent_runs_sources_checked\` (\`_order\`);`,
   )
   await db.run(
-    sql`CREATE INDEX \`agent_runs_sources_parent_id_idx\` ON \`agent_runs_sources\` (\`_parent_id\`);`,
+    sql`CREATE INDEX \`agent_runs_sources_checked_parent_id_idx\` ON \`agent_runs_sources_checked\` (\`_parent_id\`);`,
   )
-  await db.run(sql`CREATE TABLE \`agent_runs_error_messages\` (
+  await db.run(sql`CREATE TABLE \`agent_runs_review_items_evidence\` (
   	\`_order\` integer NOT NULL,
-  	\`_parent_id\` integer NOT NULL,
+  	\`_parent_id\` text NOT NULL,
   	\`id\` text PRIMARY KEY NOT NULL,
-  	\`message\` text NOT NULL,
-  	FOREIGN KEY (\`_parent_id\`) REFERENCES \`agent_runs\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  	\`url\` text NOT NULL,
+  	\`says\` text NOT NULL,
+  	\`retrieved_at\` text NOT NULL,
+  	FOREIGN KEY (\`_parent_id\`) REFERENCES \`agent_runs_review_items\`(\`id\`) ON UPDATE no action ON DELETE cascade
   );
   `)
   await db.run(
-    sql`CREATE INDEX \`agent_runs_error_messages_order_idx\` ON \`agent_runs_error_messages\` (\`_order\`);`,
+    sql`CREATE INDEX \`agent_runs_review_items_evidence_order_idx\` ON \`agent_runs_review_items_evidence\` (\`_order\`);`,
   )
   await db.run(
-    sql`CREATE INDEX \`agent_runs_error_messages_parent_id_idx\` ON \`agent_runs_error_messages\` (\`_parent_id\`);`,
+    sql`CREATE INDEX \`agent_runs_review_items_evidence_parent_id_idx\` ON \`agent_runs_review_items_evidence\` (\`_parent_id\`);`,
+  )
+  await db.run(sql`CREATE TABLE \`agent_runs_review_items_flags\` (
+  	\`order\` integer NOT NULL,
+  	\`parent_id\` text NOT NULL,
+  	\`value\` text,
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	FOREIGN KEY (\`parent_id\`) REFERENCES \`agent_runs_review_items\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  );
+  `)
+  await db.run(
+    sql`CREATE INDEX \`agent_runs_review_items_flags_order_idx\` ON \`agent_runs_review_items_flags\` (\`order\`);`,
+  )
+  await db.run(
+    sql`CREATE INDEX \`agent_runs_review_items_flags_parent_idx\` ON \`agent_runs_review_items_flags\` (\`parent_id\`);`,
   )
   await db.run(sql`CREATE TABLE \`agent_runs_review_items\` (
   	\`_order\` integer NOT NULL,
@@ -55,22 +71,29 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.run(sql`CREATE TABLE \`agent_runs\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
   	\`agent_id\` integer,
+  	\`run_id\` text NOT NULL,
   	\`agent_name\` text NOT NULL,
+  	\`pipeline_version\` numeric NOT NULL,
   	\`repo_commit\` text NOT NULL,
-  	\`status\` text DEFAULT 'running',
   	\`started_at\` text NOT NULL,
   	\`finished_at\` text,
+  	\`status\` text NOT NULL,
   	\`counts_seen\` numeric DEFAULT 0,
   	\`counts_proposed\` numeric DEFAULT 0,
+  	\`counts_updates\` numeric DEFAULT 0,
   	\`counts_rejected\` numeric DEFAULT 0,
   	\`counts_duplicates\` numeric DEFAULT 0,
-  	\`cost\` numeric,
+  	\`counts_needs_review\` numeric DEFAULT 0,
+  	\`cost_input_tokens\` numeric DEFAULT 0,
+  	\`cost_output_tokens\` numeric DEFAULT 0,
+  	\`cost_usd\` numeric,
   	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
   	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
   	FOREIGN KEY (\`agent_id\`) REFERENCES \`users\`(\`id\`) ON UPDATE no action ON DELETE set null
   );
   `)
   await db.run(sql`CREATE INDEX \`agent_runs_agent_idx\` ON \`agent_runs\` (\`agent_id\`);`)
+  await db.run(sql`CREATE UNIQUE INDEX \`agent_runs_run_id_idx\` ON \`agent_runs\` (\`run_id\`);`)
   await db.run(sql`CREATE INDEX \`agent_runs_updated_at_idx\` ON \`agent_runs\` (\`updated_at\`);`)
   await db.run(sql`CREATE INDEX \`agent_runs_created_at_idx\` ON \`agent_runs\` (\`created_at\`);`)
   await db.run(sql`CREATE TABLE \`agent_runs_texts\` (
@@ -136,8 +159,9 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
-  await db.run(sql`DROP TABLE \`agent_runs_sources\`;`)
-  await db.run(sql`DROP TABLE \`agent_runs_error_messages\`;`)
+  await db.run(sql`DROP TABLE \`agent_runs_sources_checked\`;`)
+  await db.run(sql`DROP TABLE \`agent_runs_review_items_evidence\`;`)
+  await db.run(sql`DROP TABLE \`agent_runs_review_items_flags\`;`)
   await db.run(sql`DROP TABLE \`agent_runs_review_items\`;`)
   await db.run(sql`DROP TABLE \`agent_runs\`;`)
   await db.run(sql`DROP TABLE \`agent_runs_texts\`;`)

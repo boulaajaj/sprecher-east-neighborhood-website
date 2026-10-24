@@ -3,6 +3,11 @@ import { z } from 'zod'
 import { AUDIENCES, type Audience } from '@/platform/lib'
 
 import {
+  CONTENT_HASH,
+  DATE_TIME,
+  EXTERNAL_ID,
+  HTTP_URL,
+  REVIEW_FLAGS,
   REVIEW_ITEM_KINDS,
   type ReviewItemKind,
   SUGGESTION_CAPS as CAPS,
@@ -10,60 +15,81 @@ import {
 } from '../../domain/suggestion'
 
 /**
- * The arguments of the agents' two MCP tools (#336), with a size cap on every one. The MCP server
- * checks them before the handler runs; the handler parses them again for its types.
+ * The arguments of the agents' two MCP tools (#336), as `intelligence/schemas/suggestion.schema.json`
+ * and `report.schema.json` define them (#344), with a size cap on every one. The MCP server checks
+ * them before the handler runs; the handler parses them again, with the cross-field rules.
  */
 
 const text = (max: number) => z.string().trim().min(1).max(max)
-const optionalText = (max: number) => z.string().trim().max(max).optional()
-const webAddress = z.url({ protocol: /^https?$/ }).max(CAPS.sourceUrl)
-const when = z.union([z.iso.date(), z.iso.datetime({ offset: true })])
+const optional = <T extends z.ZodType>(schema: T) => schema.nullable().optional()
+const webAddress = z.string().max(CAPS.sourceUrl).regex(HTTP_URL)
+const dateTime = z.string().regex(DATE_TIME)
+const externalId = z.string().max(CAPS.externalId).regex(EXTERNAL_ID)
 const values = <T extends string>(options: readonly { value: T }[]) =>
   options.map((option) => option.value) as [T, ...T[]]
+const unique = <T>(items: T[]) => new Set(items).size === items.length
+const isSet = (value: unknown) => value !== null && value !== undefined
+const runId = text(CAPS.runId).describe('The runId of your current run in agent-runs.')
 
 export const submitSuggestionShape = {
   collection: z.enum(SUGGESTION_COLLECTIONS).describe('Where it goes: an event or a news post.'),
   title: text(CAPS.title),
-  bodyMarkdown: z.string().max(CAPS.bodyMarkdown).describe('The full text, in Markdown.'),
-  startsAt: when.optional().describe('Events: a day (YYYY-MM-DD) or a date-time with offset.'),
-  endsAt: when.optional(),
-  allDay: z.boolean().nullable().optional(),
-  venue: optionalText(CAPS.venue),
-  address: optionalText(CAPS.address),
+  bodyMarkdown: text(CAPS.bodyMarkdown).describe('The full text, in Markdown.'),
+  startsAt: optional(dateTime).describe('Events: required, a date-time with a zone.'),
+  endsAt: optional(dateTime),
+  allDay: optional(z.boolean()),
+  venue: optional(text(CAPS.venue)),
+  address: optional(text(CAPS.address)),
   sourceName: text(CAPS.sourceName),
   sourceUrl: webAddress,
-  externalId: text(CAPS.externalId).describe('The source’s own ID for the item.'),
-  contentHash: text(CAPS.contentHash).describe('A fingerprint of the item’s content.'),
+  externalId: externalId.describe('The source id, a colon, the source’s own id.'),
+  contentHash: z.string().regex(CONTENT_HASH).describe('sha256 of the item, lowercase hex.'),
   audience: z
     .array(z.enum(values<Audience>(AUDIENCES)))
     .max(AUDIENCES.length)
-    .default([]),
-  runId: z.number().int().positive().describe('The id of your current run in agent-runs.'),
+    .refine(unique, 'Each audience once'),
+  runId,
 }
 
+const evidence = z.object({
+  url: webAddress,
+  says: text(CAPS.evidenceSays),
+  retrievedAt: dateTime,
+})
+
 export const reportItemShape = {
-  runId: z.number().int().positive(),
+  runId,
   kind: z.enum(values<ReviewItemKind>(REVIEW_ITEM_KINDS)),
-  targetCollection: z.enum(SUGGESTION_COLLECTIONS).optional(),
-  targetId: z
-    .number()
-    .int()
-    .positive()
-    .optional()
-    .describe('With targetCollection: ids are per collection.'),
-  externalId: optionalText(CAPS.externalId),
+  targetCollection: optional(z.enum(SUGGESTION_COLLECTIONS)),
+  targetId: optional(z.number().int().min(1)).describe(
+    'With targetCollection: ids are per collection.',
+  ),
+  externalId: optional(externalId),
   summary: text(CAPS.summary).describe('What an editor should know or do, in a few sentences.'),
-  evidence: z.array(text(CAPS.evidence)).max(CAPS.evidenceItems).default([]),
-  flags: z.array(text(CAPS.flag)).max(CAPS.flags).default([]),
+  evidence: z.array(evidence).max(CAPS.evidenceItems),
+  flags: z.array(z.enum(REVIEW_FLAGS)).max(CAPS.flags).refine(unique, 'Each flag once'),
   sourceUrl: webAddress,
 }
 
-export const submitSuggestionInput = z.object(submitSuggestionShape)
+export const submitSuggestionInput = z
+  .object(submitSuggestionShape)
+  .strict()
+  .refine((s) => s.collection !== 'events' || Boolean(s.startsAt), {
+    message: 'An event needs startsAt',
+    path: ['startsAt'],
+  })
+
 export const reportItemInput = z
   .object(reportItemShape)
-  .refine((item) => item.targetId === undefined || item.targetCollection !== undefined, {
+  .strict()
+  .refine((r) => !isSet(r.targetId) || isSet(r.targetCollection), {
     message: 'targetCollection is required with targetId',
     path: ['targetCollection'],
   })
+  .refine((r) => !['update', 'cancel'].includes(r.kind) || isSet(r.targetId), {
+    message: 'An update or a cancellation names its targetId',
+    path: ['targetId'],
+  })
+
 export type SubmitSuggestionInput = z.infer<typeof submitSuggestionInput>
 export type ReportItemInput = z.infer<typeof reportItemInput>

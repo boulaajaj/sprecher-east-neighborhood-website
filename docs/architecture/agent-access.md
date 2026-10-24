@@ -23,30 +23,35 @@ The plugin's raw `create` is off for events and posts: `submitSuggestion` covers
 Markdown conversion and the duplicate answer. No update, publish or delete of content, and no
 `users`, `form-submissions` or other collection.
 
+The arguments are the agents' contract in `intelligence/schemas/` (`suggestion.schema.json`,
+`report.schema.json`, #344); `cms/tools/schemas.ts` checks the same names, formats and caps.
+
 ### `submitSuggestion`
 
 Arguments: `collection` (`events` | `posts`), `title`, `bodyMarkdown`, `startsAt`, `endsAt`,
-`allDay`, `venue`, `address`, `sourceName`, `sourceUrl`, `externalId`, `contentHash`, `audience`
-(the `AUDIENCES` values) and `runId` (its own run). The Markdown becomes the collection's
-`content` through Payload's converter (`convertMarkdownToLexical`) with that field's own editor
-config. For an event, `startsAt` is required: a day (`YYYY-MM-DD`) or a date-time with offset
-gives `date` and, unless `allDay`, `timeStart` and `timeEnd` in the site timezone
-(`toEventSchedule`); `venue` and `address` give `locationName` and `locationAddress`. It runs as
-the agent (`overrideAccess: false`), and `holdSuggestions` keeps it a draft. It answers
-`{"status":"created","id"}`, or `{"status":"duplicate","id"}` when an item with the same
-`externalId` or `contentHash` is stored, and counts `proposed` or `duplicates` on the run.
+`allDay`, `venue`, `address`, `sourceName`, `sourceUrl`, `externalId` (`<source id>:<id>`),
+`contentHash` (sha256, lowercase hex), `audience` (the `AUDIENCES` values, each once) and `runId`
+(the `runId` of one of its own runs). The Markdown becomes the collection's `content` through
+Payload's converter (`convertMarkdownToLexical`) with that field's own editor config. For an
+event, `startsAt` is required (a date-time with a zone); it gives `date` and, unless `allDay`,
+`timeStart` and `timeEnd` in the site timezone (`toEventSchedule`); `venue` and `address` give
+`locationName` and `locationAddress`. It runs as the agent (`overrideAccess: false`), and
+`holdSuggestions` keeps it a draft. It answers `{"status":"created","id"}`, or
+`{"status":"duplicate","id"}` when an item with the same `externalId` or `contentHash` is stored.
+The run's counts are the agent's to keep in its run log; the tool doesn't change them.
 
 ### `reportItem`
 
 Arguments: `runId`, `kind` (`needs-review`, `update`, `cancel`, `rejected-invalid`),
-`targetCollection` and `targetId` (ids are per collection, so the collection is required with an
-id), `externalId`, `summary`, `evidence[]`, `flags[]` and `sourceUrl`. It appends the item to the
-run's `reviewItems`, which editors read and filter in Admin. An agent can't rewrite or remove
-review items by updating its run.
+`targetCollection` and `targetId` (an integer; ids are per collection, so the collection is
+required with an id, and an `update` or `cancel` names both), `externalId`, `summary`,
+`evidence[]` (`url`, `says`, `retrievedAt`), `flags[]` (the contract's flag values) and
+`sourceUrl`. It appends the item to the run's `reviewItems`, which editors read and filter in
+Admin. An agent can't rewrite or remove review items by updating its run.
 
 **Size caps** (`SUGGESTION_CAPS` in `domain/suggestion.ts`; the tool refuses anything larger):
-title 200, body 20,000, venue 200, address 300, source name 200, source link 2,000, `externalId`
-200, `contentHash` 128, summary 2,000, 20 evidence items of 1,000, 20 flags of 50.
+`runId` 100, title 120, body 3,000, venue 200, address 300, source name 200, links 2,048,
+`externalId` 200, summary 1,000, 5 evidence items with `says` up to 500, 20 flags.
 
 ## Safeguards
 
@@ -65,13 +70,15 @@ title 200, body 20,000, venue 200, address 300, source name 200, source link 2,0
 
 ## Run history (`agent-runs`)
 
-`agent` (set by the server to the agent that created it), `agentName`, `repoCommit` (required:
-the commit of the agents' prompts and code, 7 to 40 hex), `status` (`running`, `succeeded`,
-`failed`), `startedAt` (required), `finishedAt`, `sources` (up to 100: `name`, `url`, `cursor`,
-`checkedAt`), `counts` (`seen`, `proposed`, `rejected`, `duplicates`), `errorMessages` (up to 50),
-`cost` (US dollars) and `reviewItems` (up to 200, from `reportItem`). Admins read every run in
-Admin (Agents → Agent Runs); an agent reads only its own. Runs, keys and suggestions are in the
-Payload database, so the backups (#148) cover them.
+The fields of `intelligence/schemas/agent-run.schema.json`: `runId` (unique), `agentName`,
+`pipelineVersion`, `repoCommit` (40 hex), `startedAt`, `finishedAt`, `status` (`running`,
+`succeeded`, `partial`, `failed`, `stopped-budget`, `disabled`), `sourcesChecked` (`sourceId`,
+`cursor`, `status`, `error`), `counts` (`seen`, `proposed`, `updates`, `rejected`, `duplicates`,
+`needsReview`), `errors` and `cost` (`inputTokens`, `outputTokens`, `usd`). Ours on top: `agent`,
+set by the server to the agent that created the run, and `reviewItems` (up to 200, from
+`reportItem`). Admins read every run in Admin (Agents → Agent Runs); an agent reads only its own,
+to pick up its cursors. Runs, keys and suggestions are in the Payload database, so the backups
+(#148) cover them.
 
 Tests: `src/modules/agents/domain/*.test.ts`, `src/platform/payload/accessPolicy.test.ts`,
 `src/payload.config.agentAccess.test.ts` and `src/payload.config.agentTools.test.ts` (real MCP

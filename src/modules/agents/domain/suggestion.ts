@@ -3,22 +3,49 @@
  * suggestion into an event's or a post's fields. Pure, so the MCP tools and their tests share it.
  */
 
-/** Size caps on every argument, so one call can't store or process more than a real item needs. */
+/**
+ * Size caps and formats on every argument, the same as the agents' contract in
+ * `intelligence/schemas/` (#344), so one call can't store or process more than a real item needs.
+ */
 export const SUGGESTION_CAPS = {
-  title: 200,
-  bodyMarkdown: 20_000,
+  runId: 100,
+  title: 120,
+  bodyMarkdown: 3_000,
   venue: 200,
   address: 300,
   sourceName: 200,
-  sourceUrl: 2_000,
+  sourceUrl: 2_048,
   externalId: 200,
-  contentHash: 128,
-  summary: 2_000,
-  evidenceItems: 20,
-  evidence: 1_000,
+  summary: 1_000,
+  evidenceItems: 5,
+  evidenceSays: 500,
   flags: 20,
-  flag: 50,
 } as const
+
+/** `intelligence/schemas/provenance.schema.json`: the source id, a colon, the source's own id. */
+export const EXTERNAL_ID = /^[a-z0-9-]+:.+$/
+/** sha256 of the candidate's substantive fields, lowercase hex. */
+export const CONTENT_HASH = /^[a-f0-9]{64}$/
+/** A date-time with seconds optional and a zone (`Z` or an offset). */
+export const DATE_TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$/
+/** An absolute http(s) link with no spaces. */
+export const HTTP_URL = /^https?:\/\/[^\s]+$/
+
+/** What an agent may flag about an item (`common.schema.json#/$defs/flag`). */
+export const REVIEW_FLAGS = [
+  'missing-date',
+  'missing-time',
+  'missing-location',
+  'ambiguous-location',
+  'similar-name',
+  'unverified-claim',
+  'conflicting-sources',
+  'cancelled',
+  'rescheduled',
+  'past',
+  'partisan',
+  'prompt-injection',
+] as const
 
 export const SUGGESTION_COLLECTIONS = ['events', 'posts'] as const
 export type SuggestionCollection = (typeof SUGGESTION_COLLECTIONS)[number]

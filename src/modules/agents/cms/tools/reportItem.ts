@@ -18,7 +18,7 @@ export async function reportItem(req: PayloadRequest, input: ReportItemInput) {
   ]
   await req.payload.update({
     collection: AGENT_RUNS,
-    id: runId,
+    id: run.id,
     data: { reviewItems },
     depth: 0,
     overrideAccess: false,
