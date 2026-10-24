@@ -26,8 +26,9 @@ request. Those pages had no time limit, so an unpublished post would have stayed
   still going. The runners are listed in one place, `src/platform/payload/jobRunners.ts`, pinned by
   its test. No runner takes every queue: work nobody decided to run stays queued.
 - **Pages, posts, events and the home page re-render at most every 10 minutes**
-  (`revalidate = 600`), as the lists already do. So a scheduled change reaches every page within
-  10 minutes, and the hooks still refresh the cache at once for changes made in Admin.
+  (`revalidate = 600`), as the lists already do, and the sitemap's cached lists expire after 10
+  minutes too. So a scheduled change reaches every page and the sitemap within 10 minutes, and
+  the hooks still refresh the cache at once for changes made in Admin.
 - **Not chosen:** running the jobs through Payload's `/api/payload-jobs/run` route from a system
   cron with a secret (the Payload website template's way on Vercel). It would refresh the cache at
   once, but it needs a secret on the server, a crontab outside the deploy, and a second way jobs

@@ -14,8 +14,12 @@ import { getServerSideURL } from '@/platform/lib/getURL'
 import { documentHref } from '@/platform/payload/documentHref'
 
 // Rendered on request, so the build doesn't query the database for it. Each list below stays in
-// the data cache until a save expires its tag (the pages, posts and events hooks)
+// the data cache until a save expires its tag (the pages, posts and events hooks), or for 10
+// minutes: a scheduled publish runs outside a request, where its tag can't be expired (#141,
+// decision 0011)
 export const dynamic = 'force-dynamic'
+
+const LIST_REFRESH_SECONDS = 600
 
 type Entry = { path: string; lastModified: string }
 
@@ -27,7 +31,7 @@ const LISTING_PATHS = ['/search', '/posts', '/events', '/faq', '/resources']
 const NOT_INDEXED_PATHS = new Set<string>([...ACCOUNT_PAGE_PATHS, CONFIRM_EMAIL_PATH])
 
 const cachedList = (tag: string, list: () => Promise<Entry[]>) =>
-  unstable_cache(list, [tag], { tags: [tag] })
+  unstable_cache(list, [tag], { tags: [tag], revalidate: LIST_REFRESH_SECONDS })
 
 const pageEntries = cachedList(PAGES_SITEMAP_CACHE_TAG, async () => {
   const now = new Date().toISOString()
