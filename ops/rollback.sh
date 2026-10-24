@@ -21,6 +21,11 @@ if [ "$CODE_DIR" != "$APP_DIR/$target" ] || [ ! -f "$CODE_DIR/.next/BUILD_ID" ];
   report "ERROR: run rollback.sh from a release in $APP_DIR/releases"
   exit 1
 fi
+# Only a release that was set up for this server (deploy-release.sh links the shared files).
+if [ ! -L "$CODE_DIR/.env.local" ] || [ ! -L "$CODE_DIR/data" ]; then
+  report "ERROR: $target was never set up on this server (no links to .env.local and data/), so it can't be rolled back to"
+  exit 1
+fi
 if [ "$live" = "$target" ]; then
   report "$target is already live; nothing to do"
   exit 0

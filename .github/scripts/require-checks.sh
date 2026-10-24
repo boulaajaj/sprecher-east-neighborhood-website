@@ -30,11 +30,19 @@ while :; do
     line=$(awk -F'\t' -v n="$name" '$1 == n' <<<"$jobs" | tail -n 1)
     status=$(cut -f2 <<<"$line")
     conclusion=$(cut -f3 <<<"$line")
-    # Lint cancels its run on main when a newer commit arrives; that commit deploys instead.
+    # Lint cancels its run on main when a newer commit arrives; that commit deploys instead. A
+    # cancel while this commit is still main's head (the daily scheduled Lint shares the
+    # concurrency group, or someone cancelled it) means nothing replaced it: fail, so the checks
+    # get re-run and the deploy started again.
     if [ "$status" = completed ] && [ "$conclusion" = cancelled ]; then
-      echo "::notice title=Checks::$name was cancelled on $SHA (a newer commit replaced it), so it is not deployed"
-      echo "cancelled=true" >>"${GITHUB_OUTPUT:-/dev/null}"
-      exit 0
+      head=$(gh api "repos/$REPO/commits/main" --jq '.sha')
+      if [ "$head" != "$SHA" ]; then
+        echo "::notice title=Checks::$name was cancelled on $SHA and main has moved on to ${head:0:7}, which deploys instead"
+        echo "cancelled=true" >>"${GITHUB_OUTPUT:-/dev/null}"
+        exit 0
+      fi
+      echo "::error title=Checks::$name was cancelled on $SHA, which is still main's head; re-run the checks, then the deploy (Actions → Deploy to VPS → Run workflow)"
+      exit 1
     fi
     if [ "$status" = completed ] && [ "$conclusion" != success ]; then
       echo "::error title=Checks::$name finished with '$conclusion' on $SHA, so it is not deployed"
