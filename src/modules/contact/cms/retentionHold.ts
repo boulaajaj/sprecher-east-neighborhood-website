@@ -28,6 +28,7 @@ export const validateHoldReason = (
 export const retentionHoldFields: Field[] = [
   {
     name: 'retentionHold',
+    label: 'Keep longer',
     type: 'checkbox',
     defaultValue: false,
     access: staffOnly,
@@ -39,6 +40,7 @@ export const retentionHoldFields: Field[] = [
   },
   {
     name: 'retentionHoldReason',
+    label: 'Reason for keeping it longer',
     type: 'textarea',
     access: staffOnly,
     validate: validateHoldReason,
