@@ -15,7 +15,7 @@ on the VPS. Nothing here is run by hand during a normal deploy. Changes to the s
 | `install-cron.sh`   | VPS    | Installs the daily backup job (08:15 UTC) in `/etc/cron.d/sprecher-east-backup`                                                                          | #148       |
 | `restart-app.sh`    | VPS    | Reloads the app under PM2; starts it fresh, with a way back, when its start settings change. Listens on `127.0.0.1:3000` only. Deletes old sitemap files | #118, #267 |
 | `caddy-limits.sh`   | VPS    | Caps request bodies on the public form endpoints at Caddy (`caddy/form-limits.caddy`)                                                                    | #124       |
-| `caddy-https.sh`    | VPS    | Sends HSTS on the domain and www (`caddy/hsts.caddy`), and redirects plain HTTP on the IP to the HTTPS domain                                            | #235       |
+| `caddy-https.sh`    | VPS    | Sends HSTS on the domain (`caddy/hsts.caddy`), and adds a redirect to HTTPS in the plain-HTTP site blocks                                                | #235       |
 | `lib.sh`            | VPS    | Shared helpers: annotations, reading non-secret settings, checking the site through Caddy, the `current` link                                            |            |
 
 The scripts print `::notice` and `::warning` lines, which appear as annotations on the deploy run
@@ -119,31 +119,41 @@ without the revert doesn't last: the next deploy adds them back.
 
 ## Caddy HTTPS: HSTS and the IP redirect
 
-`caddy-https.sh` makes two kinds of edit to `/etc/caddy/Caddyfile`, and refuses any other:
+`caddy-https.sh` only adds lines to `/etc/caddy/Caddyfile`, and refuses any other change:
 
 - **HSTS.** It copies `caddy/hsts.caddy` to `/etc/caddy/sprecher-east-hsts.caddy` and adds
-  `import /etc/caddy/sprecher-east-hsts.caddy` to the site blocks for the domain and www (the host
-  of `NEXT_PUBLIC_SERVER_URL`). No `includeSubDomains`, no `preload`.
-- **Plain HTTP.** In each site block that serves plain HTTP, for the IP (`:80`, `http://<IP>`) or
-  for the domain (`http://<domain>`, `<domain>:80`), it replaces the one-line `reverse_proxy` to
-  the app with `redir https://<domain>{uri} 308`, so sign-in and admin can't be reached over plain
-  HTTP. If such a block reaches the app any other way, or a block mixes the domain with other
-  addresses (on one line or several), it leaves the Caddyfile alone and warns.
+  `import /etc/caddy/sprecher-east-hsts.caddy` to the HTTPS site block for the domain (the host of
+  `NEXT_PUBLIC_SERVER_URL`). `www` only redirects, so it gets none. No `includeSubDomains`, no
+  `preload`.
+- **Plain HTTP.** Each site block that serves plain HTTP, for the IP (`:80`, `http://<IP>`,
+  `[::]:80`) or for the domain (`http://<domain>`, `<domain>:80`), gets
+  `redir https://<domain>{uri} 308` as its first line. Caddy's default directive order runs
+  `redir` before `reverse_proxy`, so the request is answered with the redirect and never reaches
+  the app; the `reverse_proxy` line stays where it was. A global `order` option could change that
+  order, so a Caddyfile with one is left alone.
 
-It validates, backs up (`Caddyfile.bak` and `Caddyfile.bak-<time>`), replaces the Caddyfile in one
-rename, and reloads. It then checks that the domain sends the header and that plain HTTP to the
-domain and to the IP redirects permanently to the same path on HTTPS. If not, or if anything fails
-while it changes the files, the backup comes back and the deploy fails. The same check runs when
-nothing needed changing. The deploy logs the `curl -I` results as annotations, from the server and
-from the internet.
+It leaves the Caddyfile alone when it can't read the layout safely (a heredoc, a site block on one
+line, unbalanced braces), when a block mixes the domain with other addresses (on one line or
+several), or when the Caddyfile sets `order`. Then it still checks plain HTTP to the IP: if that
+reaches the app, the deploy fails and says why, so the redirect can be added by hand.
+
+Before changing anything it writes the backups (`Caddyfile.bak` and `Caddyfile.bak-<time>`) under a
+temporary name, compares them with the live file and only then renames them, so a backup cut short
+by a full disk is never used. It validates the new Caddyfile, replaces it in one rename and
+reloads. It then checks that the domain sends the header and that plain HTTP to the domain and to
+the IP redirects permanently to the same path on HTTPS. If not, or if anything fails while it
+changes the files, it puts back only what it replaced, and the deploy fails. The same check runs
+when nothing needed changing. The deploy logs the `curl -I` results as annotations, from the
+server and from the internet.
 
 **Rollout.** The max-age is the one value in `caddy/hsts.caddy`: 300 (5 minutes) now, then
-604800 (1 week), then 31536000 (1 year), each after a day without problems, each a one-line pull
+86400 (1 day), then 31536000 (1 year), each after a day without problems, each a one-line pull
 request. **To undo HSTS,** set `max-age=0` in that file and keep it for at least the longest
 max-age that was live, so browsers forget the rule. Removing the import alone leaves browsers
 following it until it expires. **To undo the IP redirect,** revert the pull request that added
-it, then on the server put the `reverse_proxy` line back from `Caddyfile.bak-<time>` and run
-`caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy`.
+it, then on the server delete the `redir https://<domain>{uri} 308` lines and run
+`caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy`. Deleting them without
+the revert doesn't last: the next deploy adds them back.
 
 ## Backups
 
