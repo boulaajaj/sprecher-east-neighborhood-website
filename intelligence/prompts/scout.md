@@ -23,8 +23,9 @@ The registry, `sources.yaml`. Read only entries whose `$.sources[].result` is `v
 2. **Fetch directly first** (README.md, "Fetching"): one plain GET per source, with a clear user
    agent naming the site, a 30-second timeout, and the saved ETag or Last-Modified. Respect
    `$.sources[].cadence` and any Retry-After. A 304 means nothing changed: log `not-modified`
-   and stop, with no parse and no fallback. A 5xx or 429 is retried once, never sent to
-   Playwright. A login page, CAPTCHA, paywall or bot gateway, a 401, 403 or 451, or a redirect
+   and stop, with no parse and no fallback. Follow a redirect directly (at most 3 hops) unless it
+   leads to a gate. A 5xx or 429 is retried once, never sent to Playwright; any other 4xx (404,
+   410, ...) is an error with no retry. A login page, CAPTCHA, paywall or bot gateway, a 401, 403 or 451, or a redirect
    to one, is a gate: stop and log the source as `blocked`. Never fetch a path robots.txt
    disallows.
 3. **Playwright only on a fallback trigger**, and only when `$.sources[].fetchStrategy` is

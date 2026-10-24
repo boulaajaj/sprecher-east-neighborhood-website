@@ -50,17 +50,22 @@ trips one of these triggers:
 
 - a 200 with an empty body;
 - a JavaScript shell: no text where items should be;
-- a parse that finds no items, or fails its checks;
-- a non-200 answer that isn't an error, a gate or "not modified". A 304 is logged as
-  `not-modified` and ends the source's run. A 5xx or 429 is retried once (honoring Retry-After)
-  and never sent to Playwright; a 401, 403, 451, or a redirect to a login, paywall, CAPTCHA or
-  bot gateway is a gate and stops the source as `blocked`.
+- a parse that finds no items, or fails its checks.
+
+Every other answer is handled without a browser:
+
+- **304:** `not-modified`; the source's run ends.
+- **3xx:** followed directly (at most 3 hops, same rules at each), unless it leads to a gate.
+- **5xx or 429:** retried once, honoring Retry-After; then an `error`.
+- **401, 403, 451, or a login, paywall, CAPTCHA or bot gateway:** a gate; the source stops as
+  `blocked`.
+- **Any other 4xx (404, 410, ...):** an `error`, with no retry.
 
 The fallback is one headless, logged-out page load of the same URL, at the same daily cadence.
 
 **Logged every run.** Each source entry in the run log (`schemas/agent-run.schema.json`) records
-`fetchStrategy`, the one that produced the items (`direct`, `playwright` or `none`), so the digest
-shows how often the fallback runs.
+`fetchStrategy`: the last strategy tried (`direct`, or `playwright` after a fallback), or `none`
+when the source wasn't polled. The digest shows how often the fallback runs.
 
 **Hard nos.** No logins, CAPTCHAs or paywalls (madison.com's redirect to `tollbit.madison.com`),
 no path robots.txt disallows (Dane County's press subscription page), no social networks, and no
@@ -135,7 +140,7 @@ documents directly.
   (`schemas/agent-run.schema.json`): the repository commit it loaded, start and end, sources
   checked with their cursors, counts, errors and cost.
 
-Routing by the curate decision: `accept` → `submitSuggestion`; `needs-review`, `update`, `cancel`
+Routing by the curate decision (`routes` in `pipeline.yaml`): `accept` → `submitSuggestion`; `needs-review`, `update`, `cancel`
 → `reportItem`; `reject`, `duplicate` → counted only. A suggestion with missing facts or low
 confidence also gets a `needs-review` report pointing at it.
 

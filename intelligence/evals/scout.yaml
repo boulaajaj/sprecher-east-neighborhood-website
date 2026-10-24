@@ -110,7 +110,7 @@ cases:
     given:
       sources: [{ id: madison-parks-events, result: valid, pilotRank: 6, cadence: daily }]
     expected: { fetchStrategy: direct, runStatus: error, retries: 1, candidateCount: 0 }
-    why: A 5xx is retried once and never sent to Playwright; the source waits for the next run.
+    why: A 5xx is retried once, never sent to Playwright; fetchStrategy is direct, the last tried. The source waits for the next run.
   - id: scout-restricted-not-fetched
     ref: S7
     stage: scout
@@ -131,7 +131,7 @@ cases:
           status: 302
           redirectTo: https://tollbit.madison.com/search/?f=rss
     expected: { fetchStrategy: direct, runStatus: blocked, candidateCount: 0 }
-    why: A redirect to a paid bot gateway is a gate. It isn't followed, and Playwright isn't tried.
+    why: "Synthetic: Madison365's feed answered 200 on 2026-10-24. A redirect to a paid bot gateway is a gate; it isn't followed and Playwright isn't tried. fetchStrategy is direct, the last tried."
   - id: scout-recurring-one-cancelled
     ref: X1
     stage: scout

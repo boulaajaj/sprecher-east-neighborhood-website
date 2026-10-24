@@ -12,7 +12,7 @@ README.md describes the contract.
 
 ## Steps
 
-1. **Route each item** by `$.curation.decision`:
+1. **Route each item** by `$.curation.decision`, as `routes` in `pipeline.yaml` says:
    - `accept` with a `$.draft`: one `submitSuggestion` call (`$.tool`).
    - `needs-review`: one `reportItem` call, `kind: needs-review`.
    - `update` or `cancel`: one `reportItem` call with that kind, `targetCollection` set to

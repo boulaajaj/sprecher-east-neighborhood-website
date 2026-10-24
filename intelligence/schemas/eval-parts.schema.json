@@ -74,7 +74,7 @@
           }
         },
         "sources": {
-          "description": "Fixture-only overrides of registry entries (for example a pending page as if valid). The real sources.yaml never changes.",
+          "description": "Fixture-only overrides of a pending registry entry, to valid or pending (the check refuses any other). The real sources.yaml never changes.",
           "type": "array",
           "maxItems": 3,
           "items": {
@@ -83,7 +83,7 @@
             "required": ["id", "result"],
             "properties": {
               "id": { "$ref": "common.schema.json#/$defs/sourceId" },
-              "result": { "$ref": "sources.schema.json#/$defs/source/properties/result" },
+              "result": { "enum": ["valid", "pending"] },
               "pilotRank": { "$ref": "sources.schema.json#/$defs/source/properties/pilotRank" },
               "cadence": { "$ref": "sources.schema.json#/$defs/source/properties/cadence" }
             }
@@ -106,7 +106,7 @@
           "$ref": "common.schema.json#/$defs/flags"
         },
         "route": {
-          "description": "The MCP tool the submit stage calls: accept → submitSuggestion; needs-review, update, cancel → reportItem; reject, duplicate → none.",
+          "description": "The MCP tool the submit stage calls: accept \u2192 submitSuggestion; needs-review, update, cancel \u2192 reportItem; reject, duplicate \u2192 none.",
           "enum": ["submitSuggestion", "reportItem", "none"]
         },
         "reportKind": { "$ref": "report.schema.json#/properties/kind" },

@@ -1,8 +1,7 @@
 #!/usr/bin/env node
-// Checks intelligence/ (#337, #352): the YAML files against their schemas, the stages' prompts,
-// and the eval cases' routes, sources, offsets and grader fields. Run: node
-// scripts/check-intelligence.mjs [folder]. ajv (through payload) and js-yaml (through eslint) are
-// already installed; #343 declares them. Exits 1 with a list of problems.
+// Checks intelligence/ (#337, #352): YAML against schemas, prompts, and eval routes, sources,
+// offsets and graders. Run: node scripts/check-intelligence.mjs [folder]. ajv and js-yaml come with
+// payload and eslint (#343 declares them). Exits 1 with a list of problems.
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import Ajv2020 from 'ajv/dist/2020.js'
@@ -100,19 +99,10 @@ for (const name of evalFiles) {
   }
 }
 for (const id of duplicates(cases.map((c) => c.id))) problem(evalDir, `duplicate case id ${id}`)
-// The submit stage's routing (prompts/submit.md): which MCP tool each decision leads to
-const ROUTE = {
-  accept: 'submitSuggestion',
-  'needs-review': 'reportItem',
-  update: 'reportItem',
-  cancel: 'reportItem',
-  reject: 'none',
-  duplicate: 'none',
-}
-const sourceIds = new Set(sources?.sources?.map((s) => s.id) ?? [])
-const resultOf = new Map(sources?.sources?.map((s) => [s.id, s.result]) ?? [])
-// An offset that isn't America/Chicago's at that instant (common.schema.json's grammar: optional
-// seconds and fractions, Z or an offset), unless the case tests one
+const pipeline = validate(path.join(dir, 'pipeline.yaml'), 'schemas/pipeline.schema.json')
+const ROUTE = pipeline?.routes ?? {}
+const registry = new Map(sources?.sources?.map((s) => [s.id, s]) ?? [])
+// An offset that isn't America/Chicago's at that instant, in common.schema.json's grammar
 const DATE_TIME = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?)(Z|[+-]\d{2}:\d{2})$/
 const CHICAGO = new Intl.DateTimeFormat('en-US', {
   timeZone: 'America/Chicago',
@@ -122,21 +112,32 @@ const chicagoOffset = (value) =>
   CHICAGO.formatToParts(new Date(value))
     .find((p) => p.type === 'timeZoneName')
     .value.slice(3)
-function dateTimes(value, found = []) {
-  if (typeof value === 'string' && DATE_TIME.test(value)) found.push(value)
-  else if (value && typeof value === 'object')
-    for (const v of Object.values(value)) dateTimes(v, found)
-  return found
-}
+const dateTimes = (value) =>
+  typeof value === 'string'
+    ? [value].filter((v) => DATE_TIME.test(v))
+    : Object.values(value ?? {}).flatMap(dateTimes)
 for (const c of cases) {
   const others = [c.input?.otherSources, c.input?.alsoReportedBy].flat().filter(Boolean)
   const named = [c.input?.sourceId, ...others.map((o) => o.sourceId)]
   for (const id of [...named, ...(c.given?.sources ?? []).map((o) => o.id)])
-    if (!sourceIds.has(id)) problem(c.file, `${c.id}: no source ${id}`)
+    if (!registry.has(id)) problem(c.file, `${c.id}: no source ${id}`)
+  // Only a pending source may be overridden: never a restricted or invalid one
+  for (const o of c.given?.sources ?? []) {
+    const actual = registry.get(o.id)?.result
+    if (actual !== 'pending')
+      problem(c.file, `${c.id}: ${o.id} is ${actual}; only pending can be overridden`)
+  }
+  const source = registry.get(c.input?.sourceId)
+  const viaPlaywright = c.input?.responses?.some((r) => r.via === 'playwright')
+  if (
+    (viaPlaywright || c.expected?.fetchStrategy === 'playwright') &&
+    source?.fetchStrategy !== 'direct-then-playwright'
+  )
+    problem(c.file, `${c.id}: Playwright needs ${c.input?.sourceId} to be direct-then-playwright`)
   // A scout case that fetches needs a valid source, in the registry or as a fixture override
   if (c.stage === 'scout') {
     const override = c.given?.sources?.find((o) => o.id === c.input?.sourceId)
-    const result = override?.result ?? resultOf.get(c.input?.sourceId)
+    const result = override?.result ?? source?.result
     if ((c.expected?.runStatus === 'skipped') === (result === 'valid'))
       problem(c.file, `${c.id}: runStatus ${c.expected?.runStatus} with a ${result} source`)
   }
@@ -158,7 +159,6 @@ for (const c of cases) {
   if (ROUTE[e.decision] !== e.route)
     problem(c.file, `${c.id}: ${e.decision} routes to ${ROUTE[e.decision]}`)
 }
-const pipeline = validate(path.join(dir, 'pipeline.yaml'), 'schemas/pipeline.schema.json')
 
 // 2. Field paths: `$.a.b`, with `[]` stepping into an array's items
 function lookup(schema, segments, baseId) {
