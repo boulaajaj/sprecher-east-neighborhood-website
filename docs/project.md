@@ -56,10 +56,10 @@ It is an unofficial, AI-assisted initiative (ground rules in [`AGENTS.md`](../AG
   The server scripts are in [`ops/`](../ops/README.md)
 - **Caddy config**: `/etc/caddy/Caddyfile`. Rules for editing it (never overwrite, back up,
   validate) are in [`guidelines/security.md`](guidelines/security.md#infrastructure-security)
-- **Live domains**: `sprechereast.com` (HTTPS), `www.sprechereast.com` (redirects to it). Both send
-  HSTS (`max-age` in `ops/caddy/hsts.caddy`, rolled out in stages; no `includeSubDomains` or
-  `preload`), and plain HTTP to the IP on port 80 redirects to `https://sprechereast.com` with a 308
-  (`ops/caddy-https.sh`, #235)
+- **Live domains**: `sprechereast.com` (HTTPS), `www.sprechereast.com` (redirects to it). The
+  domain sends HSTS (`max-age` in `ops/caddy/hsts.caddy`, rolled out in stages; no
+  `includeSubDomains` or `preload`), and plain HTTP to the IP on port 80 redirects to
+  `https://sprechereast.com` with a 308 (`ops/caddy-https.sh`, #235)
 
 ## Architecture
 

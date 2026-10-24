@@ -194,8 +194,9 @@ jobs:
             echo "::notice title=Port 3000::not reachable from the internet"
           fi
 
-      # What a visitor gets, from outside the server (#235): HSTS on the domain, plain HTTP and
-      # the IP redirected to HTTPS. GitHub masks the IP in the log.
+      # What a visitor gets, from outside the server (#235): HSTS on the domain, plain HTTP to the
+      # domain and to the server's SSH address (VPS_HOST, the IP or its hostname, which the `:80`
+      # catch-all answers alike) redirected to HTTPS. GitHub masks the secret in the log.
       - name: Check HTTPS from the internet (#235)
         if: steps.order.outputs.skip != 'true'
         env:
@@ -216,4 +217,4 @@ jobs:
           }
           show "$URL/" "$URL/"
           show "${URL/https:/http:}/" "${URL/https:/http:}/"
-          show "http://<IP>/login" "http://$HOST/login"
+          show "http://<VPS_HOST>/login" "http://$HOST/login"
