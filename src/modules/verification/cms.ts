@@ -3,3 +3,4 @@
 // here may be server-only, because the Payload CLI (migrations, seed) loads it outside Next.js.
 export { emailConfirmer } from './cms/emailConfirmer'
 export { createEmailConfirmations } from './cms/emailConfirmations'
+export { createConfirmationRetentionTask } from './cms/retention'

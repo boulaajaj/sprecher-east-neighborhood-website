@@ -6,6 +6,7 @@ export { isSingleAddress, parseEmailAddress } from './emailAddress'
 export { escapeMarkup } from './escapeMarkup'
 export { toEmailHtml, type OutgoingEmail } from './emailLayout'
 export { MAX_PAGE, parsePageNumber, toPageNumbers, type FeedPage } from './paging'
+export { RETENTION, toConfirmedCutoff, toUnconfirmedCutoff } from './retention'
 export { ROLES, type Role } from './roles'
 export { SlidingWindowCounter } from './slidingWindow'
 export {

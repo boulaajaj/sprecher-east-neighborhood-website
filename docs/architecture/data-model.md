@@ -34,7 +34,7 @@ What the access functions mean (`src/platform/payload/`):
 - `users` also sets `access.admin: isAdminOrEditorBoolean` (who may open `/admin`: admin and editor).
 - "Payload default" means no access function is set, so Payload uses `Boolean(req.user)`: any logged-in user, including `resident`.
 
-Also present, added by Payload or its plugins rather than defined here: `payload-folders` (from `media.folders: true`; staff-only through `folders.collectionOverrides` in `payload.config.ts`, #143), `payload-jobs` (access set by `jobs.access` in `payload.config.ts`; nothing runs the queue yet, so scheduled publishing may never fire, #141), `payload-locked-documents` (edit locks; staff-only since #147, set on the built config by `src/platform/payload/restrictEditLocks.ts`), `payload-kv`, `payload-preferences` and `payload-migrations`.
+Also present, added by Payload or its plugins rather than defined here: `payload-folders` (from `media.folders: true`; staff-only through `folders.collectionOverrides` in `payload.config.ts`, #143), `payload-jobs` (access set by `jobs.access` in `payload.config.ts`; `jobs.autoRun` runs only the `retention` queue, in the app's own process, #274; nothing runs the default queue, so scheduled publishing may never fire, #141), the global `payload-jobs-stats` (when each scheduled task last ran; admin-only, set on the built config by `src/platform/payload/restrictJobStats.ts`), `payload-locked-documents` (edit locks; staff-only since #147, set on the built config by `src/platform/payload/restrictEditLocks.ts`), `payload-kv`, `payload-preferences` and `payload-migrations`.
 
 ## Fields by collection
 
@@ -139,10 +139,12 @@ the page's script; the click also passes the robot check (#303).
 `welcomeSentAt` means the welcome was claimed, not delivered: it is set before the send, so a
 failed send (or a failed listener) is logged and never retried.
 
-What is kept: an unconfirmed record is deleted 7 days after its last link (whenever a link is
-requested or confirmed, until scheduled jobs run, #141). A confirmed record is kept until the
-person asks for removal (through the contact form), and an admin then deletes it in Admin: the
-owner's decision on #274 (2026-10-23). The site's privacy text should say the same.
+What is kept (the owner's decision on #274, 2026-10-24; rules in `src/platform/lib/retention.ts`,
+[decision 0010](decisions/0010-contact-data-retention.md)): an unconfirmed record is deleted 48
+hours after its last link. A confirmed one is deleted 12 months after it was confirmed, once no
+message from the address is kept and no account uses it (the keepers `payload.config.ts` passes
+in), so in effect 12 months after the person's last message. The hourly task
+`deleteExpiredEmailConfirmations` does it (jobs queue `retention`). An admin can delete one sooner.
 
 ### faq
 
@@ -182,7 +184,7 @@ owner's decision on #274 (2026-10-23). The site's privacy text should say the sa
 ### Plugin-created collections
 
 - `forms`: `title` (required), `fields` (blocks: `checkbox`, `country`, `email`, `message`, `number`, `select`, `state`, `text`, `textarea`; payment disabled), `submitButtonLabel`, `confirmationType` (`message` | `redirect`, default `message`), `confirmationMessage` (richText, required for message), `redirect.url`, `emails` (array: `emailTo`, `cc`, `bcc`, `replyTo`, `emailFrom`, `subject` required, `message` richText).
-- `form-submissions`: `form` → forms (required), `submissionData` (array of `field` text, `value` textarea, both required). Added by `src/modules/contact/cms/senderEmail.ts` (#183): `senderEmail` (text, indexed, from the form's first email field; text so Payload's stricter email check can never refuse a message) and `emailConfirmed` (checkbox, default false); both set by the server only. `heldEmails` (json, hidden, no read or write access): an unconfirmed sender's emails, as the form builder made them after the safety rules, kept until the sender confirms and then sent (#287). `recordSenderEmail` clears anything a visitor sends in it.
+- `form-submissions`: `form` → forms (required), `submissionData` (array of `field` text, `value` textarea, both required). Added by `src/modules/contact/cms/senderEmail.ts` (#183): `senderEmail` (text, indexed, from the form's first email field; text so Payload's stricter email check can never refuse a message) and `emailConfirmed` (checkbox, default false); both set by the server only. `heldEmails` (json, hidden, no read or write access): an unconfirmed sender's emails, as the form builder made them after the safety rules, kept until the sender confirms and then sent (#287). `recordSenderEmail` clears anything a visitor sends in it. Added by `src/modules/contact/cms/retentionHold.ts` (#274): `retentionHold` (checkbox, default false) and `retentionHoldReason` (textarea, required while the hold is on), admin-only and never set on create. Retention (#274): the hourly task `deleteExpiredContactMessages` deletes an unconfirmed message 48 hours after it was sent (not confirmed, and it has a sender address or its form asks for one: this includes rows stored before #183), and any other 12 months after its sender's last message (one from a form with no email field, 12 months after it was sent); never one on hold. The delete is one statement that re-checks the hold and the confirmation.
 - `redirects`: `from` (text, required, unique, indexed), `to` (group: `type` reference | custom, `reference` → pages | posts, `url`). Plugin covers `pages` and `posts`.
 - `search`: `title`, `priority`, `doc` → posts | events (required), `slug`, `meta` (`title`, `description`, `image` → media), `categories` (array of `relationTo`, `categoryID`, `title`). Synced from `posts` and `events` only, drafts excluded.
 
@@ -228,6 +230,7 @@ All revalidation hooks skip when `context.disableRevalidate` is set (seed script
 | form-submissions              | `rateLimitSubmissions`, `verifyHumanSubmission` (beforeChange)                                             | create          | Max 5 submissions per IP per hour (in memory), then 429. Then a Cloudflare Turnstile token check (only active when Turnstile keys are set; failure gives 400). Admins and editors skip both                                                                                                                                                                               |
 | form-submissions              | `recordSenderEmail` (beforeChange, after the robot check)                                                  | create          | Overwrites `senderEmail` with the form's email field (trimmed, lowercase) and `emailConfirmed` with whether that address is already confirmed (#183)                                                                                                                                                                                                                      |
 | form-submissions              | `requestSenderConfirmation` (afterChange, after the plugin's email step)                                   | create          | When the sender's address isn't confirmed, stores the emails the email step held on the submission (`heldEmails`, #287), then emails the sender a confirmation link through the verification module, within its limits; never throws                                                                                                                                      |
+| form-submissions              | `acknowledgeConfirmedSender` (afterChange, last)                                                           | create          | When the sender's address was confirmed before, emails them the fixed "We received your message" text, within the form email cap (#274). A first-time sender gets the welcome email after their click instead; never throws                                                                                                                                               |
 | form-submissions              | `guardFormEmails` (plugin `beforeEmail`, runs in the plugin's afterChange email send)                      | create          | Drops emails whose to/cc/bcc contains `{{...}}` from the form values; blanks a From built from form values; keeps a form-based Reply-To only if it is a single address. An unconfirmed sender's emails are held instead of sent (#287); otherwise it adds "Sender's email: confirmed." and caps form emails at 30 per hour site-wide. The submission is stored either way |
 | email-confirmations           | `onConfirmed`: contact's `markSubmissionsConfirmed`                                                        | confirm         | Sends the emails held for that address's messages (each once, marked confirmed, within the email cap; #287), then sets `emailConfirmed` on every message from that address                                                                                                                                                                                                |
 
@@ -238,6 +241,7 @@ All revalidation hooks skip when `context.disableRevalidate` is set (seed script
 - `posts.populatedAuthors`: update `() => false`.
 - `team-members.email`: read `isAdminOrEditorFieldAccess`, so the public read of `team-members` leaves it out (#140).
 - `form-submissions.senderEmail`, `form-submissions.emailConfirmed`: read `isAdminFieldAccess`, so the answer to a visitor's own submission doesn't say whether the address they typed is confirmed (#183).
+- `form-submissions.retentionHold`, `form-submissions.retentionHoldReason`: create `() => false`; read and update `isAdminFieldAccess` (#274).
 - No other field sets its own access.
 
 ## Source

@@ -64,7 +64,8 @@ grows should split its top level "into domain oriented modules which are interna
 - `payload/`: role checks and access functions (every module uses them), the `media` uploads
   collection, the default rich-text editor (`defaultLexical`), the `populatePublishedAt` hook and
   the admin dashboard components. Plugin setup is composed in `payload.config.ts`, because each
-  module brings its own options.
+  module brings its own options. Also the retention queue and schedule (`retentionJobs.ts`) that
+  the contact and verification modules' retention tasks share (#274).
 - `ui/`: primitives (`Button`, `Input`, `Media`, `Link`) with their variants, and
   `ConfirmedEmailContext`: the address the confirm page just confirmed, which `verification`
   provides to the slot `accounts` fills with its account offer (#187).

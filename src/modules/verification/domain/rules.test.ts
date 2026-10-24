@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { checkAddressLimit, checkLink, toTokenExpiry, toUnconfirmedCutoff } from './rules'
+import { RETENTION } from '@/platform/lib'
+
+import { CONFIRMATION_LIMITS } from './limits'
+import { checkAddressLimit, checkLink, toTokenExpiry } from './rules'
 
 const HOUR = 60 * 60 * 1000
 const DAY = 24 * HOUR
@@ -53,9 +56,11 @@ describe('toTokenExpiry', () => {
   })
 })
 
-describe('toUnconfirmedCutoff', () => {
-  it('is 7 days before now', () => {
-    expect(toUnconfirmedCutoff(NOW)).toBe(iso(NOW - 7 * DAY))
+describe('the limits and the retention rules (#274)', () => {
+  it('end a link, and the per-address window, before an unconfirmed record is deleted', () => {
+    expect(CONFIRMATION_LIMITS.linkLifetimeMs).toBe(DAY)
+    expect(CONFIRMATION_LIMITS.linkLifetimeMs).toBeLessThan(RETENTION.unconfirmedMs)
+    expect(CONFIRMATION_LIMITS.addressWindowMs).toBeLessThan(RETENTION.unconfirmedMs)
   })
 })
 

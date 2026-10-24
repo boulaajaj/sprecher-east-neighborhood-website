@@ -24,10 +24,6 @@ export function checkAddressLimit(record: AddressWindow | null, now: number): Ad
 export const toTokenExpiry = (now: number): string =>
   new Date(now + CONFIRMATION_LIMITS.linkLifetimeMs).toISOString()
 
-/** Unconfirmed addresses whose last link was sent before this moment are deleted. */
-export const toUnconfirmedCutoff = (now: number): string =>
-  new Date(now - CONFIRMATION_LIMITS.keepUnconfirmedMs).toISOString()
-
 /**
  * What a valid link for this record does now: confirm it, nothing (already confirmed, so a
  * reused link) or nothing because it expired. An expiry that can't be read counts as expired.

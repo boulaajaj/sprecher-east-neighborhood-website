@@ -36,7 +36,7 @@ export const createEmailConfirmations = ({
   admin: {
     defaultColumns: ['email', 'confirmedAt', 'lastSentAt'],
     description:
-      'Addresses typed into a public form, and when they were confirmed by link. Unconfirmed ones are deleted 7 days after their last link. To remove a confirmed address on request, delete it here.',
+      'Addresses typed into a public form, and when they were confirmed by link. Unconfirmed ones are deleted automatically 48 hours after their last link. A confirmed one is deleted automatically 12 months after the person’s last message, unless they have an account or a message on hold. To remove an address on request sooner, delete it here.',
     useAsTitle: 'email',
   },
   defaultSort: '-updatedAt',
