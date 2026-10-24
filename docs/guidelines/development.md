@@ -102,7 +102,8 @@ In development, failures should be visible and informative (console warnings, fa
 ## Respect Template Conventions
 
 See [`docs/architecture/`](../architecture/README.md) for where new code belongs, and
-[`payload-cms.md`](payload-cms.md) for today's template folders (blocks, collections, fields, hooks).
+[`payload-cms.md`](payload-cms.md) for the Payload patterns (collections, blocks, heroes, hooks,
+fields).
 
 ## Fix Everything You Touch
 

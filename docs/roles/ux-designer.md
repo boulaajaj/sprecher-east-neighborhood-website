@@ -17,7 +17,7 @@ The website must be so intuitive that a first-time visitor — whether a tech-sa
 - **Live Preview**: Real-time content preview in admin panel via `window.postMessage` — supports mobile/tablet/desktop breakpoints
 - **Draft Preview**: Unpublished content previewable before publishing via draft routes
 - **Auth**: Payload native auth (email and password); social login is not installed
-- **UI Components**: shadcn/ui (Radix UI primitives + Tailwind) — leverage these for consistent interaction patterns
+- **UI Components**: the UI kit in `src/platform/ui/` (Radix UI primitives, `cva` variants, Tailwind tokens), listed in [`docs/ui/component-set.md`](../ui/component-set.md) — leverage these for consistent interaction patterns
 - **Docs Reference**: https://payloadcms.com/llms-full.txt
 
 ### Admin UX Considerations

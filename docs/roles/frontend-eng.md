@@ -89,7 +89,7 @@ the [current folders](../project.md#architecture). File size and naming: [conven
 
 ### Layout Consistency
 
-- All pages use the same `Container` component with consistent max-width
+- All pages use the same max-width: the `container` class (the planned `Section` component's `width` in [`docs/ui/component-set.md`](../ui/component-set.md) replaces a separate `Container`)
 - Content areas must visually align with navigation bar edges
 - Consistent spacing rhythm across all pages
 

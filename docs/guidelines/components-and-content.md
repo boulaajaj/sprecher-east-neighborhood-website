@@ -10,6 +10,10 @@ Patterns for using existing components and maintaining content quality standards
 
 ## Key Reusable Components
 
+The full list of shared components, with their variants and props, is
+[`docs/ui/component-set.md`](../ui/component-set.md), and the code is in `src/platform/ui/`. This
+table names only the ones used most.
+
 | Component | Path                                 | Usage                                                                                    |
 | --------- | ------------------------------------ | ---------------------------------------------------------------------------------------- |
 | CMSLink   | `src/platform/ui/CMSLink.tsx`        | Internal/external links with reference support                                           |
