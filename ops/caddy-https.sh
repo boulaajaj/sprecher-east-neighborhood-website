@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
 # HTTPS at Caddy (#235): the site's HTTPS blocks send HSTS, and plain HTTP to the server's IP
-# redirects to the canonical HTTPS address instead of reaching the app.
+# (or to the domain, if a block serves it) redirects to the canonical HTTPS address instead of
+# reaching the app.
 #
 # Two edits to /etc/caddy/Caddyfile, and nothing else, checked before saving:
-#   - each site block for the domain or www gets one line importing
+#   - each HTTPS site block for the domain or www gets one line importing
 #     /etc/caddy/sprecher-east-hsts.caddy (a copy of ops/caddy/hsts.caddy, where max-age is set)
-#   - in the one site block that serves plain HTTP for the IP (`:80` or `http://<IP>`), the
+#   - in each site block that serves plain HTTP (`:80`, `http://<IP>`, `http://<domain>`), the
 #     one-line `reverse_proxy` to the app becomes `redir https://<domain>{uri} 308`
 # The canonical address is NEXT_PUBLIC_SERVER_URL. Every change is validated first and the old
-# Caddyfile backed up (Caddyfile.bak and a dated copy); if Caddy won't reload, or the site, the
-# header or the redirect isn't right afterwards, the previous files come back. Running it again
-# changes nothing. Its results, like `curl -I`, are printed as annotations on the deploy run.
+# Caddyfile backed up (Caddyfile.bak and a dated copy), then replaced in one rename. Success
+# means the domain sends the header and plain HTTP to the domain and the IP redirects
+# permanently to https; otherwise, or on any unexpected failure while changing, the previous files
+# come back and the script fails. That check also runs when nothing needed changing. Its results,
+# like `curl -I`, are printed as annotations on the deploy run.
 set -Eeuo pipefail
 umask 077
 trap '' HUP # a dropped SSH session must not stop the script between a change and its rollback
@@ -64,27 +67,40 @@ ip_address_file="$CADDYFILE.sprecher-east-https-ip"
 hsts_backup=""
 trap 'rm -f "$candidate" "$original" "$ip_address_file"' EXIT
 
-# Prints the Caddyfile with both edits made, and writes the IP block's address to
-# $ip_address_file. Exits 3 if the layout can't be read safely, 4 if no block serves the domain,
-# 5 if the IP block reaches the app other than through one plain `reverse_proxy` line, 6 if more
-# than one block serves the IP, 7 if a block mixes the domain with other addresses.
+# Prints the Caddyfile with both edits made, and writes the address of a plain-HTTP block that
+# serves the IP (or any host) to $ip_address_file. Exits 3 if the layout can't be read safely, 4
+# if no block serves the domain over HTTPS, 5 if a plain-HTTP block reaches the app other than
+# through one plain `reverse_proxy` line, 7 if a block mixes the HTTPS domain with other addresses.
+# A site's address list may span lines (each but the last ending in a comma); it is classified
+# as a whole.
 rewrite() {
   awk -v host="$host" -v imp="$IMPORT_LINE" -v redir="$REDIR_LINE" -v port="$APP_PORT" \
     -v side="$ip_address_file" '
     function clean(s) { sub(/(^|[[:space:]])#.*$/, "", s); gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); return s }
-    # 1: every address is the domain or www; 2: every address is plain HTTP on the IP or any
-    # host (":80", "http://", "http://<IPv4>[:80]", "<IPv4>:80"); 3: the domain mixed with others.
-    function kind(addr,   n, i, t, a, dom, ip, other) {
+    function ours(t) { return t == host || t == "www." host }
+    # 1: every address is the domain or www over HTTPS. 2: every address is plain HTTP, on the
+    # IP or any host (":80", "http://", "http://<IPv4>[:80]", "<IPv4>:80") or on the domain or www
+    # ("http://<domain>", "<domain>:80"). 3: the HTTPS domain mixed with anything else.
+    function kind(addr,   n, i, t, a, dom, plain, other) {
       n = split(addr, a, /[ ,\t]+/)
       for (i = 1; i <= n; i++) {
         t = a[i]
         if (t == "") continue
-        if (t ~ /^(http:\/\/)?([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)?(:80)?$/ && (t ~ /^http:\/\// || t ~ /:80$/)) { ip++; continue }
+        if (t ~ /^(http:\/\/)?([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)?(:80)?$/ && (t ~ /^http:\/\// || t ~ /:80$/)) {
+          plain++
+          if (t ~ /^(http:\/\/)?(:80)?$/ || t ~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/) caught = caught " " t
+          continue
+        }
+        if (t ~ /^http:\/\// || t ~ /:80$/) {
+          sub(/^http:\/\//, "", t); sub(/:80$/, "", t)
+          if (ours(t)) plain++; else other++
+          continue
+        }
         sub(/^https:\/\//, "", t); sub(/:443$/, "", t)
-        if (t == host || t == "www." host) dom++; else other++
+        if (ours(t)) dom++; else other++
       }
-      if (dom && !ip && !other) return 1
-      if (ip && !dom && !other) return 2
+      if (dom && !plain && !other) return 1
+      if (plain && !dom && !other) return 2
       if (dom) return 3
       return 0
     }
@@ -92,10 +108,14 @@ rewrite() {
       text[NR] = $0
       s = clean($0)
       if ($0 ~ /<</) bad = 3
+      # An address line ending in a comma continues on the next line.
+      if (depth == 0 && s ~ /,$/ && s !~ /[{}]/) { pending = pending " " s; next }
+      if (depth == 0 && pending != "" && s !~ /\{$/) bad = 3
       if (depth == 0 && s ~ /\{$/ && s !~ /^\{/ && s !~ /^&?\(/) {
-        start = NR; k = kind(substr(s, 1, length(s) - 1)); has = 0
+        caught = ""
+        start = NR; k = kind(pending " " substr(s, 1, length(s) - 1)); has = 0; pending = ""
         if (k == 3) mixed = 1
-        if (k == 2) { ipblocks++; ipaddr = substr(s, 1, length(s) - 1) }
+        if (k == 2 && caught != "" && ipaddr == "") ipaddr = caught
       }
       if (depth > 0 && start && k == 1 && s == imp) has = 1
       if (depth > 0 && start && k == 2 && s ~ /^reverse_proxy([[:space:]]|$)/) {
@@ -116,8 +136,8 @@ rewrite() {
       if (mixed) exit 7
       if (!domains) exit 4
       if (odd) exit 5
-      if (ipblocks > 1) exit 6
-      if (ipblocks) { gsub(/^[[:space:]]+|[[:space:]]+$/, "", ipaddr); print ipaddr > side }
+      if (pending != "") exit 3
+      if (ipaddr != "") { gsub(/^[[:space:]]+|[[:space:]]+$/, "", ipaddr); print ipaddr > side }
       for (i = 1; i <= NR; i++) {
         if (i in swap) {
           match(text[i], /^[[:space:]]*/)
@@ -139,15 +159,11 @@ rewrite >"$candidate" || status=$?
 case $status in
   0) ;;
   4)
-    report "WARNING: no Caddy site block serves $host, so HSTS and the IP redirect were not added"
+    report "WARNING: no Caddy site block serves $host over HTTPS, so HSTS and the IP redirect were not added"
     exit 0
     ;;
   5)
-    report "WARNING: the plain-HTTP IP block reaches the app other than through one reverse_proxy line, so the Caddyfile was left alone"
-    exit 0
-    ;;
-  6)
-    report "WARNING: more than one Caddy site block serves plain HTTP on the IP, so the Caddyfile was left alone"
+    report "WARNING: a plain-HTTP Caddy site block reaches the app other than through one reverse_proxy line, so the Caddyfile was left alone"
     exit 0
     ;;
   7)
@@ -175,7 +191,7 @@ imports=$(grep -cxF "$IMPORT_LINE" <<<"$added" || true)
 if { [ -n "$removed" ] && grep -vqE "^reverse_proxy[[:space:]]+(http://)?(localhost|127\.0\.0\.1)?:$APP_PORT$" <<<"$removed"; } ||
   [ "$((redirects + imports))" -ne "$(grep -c . <<<"$added" || true)" ] ||
   [ "$removed_count" -ne "$redirects" ]; then
-  report "ERROR: the Caddyfile edit changed more than the HSTS imports and the IP redirect; nothing was changed"
+  report "ERROR: the Caddyfile edit changed more than the HSTS imports and the HTTP redirects; nothing was changed"
   exit 1
 fi
 
@@ -183,6 +199,18 @@ hsts_changed=no
 if ! cmp -s "$SOURCE" "$HSTS_FILE"; then hsts_changed=yes; fi
 caddyfile_changed=no
 if [ "$((redirects + imports))" -gt 0 ]; then caddyfile_changed=yes; fi
+
+# Replaces <dst> with a copy of <src> in one rename, keeping <dst>'s owner and mode, so the file
+# is never seen half written.
+atomic_replace() { # <src> <dst>
+  local tmp
+  tmp=$(mktemp "$2.sprecher-east-tmp-XXXXXX") || return 1
+  if cp "$1" "$tmp" && chown --reference="$2" "$tmp" && chmod --reference="$2" "$tmp" && mv -f "$tmp" "$2"; then
+    return 0
+  fi
+  rm -f "$tmp"
+  return 1
+}
 
 restore_hsts() {
   if [ -n "$hsts_backup" ]; then
@@ -195,8 +223,8 @@ restore_hsts() {
 # Puts the previous Caddyfile and HSTS file back and reloads. On failure, prints what went wrong.
 restore_all() {
   local failed=""
-  # cp reads the backup before it truncates the Caddyfile, so an unreadable backup can't empty it.
-  if [ "$caddyfile_changed" = yes ] && ! cp "$CADDYFILE.bak-$stamp" "$CADDYFILE"; then
+  if [ "$caddyfile_changed" = yes ] && [ -f "$CADDYFILE.bak-$stamp" ] &&
+    ! atomic_replace "$CADDYFILE.bak-$stamp" "$CADDYFILE"; then
     failed="the Caddyfile (backup: $CADDYFILE.bak-$stamp)"
   fi
   if [ "$hsts_changed" = yes ] && ! restore_hsts; then failed="${failed:+$failed and }the HSTS file (copy: $hsts_backup)"; fi
@@ -210,49 +238,79 @@ restore_all() {
   fi
 }
 
-# Status, Location and Strict-Transport-Security of a HEAD-like request through Caddy here.
+# From the HSTS install until the check passes, any unexpected failure puts the old files back.
+mutating=no
+on_unexpected_error() {
+  [ "$BASH_SUBSHELL" -eq 0 ] || return 0
+  trap - ERR
+  if [ "$mutating" = yes ] && detail=$(restore_all); then
+    report "ERROR: caddy-https.sh failed unexpectedly at line $1; the previous Caddy config is back"
+  elif [ "$mutating" = yes ]; then
+    report "ERROR: caddy-https.sh failed unexpectedly at line $1. $detail"
+  else
+    report "ERROR: caddy-https.sh failed unexpectedly at line $1; nothing was changed"
+  fi
+  exit 1
+}
+
+# Status, Location and Strict-Transport-Security of a request through Caddy on this machine.
 headers_of() { # <url> [curl args…]
   local target="$1"
   shift
-  curl -s -o /dev/null -D - --max-time 15 "$@" "$target" 2>/dev/null | tr -d '\r' | awk '
+  { curl -s -o /dev/null -D - --max-time 15 "$@" "$target" 2>/dev/null || true; } | tr -d '\r' | awk '
     NR == 1 { code = $2 }
     tolower($1) == "location:" { loc = $2 }
     tolower($1) == "strict-transport-security:" { sub(/^[^:]*:[[:space:]]*/, ""); hsts = $0 }
     END { printf "%s|%s|%s\n", code ? code : "000", loc, hsts }'
 }
+field() { cut -d'|' -f"$1" <<<"$2"; }
 domain_headers() { headers_of "https://$host/" --resolve "$host:443:127.0.0.1"; }
+http_headers() { headers_of "http://$host/login" --resolve "$host:80:127.0.0.1"; }
 # Plain HTTP to the IP block: to its IP when it names one, else to any host it catches.
 ip_headers() {
   local ip
   ip=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' <<<"$ip_address" | head -n 1 || true)
   headers_of "http://127.0.0.1/login" -H "Host: ${ip:-127.0.0.1}"
 }
-http_headers() { headers_of "http://$host/" --resolve "$host:80:127.0.0.1"; }
 
-# What the change must achieve: HSTS on the domain, the IP redirecting to the same path on it.
-problem_after() {
-  local d i
-  wait_until_up 20 || { echo "the site stopped answering"; return; }
+# What must hold, changed or not: the site answers, the domain sends the HSTS header, and plain
+# HTTP to the domain and to the IP redirects permanently to the same path on the HTTPS domain.
+# Prints the first problem, or nothing.
+problem_now() {
+  local d h i
+  wait_until_up 20 || { echo "the site does not answer through Caddy"; return; }
   d=$(domain_headers)
-  [ "$(cut -d'|' -f3 <<<"$d")" = "$hsts_value" ] || { echo "https://$host/ does not send Strict-Transport-Security: $hsts_value"; return; }
+  [ "$(field 3 "$d")" = "$hsts_value" ] ||
+    { echo "https://$host/ does not send Strict-Transport-Security: $hsts_value"; return; }
+  h=$(http_headers)
+  case "$(field 1 "$h")" in 301 | 308) ;; *) h="" ;; esac
+  [ -n "$h" ] && [ "$(field 2 "$h")" = "https://$host/login" ] ||
+    { echo "plain HTTP to $host does not redirect permanently to https://$host/login"; return; }
   if [ -n "$ip_address" ]; then
     i=$(ip_headers)
-    [ "$(cut -d'|' -f1 <<<"$i")" = 308 ] && [ "$(cut -d'|' -f2 <<<"$i")" = "https://$host/login" ] ||
-      { echo "plain HTTP to the IP answers $(cut -d'|' -f1 <<<"$i") instead of redirecting to https://$host/login"; return; }
+    [ "$(field 1 "$i")" = 308 ] && [ "$(field 2 "$i")" = "https://$host/login" ] ||
+      { echo "plain HTTP to the IP answers $(field 1 "$i") instead of redirecting to https://$host/login"; return; }
   fi
 }
 
 if [ "$caddyfile_changed" = no ] && [ "$hsts_changed" = no ]; then
+  problem=$(problem_now)
+  if [ -n "$problem" ]; then
+    report "ERROR: Caddy's HTTPS settings look in place, but $problem; nothing was changed"
+    exit 1
+  fi
   report "Caddy HTTPS settings already in place (HSTS $hsts_value, Caddy $(caddy_version))"
 else
+  mutating=yes
   if [ -f "$HSTS_FILE" ]; then
     hsts_backup=$(mktemp "$HSTS_FILE.previous-XXXXXX")
     cp -p "$HSTS_FILE" "$hsts_backup"
   fi
   install -m 644 "$SOURCE" "$HSTS_FILE"
   if ! caddy_accepts "$candidate"; then
+    mutating=no
     if restore_hsts; then
-      report "ERROR: Caddy rejected the HSTS and IP redirect change; nothing was changed"
+      report "ERROR: Caddy rejected the HSTS and HTTP redirect change; nothing was changed"
     else
       report "ERROR: Caddy rejected the change, and the previous HSTS file could not be put back (copy: $hsts_backup)"
     fi
@@ -261,16 +319,17 @@ else
   if [ "$caddyfile_changed" = yes ]; then
     cp -p "$CADDYFILE" "$CADDYFILE.bak"
     cp -p "$CADDYFILE" "$CADDYFILE.bak-$stamp"
-    cp "$candidate" "$CADDYFILE" # cp onto the existing file keeps its owner and mode
+    atomic_replace "$candidate" "$CADDYFILE"
   fi
 
   problem=""
   if ! $RELOAD_CADDY >/dev/null 2>&1; then
-    problem="Caddy would not reload with the HSTS and IP redirect change"
+    problem="Caddy would not reload with the HSTS and HTTP redirect change"
   else
-    problem=$(problem_after)
+    problem=$(problem_now)
   fi
   if [ -n "$problem" ]; then
+    mutating=no
     if detail=$(restore_all); then
       report "ERROR: $problem; the previous Caddy config is back"
     else
@@ -278,9 +337,10 @@ else
     fi
     exit 1
   fi
+  mutating=no
   if [ -n "$hsts_backup" ]; then rm -f "$hsts_backup"; fi
   if [ "$caddyfile_changed" = yes ]; then
-    report "Caddy HTTPS settings applied: $imports HSTS import(s), $redirects IP redirect(s) (backup: $CADDYFILE.bak-$stamp)"
+    report "Caddy HTTPS settings applied: $imports HSTS import(s), $redirects HTTP redirect(s) (backup: $CADDYFILE.bak-$stamp)"
   else
     report "Caddy HSTS updated: $hsts_value"
   fi
@@ -288,12 +348,12 @@ fi
 
 # Evidence for #235, as `curl -I` sees it from this server through Caddy.
 d=$(domain_headers)
-report "curl -I https://$host/ → $(cut -d'|' -f1 <<<"$d"), Strict-Transport-Security: $(cut -d'|' -f3 <<<"$d")"
+report "curl -I https://$host/ → $(field 1 "$d"), Strict-Transport-Security: $(field 3 "$d")"
 h=$(http_headers)
-report "curl -I http://$host/ → $(cut -d'|' -f1 <<<"$h") to $(cut -d'|' -f2 <<<"$h")"
+report "curl -I http://$host/login → $(field 1 "$h") to $(field 2 "$h")"
 if [ -n "$ip_address" ]; then
   i=$(ip_headers)
-  report "curl -I http://<IP>/login → $(cut -d'|' -f1 <<<"$i") to $(cut -d'|' -f2 <<<"$i")"
+  report "curl -I http://<IP>/login → $(field 1 "$i") to $(field 2 "$i")"
 else
   report "WARNING: no Caddy site block serves plain HTTP on the IP, so there was nothing to redirect"
 fi
