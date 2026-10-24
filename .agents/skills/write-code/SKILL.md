@@ -30,8 +30,9 @@ look for a open source plugin [...] If none of it is there, only then we can wri
 
 ## 1. Find what exists first
 
-Before writing anything, search for it: this module, then `src/platform/`. Then go down the ladder: native Payload, Next.js and React features and
-config, official plugins, well-established free open-source plugins, and only then our own code.
+Before writing anything, search for it: this module, then `src/platform/`. Then go down the
+ladder: native Payload, Next.js and React features and config, official plugins, well-established
+free open-source plugins, and only then our own code.
 Record what each step found on the issue before writing custom code. How:
 [`references/reuse.md`](references/reuse.md).
 
