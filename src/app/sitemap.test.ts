@@ -60,6 +60,28 @@ describe('sitemap', () => {
     ])
   })
 
+  it('leaves out the sign-in, account and confirmation pages, even as CMS page slugs (#280)', async () => {
+    const hidden = [
+      'login',
+      'account',
+      'forgot-password',
+      'reset-password',
+      'sign-up',
+      'verify-account',
+      'confirm-email',
+    ]
+    mocks.listPageSlugs.mockResolvedValue(
+      [...hidden, 'about'].map((slug) => ({ slug, updatedAt: '2026-10-02T00:00:00.000Z' })),
+    )
+    mocks.listPostSlugs.mockResolvedValue([])
+    mocks.listEventSlugs.mockResolvedValue([])
+
+    const paths = (await sitemap()).map(({ url }) => new URL(url).pathname)
+
+    expect(paths).toContain('/about')
+    for (const slug of hidden) expect(paths).not.toContain(`/${slug}`)
+  })
+
   it('escapes a URL for the XML, since Next writes it as it is', async () => {
     mocks.listPageSlugs.mockResolvedValue([])
     mocks.listPostSlugs.mockResolvedValue([

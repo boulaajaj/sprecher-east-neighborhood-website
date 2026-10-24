@@ -2,13 +2,14 @@ import type { Metadata } from 'next'
 
 import { parseLinkToken } from '@/modules/accounts'
 import { VerifyAccount } from '@/modules/accounts/server'
+import { NOT_INDEXED } from '@/platform/seo/notIndexed'
 
 export const metadata: Metadata = {
   title: 'Confirm Your Account',
   description: 'Confirm the email of your new Sprecher East account.',
   // The token is in this page's address: never send it to another site, never index it
   referrer: 'no-referrer',
-  robots: { index: false, follow: false },
+  robots: NOT_INDEXED,
 }
 
 type Props = { searchParams: Promise<{ token?: string | string[] }> }

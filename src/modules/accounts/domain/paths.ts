@@ -17,3 +17,13 @@ export const SIGN_UP_PATH = '/sign-up'
 
 /** Where the link in Payload's verification email lands, with `?token=…`. */
 export const VERIFY_ACCOUNT_PATH = '/verify-account'
+
+/** Every page of this module: none belongs in search results or the sitemap (#280). */
+export const ACCOUNT_PAGE_PATHS = [
+  SIGN_IN_PATH,
+  ACCOUNT_PATH,
+  FORGOT_PASSWORD_PATH,
+  RESET_PASSWORD_PATH,
+  SIGN_UP_PATH,
+  VERIFY_ACCOUNT_PATH,
+] as const

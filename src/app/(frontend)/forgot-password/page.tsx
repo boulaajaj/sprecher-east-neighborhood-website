@@ -3,10 +3,12 @@ import { redirect } from 'next/navigation'
 
 import { ACCOUNT_PATH } from '@/modules/accounts'
 import { ForgotPasswordForm, getCurrentUser } from '@/modules/accounts/server'
+import { NOT_INDEXED } from '@/platform/seo/notIndexed'
 
 export const metadata: Metadata = {
   title: 'Forgot Password',
   description: 'Get a link to choose a new password for your Sprecher East account.',
+  robots: NOT_INDEXED,
 }
 
 /** Where a visitor asks for a link to reset a forgotten password (#269). */

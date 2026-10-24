@@ -3,10 +3,12 @@ import { redirect } from 'next/navigation'
 
 import { ACCOUNT_PATH } from '@/modules/accounts'
 import { getCurrentUser, SignInForm } from '@/modules/accounts/server'
+import { NOT_INDEXED } from '@/platform/seo/notIndexed'
 
 export const metadata: Metadata = {
   title: 'Log In',
   description: 'Log in to your Sprecher East account.',
+  robots: NOT_INDEXED,
 }
 
 export default async function LoginPage() {
