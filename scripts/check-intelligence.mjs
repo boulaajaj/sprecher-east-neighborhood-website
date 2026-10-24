@@ -83,9 +83,25 @@ if (sources?.sources) {
   for (const rank of duplicates(list.map((s) => s.pilotRank)))
     problem(path.join(dir, 'sources.yaml'), `two sources share pilotRank ${rank}`)
 }
-const evals = validate(path.join(dir, 'evals', 'cases.yaml'), 'schemas/eval-cases.schema.json')
-for (const id of duplicates(evals?.cases?.map((c) => c.id) ?? []))
-  problem(path.join(dir, 'evals', 'cases.yaml'), `duplicate case id ${id}`)
+// Eval cases: one file per stage, `<stage>.yaml` or `<stage>-<topic>.yaml`
+const evalDir = path.join(dir, 'evals')
+const evalFiles = existsSync(evalDir)
+  ? readdirSync(evalDir).filter((name) => name.endsWith('.yaml'))
+  : []
+if (evalFiles.length === 0) problem(evalDir, 'no eval files')
+const cases = []
+for (const name of evalFiles) {
+  const file = path.join(evalDir, name)
+  const data = validate(file, 'schemas/eval-cases.schema.json')
+  if (!data?.cases) continue
+  if (!name.startsWith(`${data.stage}.`) && !name.startsWith(`${data.stage}-`))
+    problem(file, `file name must start with its stage, ${data.stage}`)
+  for (const c of data.cases) {
+    if (c.stage !== data.stage) problem(file, `${c.id}: stage ${c.stage} in a ${data.stage} file`)
+    cases.push({ ...c, file })
+  }
+}
+for (const id of duplicates(cases.map((c) => c.id))) problem(evalDir, `duplicate case id ${id}`)
 // The submit stage's routing (prompts/submit.md): which MCP tool each decision leads to
 const ROUTE = {
   accept: 'submitSuggestion',
@@ -96,18 +112,45 @@ const ROUTE = {
   duplicate: 'none',
 }
 const sourceIds = new Set(sources?.sources?.map((s) => s.id) ?? [])
-const casesFile = path.join(dir, 'evals', 'cases.yaml')
-for (const c of evals?.cases ?? []) {
-  if (!sourceIds.has(c.input?.sourceId))
-    problem(casesFile, `${c.id}: no source ${c.input?.sourceId}`)
+// An offset that isn't America/Chicago's at that local time, unless the case tests one
+const DATE_TIME = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?)([+-]\d{2}:\d{2})$/
+function chicagoOffset(value) {
+  const instant = new Date(value)
+  const name = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Chicago',
+    timeZoneName: 'longOffset',
+  })
+    .formatToParts(instant)
+    .find((part) => part.type === 'timeZoneName').value
+  return name.replace('GMT', '')
+}
+function dateTimes(value, found = []) {
+  if (typeof value === 'string' && DATE_TIME.test(value)) found.push(value)
+  else if (value && typeof value === 'object')
+    for (const v of Object.values(value)) dateTimes(v, found)
+  return found
+}
+for (const c of cases) {
+  for (const id of [c.input?.sourceId, ...(c.input?.otherSources ?? []).map((o) => o.sourceId)]) {
+    if (!sourceIds.has(id)) problem(c.file, `${c.id}: no source ${id}`)
+  }
+  if (!c.tags?.includes('wrong-offset')) {
+    for (const value of dateTimes([c.input, c.given, c.graders])) {
+      const offset = DATE_TIME.exec(value)[2]
+      if (chicagoOffset(value) !== offset)
+        problem(c.file, `${c.id}: ${value} should use ${chicagoOffset(value)} in America/Chicago`)
+    }
+  }
+  const e = c.expected
+  if (!e?.decision) continue
   // duplicate, update and cancel name the known document; nothing else names one
-  const known = ['duplicate', 'update', 'cancel'].includes(c.expected?.decision) ? c.known : null
-  if (c.expected && (c.expected.targetId ?? null) !== (known?.id ?? null))
-    problem(casesFile, `${c.id}: targetId must be ${known?.id ?? 'null'}`)
-  if (c.expected && (c.expected.targetCollection ?? null) !== (known?.collection ?? null))
-    problem(casesFile, `${c.id}: targetCollection must be ${known?.collection ?? 'null'}`)
-  if (c.expected && ROUTE[c.expected.decision] !== c.expected.route)
-    problem(casesFile, `${c.id}: ${c.expected.decision} routes to ${ROUTE[c.expected.decision]}`)
+  const known = ['duplicate', 'update', 'cancel'].includes(e.decision) ? c.known : null
+  if ((e.targetId ?? null) !== (known?.id ?? null))
+    problem(c.file, `${c.id}: targetId must be ${known?.id ?? 'null'}`)
+  if ((e.targetCollection ?? null) !== (known?.collection ?? null))
+    problem(c.file, `${c.id}: targetCollection must be ${known?.collection ?? 'null'}`)
+  if (ROUTE[e.decision] !== e.route)
+    problem(c.file, `${c.id}: ${e.decision} routes to ${ROUTE[e.decision]}`)
 }
 const pipeline = validate(path.join(dir, 'pipeline.yaml'), 'schemas/pipeline.schema.json')
 
@@ -175,11 +218,26 @@ for (const stage of pipeline?.stages ?? []) {
   }
 }
 
+// 4. Graders name fields of their stage's input or output schema
+const stageSchemas = Object.fromEntries(
+  (pipeline?.stages ?? []).map((stage) => [stage.id, [stage.input, stage.output]]),
+)
+for (const c of cases) {
+  for (const grader of c.graders ?? []) {
+    if (!grader.field) continue
+    const names = stageSchemas[c.stage] ?? []
+    const segments = grader.field.slice(2).split('.')
+    if (!names.some((name) => compiled[name] && lookup(schemaAt(idOf[name]), segments, idOf[name])))
+      problem(c.file, `${c.id}: grader field ${grader.field} is not in ${names.join(' or ')}`)
+  }
+}
+
 if (problems.length) {
   console.error(`intelligence/ check failed:\n- ${problems.join('\n- ')}`)
   process.exit(1)
 }
 console.log(
-  `intelligence/ check passed: ${sources.sources.length} sources, ${evals.cases.length} eval cases, ` +
+  `intelligence/ check passed: ${sources.sources.length} sources, ${cases.length} eval cases ` +
+    `in ${evalFiles.length} files, ` +
     `${pipeline.stages.length} stages, ${schemaFiles.length} schemas.`,
 )

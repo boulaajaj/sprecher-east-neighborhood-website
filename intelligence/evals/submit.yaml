@@ -1,0 +1,112 @@
+# Submit eval cases: the envelope, validation, retries and the draft cap. Submit is code, so these
+# become unit tests for the collector (#272). Graders name fields of schemas/submission.schema.json.
+version: 1
+asOf: '2026-10-24'
+stage: submit
+cases:
+  - id: submit-valid-suggestion
+    ref: SB1
+    stage: submit
+    tags: [provenance]
+    input:
+      sourceId: mpl-pinney-events
+      externalId: mpl-pinney-events:f893db74-0646-428d-8d98-4568227a4399
+      contentHash: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+      title: Silent Book Club
+      startsAt: 2026-11-17T19:00:00-06:00
+      locationText: Pinney Library
+    given:
+      curation: { decision: accept, audiences: [everyone] }
+      draft:
+        collection: events
+        title: Silent Book Club at Pinney Library
+        bodyMarkdown: Bring a book and read together. Free; no registration.
+        audience: [everyone]
+      run: { mcpAnswers: [created] }
+    expected: { route: submitSuggestion }
+    graders:
+      - { check: equals, field: $.tool, value: submitSuggestion }
+      - { check: equals, field: $.action, value: call }
+      - {
+          check: equals,
+          field: $.arguments.externalId,
+          value: 'mpl-pinney-events:f893db74-0646-428d-8d98-4568227a4399',
+        }
+    why: Real UID from the 2026-10-24 check. The server stores an unpublished draft with its provenance.
+  - id: submit-malformed-blocked
+    ref: SB2
+    stage: submit
+    tags: [schema]
+    input:
+      sourceId: mpl-pinney-events
+      title: Craft afternoon
+      startsAt: 2026-11-01T14:00:00-06:00
+      locationText: Pinney Library
+    given:
+      curation: { decision: accept, audiences: [families] }
+      draft: { collection: events, bodyMarkdown: Crafts for all ages. }
+    expected: { route: reportItem, reportKind: rejected-invalid }
+    graders:
+      - { check: equals, field: $.action, value: skip }
+      - { check: present, field: $.skipReason }
+    why: The draft has no title, so the envelope fails validation and is never sent.
+  - id: submit-transient-failure
+    ref: SB3
+    stage: submit
+    tags: [retry]
+    input:
+      sourceId: mpl-pinney-events
+      title: Family Storytime
+      startsAt: 2026-11-04T10:30:00-06:00
+      locationText: Pinney Library
+    given:
+      curation: { decision: accept, audiences: [families] }
+      draft:
+        collection: events
+        title: Family Storytime at Pinney Library
+        bodyMarkdown: Stories and songs for young children and their grown-ups.
+        audience: [families]
+      run: { mcpAnswers: [transient-error, transient-error, created] }
+    expected: { route: reportItem, reportKind: needs-review, retries: 1 }
+    why: One retry. After the second failure, a needs-review report carries the draft to an editor.
+  - id: submit-review-queue-fields
+    ref: SB4
+    stage: submit
+    tags: [review-queue]
+    input:
+      sourceId: legistar-events
+      externalId: legistar-events:29400
+      contentHash: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+      title: COMMON COUNCIL
+      startsAt: 2026-10-27T18:30:00-05:00
+      locationText: Virtual
+    given:
+      curation: { decision: accept, audiences: [everyone] }
+      draft:
+        collection: events
+        title: Common Council meeting
+        bodyMarkdown: The Council meets online; anyone can register to speak.
+        audience: [everyone]
+      run: { mcpAnswers: [created] }
+    expected: { route: submitSuggestion }
+    graders:
+      - { check: present, field: $.arguments.sourceName }
+      - { check: present, field: $.arguments.sourceUrl }
+      - { check: present, field: $.arguments.contentHash }
+      - check: model
+        rubric: The created document has moderationStatus suggested, sourceName, sourceUrl, externalId and contentHash, and is an unpublished draft (#342).
+    why: Agents are never staff, so every suggestion carries the review-queue fields.
+  - id: submit-draft-cap-reached
+    ref: C14
+    stage: submit
+    tags: [draft-limit]
+    input:
+      sourceId: mpl-pinney-events
+      title: Teen game night
+      startsAt: 2026-11-05T18:00:00-06:00
+      locationText: Pinney Library
+    given:
+      curation: { decision: accept, audiences: [youth] }
+      run: { draftsSoFar: 10 }
+    expected: { route: none, deferred: true }
+    why: At maxDraftsPerRun (10) the item waits for the next run. It isn't dropped or marked as seen.

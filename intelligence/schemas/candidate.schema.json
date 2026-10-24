@@ -102,6 +102,27 @@
     },
     "change": {
       "enum": ["new", "updated", "unchanged"]
+    },
+    "alsoReportedBy": {
+      "description": "Other pilot sources whose item scout matched to this one (same normalized title and start). The candidate keeps the higher-ranked source.",
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sourceId", "sourceUrl", "externalId"],
+        "properties": {
+          "sourceId": {
+            "$ref": "common.schema.json#/$defs/sourceId"
+          },
+          "sourceUrl": {
+            "$ref": "common.schema.json#/$defs/httpUrl"
+          },
+          "externalId": {
+            "$ref": "provenance.schema.json#/properties/externalId"
+          }
+        }
+      }
     }
   }
 }

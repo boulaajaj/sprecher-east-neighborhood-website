@@ -1,5 +1,5 @@
-# Source registry for the neighborhood intelligence agents (#271). Summary: sources.md. Only
-# `result: valid` is fetched; `pilotRank` (1 = first) marks what the daily pilot reads.
+# Source registry for the intelligence agents (#271, #352). Summary: sources.md. Only `valid` is
+# polled; `pilotRank` marks the daily pilot; `fetchStrategy` is `direct` unless stated.
 version: 1
 checkedOn: '2026-10-24'
 sources:
@@ -18,10 +18,9 @@ sources:
     result: valid
     pilotRank: 1
     treatment: >-
-      Query a 14-day window. Dedupe on EventId; treat a newer EventLastModifiedUtc as an update.
-      EventAgendaStatusName "Cancelled" goes to the cancellation path. Pass Common Council
-      meetings and public hearings to curate; drop other bodies unless an agenda item names a
-      place in the area (coverage.md).
+      A 14-day window; dedupe on EventId, a newer EventLastModifiedUtc is an update, "Cancelled"
+      is a cancellation. Pass Common Council meetings and public hearings to curate; drop other
+      bodies unless an agenda item names a place in the area (coverage.md).
     example:
       title: TRANSPORTATION COMMISSION, 5:00 PM, Virtual
       date: '2026-10-28'
@@ -44,9 +43,8 @@ sources:
     result: valid
     pilotRank: 3
     treatment: >-
-      Read items changed since the cursor and keep those whose title names a place in the area
-      (coverage.md). Match text on our side: a substringof() filter on MatterTitle returned a
-      server error.
+      Items changed since the cursor whose title names a place in the area (coverage.md). Match
+      text on our side: a substringof() filter on MatterTitle returned a server error.
     example:
       title: MatterId 103134, file 95368, Proposed 2027 Transportation budgets
       date: '2026-10-23'
@@ -66,17 +64,15 @@ sources:
     result: valid
     pilotRank: 2
     treatment: >-
-      Parse with an established iCalendar parser. Dedupe on UID; treat a newer LAST-MODIFIED as an
-      update. The feed also holds past items: keep only DTSTART from today on. Events have no URL
-      property, so link the library's event page from DESCRIPTION when present.
+      iCalendar parser; dedupe on UID, a newer LAST-MODIFIED is an update. Keep only DTSTART from
+      today on. Events have no URL property: link the event page from DESCRIPTION when present.
     example:
       title: Silent Book Club (UID f893db74-0646-428d-8d98-4568227a4399, 19:00 America/Chicago)
       date: '2026-11-17'
       url: https://www.madisonpubliclibrary.org/events/calendar/library-type/1940/237/export.ics
     notes: >-
-      The all-events file (~89,000 characters, ordered from April 2026) was cut off by the check
-      tool in May 2026. Pinney's Book Discussion feed, same generator, was read whole: 5 of 8 events
-      fall 2026-10-15 to 2026-12-15. #272's first run must log a future UID from the all-events feed.
+      The check tool cut the all-events file (~89,000 characters) off in May 2026. The Book
+      Discussion feed was read whole (to 2026-12-15). #272 logs a future all-events UID first.
   - id: madison365-news
     name: Madison365 (RSS)
     owner: Madison365 (nonprofit newsroom)
@@ -118,9 +114,7 @@ sources:
       title: Still warm for late October with more clouds Saturday
       date: '2026-10-24'
       url: http://www.spectrumnews1.com/wi/madison/weather/2020/05/13/wisconsin-weather-forecast
-    notes: >-
-      Well-formed but not strict RSS 2.0: custom elements, and pubDate like "Sat, 24 Oct 2026
-      06:00 AM CDT", which RFC 822 parsers may reject. Served over plain http.
+    notes: Not strict RSS 2.0; pubDates such as "06:00 AM CDT" may fail RFC 822 parsers. Plain http.
   - id: madison-parks-events
     name: Madison Parks events
     owner: City of Madison Parks Division
@@ -135,9 +129,12 @@ sources:
     lastChecked: '2026-10-24'
     result: pending
     pilotRank: null
+    fetchStrategy: direct-then-playwright
+    robots:
+      { checked: '2026-10-24', result: allowed, url: https://www.cityofmadison.com/robots.txt }
     treatment: >-
-      Not collected until a feed exists or page parsing is approved in its own issue. None of the
-      first 8 events (Oct 24-29) was at Door Creek Park or Elvehjem Sanctuary.
+      Page parsing approved on #352. A direct GET on 2026-10-24 served the list in the HTML (no
+      JavaScript needed), with item links. Stays pending until the collector records a parse.
     example:
       title: Bird & Nature Adventures, Aldo Leopold Nature Center
       date: '2026-10-24'
@@ -156,9 +153,12 @@ sources:
     lastChecked: '2026-10-24'
     result: pending
     pilotRank: null
+    fetchStrategy: direct-then-playwright
+    robots:
+      { checked: '2026-10-24', result: allowed, url: https://www.cityofmadison.com/robots.txt }
     treatment: >-
-      High local value. Not collected until a feed is found or page parsing is approved; meanwhile
-      Legistar covers the meetings it highlights.
+      Page parsing approved on #352. A direct GET on 2026-10-24 served the post list in the HTML,
+      newest 2026-10-06. Stays pending until the collector records a parse of a current post.
     example:
       title: Data Centers - Public Information Meeting Oct. 27th
       date: '2026-10-06'

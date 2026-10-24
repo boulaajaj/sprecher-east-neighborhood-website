@@ -3,7 +3,16 @@
   "$id": "https://sprechereast.com/intelligence/schemas/pipeline.schema.json",
   "title": "Pipeline settings (pipeline.yaml)",
   "type": "object",
-  "required": ["version", "enabled", "schedule", "budgets", "sources", "coverage", "stages"],
+  "required": [
+    "version",
+    "enabled",
+    "schedule",
+    "budgets",
+    "sources",
+    "coverage",
+    "stages",
+    "escalation"
+  ],
   "additionalProperties": false,
   "properties": {
     "version": {
@@ -101,6 +110,22 @@
       },
       "minItems": 5,
       "maxItems": 5
+    },
+    "escalation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verifyBelowConfidence", "to"],
+      "properties": {
+        "verifyBelowConfidence": {
+          "description": "Rerun verify at this effort when its confidence is below this; still below after the rerun sends the item to review.",
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "to": {
+          "const": "high"
+        }
+      }
     }
   }
 }

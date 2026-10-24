@@ -44,7 +44,9 @@
         "rescheduled",
         "past",
         "partisan",
-        "prompt-injection"
+        "prompt-injection",
+        "needs-date",
+        "wrong-offset"
       ]
     },
     "flags": {
@@ -62,6 +64,14 @@
       "description": "A Payload document id (numeric with SQLite), unique only within its collection.",
       "type": "integer",
       "minimum": 1
+    },
+    "fetchStrategy": {
+      "description": "How a source is fetched: direct (plain GET, the default) or direct-then-playwright (a headless browser only when the direct fetch trips a fallback trigger, README.md).",
+      "enum": ["direct", "direct-then-playwright"]
+    },
+    "fetchUsed": {
+      "description": "What actually handled a source in a run.",
+      "enum": ["direct", "playwright", "none"]
     }
   }
 }

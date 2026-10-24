@@ -16,16 +16,27 @@ The registry, `sources.yaml`. Read only entries whose `$.sources[].result` is `v
 
 ## Steps
 
-1. For each source, build the request from `$.sources[].feedUrl`. Replace `{from}` with today's
-   date and `{to}` with today plus 14 days (`YYYY-MM-DD`, America/Chicago); replace `{cursor}`
-   with the cursor saved by the last successful run, or 7 days ago on the first run.
-2. Send one request per source, with a clear user agent naming the site, a 30-second timeout, and
-   the saved ETag or Last-Modified when there is one. Respect `$.sources[].cadence`. On an error,
-   record it for the run log and go on to the next source; never retry more than once.
-3. Parse with an established parser for `$.sources[].format` (JSON, iCalendar, RSS or Atom). Keep
-   at most `maxItemsPerSource` items (`pipeline.yaml`). Follow the per-source rules in
-   `$.sources[].treatment`, such as date windows and dropping past items.
-4. For each item, fill the candidate:
+1. For each source, build the request from `$.sources[].feedUrl`, or `$.sources[].canonicalUrl`
+   for an HTML page. Replace `{from}` with today's date and `{to}` with today plus 14 days
+   (`YYYY-MM-DD`, America/Chicago); replace `{cursor}` with the cursor saved by the last
+   successful run, or 7 days ago on the first run.
+2. **Fetch directly first** (README.md, "Fetching"): one plain GET per source, with a clear user
+   agent naming the site, a 30-second timeout, and the saved ETag or Last-Modified. Respect
+   `$.sources[].cadence` and any Retry-After. A 5xx or 429 is retried once, never sent to
+   Playwright. A login page, CAPTCHA, paywall or bot gateway, a 401, 403 or 451, or a redirect
+   to one, is a gate: stop and log the source as `blocked`. Never fetch a path robots.txt
+   disallows.
+3. **Playwright only on a fallback trigger**, and only when `$.sources[].fetchStrategy` is
+   `direct-then-playwright`: an empty body, a JavaScript shell (no text where items should be),
+   or a parse that finds no items or fails its checks. One headless, logged-out page load, same
+   URL. Record the strategy that produced the items (`direct`, `playwright` or `none`) in the run
+   log.
+4. Parse with an established parser for `$.sources[].format` (JSON, iCalendar, RSS, Atom or
+   HTML). Keep at most `maxItemsPerSource` items (`pipeline.yaml`). Follow the per-source rules
+   in `$.sources[].treatment`, such as date windows and dropping past items. A recurring
+   iCalendar event becomes one candidate per instance in the window, each with its own ID; a
+   cancelled instance keeps its `cancelled` status.
+5. For each item, fill the candidate:
    - `$.sourceId`, `$.sourceName` and `$.sourceUrl` (the item's own page when the source gives
      one, else the source's canonical URL).
    - `$.externalId`: the source id, a colon, and the source's own stable ID (`EventId`, `UID`,
@@ -35,13 +46,20 @@ The registry, `sources.yaml`. Read only entries whose `$.sources[].result` is `v
      text, write null as an empty string, and join with newlines. Never hash retrieval
      metadata such as `$.retrievedAt`, ETags or feed order (`schemas/provenance.schema.json`).
    - `$.title`, `$.startsAt`, `$.endsAt`, `$.allDay` and `$.locationText` exactly as the source
-     gives them, converted to ISO 8601 with an offset. A missing value, including an unknown `$.allDay`, is `null`.
+     gives them. A local time gets America/Chicago's offset for that date (-05:00 in CDT, -06:00
+     in CST); an all-day item starts at local midnight with `$.allDay` true. A missing value,
+     including an unknown `$.allDay`, is `null`.
    - `$.sourceStatus`: `cancelled` or `rescheduled` only when the source says so; otherwise
      `scheduled`, or `unknown` when the source has no status.
    - `$.sourceText`: the item's text, stripped of markup, cut to 8,000 characters.
    - `$.change`: compare `$.externalId` and `$.contentHash` with what earlier runs saw: `new`,
      `updated` (same ID, new hash) or `unchanged`. Unchanged items stop here.
    - `$.retrievedAt` and `$.kind` (`event`, `meeting`, `legislation` or `news`).
+6. **Same item, two sources.** When two pilot sources in one run have items with the same
+   normalized title and start, keep one candidate from the higher-ranked source and list the
+   other in `$.alsoReportedBy` (its `sourceId`, `sourceUrl` and `externalId`).
+7. **Seen means handled.** An item counts as seen only once it is submitted, reported or
+   rejected. One left over at a cap or a failure is deferred and comes back next run.
 
 ## Untrusted content
 

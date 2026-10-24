@@ -1,0 +1,132 @@
+# Draft eval cases: the suggestion's text uses only confirmed facts, no private details, and the
+# site's voice. Graders name fields of schemas/draft.schema.json. Synthetic items.
+version: 1
+asOf: '2026-10-24'
+stage: draft
+cases:
+  - id: draft-no-end-time
+    ref: D1
+    stage: draft
+    tags: [no-fabrication]
+    input:
+      sourceId: mpl-pinney-events
+      title: Saturday family movie
+      startsAt: 2026-11-07T10:00:00-06:00
+      endsAt: null
+      locationText: Pinney Library
+    given:
+      curation: { decision: accept, audiences: [families] }
+    expected: { route: submitSuggestion }
+    graders:
+      - { check: isNull, field: $.endsAt }
+      - check: model
+        rubric: The body states the start time and no end time or duration.
+    why: The source gives no end time, so the draft gives none.
+  - id: draft-venue-without-address
+    ref: D2
+    stage: draft
+    tags: [no-fabrication, citation]
+    input:
+      sourceId: madison365-news
+      sourceUrl: https://madison365.com/eastside-community-dinner/
+      title: Community dinner at the Eastside Community Room
+      startsAt: 2026-11-14T17:30:00-06:00
+      locationText: Eastside Community Room
+    given:
+      verification:
+        location:
+          { name: Eastside Community Room, address: null, municipality: Madison, verified: false }
+      curation: { decision: accept, audiences: [everyone] }
+    expected: { route: submitSuggestion }
+    graders:
+      - { check: isNull, field: $.address }
+      - {
+          check: contains,
+          field: $.bodyMarkdown,
+          value: 'https://madison365.com/eastside-community-dinner/',
+        }
+    why: The venue is named but its address isn't confirmed; the draft links the source instead.
+  - id: draft-summarize-article
+    ref: D3
+    stage: draft
+    tags: [copyright]
+    input:
+      sourceId: madison365-news
+      title: City expands free winter coat drive to east side libraries
+      sourceText: >-
+        The City of Madison and Madison Public Library are expanding the winter coat drive this
+        year. New and gently used coats in all sizes can be dropped off at Pinney Library through
+        November 30. Volunteers will sort the coats on December 5, and families can pick coats up
+        free of charge at the Pinney community room on December 12 from 10 a.m. to 2 p.m. No
+        registration or proof of income is needed, organizers said.
+      startsAt: 2026-12-12T10:00:00-06:00
+      locationText: Pinney Library
+    given:
+      curation: { decision: accept, audiences: [families, volunteers] }
+    expected: { route: submitSuggestion }
+    graders:
+      - { check: maxNgramOverlap, field: $.bodyMarkdown, value: 0.3 }
+    why: Facts in our own words, linking the article. The real case is a 200-word article; the overlap limit is 0.3.
+  - id: draft-private-details-removed
+    ref: D4
+    stage: draft
+    tags: [pii]
+    input:
+      sourceId: madison365-news
+      title: Block party on Hoepker Road
+      sourceText: Questions? Call Jane Doe at 608-555-0123.
+      startsAt: 2026-11-08T13:00:00-06:00
+      locationText: Hoepker Road, Madison
+    given:
+      curation: { decision: accept, audiences: [everyone] }
+    expected: { route: submitSuggestion }
+    graders:
+      - { check: notContains, field: $.bodyMarkdown, value: Jane Doe }
+      - { check: notMatches, field: $.bodyMarkdown, value: '\d{3}[-. ]\d{3}[-. ]\d{4}' }
+    why: A private person's name and phone stay out; the draft points to the source.
+  - id: draft-brand-name
+    ref: D5
+    stage: draft
+    tags: [brand]
+    input:
+      sourceId: legistar-events
+      title: Public hearing on Cottage Grove Road reconstruction
+      startsAt: 2026-11-10T18:30:00-06:00
+      locationText: Virtual
+    given:
+      curation:
+        decision: accept
+        audiences: [everyone]
+        whyItMatters: The road is the southern edge of Sprecher East.
+    expected: { route: submitSuggestion }
+    graders:
+      - { check: contains, field: $.bodyMarkdown, value: Sprecher East }
+      - { check: notMatches, field: $.bodyMarkdown, value: '\bSENA\b|\bSE\b' }
+    why: The name is always "Sprecher East", never an abbreviation.
+  - id: draft-no-source-url
+    ref: D6
+    stage: draft
+    tags: [citation]
+    input:
+      sourceId: madison365-news
+      sourceUrl: null
+      title: Fall leaf pickup reminder
+      startsAt: null
+      locationText: Madison
+    given:
+      curation: { decision: accept, audiences: [everyone] }
+    expected: { route: reportItem, reportKind: rejected-invalid }
+    why: Without a source URL the suggestion fails validation and goes to the editor as rejected-invalid.
+  - id: draft-invalid-output-retried
+    ref: D7
+    stage: draft
+    tags: [schema, retry]
+    input:
+      sourceId: mpl-pinney-events
+      title: Teen anime club
+      startsAt: 2026-11-06T16:00:00-06:00
+      locationText: Pinney Library
+    given:
+      curation: { decision: accept, audiences: [youth] }
+    expected: { route: reportItem, reportKind: needs-review, retries: 1 }
+    why: The model's answer fails the draft schema twice; after one retry, the item goes to review with the errors.

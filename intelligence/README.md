@@ -9,14 +9,14 @@ The agents never publish. They create **suggested drafts**; an editor reads, fix
 
 ## What's here
 
-| Path                                   | What it is                                                                 |
-| -------------------------------------- | -------------------------------------------------------------------------- |
-| [`pipeline.yaml`](pipeline.yaml)       | The settings a runtime reads first: kill switch, schedule, budgets, stages |
-| [`sources.yaml`](sources.yaml)         | Approved sources, each checked by hand ([summary](sources.md))             |
-| [`coverage.md`](coverage.md)           | The Sprecher East area and the relevance policy                            |
-| [`prompts/`](prompts/)                 | One prompt per stage, each naming its input and output schema              |
-| [`schemas/`](schemas/)                 | JSON Schemas for every file and every stage's output                       |
-| [`evals/cases.yaml`](evals/cases.yaml) | Test cases with the result a correct pipeline reaches                      |
+| Path                             | What it is                                                                 |
+| -------------------------------- | -------------------------------------------------------------------------- |
+| [`pipeline.yaml`](pipeline.yaml) | The settings a runtime reads first: kill switch, schedule, budgets, stages |
+| [`sources.yaml`](sources.yaml)   | Approved sources, each checked by hand ([summary](sources.md))             |
+| [`coverage.md`](coverage.md)     | The Sprecher East area and the relevance policy                            |
+| [`prompts/`](prompts/)           | One prompt per stage, each naming its input and output schema              |
+| [`schemas/`](schemas/)           | JSON Schemas for every file and every stage's output                       |
+| [`evals/`](evals/)               | Test cases per stage with the result a correct pipeline reaches            |
 
 ## The pipeline
 
@@ -38,6 +38,47 @@ Deterministic steps come first: fetching, parsing and deduplication never use a 
 model handles only relevance, location ambiguity and the write-up, at medium effort, escalating to
 high only for conflicting or ambiguous evidence (`model` in `pipeline.yaml`).
 
+## Fetching (#352)
+
+**Direct first.** Every source is read with a plain GET (or its feed or API client): content-type
+detection, ETag and Last-Modified caching, and a deterministic parser for RSS, Atom, iCalendar,
+JSON or HTML. `fetchStrategy` in `sources.yaml` is `direct` unless a source says
+`direct-then-playwright`; today only Madison Parks events and the District 16 blog do.
+
+**Playwright only as a fallback**, for a `direct-then-playwright` source, when the direct answer
+trips one of these triggers:
+
+- a 200 with an empty body;
+- a JavaScript shell: no text where items should be;
+- a parse that finds no items, or fails its checks;
+- a non-200 answer that isn't an error or a gate. A 5xx or 429 is retried once (honoring
+  Retry-After) and never sent to Playwright; a 401, 403, 451, or a redirect to a login, paywall,
+  CAPTCHA or bot gateway is a gate and stops the source as `blocked`.
+
+The fallback is one headless, logged-out page load of the same URL, at the same daily cadence.
+
+**Logged every run.** Each source entry in the run log (`schemas/agent-run.schema.json`) records
+`fetchStrategy`, the one that produced the items (`direct`, `playwright` or `none`), so the digest
+shows how often the fallback runs.
+
+**Hard nos.** No logins, CAPTCHAs or paywalls (madison.com's redirect to `tollbit.madison.com`),
+no path robots.txt disallows (Dane County's press subscription page), no social networks, and no
+source that isn't `valid` or `pending` in `sources.yaml`. The check refuses
+`direct-then-playwright` on any source without an `allowed` robots.txt result, on a source that
+isn't HTML, or on one that is `restricted` or `invalid`. Agents summarize facts and never
+republish articles.
+
+**Where Playwright runs.** In the agent runtime's scout step only. Never in the website, its
+build or its CI: CI checks the files in this folder, including the direct path's rules and the
+eval routing, and makes no network or model calls.
+
+**Legal note**, checked against sources on #352. Public pages, read logged out with no gate, are
+the least risky shape; the remaining risks are contract (terms accepted by logging in, which we
+never do) and copyright (we summarize facts and link, never republish). _Ziff Davis v. OpenAI_
+(S.D.N.Y., December 2025) held that robots.txt doesn't "control access" under the DMCA, and the
+Ninth Circuit's Perplexity/Comet CFAA decision was reported in August 2026. Neither changes our
+rule: we still honor robots.txt by choice. This is the project's reasoning, not legal advice.
+
 ## How a runtime loads it
 
 The runtime is OpenClaw, on the owner's side; any runtime that can read files and call MCP tools
@@ -48,7 +89,8 @@ can run the same folder. Its own configuration, schedule and keys stay outside t
 2. Read `pipeline.yaml`. If `enabled` is false, log a `disabled` run and stop.
 3. Load the schemas in `schemas/`, `sources.yaml` and `coverage.md`.
 4. For each stage in order, give the model the stage's prompt, `coverage.md`, and the item as
-   JSON; validate its answer against the stage's `output` schema. An answer that doesn't validate
+   JSON; validate its answer against the stage's `output` schema. When verify's `confidence` is below
+   `escalation.verifyBelowConfidence` (0.6), run verify once more at high effort. An answer that doesn't validate
    is retried once, then the item goes to review with the error.
 5. Before curate, look each candidate's `externalId` up with the MCP find tool (runtime code, not
    a model) and put the result in the item's `known` section: collection, id, hash and status,
@@ -123,7 +165,10 @@ Until #336 is live, a run writes the same calls and its run log as a digest for 
 ## Changing it
 
 Edit the files, then run `node scripts/check-intelligence.mjs`. It validates `pipeline.yaml`,
-`sources.yaml` and `evals/cases.yaml` against their schemas, and checks that every field a prompt
-names (written `` `$.field` ``) exists in that stage's input or output schema, and that each eval
-case's `route` follows the routing above. CI runs the same check on every pull request. Add an
-eval case whenever the pipeline gets something wrong.
+`sources.yaml` and every file in `evals/` (one per stage, `<stage>.yaml` or
+`<stage>-<topic>.yaml`) against their schemas, checks that eval times use America/Chicago's
+offset, and that grader fields, and every field a prompt names (written `` `$.field` ``), exist
+in the stage's input or output schema. Each eval case's `route` must follow the routing above.
+CI runs the same check on every pull request; it checks the cases' structure and never calls a
+model. Running the cases against a model is the collector's job (#272). Add an eval case whenever
+the pipeline gets something wrong.

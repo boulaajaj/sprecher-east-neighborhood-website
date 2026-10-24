@@ -8,6 +8,7 @@
     "location",
     "coverage",
     "coverageReason",
+    "confidence",
     "dateConfirmed",
     "statusConfirmed",
     "evidence",
@@ -69,6 +70,12 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 500
+    },
+    "confidence": {
+      "description": "0 to 1: how sure the stage is of place, date and status together. Below pipeline.yaml's escalation threshold, the runtime reruns verify at high effort.",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
     },
     "dateConfirmed": {
       "type": "boolean"

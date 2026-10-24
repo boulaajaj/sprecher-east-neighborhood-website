@@ -35,13 +35,16 @@ README.md describes the contract.
 3. **Validate** the envelope against `schemas/submission.schema.json`. If it fails, don't send
    it: mark it `$.action` `skip` with the errors in `$.skipReason`, and send a `reportItem` with
    `kind: rejected-invalid`, the validation errors in the summary, and the candidate's source URL.
-4. **Send.** `submitSuggestion` answers `created` or `duplicate`. The run log records the
+4. **Send.** A transient failure (timeout, 5xx) is retried once; after a second failure, the
+   item goes to the editor as a `needs-review` report, or is deferred if the CMS can't take
+   that either. `submitSuggestion` answers `created` or `duplicate`. The run log records the
    result: a duplicate is logged as skipped, with the server's answer as the reason. The
    envelope that was sent doesn't change. When the draft's `$.draft.missing` is not empty or
    `$.draft.confidence` is `low`, follow a created suggestion with a `reportItem`
    (`kind: needs-review`, `targetCollection` and `targetId` = the new document) listing what's
    missing.
-5. Stop at `maxDraftsPerRun` suggestions (`pipeline.yaml`); the rest wait for the next run.
+5. Stop at `maxDraftsPerRun` suggestions (`pipeline.yaml`). The rest are deferred: counted in
+   the run log, not marked as seen, and picked up by the next run.
 6. Write the run log to `agent-runs` at the start and the end of the run
    (`schemas/agent-run.schema.json`), with the repository commit the run loaded.
 
