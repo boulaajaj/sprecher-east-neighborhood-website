@@ -2,7 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import type { HumanVerifier } from '@/platform/lib/humanCheck'
 import type { EmailConfirmedListener } from '@/platform/payload/emailConfirmer'
-import { isAdmin } from '@/platform/payload/roles'
+import { isAdmin, serverOnlyFieldAccess } from '@/platform/payload/roles'
 import { TurnstileVerifier } from '@/platform/turnstile/turnstileVerifier'
 
 import { EMAIL_CONFIRMATIONS } from '../domain/paths'
@@ -66,12 +66,19 @@ export const createEmailConfirmations = ({
       index: true,
       admin: { ...readOnly, description: 'When the latest confirmation link was sent.' },
     },
-    // The link's token is never stored, only its SHA-256, and it never leaves the server
-    { name: 'tokenHash', type: 'text', index: true, hidden: true },
+    // The link's token is never stored, only its SHA-256, and it never leaves the server. The
+    // server-only fields refuse writes too, even an admin's (#299)
+    { name: 'tokenHash', type: 'text', index: true, hidden: true, access: serverOnlyFieldAccess },
     { name: 'tokenExpiresAt', type: 'date', admin: readOnly },
     // The per-address limit: links sent since sendWindowStart
-    { name: 'sendCount', type: 'number', defaultValue: 0, hidden: true },
-    { name: 'sendWindowStart', type: 'date', hidden: true },
+    {
+      name: 'sendCount',
+      type: 'number',
+      defaultValue: 0,
+      hidden: true,
+      access: serverOnlyFieldAccess,
+    },
+    { name: 'sendWindowStart', type: 'date', hidden: true, access: serverOnlyFieldAccess },
   ],
   timestamps: true,
 })

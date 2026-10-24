@@ -5,7 +5,8 @@ import { defineConfig } from 'vitest/config'
 const root = path.dirname(fileURLToPath(import.meta.url))
 
 /**
- * Unit tests: pure rules and guards, run in Node with no network and no database.
+ * Unit tests: pure rules and guards, run in Node with no network and no database file. The few
+ * tests that must send real API requests boot Payload on in-memory SQLite (`file::memory:`).
  * Test files sit next to the code they test as `*.test.ts`. Component tests are `*.test.tsx`
  * and start with `// @vitest-environment jsdom`.
  */
