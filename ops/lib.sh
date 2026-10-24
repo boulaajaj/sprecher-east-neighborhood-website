@@ -143,3 +143,11 @@ drop_page_cache() { # <release dir>
   find "$app" -type d -name '*.segments' -prune -exec rm -rf {} +
   rm -rf "$1/.next/cache"
 }
+
+# Never print Caddy's own output: the Caddyfile could hold credentials and the deploy log is public.
+caddy_accepts() { caddy validate --config "$1" --adapter caddyfile >/dev/null 2>&1; }
+caddy_version() {
+  local v
+  v=$(caddy version 2>/dev/null | awk '{ print $1; exit }' || true)
+  echo "${v:-unknown}"
+}
