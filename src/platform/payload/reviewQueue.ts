@@ -1,5 +1,8 @@
 import {
   type CollectionBeforeChangeHook,
+  type CollectionSlug,
+  type Payload,
+  type TypedUser,
   type Field,
   type FieldHook,
   ValidationError,
@@ -79,6 +82,29 @@ export const REVIEW_QUEUE_FIELDS: Field[] = [
     admin: SIDEBAR,
   },
 ]
+
+/**
+ * How many suggestions wait for review, as the admin list counts them: from each document's
+ * latest draft (`draft: true`), since a status changed with Save Draft is stored only in the
+ * version history, not on the collection row. With the user's own access.
+ */
+export async function countSuggestions(
+  payload: Payload,
+  collection: CollectionSlug,
+  user: TypedUser | undefined,
+): Promise<number> {
+  const { totalDocs } = await payload.find({
+    collection,
+    draft: true,
+    where: { moderationStatus: { equals: 'suggested' } },
+    limit: 1,
+    depth: 0,
+    select: {},
+    overrideAccess: false,
+    user,
+  })
+  return totalDocs
+}
 
 /** The admin list slot that filters the list to suggestions waiting for review. */
 export const SUGGESTIONS_FILTER = '@/platform/payload/admin/SuggestionsFilter'

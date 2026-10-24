@@ -1,6 +1,7 @@
 import type { BeforeListTableServerProps } from 'payload'
 import React from 'react'
 
+import { countSuggestions } from '../reviewQueue'
 import './SuggestionsFilter.scss'
 
 const baseClass = 'suggestions-filter'
@@ -17,12 +18,7 @@ const SuggestionsFilter = async ({
   searchParams,
   user,
 }: BeforeListTableServerProps) => {
-  const { totalDocs } = await payload.count({
-    collection: collectionSlug,
-    where: { moderationStatus: { equals: 'suggested' } },
-    overrideAccess: false,
-    user,
-  })
+  const totalDocs = await countSuggestions(payload, collectionSlug, user)
   const filtered = searchParams?.[FILTER_KEY] === 'suggested'
   const listUrl = `${payload.config.routes.admin}/collections/${collectionSlug}`
 

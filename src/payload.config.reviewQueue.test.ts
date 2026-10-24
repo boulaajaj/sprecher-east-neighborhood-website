@@ -2,6 +2,7 @@ import type { Payload } from 'payload'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 
 import type { User } from '@/payload-types'
+import { countSuggestions } from '@/platform/payload/reviewQueue'
 
 /**
  * The review queue on events and posts (#123), through the Local API on Payload booted on an
@@ -139,5 +140,46 @@ describe('de-duplication', () => {
     await serverCreate({ externalId: '', contentHash: ' ' })
     const second = await serverCreate({ externalId: '', contentHash: '' })
     expect(second).toMatchObject({ externalId: null, contentHash: null })
+  })
+})
+
+// The admin list's "waiting for review" count reads each item's latest draft: Save Draft stores a
+// status change in the version history only, not on the collection row
+describe('the count of suggestions waiting for review', () => {
+  const waiting = () => countSuggestions(payload, 'events', editor)
+  const saveDraft = (id: number, data: Record<string, unknown>) =>
+    payload.update({
+      collection: 'events',
+      id,
+      data,
+      draft: true,
+      user: editor,
+      overrideAccess: false,
+      context: NO_REVALIDATE,
+    })
+
+  it('drops a suggestion staff reject with Save Draft', async () => {
+    const suggestion = await payload.create({
+      collection: 'events',
+      data: event(source),
+      user: resident,
+      overrideAccess: true,
+    })
+    const before = await waiting()
+    await saveDraft(suggestion.id, { moderationStatus: 'rejected' })
+    expect(await waiting()).toBe(before - 1)
+  })
+
+  it('counts a published item marked suggested again in a draft', async () => {
+    const published = await payload.create({
+      collection: 'events',
+      data: event({ _status: 'published' }),
+      user: editor,
+      overrideAccess: false,
+      context: NO_REVALIDATE,
+    })
+    const before = await waiting()
+    await saveDraft(published.id, { moderationStatus: 'suggested' })
+    expect(await waiting()).toBe(before + 1)
   })
 })

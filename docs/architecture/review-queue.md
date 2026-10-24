@@ -42,14 +42,17 @@ for review, or a suggestion staff turned down. Drafts alone can't tell those apa
 ## De-duplication
 
 `externalId` and `contentHash` have unique indexes on the collection tables (not on the version
-tables), so a second item with the same value is refused by the database. Blank values are
+tables), so a second item with the same value is refused by the database. A value changed only
+in a draft is checked when that draft is published. Blank values are
 stored as NULL, which SQLite allows any number of times, so items without them never collide.
 
 ## In Admin
 
 The events and posts lists show a "Review status" column and, above the table, a link to the
 suggestions waiting for review (`SuggestionsFilter`, the list's `beforeListTable` slot). The link
-uses the list view's own filter (`?where[moderationStatus][equals]=suggested`). Each item shows
+uses the list view's own filter (`?where[moderationStatus][equals]=suggested`). The count reads
+each item's latest draft (`countSuggestions`, `draft: true`), as the list does: a status changed
+with Save Draft is stored only in the version history, not on the collection row. Each item shows
 its source in the sidebar.
 
 Tests: `src/platform/lib/reviewQueue.test.ts` (the rules) and
