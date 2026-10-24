@@ -62,6 +62,14 @@ describe('proxy', () => {
     )
   })
 
+  it('redirects a junk escape in the admin verify path instead of failing', () => {
+    const response = proxy(
+      new NextRequest('https://sprechereast.example/admin/users/verify/%E0%A4%A'),
+    )
+    expect(response.status).toBe(307)
+    expect(response.headers.get('location')).toMatch(/\/verify-account\?token=/)
+  })
+
   it('passes a valid paging URL on to the page', () => {
     const response = proxy(new NextRequest('https://sprechereast.example/posts/page/2'))
     expect(response.headers.get('x-middleware-next')).toBe('1')

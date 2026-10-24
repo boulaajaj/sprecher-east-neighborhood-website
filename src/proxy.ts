@@ -37,7 +37,8 @@ export function proxy(request: NextRequest): NextResponse {
   // a resent link's password step (#289). The site's page does both (#303): send the token there.
   if (pathname.startsWith(ADMIN_VERIFY_PREFIX)) {
     const target = new URL(VERIFY_ACCOUNT_PATH, request.url)
-    target.searchParams.set('token', decodeURIComponent(pathname.slice(ADMIN_VERIFY_PREFIX.length)))
+    // Tokens are hex, so no decoding: a junk escape (`%E0%A4%A`) then can't throw
+    target.searchParams.set('token', pathname.slice(ADMIN_VERIFY_PREFIX.length))
     return NextResponse.redirect(target)
   }
   if (isValidPagingPath(pathname)) return NextResponse.next()
