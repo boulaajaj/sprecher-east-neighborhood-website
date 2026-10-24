@@ -28,8 +28,10 @@ what was checked, with a link, and why it doesn't fit.
 
 **This is a guide for judgment, not a hard gate.** Be reasonable and proportionate: don't decide
 by reflex that a plugin always wins, or that our own code always does. When the choice between a
-plugin and our own code is a real trade-off, put it to the owner on the issue (label
-`needs owner`) with the findings and a recommendation, and let him decide.
+plugin and our own code is a technical trade-off, decide it yourself and record the reasoning on
+the issue. Only a product, cost, legal or privacy trade-off goes to the owner (label
+`needs owner`), with the findings and a recommendation
+([`AGENTS.md`](../../AGENTS.md#ground-rules), #315).
 
 Using a plugin doesn't skip the architecture: its setup lives in the owning module's `cms/` and is
 composed in `payload.config.ts`, and the module's own types still face the rest of the site. The

@@ -40,7 +40,10 @@ The allowed labels are in [`.github/label-policy.json`](../../.github/label-poli
   `PR Policy` check enforces this for linked issues.
 - **Markers** (optional, with a fixed meaning):
   - `epic`: a parent issue whose sub-issues are the work.
-  - `needs owner`: needs the owner's login, money or decision. Agents can't do it. Every
+  - `needs owner`: needs the owner's login or money, or his decision on a product trade-off, a
+    meaningful cost, a legal or privacy commitment, or something best practice can't settle.
+    Agents can't do it. A choice between technically valid approaches isn't one: agents decide
+    it and record why on the issue ([`AGENTS.md`](../../AGENTS.md#ground-rules)). Every
     `needs owner` issue is listed in the checklist of the owner-actions epic (#169); its parent
     stays the epic it belongs to. The issues that depend on it are marked **blocked by** it, so
     nobody starts them too early.

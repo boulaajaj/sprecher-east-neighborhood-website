@@ -104,8 +104,11 @@ another one. Read the parent epic too: it says what the issue is part of.
    A sub-issue has one parent. Don't move an issue to another epic just to group it; use a label
    or a link in the epic's description instead.
 
-5. **Needs the owner?** If only the owner can do it (a login, a payment, a decision), or it
-   changes policy he didn't ask for ([`AGENTS.md`](../../../AGENTS.md) step 3):
+5. **Needs the owner?** Only if he alone can do it (a login, a payment), it needs his decision on
+   a product trade-off, a meaningful cost, a legal or privacy commitment or something best
+   practice can't settle, or it changes policy he didn't ask for ([`AGENTS.md`](../../../AGENTS.md)
+   step 3). A choice between technically valid approaches isn't one: decide it, record why on the
+   issue, and carry on. Otherwise:
    - label it `needs owner`
    - add it to the checklist in the owner-actions epic (#169); its parent stays its own epic
    - mark the issues that depend on it as blocked by it
@@ -115,10 +118,10 @@ another one. Read the parent epic too: it says what the issue is part of.
    Ask him on the issue, and in the chat too when he's there. Make it easy to answer:
 
    ```markdown
-   **Question:** For the volunteer sign-up, use the form-builder plugin or build our own form?
+   **Question:** Should volunteers sign up with a phone number as well as an email?
 
-   - **A. Plugin (recommended):** editors change the fields in the admin; nothing to maintain.
-   - **B. Our own:** a custom layout; about 200 lines to write and keep working.
+   - **A. Email only (recommended):** less personal data to keep and protect.
+   - **B. Email and phone:** organizers can text people, but we store and guard more data.
 
    Reply A or B. Until then, this issue and #123 wait.
    ```

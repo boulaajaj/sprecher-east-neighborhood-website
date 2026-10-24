@@ -17,13 +17,24 @@ change this file through the same workflow below.
 - **Native first, then plugins, then our code.** Before building a feature, check what Payload,
   Next.js and React do natively, then official plugins, then well-established free open-source
   ones. Write custom code only when none fits, and record what each step found on the issue.
-  It's a guide for judgment: real trade-offs go to the owner
+  It's a guide for judgment
   ([the ladder](docs/guidelines/development.md#native-first-then-plugins-then-our-code)).
+- **Decide routine technical choices yourself.** Use engineering judgment and established
+  practice: built-in features and mature, maintained libraries over custom code, reuse what
+  exists, don't duplicate work already underway, and follow security, privacy, accessibility
+  and usability standards, with fast, simple interactions on mobile first. Add tests and get
+  the code reviewed. Record each decision briefly on its issue. Ask the owner only about product
+  trade-offs, meaningful costs, legal or privacy commitments, or what best practice can't
+  settle; several valid technical approaches are never a reason to wait for him (the owner's
+  rule, 2026-10-24, quoted on #315).
+- **Test every finished flow as a resident would use it:** on a phone, with expired links,
+  wrong input, and recovering from errors (#315).
 - **Push back before building what's probably not the best way.** When the owner asks for
   something that looks weaker than the standard approach (for example a security trade-off),
   don't build it as asked. Explain the better option with sources, then stop and wait until he
   has read it and decided. Building first wastes work on a change that may be thrown away (the
-  owner's rule, 2026-10-23, quoted on #305).
+  owner's rule, 2026-10-23, quoted on #305). This and the rule above fit together: push back
+  when his request is weaker than the standard; decide routine things yourself.
 
 ## The only way code reaches `main` and production
 

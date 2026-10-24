@@ -51,7 +51,9 @@ gh api "repos/{owner}/{repo}/stacks?pull_request=<number>" -H 'X-GitHub-Api-Vers
   [ladder](../../../docs/guidelines/development.md#native-first-then-plugins-then-our-code):
   native Payload, Next.js and React, official plugins, open-source plugins. Check one or two
   claims yourself and use judgment, not a checklist. Findings missing, or a step that clearly
-  fits: **Changes requested**. A real trade-off the owner hasn't decided: **Waits for owner**.
+  fits: **Changes requested**. A technical trade-off is the author's to decide, with the reasoning
+  on the issue; only a product, cost, legal or privacy trade-off the owner hasn't decided is
+  **Waits for owner**.
 - **Guidelines and architecture:** the change follows the guidelines for what it touches
   ([`docs/guidelines/`](../../../docs/guidelines/README.md)) and puts code where
   [`docs/architecture/`](../../../docs/architecture/README.md) says it goes. For code under
