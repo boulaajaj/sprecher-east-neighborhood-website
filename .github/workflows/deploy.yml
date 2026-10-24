@@ -193,3 +193,27 @@ jobs:
           else
             echo "::notice title=Port 3000::not reachable from the internet"
           fi
+
+      # What a visitor gets, from outside the server (#235): HSTS on the domain, plain HTTP and
+      # the IP redirected to HTTPS. GitHub masks the IP in the log.
+      - name: Check HTTPS from the internet (#235)
+        if: steps.order.outputs.skip != 'true'
+        env:
+          URL: ${{ needs.preflight.outputs.server_url }}
+          HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          show() { # <label> <url>
+            curl -s -o /dev/null -D - --max-time 15 "$2" | tr -d '\r' | awk -v label="$1" '
+              NR == 1 { code = $2 }
+              tolower($1) == "location:" { loc = $2 }
+              tolower($1) == "strict-transport-security:" { sub(/^[^:]*:[[:space:]]*/, ""); hsts = $0 }
+              END {
+                printf "::notice title=HTTPS::curl -I %s → %s", label, code ? code : "no answer"
+                if (loc) printf " to %s", loc
+                if (hsts) printf ", Strict-Transport-Security: %s", hsts
+                print ""
+              }'
+          }
+          show "$URL/" "$URL/"
+          show "${URL/https:/http:}/" "${URL/https:/http:}/"
+          show "http://<IP>/login" "http://$HOST/login"
