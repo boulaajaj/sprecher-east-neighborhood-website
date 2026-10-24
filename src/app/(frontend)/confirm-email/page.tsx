@@ -3,13 +3,14 @@ import type { Metadata } from 'next'
 import { AccountOffer } from '@/modules/accounts/server'
 import { parseConfirmationToken } from '@/modules/verification'
 import { ConfirmEmail } from '@/modules/verification/server'
+import { NOT_INDEXED } from '@/platform/seo/notIndexed'
 
 export const metadata: Metadata = {
   title: 'Confirm Your Email',
   description: 'Confirm your email address for Sprecher East.',
   // The token is in this page's address: never send it to another site, never index it
   referrer: 'no-referrer',
-  robots: { index: false, follow: false },
+  robots: NOT_INDEXED,
 }
 
 type Props = { searchParams: Promise<{ token?: string | string[] }> }

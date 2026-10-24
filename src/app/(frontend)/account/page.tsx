@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 
 import { ChangePasswordForm, requireUser } from '@/modules/accounts/server'
+import { NOT_INDEXED } from '@/platform/seo/notIndexed'
 
 export const metadata: Metadata = {
   title: 'Account',
   description: 'Manage your Sprecher East account.',
+  robots: NOT_INDEXED,
 }
 
 export default async function AccountPage() {

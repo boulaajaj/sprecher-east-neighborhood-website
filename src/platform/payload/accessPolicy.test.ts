@@ -117,6 +117,18 @@ describe('collections', () => {
     }
   })
 
+  // A noindex header only asks search engines (#280): this is what keeps the data private. The
+  // REST API runs these same functions for `GET /api/<slug>` and `GET /api/<slug>/<id>`
+  it.each(['users', 'form-submissions', 'email-confirmations', 'payload-jobs', 'redirects'])(
+    'refuse anonymous reads of %s, as a list or one document',
+    async (slug) => {
+      const collection = config.collections.find((c) => c.slug === slug)
+      expect(collection).toBeDefined()
+      expect(await allows(collection?.access.read, 'visitor')).toBe(false)
+      expect(await allows(collection?.access.read, 'visitor', 1)).toBe(false)
+    },
+  )
+
   it('let a resident reach their own user record and nobody else’s', async () => {
     const users = config.collections.find((c) => c.slug === 'users')
     expect(await allows(users?.access.update, 'resident', 7)).toBe(true)

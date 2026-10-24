@@ -14,6 +14,19 @@ const NEXT_PUBLIC_SERVER_URL =
   process.env.__NEXT_PRIVATE_ORIGIN ||
   'http://localhost:3000'
 
+/**
+ * Raw API answers stay out of search results (#280): every `/api/` response but the uploads under
+ * `/api/media/file/`, so the site's images stay in image search. robots.txt must not block `/api/`
+ * instead, or crawlers would never read this header, and images would drop out. It only asks
+ * search engines; access control is what keeps private data private.
+ */
+export const API_HEADERS = [
+  {
+    source: '/api/:path((?!media/file/).*)',
+    headers: [{ key: 'X-Robots-Tag', value: 'noindex' }],
+  },
+]
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   env: {
@@ -56,6 +69,7 @@ const nextConfig = {
   logging: { serverFunctions: false },
   reactStrictMode: true,
   redirects,
+  headers: async () => API_HEADERS,
   // CI type-checks every PR with `tsc --noEmit` (the required "Type-check & Build" check), so
   // `next build` skips its own type check. On the 1-CPU server that step took over 8 minutes and
   // pushed the deploy past its time limit (#246)

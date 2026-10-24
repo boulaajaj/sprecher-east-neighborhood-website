@@ -70,26 +70,30 @@ The root layout already sets `twitter.card` to `summary_large_image`.
 
 ### Sitemap
 
-- Auto-generated sitemaps at `/pages-sitemap.xml`, `/posts-sitemap.xml` and `/events-sitemap.xml`
-- Include all public pages, published posts, published events
-- Update frequency hints: posts (weekly), events (daily), static pages (monthly)
-- Exclude admin, login, draft content
+- One sitemap, `/sitemap.xml` (`src/app/sitemap.ts`, Next.js's native sitemap): the listing
+  pages, then every published page, post and event
+- Never admin, drafts, or the pages kept out of search results (below)
 
-### robots.txt
+### Keeping pages out of search results
 
-The target:
+The owner's decision on #280 (2026-10-24, in a Claude Code session): "Choose B, with appropriate
+scope. Add noindex to sign-in, sign-up, password recovery, and account-management pages. Prevent
+indexing of raw API responses where appropriate. Ensure private API data is protected through
+actual authentication and authorization, not merely search-engine directives. Keep intended
+public neighborhood pages discoverable."
 
-```
-User-agent: *
-Allow: /
-Disallow: /admin/
-Disallow: /api/
-Disallow: /login
-```
-
-plus a `Sitemap:` line for each sitemap the site serves. Today `src/app/robots.ts` serves only
-`Disallow: /admin/*` and the sitemap lines; whether to add the `/api/` and `/login` lines is an open
-question for the owner (#280).
+- **Account and confirmation pages** (`/login`, `/sign-up`, `/verify-account`, `/forgot-password`,
+  `/reset-password`, `/account`, `/confirm-email`) set `robots: NOT_INDEXED` from
+  `src/platform/seo/notIndexed.ts` in their metadata. A new page of that kind does the same.
+- **API answers** get an `X-Robots-Tag: noindex` header (`API_HEADERS` in `next.config.js`),
+  except `/api/media/file/`, so the site's images stay in image search.
+- **robots.txt** (`src/app/robots.ts`) blocks only `/admin/*`. Don't add `/api/` or `/login`:
+  robots.txt controls crawling, not indexing, and a crawler that may not fetch a page never reads
+  its `noindex` ([Google: block indexing with noindex](https://developers.google.com/search/docs/crawling-indexing/block-indexing)).
+  Blocking `/api/` would also hide the images.
+- **None of this protects data.** Private collections are protected by their access rules, which
+  `src/platform/payload/accessPolicy.test.ts` checks.
+- Every other public page stays indexable: never put `noindex` on it.
 
 ### Performance (Core Web Vitals)
 
