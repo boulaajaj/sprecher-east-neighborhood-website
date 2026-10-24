@@ -41,6 +41,15 @@ export function ConfirmEmail({
   // Why the button can't send yet (the robot check is still running or couldn't load)
   const [waitMessage, setWaitMessage] = useState<string | null>(null)
   const robotCheck = useRobotCheck()
+  // An answer that comes back after the person left the page changes nothing
+  const mounted = useRef(true)
+
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+    }
+  }, [])
 
   useEffect(() => {
     // The check finished after a press that had to wait: the reason no longer holds
@@ -68,6 +77,7 @@ export function ConfirmEmail({
     } catch {
       next = 'offline'
     }
+    if (!mounted.current) return
     robotCheck.renewToken()
     // The link is done with: keep its token out of the address bar and the history
     if (isLinkDone(next)) window.history.replaceState(null, '', window.location.pathname)

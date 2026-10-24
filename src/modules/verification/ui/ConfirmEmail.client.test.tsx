@@ -156,6 +156,18 @@ describe('ConfirmEmail', () => {
     expect(new Headers(init?.headers).get('x-turnstile-token')).toBe('token-1')
   })
 
+  it('ignores an answer that arrives after the person left the page', async () => {
+    let reply: (r: Response) => void = () => {}
+    fetchMock.mockReturnValue(new Promise<Response>((r) => (reply = r)))
+    const { unmount } = render(<ConfirmEmail token={TOKEN} retryHref="/contact" />)
+    await clickConfirm()
+    unmount()
+    window.history.replaceState(null, '', '/search?q=garden')
+    reply(new Response(JSON.stringify({ outcome: 'confirmed' }), { status: 200 }))
+    await new Promise((r) => setTimeout(r, 0))
+    expect(window.location.search).toBe('?q=garden')
+  })
+
   it('says a link without a usable token isn’t valid, without asking the server', async () => {
     render(
       <main>
