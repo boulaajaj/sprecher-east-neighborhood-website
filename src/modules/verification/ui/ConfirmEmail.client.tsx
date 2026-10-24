@@ -39,6 +39,8 @@ export function ConfirmEmail({
   const messageRef = useRef<HTMLDivElement>(null)
   // React runs effects twice in development: confirm once per page load
   const started = useRef(false)
+  // An answer that comes back after the person left the page changes nothing
+  const mounted = useRef(true)
 
   const confirm = async (link: string) => {
     setSending(true)
@@ -50,11 +52,19 @@ export function ConfirmEmail({
     } catch {
       next = 'offline'
     }
+    if (!mounted.current) return
     // The link is done with: keep its token out of the address bar and the history
     if (isLinkDone(next)) window.history.replaceState(null, '', window.location.pathname)
     setAnswer(next)
     setSending(false)
   }
+
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+    }
+  }, [])
 
   useEffect(() => {
     if (!token || started.current) return
@@ -79,17 +89,36 @@ export function ConfirmEmail({
 
   return (
     <div className="space-y-6">
-      {sending && <PendingStatus>Confirming your email…</PendingStatus>}
-      {message && (
-        <div ref={messageRef} tabIndex={-1} className="space-y-3 outline-none">
-          <Alert variant={message.variant}>{message.text}</Alert>
-          {isLinkDone(answer) && !settled && (
-            <Link href={retryHref} variant="action">
-              Go to the contact form
-            </Link>
-          )}
-        </div>
-      )}
+      {/* One live region from the first render, so the answer that replaces "Confirming" is
+          announced; an error keeps its own alert */}
+      <div
+        ref={messageRef}
+        tabIndex={-1}
+        role="status"
+        aria-live="polite"
+        className="space-y-3 outline-none"
+      >
+        {sending && (
+          <>
+            <PendingStatus>Confirming your email…</PendingStatus>
+            <noscript>
+              <p className="text-foreground">
+                Confirming needs JavaScript. Turn it on, then open the link again.
+              </p>
+            </noscript>
+          </>
+        )}
+        {message && (
+          <Alert variant={message.variant} quiet={message.variant === 'success'}>
+            {message.text}
+          </Alert>
+        )}
+        {isLinkDone(answer) && !settled && (
+          <Link href={retryHref} variant="action">
+            Go to the contact form
+          </Link>
+        )}
+      </div>
       {canRetry && !sending && (
         <Button
           type="button"

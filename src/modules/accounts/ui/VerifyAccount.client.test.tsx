@@ -31,9 +31,10 @@ describe('VerifyAccount', () => {
     expect(window.location.search).toBe('')
     await expectAccessible(document.body)
 
-    const status = await screen.findByText(/account is ready/)
+    await screen.findByText(/account is ready/)
     expect(mocks.verifyAccount).toHaveBeenCalledExactlyOnceWith({ token: TOKEN })
-    expect(status.getAttribute('role')).toBe('status')
+    // The same live region that said "Confirming" now holds the answer, so it is announced
+    expect(screen.getByRole('status').textContent).toMatch(/account is ready/)
     expect(document.activeElement).toBe(document.body) // nothing steals focus on page load
     expect(screen.getByRole('link', { name: 'Log In' }).getAttribute('href')).toBe('/login')
     await expectAccessible(document.body)
@@ -65,9 +66,9 @@ describe('VerifyAccount', () => {
 
     mocks.verifyAccount.mockResolvedValueOnce({ ok: true })
     await userEvent.click(screen.getByRole('button', { name: 'Try Again' }))
-    const status = await screen.findByText(/account is ready/)
+    await screen.findByText(/account is ready/)
     expect(mocks.verifyAccount).toHaveBeenCalledTimes(2)
-    expect(status.parentElement?.contains(document.activeElement)).toBe(true)
+    expect(document.activeElement).toBe(screen.getByRole('status'))
   })
 
   it('verifies once even when React runs the page-load effect twice (strict mode)', async () => {

@@ -39,12 +39,13 @@ describe('ConfirmEmail', () => {
     expect(screen.queryByText('Account offer')).toBeNull()
     await expectAccessible(document.body)
 
-    const status = await screen.findByText(/your email is confirmed/)
+    await screen.findByText(/your email is confirmed/)
     expect(fetchMock).toHaveBeenCalledTimes(1)
     const [url, init] = fetchMock.mock.calls[0] ?? []
     expect(String(url)).toMatch(/\/api\/email-confirmations\/confirm$/)
     expect(init).toMatchObject({ method: 'POST', body: JSON.stringify({ token: TOKEN }) })
-    expect(status.getAttribute('role')).toBe('status')
+    // The same live region that said "Confirming" now holds the answer, so it is announced
+    expect(screen.getByRole('status').textContent).toContain('your email is confirmed')
     expect(document.activeElement).toBe(document.body) // nothing steals focus on page load
     expect(window.location.search).toBe('')
     expect(screen.queryByRole('button')).toBeNull()
@@ -116,10 +117,21 @@ describe('ConfirmEmail', () => {
 
     answer(200, { outcome: 'confirmed' })
     await clickTryAgain()
-    const status = await screen.findByText(/your email is confirmed/)
+    await screen.findByText(/your email is confirmed/)
     expect(fetchMock).toHaveBeenCalledTimes(2)
-    expect(status.parentElement?.contains(document.activeElement)).toBe(true)
+    expect(document.activeElement).toBe(screen.getByRole('status'))
     expect(screen.queryByRole('button')).toBeNull()
+  })
+
+  it('ignores an answer that arrives after the person left the page', async () => {
+    let reply: (r: Response) => void = () => {}
+    fetchMock.mockReturnValue(new Promise<Response>((r) => (reply = r)))
+    const { unmount } = render(<ConfirmEmail token={TOKEN} retryHref="/contact" />)
+    unmount()
+    window.history.replaceState(null, '', '/search?q=garden')
+    reply(new Response(JSON.stringify({ outcome: 'confirmed' }), { status: 200 }))
+    await new Promise((r) => setTimeout(r, 0))
+    expect(window.location.search).toBe('?q=garden')
   })
 
   it('confirms once even when React runs the page-load effect twice (strict mode)', async () => {

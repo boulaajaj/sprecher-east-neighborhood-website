@@ -43,6 +43,8 @@ export function VerifyAccount({ token: linkToken }: { token: string | null }) {
   const messageRef = useRef<HTMLDivElement>(null)
   // React runs effects twice in development: verify once per page load
   const started = useRef(false)
+  // An answer that comes back after the person left the page changes nothing
+  const mounted = useRef(true)
 
   const send = async (link: string, password?: NewPasswordValues) => {
     setSending(true)
@@ -53,11 +55,18 @@ export function VerifyAccount({ token: linkToken }: { token: string | null }) {
     } catch {
       next = 'offline'
     }
+    if (!mounted.current) return
     if (next === 'needs-password') setChoosingPassword(true)
     setAnswer(next)
     setSending(false)
   }
 
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+    }
+  }, [])
   useEffect(() => {
     if (window.location.search) window.history.replaceState(null, '', window.location.pathname)
     if (!token || started.current) return
@@ -81,18 +90,28 @@ export function VerifyAccount({ token: linkToken }: { token: string | null }) {
 
   return (
     <div className="space-y-6">
-      {confirmingOnLoad && <PendingStatus>Confirming your account…</PendingStatus>}
-      {answer && !confirmingOnLoad && (
-        <div ref={messageRef} tabIndex={-1} className="outline-none">
-          {answer === 'verified' ? (
-            <Alert variant="success">{ACCOUNT_VERIFIED}</Alert>
-          ) : answer === 'needs-password' ? (
-            <p className="text-foreground">{CHOOSE_PASSWORD_TO_VERIFY}</p>
-          ) : (
-            <Alert variant="error">{toVerifyAccountErrorMessage(answer)}</Alert>
-          )}
-        </div>
-      )}
+      {/* One live region from the first render, so the answer that replaces "Confirming" is
+          announced; an error keeps its own alert */}
+      <div ref={messageRef} tabIndex={-1} role="status" aria-live="polite" className="outline-none">
+        {confirmingOnLoad ? (
+          <>
+            <PendingStatus>Confirming your account…</PendingStatus>
+            <noscript>
+              <p className="mt-3 text-foreground">
+                Confirming needs JavaScript. Turn it on, then open the link again.
+              </p>
+            </noscript>
+          </>
+        ) : answer === 'verified' ? (
+          <Alert variant="success" quiet>
+            {ACCOUNT_VERIFIED}
+          </Alert>
+        ) : answer === 'needs-password' ? (
+          <p className="text-foreground">{CHOOSE_PASSWORD_TO_VERIFY}</p>
+        ) : (
+          answer && <Alert variant="error">{toVerifyAccountErrorMessage(answer)}</Alert>
+        )}
+      </div>
       {done ? (
         <Button href={SIGN_IN_PATH} fullWidth>
           Log In

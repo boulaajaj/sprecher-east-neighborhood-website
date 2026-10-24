@@ -54,8 +54,10 @@ Contact-form senders aren't accounts, so their confirmation link uses the site's
   unconfirmed sign-up could aim reset emails at someone else's inbox. #187 stops reset emails to
   unconfirmed accounts, with a test.
 - A mail scanner that runs the page's script (some workplace filters do) can now confirm on the
-  person's behalf. For a contact sender that only sends the welcome early. For a first sign-up
-  link it could open an account someone else started with that address (#290).
+  person's behalf, though nobody at that address clicked. For a contact sender, the scanner sends
+  the welcome, releases the emails that address's messages were holding (#287) and marks the
+  sender confirmed. For a first sign-up link, it could open an account someone else started with
+  that address (#290).
 - The technical rules are acceptance criteria in #183 and #187, checked in review.
 - Edit locks (#147) are fixed before any resident account exists.
 
