@@ -49,7 +49,8 @@ You are not just a critic — you are a creative designer. Your job is to **make
 
 ### UI Kit Rules
 
-- Interactive components (Dialog, Dropdown, Tabs, Accordion, etc.) are built once in `src/platform/ui/` on Radix UI primitives, with a variant (`cva`) for each look
+- A component one module uses stays in that module's `ui/`; it moves to `src/platform/ui/` on its second use ([architecture](../architecture/README.md#where-does-it-go)). The FAQ accordion, for example, is `FaqList` in `directory/ui`, a native `<details>`
+- Shared components are built once in `src/platform/ui/`, with a variant (`cva`) for each look; prefer a native element, and use a Radix UI primitive where native isn't enough (as `Field.Select` does)
 - Style them with Sprecher East design tokens — don't override with arbitrary values
 - Check [`docs/ui/component-set.md`](../ui/component-set.md) and `src/platform/ui/` before designing a new component
 - Dark mode is supported: tokens switch under `[data-theme='dark']`, so test every change in both themes
