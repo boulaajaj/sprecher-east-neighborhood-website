@@ -30,6 +30,8 @@ name=$(basename "$RELEASE")
 
 switched=no # yes once `current` points at this release
 previous="" # what `current` pointed at before (releases/<name>), empty for the old checkout
+# First run only: PM2's start settings for the old checkout, kept until the new release passes
+legacy_args="" legacy_cwd="" legacy_config=""
 
 on_unexpected_error() {
   [ "$BASH_SUBSHELL" -eq 0 ] || return 0
@@ -65,13 +67,20 @@ switch_back() { # <reason>
       report "ERROR: $reason; switched back to $(basename "$previous"), but the site does not answer; see ops/README.md (Roll back)"
     fi
   else
-    # First run: restart-app.sh has already put PM2's previous settings (the old checkout) back
-    # if the new release never answered.
+    # First run. restart-app.sh puts PM2's previous settings back if the new release never
+    # answered; if it did answer and a later check failed, PM2 still runs from `current`, so
+    # start it again from the old checkout with the settings saved before the switch.
+    if [ "$(pm2_stored cwd)" != "$legacy_cwd" ] || [ "$(pm2_stored args)" != "$legacy_args" ]; then
+      pm2 delete "$APP_NAME" >/dev/null 2>&1 || true
+      pm2 start "$legacy_config" --only "$APP_NAME" >/dev/null 2>&1 || true
+      pm2 save --force >/dev/null 2>&1 || true
+    fi
     rm -f "$CURRENT"
-    if [ "$(pm2_stored cwd)" = "$APP_DIR" ] && wait_until_up "$UP_SECONDS"; then
+    if [ "$(pm2_stored cwd)" = "$legacy_cwd" ] && wait_until_up "$UP_SECONDS"; then
+      rm -f "$legacy_config"
       report "ERROR: $reason; the old checkout in $APP_DIR is serving again"
     else
-      report "ERROR: $reason, and the old checkout is not serving either; see ops/README.md (Roll back)"
+      report "ERROR: $reason, and the old checkout is not serving either; by hand: pm2 delete $APP_NAME; pm2 start $legacy_config --only $APP_NAME; pm2 save (ops/README.md, Roll back)"
     fi
   fi
   exit 1
@@ -119,7 +128,14 @@ echo "→ Running database migrations..."
 drop_page_cache "$RELEASE"
 
 # 5. Switch and reload.
-if [ -L "$CURRENT" ]; then previous=$(readlink "$CURRENT"); fi
+if [ -L "$CURRENT" ]; then
+  previous=$(readlink "$CURRENT")
+else
+  legacy_args=$(pm2_stored args)
+  legacy_cwd=$(pm2_stored cwd)
+  [ -n "$legacy_cwd" ] || legacy_cwd="$APP_DIR"
+  legacy_config=$(pm2_config_with "${legacy_args:-start}" "$legacy_cwd")
+fi
 point_current_at "releases/$name"
 switched=yes
 
@@ -138,6 +154,7 @@ if ! wait_until_up "$UP_SECONDS" "$build_id"; then
   wait_until_up "$UP_SECONDS" "$build_id" || switch_back "release $name did not answer through Caddy with its build within ${UP_SECONDS}s"
 fi
 trap - ERR
+[ -z "$legacy_config" ] || rm -f "$legacy_config"
 set +e # from here on, a failure is reported but never touches the live release
 report "release $name is live (build $build_id)"
 

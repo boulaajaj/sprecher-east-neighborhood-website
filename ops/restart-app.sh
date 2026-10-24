@@ -120,14 +120,7 @@ if ! site_is_up; then
   exit 0
 fi
 
-rollback_config=$(mktemp /tmp/sprecher-east-rollback-XXXXXX.config.cjs)
-node -e '
-  const fs = require("fs")
-  const [file, name, args, cwd, out] = process.argv.slice(1)
-  const config = require(file)
-  config.apps = config.apps.filter((a) => a.name === name).map((a) => ({ ...a, args, cwd }))
-  fs.writeFileSync(out, "module.exports = " + JSON.stringify(config, null, 2) + "\n")
-' "$CODE_DIR/ecosystem.config.cjs" "$NAME" "${stored_args:-start}" "${stored_cwd:-$APP_DIR}" "$rollback_config"
+rollback_config=$(pm2_config_with "${stored_args:-start}" "${stored_cwd:-$APP_DIR}")
 
 pm2 delete "$NAME" >/dev/null 2>&1 || true
 pm2 start ecosystem.config.cjs --only "$NAME" >/dev/null

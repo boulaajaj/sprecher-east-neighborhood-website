@@ -94,6 +94,21 @@ pm2_stored() { # args|cwd
     })' "$APP_NAME" "$1"
 }
 
+# Writes a PM2 config for the app: ecosystem.config.cjs with the given start arguments and
+# folder, the way back to settings PM2 had before. Prints the file's path.
+pm2_config_with() { # <args> <cwd>
+  local out
+  out=$(mktemp /tmp/sprecher-east-rollback-XXXXXX.config.cjs)
+  node -e '
+    const fs = require("fs")
+    const [file, name, args, cwd, out] = process.argv.slice(1)
+    const config = require(file)
+    config.apps = config.apps.filter((a) => a.name === name).map((a) => ({ ...a, args, cwd }))
+    fs.writeFileSync(out, "module.exports = " + JSON.stringify(config, null, 2) + "\n")
+  ' "$CODE_DIR/ecosystem.config.cjs" "$APP_NAME" "$1" "$2" "$out"
+  echo "$out"
+}
+
 # True when the public home page answers 200 through Caddy on this machine. A redirect doesn't
 # count: Caddy can answer one without ever reaching the app. With a build ID, the app must also
 # report that build, which proves the release that was just switched to is the one serving.

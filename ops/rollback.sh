@@ -29,8 +29,8 @@ build_id=$(cat "$CODE_DIR/.next/BUILD_ID")
 
 drop_page_cache "$CODE_DIR"
 point_current_at "$target"
-pm2 reload "$APP_NAME" --update-env >/dev/null
-if wait_until_up "$UP_SECONDS" "$build_id"; then
+# The reload and the check together: a failure of either switches back below.
+if pm2 reload "$APP_NAME" --update-env >/dev/null 2>&1 && wait_until_up "$UP_SECONDS" "$build_id"; then
   touch "$CODE_DIR" # newest again, so the next deploy keeps it
   report "rolled back to $target (build $build_id); it answers through Caddy"
   exit 0
@@ -39,8 +39,8 @@ fi
 if [ -n "$live" ]; then
   point_current_at "$live"
   pm2 reload "$APP_NAME" --update-env >/dev/null 2>&1 || true
-  report "ERROR: $target did not answer with its build within ${UP_SECONDS}s; switched back to $live"
+  report "ERROR: $target did not reload, or did not answer with its build within ${UP_SECONDS}s; switched back to $live"
 else
-  report "ERROR: $target did not answer with its build within ${UP_SECONDS}s"
+  report "ERROR: $target did not reload, or did not answer with its build within ${UP_SECONDS}s"
 fi
 exit 1
