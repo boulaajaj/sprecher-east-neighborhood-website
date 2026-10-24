@@ -23,9 +23,8 @@ async function readToken(json: (() => Promise<unknown>) | undefined): Promise<un
 
 /**
  * `POST /api/email-confirmations/confirm` with `{ token }`: follows a confirmation link and
- * answers `{ outcome }`, with the `email` once it is confirmed (`ConfirmResult`). A POST sent by
- * the confirm page's script once it loads (#300), never a GET, so a scanner that only fetches
- * the link uses nothing up. Public on purpose: the
+ * answers `{ outcome }`, with the `email` once it is confirmed (`ConfirmResult`). A POST, never
+ * the page load, because mail scanners open links and would use them up. Public on purpose: the
  * token is the proof.
  */
 export const confirmEndpoint = (listeners: readonly EmailConfirmedListener[]): Endpoint => ({

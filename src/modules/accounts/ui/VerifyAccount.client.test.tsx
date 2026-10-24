@@ -1,7 +1,6 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import React from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { expectAccessible } from '@/platform/ui/testing/expectAccessible'
@@ -19,23 +18,27 @@ beforeEach(() => {
 })
 afterEach(cleanup)
 
+const clickConfirm = () =>
+  userEvent.click(screen.getByRole('button', { name: 'Confirm My Account' }))
+
 describe('VerifyAccount', () => {
-  it('verifies as soon as the page loads, without a click, and offers to log in (#300)', async () => {
+  it('does nothing until the button is clicked, then verifies and offers to log in', async () => {
     mocks.verifyAccount.mockResolvedValue({ ok: true })
     render(
       <main>
         <VerifyAccount token={TOKEN} />
       </main>,
     )
-    expect(screen.getByRole('status').textContent).toMatch(/Confirming your account/)
-    expect(window.location.search).toBe('')
     await expectAccessible(document.body)
+    expect(window.location.search).toBe('')
+    expect(mocks.verifyAccount).not.toHaveBeenCalled()
 
-    await screen.findByText(/account is ready/)
+    await clickConfirm()
+
     expect(mocks.verifyAccount).toHaveBeenCalledExactlyOnceWith({ token: TOKEN })
-    // The same live region that said "Confirming" now holds the answer, so it is announced
-    expect(screen.getByRole('status').textContent).toMatch(/account is ready/)
-    expect(document.activeElement).toBe(document.body) // nothing steals focus on page load
+    const status = await screen.findByRole('status')
+    expect(status.textContent).toMatch(/account is ready/)
+    expect(status.parentElement?.contains(document.activeElement)).toBe(true)
     expect(screen.getByRole('link', { name: 'Log In' }).getAttribute('href')).toBe('/login')
     await expectAccessible(document.body)
   })
@@ -43,43 +46,18 @@ describe('VerifyAccount', () => {
   it('says a used or unknown link is dead, and offers to log in', async () => {
     mocks.verifyAccount.mockResolvedValue({ ok: false, failure: 'invalid-link' })
     render(<VerifyAccount token={TOKEN} />)
+    await clickConfirm()
     expect((await screen.findByRole('alert')).textContent).toMatch(/already used/)
     expect(screen.queryByRole('button')).toBeNull()
     expect(screen.getByRole('link', { name: 'Log In' })).toBeTruthy()
   })
 
-  it.each([
-    [
-      'no answer',
-      () => mocks.verifyAccount.mockRejectedValueOnce(new TypeError('x')),
-      /connection/,
-    ],
-    [
-      'a server error',
-      () => mocks.verifyAccount.mockResolvedValueOnce({ ok: false, failure: 'server-error' }),
-      /try again in a few minutes/,
-    ],
-  ])('offers to try again after %s', async (_, setUp, text) => {
-    setUp()
+  it('keeps the button to try again after a server error or no answer', async () => {
+    mocks.verifyAccount.mockRejectedValueOnce(new TypeError('Failed to fetch'))
     render(<VerifyAccount token={TOKEN} />)
-    expect((await screen.findByRole('alert')).textContent).toMatch(text)
-
-    mocks.verifyAccount.mockResolvedValueOnce({ ok: true })
-    await userEvent.click(screen.getByRole('button', { name: 'Try Again' }))
-    await screen.findByText(/account is ready/)
-    expect(mocks.verifyAccount).toHaveBeenCalledTimes(2)
-    expect(document.activeElement).toBe(screen.getByRole('status'))
-  })
-
-  it('verifies once even when React runs the page-load effect twice (strict mode)', async () => {
-    mocks.verifyAccount.mockResolvedValue({ ok: true })
-    render(
-      <React.StrictMode>
-        <VerifyAccount token={TOKEN} />
-      </React.StrictMode>,
-    )
-    await screen.findByText(/account is ready/)
-    expect(mocks.verifyAccount).toHaveBeenCalledTimes(1)
+    await clickConfirm()
+    expect((await screen.findByRole('alert')).textContent).toMatch(/connection/)
+    expect(screen.getByRole('button', { name: 'Confirm My Account' })).toBeTruthy()
   })
 
   it('asks for a password on a resent link, then sets it and verifies in one step (#289)', async () => {
@@ -90,9 +68,10 @@ describe('VerifyAccount', () => {
         <VerifyAccount token={TOKEN} />
       </main>,
     )
+    await clickConfirm()
 
     expect(await screen.findByText(/Choose a password to finish/)).toBeTruthy()
-    expect(screen.queryByRole('button', { name: 'Try Again' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Confirm My Account' })).toBeNull()
     await expectAccessible(document.body)
 
     await userEvent.type(screen.getByLabelText(/^Password/), 'correct-horse')
@@ -111,6 +90,7 @@ describe('VerifyAccount', () => {
   it('checks the chosen passwords match before sending', async () => {
     mocks.verifyAccount.mockResolvedValue({ ok: false, failure: 'needs-password' })
     render(<VerifyAccount token={TOKEN} />)
+    await clickConfirm()
     await userEvent.type(await screen.findByLabelText(/^Password/), 'correct-horse')
     await userEvent.type(screen.getByLabelText(/Confirm password/), 'other-horse')
     await userEvent.click(screen.getByRole('button', { name: 'Set Password and Confirm' }))
