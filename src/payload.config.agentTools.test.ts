@@ -22,7 +22,7 @@ let runDocId = 0
 
 const KEY = 'tools-key-for-tests-0123456789abcdef'
 const RUN_ID = 'scout-2026-10-24'
-const RUN = { pipelineVersion: 1, repoCommit: 'a'.repeat(40), status: 'running' }
+const RUN = { pipelineVersion: 1, repoCommit: 'a'.repeat(40), status: 'running' as const }
 const SOURCE = { sourceName: 'Madison Public Library', sourceUrl: 'https://example.com/e/1' }
 let next = 0
 const suggestion = (extra: Record<string, unknown> = {}) => ({
