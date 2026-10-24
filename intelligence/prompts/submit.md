@@ -34,7 +34,8 @@ README.md describes the contract.
      `$.verification.evidence`, and `$.arguments.flags` from `$.verification.flags`.
 3. **Validate** the envelope against `schemas/submission.schema.json`. If it fails, don't send
    it: mark it `$.action` `skip` with the errors in `$.skipReason`, and send a `reportItem` with
-   `kind: rejected-invalid`, the validation errors in the summary, and the candidate's source URL.
+   `kind: rejected-invalid`, the validation errors in the summary, and the candidate's source URL
+   (null when it has none; only this kind allows that).
 4. **Send.** A transient failure (timeout, 5xx) is retried once; after a second failure, the
    item goes to the editor as a `needs-review` report, or is deferred if the CMS can't take
    that either. `submitSuggestion` answers `created` or `duplicate`. The run log records the

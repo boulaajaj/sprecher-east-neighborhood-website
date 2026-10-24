@@ -64,6 +64,28 @@
               "type": "array",
               "items": { "enum": ["created", "duplicate", "transient-error"] },
               "maxItems": 4
+            },
+            "modelAnswers": {
+              "description": "What the model stage returns on each try, for retry cases.",
+              "type": "array",
+              "maxItems": 3,
+              "items": { "enum": ["valid", "invalid"] }
+            }
+          }
+        },
+        "sources": {
+          "description": "Fixture-only overrides of registry entries (for example a pending page as if valid). The real sources.yaml never changes.",
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "result"],
+            "properties": {
+              "id": { "$ref": "common.schema.json#/$defs/sourceId" },
+              "result": { "$ref": "sources.schema.json#/$defs/source/properties/result" },
+              "pilotRank": { "$ref": "sources.schema.json#/$defs/source/properties/pilotRank" },
+              "cadence": { "$ref": "sources.schema.json#/$defs/source/properties/cadence" }
             }
           }
         }

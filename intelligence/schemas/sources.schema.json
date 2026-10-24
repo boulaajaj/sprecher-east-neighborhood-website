@@ -6,20 +6,9 @@
   "required": ["version", "checkedOn", "sources"],
   "additionalProperties": false,
   "properties": {
-    "version": {
-      "type": "integer",
-      "minimum": 1
-    },
-    "checkedOn": {
-      "$ref": "common.schema.json#/$defs/date"
-    },
-    "sources": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "$ref": "#/$defs/source"
-      }
-    }
+    "version": { "type": "integer", "minimum": 1 },
+    "checkedOn": { "$ref": "common.schema.json#/$defs/date" },
+    "sources": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/source" } }
   },
   "$defs": {
     "source": {
@@ -44,76 +33,28 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "id": {
-          "$ref": "common.schema.json#/$defs/sourceId"
-        },
-        "name": {
-          "type": "string",
-          "minLength": 1
-        },
-        "owner": {
-          "type": "string",
-          "minLength": 1
-        },
-        "canonicalUrl": {
-          "$ref": "common.schema.json#/$defs/httpUrl"
-        },
+        "id": { "$ref": "common.schema.json#/$defs/sourceId" },
+        "name": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string", "minLength": 1 },
+        "canonicalUrl": { "$ref": "common.schema.json#/$defs/httpUrl" },
         "feedUrl": {
-          "anyOf": [
-            {
-              "$ref": "common.schema.json#/$defs/httpUrl"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "anyOf": [{ "$ref": "common.schema.json#/$defs/httpUrl" }, { "type": "null" }]
         },
-        "format": {
-          "enum": ["json-api", "ics", "rss", "atom", "html"]
-        },
-        "scope": {
-          "type": "string",
-          "minLength": 1
-        },
+        "format": { "enum": ["json-api", "ics", "rss", "atom", "html"] },
+        "scope": { "type": "string", "minLength": 1 },
         "audiences": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": {
-            "$ref": "common.schema.json#/$defs/audience"
-          }
+          "items": { "$ref": "common.schema.json#/$defs/audience" }
         },
-        "reliability": {
-          "enum": ["official", "established-media", "community"]
-        },
-        "access": {
-          "type": "string",
-          "minLength": 1
-        },
-        "cadence": {
-          "enum": ["daily", "weekly", "none"]
-        },
-        "lastChecked": {
-          "$ref": "common.schema.json#/$defs/date"
-        },
-        "result": {
-          "enum": ["valid", "invalid", "restricted", "pending"]
-        },
-        "pilotRank": {
-          "anyOf": [
-            {
-              "type": "integer",
-              "minimum": 1
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "treatment": {
-          "type": "string",
-          "minLength": 1
-        },
+        "reliability": { "enum": ["official", "established-media", "community"] },
+        "access": { "type": "string", "minLength": 1 },
+        "cadence": { "enum": ["daily", "weekly", "none"] },
+        "lastChecked": { "$ref": "common.schema.json#/$defs/date" },
+        "result": { "enum": ["valid", "invalid", "restricted", "pending"] },
+        "pilotRank": { "anyOf": [{ "type": "integer", "minimum": 1 }, { "type": "null" }] },
+        "treatment": { "type": "string", "minLength": 1 },
         "example": {
           "anyOf": [
             {
@@ -121,112 +62,60 @@
               "required": ["title", "date", "url"],
               "additionalProperties": false,
               "properties": {
-                "title": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "date": {
-                  "$ref": "common.schema.json#/$defs/date"
-                },
-                "url": {
-                  "$ref": "common.schema.json#/$defs/httpUrl"
-                }
+                "title": { "type": "string", "minLength": 1 },
+                "date": { "$ref": "common.schema.json#/$defs/date" },
+                "url": { "$ref": "common.schema.json#/$defs/httpUrl" }
               }
             },
-            {
-              "type": "null"
-            }
+            { "type": "null" }
           ]
         },
-        "notes": {
-          "type": "string"
-        },
-        "fetchStrategy": {
-          "$ref": "common.schema.json#/$defs/fetchStrategy"
-        },
+        "notes": { "type": "string" },
+        "fetchStrategy": { "$ref": "common.schema.json#/$defs/fetchStrategy" },
         "robots": {
           "description": "The robots.txt check for the paths this source reads.",
           "type": "object",
           "additionalProperties": false,
           "required": ["checked", "result", "url"],
           "properties": {
-            "checked": {
-              "$ref": "common.schema.json#/$defs/date"
-            },
-            "result": {
-              "enum": ["allowed", "disallowed"]
-            },
-            "url": {
-              "$ref": "common.schema.json#/$defs/httpUrl"
-            }
+            "checked": { "$ref": "common.schema.json#/$defs/date" },
+            "result": { "enum": ["allowed", "disallowed"] },
+            "url": { "$ref": "common.schema.json#/$defs/httpUrl" }
           }
         }
       },
       "allOf": [
         {
-          "if": {
-            "properties": {
-              "pilotRank": {
-                "type": "integer"
-              }
-            }
-          },
+          "if": { "properties": { "pilotRank": { "type": "integer" } } },
           "then": {
             "properties": {
-              "result": {
-                "const": "valid"
-              },
-              "cadence": {
-                "not": {
-                  "const": "none"
-                }
-              }
+              "result": { "const": "valid" },
+              "cadence": { "not": { "const": "none" } }
             }
           }
         },
         {
           "if": {
             "properties": {
-              "result": {
-                "const": "valid"
-              }
+              "result": { "const": "valid" },
+              "format": { "not": { "const": "html" } }
             }
           },
-          "then": {
-            "properties": {
-              "feedUrl": {
-                "type": "string"
-              }
-            }
-          }
+          "then": { "properties": { "feedUrl": { "type": "string" } } },
+          "description": "A valid feed or API has a feedUrl; a valid HTML page is read at its canonicalUrl."
         },
         {
           "description": "Playwright only for public HTML pages that robots.txt allows; never for restricted or invalid sources.",
           "if": {
             "required": ["fetchStrategy"],
-            "properties": {
-              "fetchStrategy": {
-                "const": "direct-then-playwright"
-              }
-            }
+            "properties": { "fetchStrategy": { "const": "direct-then-playwright" } }
           },
           "then": {
             "required": ["robots"],
             "properties": {
-              "format": {
-                "const": "html"
-              },
-              "result": {
-                "enum": ["valid", "pending"]
-              },
-              "robots": {
-                "properties": {
-                  "result": {
-                    "const": "allowed"
-                  }
-                },
-                "type": "object"
-              }
+              "format": { "const": "html" },
+              "result": { "enum": ["valid", "pending"] },
+              "robots": { "properties": { "result": { "const": "allowed" } }, "type": "object" }
             }
           }
         }

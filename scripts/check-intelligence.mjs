@@ -1,10 +1,8 @@
 #!/usr/bin/env node
-// Checks the intelligence/ folder (#337): the YAML files against their JSON Schemas, the pipeline's
-// stage files, and that every field a prompt names (written `$.path`) exists in that stage's input
-// or output schema. Run: node scripts/check-intelligence.mjs [folder]. Exits 1 with a list of problems.
-//
-// ajv and js-yaml are already installed with the site's dependencies (ajv through payload, pinned
-// by the `overrides` in package.json; js-yaml through eslint). #343 declares them directly.
+// Checks intelligence/ (#337, #352): the YAML files against their schemas, the stages' prompts,
+// and the eval cases' routes, sources, offsets and grader fields. Run: node
+// scripts/check-intelligence.mjs [folder]. ajv (through payload) and js-yaml (through eslint) are
+// already installed; #343 declares them. Exits 1 with a list of problems.
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import Ajv2020 from 'ajv/dist/2020.js'
@@ -112,18 +110,18 @@ const ROUTE = {
   duplicate: 'none',
 }
 const sourceIds = new Set(sources?.sources?.map((s) => s.id) ?? [])
-// An offset that isn't America/Chicago's at that local time, unless the case tests one
-const DATE_TIME = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?)([+-]\d{2}:\d{2})$/
-function chicagoOffset(value) {
-  const instant = new Date(value)
-  const name = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Chicago',
-    timeZoneName: 'longOffset',
-  })
-    .formatToParts(instant)
-    .find((part) => part.type === 'timeZoneName').value
-  return name.replace('GMT', '')
-}
+const resultOf = new Map(sources?.sources?.map((s) => [s.id, s.result]) ?? [])
+// An offset that isn't America/Chicago's at that instant (common.schema.json's grammar: optional
+// seconds and fractions, Z or an offset), unless the case tests one
+const DATE_TIME = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?)(Z|[+-]\d{2}:\d{2})$/
+const CHICAGO = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'America/Chicago',
+  timeZoneName: 'longOffset',
+})
+const chicagoOffset = (value) =>
+  CHICAGO.formatToParts(new Date(value))
+    .find((p) => p.type === 'timeZoneName')
+    .value.slice(3)
 function dateTimes(value, found = []) {
   if (typeof value === 'string' && DATE_TIME.test(value)) found.push(value)
   else if (value && typeof value === 'object')
@@ -131,12 +129,20 @@ function dateTimes(value, found = []) {
   return found
 }
 for (const c of cases) {
-  for (const id of [c.input?.sourceId, ...(c.input?.otherSources ?? []).map((o) => o.sourceId)]) {
+  const others = [c.input?.otherSources, c.input?.alsoReportedBy].flat().filter(Boolean)
+  const named = [c.input?.sourceId, ...others.map((o) => o.sourceId)]
+  for (const id of [...named, ...(c.given?.sources ?? []).map((o) => o.id)])
     if (!sourceIds.has(id)) problem(c.file, `${c.id}: no source ${id}`)
+  // A scout case that fetches needs a valid source, in the registry or as a fixture override
+  if (c.stage === 'scout') {
+    const override = c.given?.sources?.find((o) => o.id === c.input?.sourceId)
+    const result = override?.result ?? resultOf.get(c.input?.sourceId)
+    if ((c.expected?.runStatus === 'skipped') === (result === 'valid'))
+      problem(c.file, `${c.id}: runStatus ${c.expected?.runStatus} with a ${result} source`)
   }
   if (!c.tags?.includes('wrong-offset')) {
     for (const value of dateTimes([c.input, c.given, c.graders])) {
-      const offset = DATE_TIME.exec(value)[2]
+      const offset = DATE_TIME.exec(value)[2].replace('Z', '+00:00')
       if (chicagoOffset(value) !== offset)
         problem(c.file, `${c.id}: ${value} should use ${chicagoOffset(value)} in America/Chicago`)
     }

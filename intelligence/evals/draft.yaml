@@ -128,5 +128,6 @@ cases:
       locationText: Pinney Library
     given:
       curation: { decision: accept, audiences: [youth] }
+      run: { modelAnswers: [invalid, invalid] }
     expected: { route: reportItem, reportKind: needs-review, retries: 1 }
     why: The model's answer fails the draft schema twice; after one retry, the item goes to review with the errors.

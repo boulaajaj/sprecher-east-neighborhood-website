@@ -51,9 +51,10 @@ trips one of these triggers:
 - a 200 with an empty body;
 - a JavaScript shell: no text where items should be;
 - a parse that finds no items, or fails its checks;
-- a non-200 answer that isn't an error or a gate. A 5xx or 429 is retried once (honoring
-  Retry-After) and never sent to Playwright; a 401, 403, 451, or a redirect to a login, paywall,
-  CAPTCHA or bot gateway is a gate and stops the source as `blocked`.
+- a non-200 answer that isn't an error, a gate or "not modified". A 304 is logged as
+  `not-modified` and ends the source's run. A 5xx or 429 is retried once (honoring Retry-After)
+  and never sent to Playwright; a 401, 403, 451, or a redirect to a login, paywall, CAPTCHA or
+  bot gateway is a gate and stops the source as `blocked`.
 
 The fallback is one headless, logged-out page load of the same URL, at the same daily cadence.
 

@@ -35,8 +35,9 @@ One item with `$.candidate` filled in: its title, `$.candidate.startsAt`,
    or one side of a ballot measure (a forum open to every candidate, or a neutral explainer, is
    not partisan). Postponed or rescheduled with no new date: add `needs-date`; the old date no
    longer holds, and you never pick a new one.
-   Check the offset against America/Chicago for that date (-05:00 until 02:00 on the first
-   Sunday of November, -06:00 after): a wrong one gets `wrong-offset`.
+   Check the offset with the IANA rules for America/Chicago: -05:00 (CDT) from 02:00 on the
+   second Sunday of March to 02:00 on the first Sunday of November, -06:00 (CST) otherwise; in
+   the repeated autumn hour (01:00 to 02:00) either is right. A wrong one gets `wrong-offset`.
 5. **Evidence.** List up to five pages you relied on in `$.evidence`, each with what it says in
    one line. Only pages you actually read.
 6. **Gaps.** Put every fact you couldn't confirm in `$.unknowns`, and add the matching flag
