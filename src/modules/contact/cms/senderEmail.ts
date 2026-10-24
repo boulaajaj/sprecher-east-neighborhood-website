@@ -3,10 +3,8 @@ import type { CollectionAfterChangeHook, CollectionBeforeChangeHook, Field } fro
 import type { EmailConfirmedListener, EmailConfirmer } from '@/platform/payload/emailConfirmer'
 import { isAdminFieldAccess } from '@/platform/payload/roles'
 
-import { findSenderEmail, type SubmittedRow } from '../domain/senderEmail'
+import { FORM_SUBMISSIONS, findSenderEmail, type SubmittedRow } from '../domain/senderEmail'
 import { holdEmails, releaseHeldEmails, takeHeldEmails } from './heldEmails'
-
-const FORM_SUBMISSIONS = 'form-submissions'
 
 /**
  * Set by the server only, from the submission and the email confirmation (#183). Only admins
@@ -37,16 +35,20 @@ export const senderEmailFields: Field[] = [
   },
   {
     // The message's emails, kept until the sender confirms their address, then sent (#287).
-    // Server-only: hidden from the API and the admin panel.
+    // Server-only. `hidden` only hides it from reads, so writes are refused too: a visitor's own
+    // value would otherwise be sent as written once they confirm. The server writes it through the
+    // database adapter, and `recordSenderEmail` clears anything sent with a new submission.
     name: 'heldEmails',
     type: 'json',
     hidden: true,
+    access: { create: () => false, update: () => false, read: () => false },
   },
 ]
 
 /**
  * A hook that records who sent a new submission and whether that address is already confirmed.
- * It always overwrites both fields, so a visitor can't send them. Runs after the safeguards.
+ * It always overwrites both fields, and clears the held emails, so a visitor can't send any of
+ * them. Runs after the safeguards.
  */
 export const recordSenderEmail =
   (confirmer: EmailConfirmer): CollectionBeforeChangeHook =>
@@ -72,6 +74,8 @@ export const recordSenderEmail =
       ...data,
       senderEmail,
       emailConfirmed: senderEmail ? await confirmer.isConfirmed(senderEmail, req) : false,
+      // Only the form's own email step fills this in, after the safety rules (#287)
+      heldEmails: null,
     }
   }
 
@@ -91,7 +95,7 @@ export const requestSenderConfirmation =
       if (held.length > 0) {
         await holdEmails(doc.id, held, req).catch((error: unknown) =>
           req.payload.logger.error(
-            `Form emails could not be held for confirmation (${error instanceof Error ? error.name : 'error'})`,
+            `Form emails of submission ${doc.id} could not be held for confirmation (${error instanceof Error ? error.name : 'error'})`,
           ),
         )
       }

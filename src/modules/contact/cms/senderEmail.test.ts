@@ -7,6 +7,7 @@ import {
   markSubmissionsConfirmed,
   recordSenderEmail,
   requestSenderConfirmation,
+  senderEmailFields,
 } from './senderEmail'
 
 const CONTACT_FORM = {
@@ -57,9 +58,11 @@ describe('recordSenderEmail', () => {
     const { result } = await record(fakeConfirmer(), {
       senderEmail: 'someone-else@example.com',
       emailConfirmed: true,
+      // Emails a visitor writes themselves would go out as written once they confirm (#287)
+      heldEmails: [{ to: 'victim@example.net', from: 'ceo@bank.example', html: '<p>Pay</p>' }],
       submissionData: [{ field: 'name', value: 'Ana' }],
     })
-    expect(result).toMatchObject({ senderEmail: null, emailConfirmed: false })
+    expect(result).toMatchObject({ senderEmail: null, emailConfirmed: false, heldEmails: null })
   })
 
   it('looks the form up without failing, so an unknown form gets the usual validation error', async () => {
@@ -94,6 +97,17 @@ const heldEmail = {
   subject: 'Website message',
   html: '<p>Hello</p>',
 }
+
+describe('heldEmails field', () => {
+  it('can’t be written or read through the API: only the server sets it (#287)', () => {
+    const field = senderEmailFields.find((f) => 'name' in f && f.name === 'heldEmails')
+    const access = field && 'access' in field ? field.access : undefined
+    expect(field).toMatchObject({ type: 'json', hidden: true })
+    for (const operation of ['create', 'update', 'read'] as const) {
+      expect(access?.[operation]?.({} as never)).toBe(false)
+    }
+  })
+})
 
 describe('requestSenderConfirmation', () => {
   const run = (
@@ -146,7 +160,9 @@ describe('requestSenderConfirmation', () => {
       operation: 'create',
       req,
     } as unknown as AfterArgs)
-    expect(error).toHaveBeenCalledWith('Form emails could not be held for confirmation (Error)')
+    expect(error).toHaveBeenCalledWith(
+      'Form emails of submission 7 could not be held for confirmation (Error)',
+    )
     expect(confirmer.request).toHaveBeenCalled()
   })
 
@@ -220,12 +236,39 @@ describe('markSubmissionsConfirmed', () => {
     })
   })
 
+  it('keeps releasing the other messages when one fails, and logs its id', async () => {
+    const payload = payloadWith([
+      { id: 7, heldEmails: [heldEmail] },
+      { id: 8, heldEmails: [{ ...heldEmail, subject: 'Second' }] },
+    ])
+    payload.db.updateOne.mockRejectedValueOnce(new Error('locked'))
+    const req = { payload } as unknown as PayloadRequest
+    await markSubmissionsConfirmed('ana@example.com', req)
+    expect(payload.logger.error).toHaveBeenCalledWith(
+      'Held emails of form submission 7 could not be released (Error)',
+    )
+    expect(payload.sendEmail).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ subject: 'Second' }),
+    )
+  })
+
   it('logs a held email that fails to send, and still marks the messages', async () => {
     const payload = payloadWith([{ id: 7, heldEmails: [heldEmail] }])
     payload.sendEmail.mockRejectedValue(new Error('SMTP down for info@example.org'))
     const req = { payload } as unknown as PayloadRequest
     await markSubmissionsConfirmed('ana@example.com', req)
-    expect(payload.logger.error).toHaveBeenCalledWith('Held form email could not be sent (Error)')
+    expect(payload.logger.error).toHaveBeenCalledWith(
+      'Held email of form submission 7 could not be sent (Error)',
+    )
     expect(payload.update).toHaveBeenCalled()
+  })
+})
+
+describe('takeHeldEmails', () => {
+  it('hands the held emails over once, so a second submission can’t pick them up', async () => {
+    const { takeHeldEmails } = await import('./heldEmails')
+    const context: Record<string, unknown> = { heldFormEmails: [heldEmail] }
+    expect(takeHeldEmails(context)).toEqual([heldEmail])
+    expect(takeHeldEmails(context)).toEqual([])
   })
 })

@@ -48,8 +48,8 @@ export const guardFormEmails: BeforeEmail<FormSubmission> = async (emails, { dat
   // A message reaches the owner only once its sender confirms their address (#274, #287): until
   // then its emails wait on the submission, and the confirmation sends them
   if (holdsForConfirmation(data?.senderEmail, data?.emailConfirmed)) {
-    // The submission's id isn't known here; `requestSenderConfirmation` stores them right after.
-    // On the request's context: the hooks' own `context` argument isn't one shared object
+    // The submission's id isn't known here; `requestSenderConfirmation`, the next hook, stores
+    // them. The plugin types this hook's arguments without `context`, so they travel on `req`
     req.context[HELD_EMAILS] = allowed
     return []
   }

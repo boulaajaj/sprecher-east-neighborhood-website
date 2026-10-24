@@ -1,10 +1,8 @@
 import type { FormattedEmail } from '@payloadcms/plugin-form-builder/types'
 import type { PayloadRequest } from 'payload'
 
-import { toSenderEmailNote } from '../domain/senderEmail'
+import { FORM_SUBMISSIONS, toSenderEmailNote } from '../domain/senderEmail'
 import { capFormEmails } from './rateLimits'
-
-const FORM_SUBMISSIONS = 'form-submissions'
 
 /**
  * Where the form builder's email step leaves a new message's held emails in the request's
@@ -13,9 +11,15 @@ const FORM_SUBMISSIONS = 'form-submissions'
  */
 export const HELD_EMAILS = 'heldFormEmails'
 
-/** The held emails the email step left in the context; anything else is none. */
-export const takeHeldEmails = (context: Record<string, unknown>): FormattedEmail[] =>
-  toHeldEmails(context[HELD_EMAILS])
+/**
+ * Takes the held emails the email step left in the context (anything else is none), and removes
+ * them, so another submission in the same request can't pick them up.
+ */
+export function takeHeldEmails(context: Record<string, unknown>): FormattedEmail[] {
+  const held = toHeldEmails(context[HELD_EMAILS])
+  context[HELD_EMAILS] = undefined
+  return held
+}
 
 /** Adds the line saying the sender confirmed their address (#183) to each email. */
 export const withSenderNote = (
@@ -65,23 +69,37 @@ export async function releaseHeldEmails(email: string, req: PayloadRequest): Pro
     req,
   })
   for (const doc of docs) {
-    const held = toHeldEmails(doc.heldEmails)
-    if (held.length === 0) continue
-    await req.payload.db.updateOne({
-      collection: FORM_SUBMISSIONS,
-      id: doc.id,
-      data: { heldEmails: null },
-      req,
-      returning: false,
-    })
-    for (const message of capFormEmails(withSenderNote(held, email), req.payload.logger)) {
-      try {
-        await req.payload.sendEmail(message)
-      } catch (error) {
-        req.payload.logger.error(
-          `Held form email could not be sent (${error instanceof Error ? error.name : 'error'})`,
-        )
-      }
+    // One message that fails doesn't keep the others from going out
+    await releaseOne(doc.id, toHeldEmails(doc.heldEmails), email, req).catch((error: unknown) =>
+      req.payload.logger.error(
+        `Held emails of form submission ${doc.id} could not be released (${error instanceof Error ? error.name : 'error'})`,
+      ),
+    )
+  }
+}
+
+/** Clears one message's held emails, then sends them, marked confirmed, within the cap. */
+async function releaseOne(
+  id: number | string,
+  held: FormattedEmail[],
+  senderEmail: string,
+  req: PayloadRequest,
+): Promise<void> {
+  if (held.length === 0) return
+  await req.payload.db.updateOne({
+    collection: FORM_SUBMISSIONS,
+    id,
+    data: { heldEmails: null },
+    req,
+    returning: false,
+  })
+  for (const message of capFormEmails(withSenderNote(held, senderEmail), req.payload.logger)) {
+    try {
+      await req.payload.sendEmail(message)
+    } catch (error) {
+      req.payload.logger.error(
+        `Held email of form submission ${id} could not be sent (${error instanceof Error ? error.name : 'error'})`,
+      )
     }
   }
 }

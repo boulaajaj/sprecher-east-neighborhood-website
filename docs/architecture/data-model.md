@@ -138,11 +138,9 @@ sends the welcome email. The page `/confirm-email` calls it on a button click, n
 failed send (or a failed listener) is logged and never retried.
 
 What is kept: an unconfirmed record is deleted 7 days after its last link (whenever a link is
-requested or confirmed, until scheduled jobs run, #141). How long a confirmed record is kept is **not decided
-yet: it waits for the owner (#274)**. The proposal is to keep the address and the dates above
-until the person asks for removal through the contact form, and an admin then deletes it in
-Admin. The site's privacy text should say the same once he decides. Until then nothing deletes
-confirmed records.
+requested or confirmed, until scheduled jobs run, #141). A confirmed record is kept until the
+person asks for removal (through the contact form), and an admin then deletes it in Admin: the
+owner's decision on #274 (2026-10-23). The site's privacy text should say the same.
 
 ### faq
 
@@ -182,7 +180,7 @@ confirmed records.
 ### Plugin-created collections
 
 - `forms`: `title` (required), `fields` (blocks: `checkbox`, `country`, `email`, `message`, `number`, `select`, `state`, `text`, `textarea`; payment disabled), `submitButtonLabel`, `confirmationType` (`message` | `redirect`, default `message`), `confirmationMessage` (richText, required for message), `redirect.url`, `emails` (array: `emailTo`, `cc`, `bcc`, `replyTo`, `emailFrom`, `subject` required, `message` richText).
-- `form-submissions`: `form` → forms (required), `submissionData` (array of `field` text, `value` textarea, both required). Added by `src/modules/contact/cms/senderEmail.ts` (#183): `senderEmail` (text, indexed, from the form's first email field; text so Payload's stricter email check can never refuse a message) and `emailConfirmed` (checkbox, default false); both set by the server only. `heldEmails` (json, hidden): an unconfirmed sender's emails, as the form builder made them, kept until the sender confirms and then sent (#287). A confirmed address is kept until the person asks for removal (owner, #274).
+- `form-submissions`: `form` → forms (required), `submissionData` (array of `field` text, `value` textarea, both required). Added by `src/modules/contact/cms/senderEmail.ts` (#183): `senderEmail` (text, indexed, from the form's first email field; text so Payload's stricter email check can never refuse a message) and `emailConfirmed` (checkbox, default false); both set by the server only. `heldEmails` (json, hidden, no read or write access): an unconfirmed sender's emails, as the form builder made them after the safety rules, kept until the sender confirms and then sent (#287). `recordSenderEmail` clears anything a visitor sends in it.
 - `redirects`: `from` (text, required, unique, indexed), `to` (group: `type` reference | custom, `reference` → pages | posts, `url`). Plugin covers `pages` and `posts`.
 - `search`: `title`, `priority`, `doc` → posts | events (required), `slug`, `meta` (`title`, `description`, `image` → media), `categories` (array of `relationTo`, `categoryID`, `title`). Synced from `posts` and `events` only, drafts excluded.
 

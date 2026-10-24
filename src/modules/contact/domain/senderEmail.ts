@@ -1,5 +1,8 @@
 import { parseEmailAddress } from '@/platform/lib'
 
+/** The form builder's submissions collection. */
+export const FORM_SUBMISSIONS = 'form-submissions'
+
 /** A form field as this rule reads it: its block type (`email`, `text`…) and its name. */
 export type FormFieldShape = { blockType?: string; name?: string | null }
 
