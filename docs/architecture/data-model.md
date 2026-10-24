@@ -129,11 +129,13 @@ only admins can see it.
 | `sendCount`, `sendWindowStart` | number, date | No       | Hidden: links sent to this address in the current 24-hour window                            |
 
 Endpoint: `POST /api/email-confirmations/confirm` with `{ token }`, public (the token is the proof),
-20 tries an hour per connection. It answers `{ outcome }`: `confirmed`, `already-confirmed`,
+20 tries an hour per connection, and the robot check (Turnstile token in `x-turnstile-token`,
+400 `robot-check` without a valid one, #303). It answers `{ outcome }`: `confirmed`, `already-confirmed`,
 `expired` or `invalid`. The first valid click sets `confirmedAt` and `welcomeSentAt` in one
 conditional update through the database adapter (`UPDATE … WHERE confirmed_at IS NULL`, so two
 clicks at once confirm once), runs the `onConfirmed` listeners `payload.config.ts` passes in, then
-sends the welcome email. The page `/confirm-email` calls it on a button click, never on load.
+sends the welcome email. The page `/confirm-email` calls it on a button click, never on load, because some mail scanners run
+the page's script; the click also passes the robot check (#303).
 `welcomeSentAt` means the welcome was claimed, not delivered: it is set before the send, so a
 failed send (or a failed listener) is logged and never retried.
 

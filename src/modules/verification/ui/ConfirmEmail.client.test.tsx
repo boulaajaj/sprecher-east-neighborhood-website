@@ -3,15 +3,22 @@ import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { fakeTurnstile } from '@/platform/turnstile/testing/fakeTurnstileWidget'
 import { useConfirmedEmail } from '@/platform/ui/ConfirmedEmail.client'
 import { expectAccessible } from '@/platform/ui/testing/expectAccessible'
 
 import { ConfirmEmail } from './ConfirmEmail.client'
 
+vi.mock(
+  '@/platform/turnstile/TurnstileWidget.client',
+  () => import('@/platform/turnstile/testing/fakeTurnstileWidget'),
+)
+
 const TOKEN = 'a'.repeat(43)
 const fetchMock = vi.fn()
 
 beforeEach(() => {
+  fakeTurnstile.tokenFor = (reset) => `token-${reset}`
   fetchMock.mockReset()
   vi.stubGlobal('fetch', fetchMock)
   // The page as the link opens it
@@ -43,6 +50,8 @@ describe('ConfirmEmail', () => {
     const [url, init] = fetchMock.mock.calls[0] ?? []
     expect(String(url)).toMatch(/\/api\/email-confirmations\/confirm$/)
     expect(init).toMatchObject({ method: 'POST', body: JSON.stringify({ token: TOKEN }) })
+    // The robot check's token goes with it (#303)
+    expect(new Headers(init?.headers).get('x-turnstile-token')).toBe('token-0')
     const status = await screen.findByRole('status')
     expect(status.textContent).toContain('your email is confirmed')
     expect(status.parentElement?.contains(document.activeElement)).toBe(true)
@@ -122,6 +131,29 @@ describe('ConfirmEmail', () => {
     expect(alert.parentElement?.contains(document.activeElement)).toBe(true)
     expect(window.location.search).toBe(`?token=${TOKEN}`)
     expect(screen.getByRole('button', { name: 'Confirm my email' })).toBeTruthy()
+  })
+
+  it('sends nothing while the robot check is still running, and says why (#303)', async () => {
+    fakeTurnstile.tokenFor = () => null
+    render(<ConfirmEmail token={TOKEN} retryHref="/contact" />)
+    await clickConfirm()
+    expect(fetchMock).not.toHaveBeenCalled()
+    expect(screen.getByRole('alert').textContent).toContain('the spam check is still running')
+  })
+
+  it('says when the robot check fails, and sends a fresh token on the next press', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ error: 'robot-check' }), { status: 400 }),
+    )
+    render(<ConfirmEmail token={TOKEN} retryHref="/contact" />)
+    await clickConfirm()
+    expect((await screen.findByRole('alert')).textContent).toContain('spam check didn’t pass')
+
+    answer(200, { outcome: 'confirmed' })
+    await clickConfirm()
+    await screen.findByText(/your email is confirmed/)
+    const [, init] = fetchMock.mock.calls[1] ?? []
+    expect(new Headers(init?.headers).get('x-turnstile-token')).toBe('token-1')
   })
 
   it('says a link without a usable token isn’t valid, without asking the server', async () => {

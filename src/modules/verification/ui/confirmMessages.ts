@@ -22,6 +22,10 @@ const MESSAGES: Record<ConfirmAnswer | 'offline', ConfirmMessage> = {
     variant: 'error',
     text: 'This link isn’t valid. Check that you opened the whole link from the email, or send the form again to get a new one.',
   },
+  'robot-check': {
+    variant: 'error',
+    text: 'The spam check didn’t pass. Please wait a moment and press Confirm again.',
+  },
   'too-many-tries': {
     variant: 'error',
     text: 'Too many tries from your connection. Please wait a few minutes and try again.',

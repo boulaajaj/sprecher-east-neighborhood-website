@@ -104,11 +104,18 @@ export async function signUp(
   return signUpResident(parsed.data, await toPublicRequest(robotCheckToken), robotCheck)
 }
 
-/** Verifies an account from its link's token. Input that doesn't parse is a dead link. */
-export async function verifyAccount(input: unknown): Promise<ActionResult<VerifyAccountFailure>> {
+/**
+ * Verifies an account from its link's token, once the robot check passes (#303). Input that
+ * doesn't parse is a dead link.
+ */
+export async function verifyAccount(
+  input: unknown,
+  robotCheckToken?: unknown,
+): Promise<ActionResult<VerifyAccountFailure>> {
   const parsed = verifyAccountSchema.safeParse(input)
   if (!parsed.success) return { ok: false, failure: 'invalid-link' }
-  return verifyAccountFromLink(parsed.data)
+  const { token } = await toPublicRequest(robotCheckToken)
+  return verifyAccountFromLink(parsed.data, token, robotCheck)
 }
 
 /**

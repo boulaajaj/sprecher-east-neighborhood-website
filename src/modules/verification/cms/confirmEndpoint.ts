@@ -1,5 +1,6 @@
 import type { Endpoint } from 'payload'
 
+import { HUMAN_CHECK_TOKEN_HEADER, type HumanVerifier } from '@/platform/lib/humanCheck'
 import { parseClientIp, SlidingWindowCounter } from '@/platform/lib'
 import type { EmailConfirmedListener } from '@/platform/payload/emailConfirmer'
 
@@ -21,13 +22,21 @@ async function readToken(json: (() => Promise<unknown>) | undefined): Promise<un
   }
 }
 
+/** What the endpoint answers when the robot check fails, so the page can say so. */
+export const ROBOT_CHECK_ERROR = 'robot-check'
+
 /**
  * `POST /api/email-confirmations/confirm` with `{ token }`: follows a confirmation link and
- * answers `{ outcome }`, with the `email` once it is confirmed (`ConfirmResult`). A POST, never
- * the page load, because mail scanners open links and would use them up. Public on purpose: the
- * token is the proof.
+ * answers `{ outcome }`, with the `email` once it is confirmed (`ConfirmResult`). A POST sent by
+ * the page's Confirm button, never the page load, because mail scanners open links, and some run
+ * the page's script (#303). The button also runs the robot check (decision 0003), sent in the
+ * `x-turnstile-token` header: without a valid token nothing is confirmed (400). Public on purpose:
+ * the link's token is the proof of the mailbox, the robot check the proof of a person.
  */
-export const confirmEndpoint = (listeners: readonly EmailConfirmedListener[]): Endpoint => ({
+export const confirmEndpoint = (
+  listeners: readonly EmailConfirmedListener[],
+  verifier: HumanVerifier,
+): Endpoint => ({
   path: CONFIRM_ENDPOINT_PATH,
   method: 'post',
   handler: async (req) => {
@@ -37,6 +46,14 @@ export const confirmEndpoint = (listeners: readonly EmailConfirmedListener[]): E
     const ip = parseClientIp(req.headers)
     if (ip && !attempts.tryTake(ip, CONFIRMATION_LIMITS.confirmAttemptsPerConnection, Date.now())) {
       return Response.json({ error: 'Too many tries. Please wait and try again.' }, { status: 429 })
+    }
+    if (verifier.isEnabled()) {
+      const check = await verifier.verify(req.headers?.get(HUMAN_CHECK_TOKEN_HEADER))
+      if (!check.ok) {
+        // Why goes to the log (a wrong secret looks like a bot otherwise); the page gets a code
+        req.payload.logger.warn(`Robot check refused an email confirmation: ${check.reason}`)
+        return Response.json({ error: ROBOT_CHECK_ERROR }, { status: 400 })
+      }
     }
     try {
       return Response.json(await confirmEmail(await readToken(req.json?.bind(req)), req, listeners))

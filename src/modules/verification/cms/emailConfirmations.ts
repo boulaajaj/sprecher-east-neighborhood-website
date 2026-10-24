@@ -1,7 +1,9 @@
 import type { CollectionConfig } from 'payload'
 
+import type { HumanVerifier } from '@/platform/lib/humanCheck'
 import type { EmailConfirmedListener } from '@/platform/payload/emailConfirmer'
 import { isAdmin } from '@/platform/payload/roles'
+import { TurnstileVerifier } from '@/platform/turnstile/turnstileVerifier'
 
 import { EMAIL_CONFIRMATIONS } from '../domain/paths'
 import { confirmEndpoint } from './confirmEndpoint'
@@ -14,12 +16,17 @@ const readOnly = { readOnly: true, position: 'sidebar' } as const
  * (#183). Kept apart from accounts (`users`). Only admins can see or change it: it is personal
  * data, and the server writes it with access bypassed. `onConfirmed` runs once per address when
  * its link is clicked; `payload.config.ts` passes in what other modules need (decision 0008).
+ * `humanVerifier` is the robot check the Confirm button must pass (#303); Turnstile by default.
  */
 export const createEmailConfirmations = ({
   onConfirmed = [],
-}: { onConfirmed?: readonly EmailConfirmedListener[] } = {}): CollectionConfig => ({
+  humanVerifier = new TurnstileVerifier(),
+}: {
+  onConfirmed?: readonly EmailConfirmedListener[]
+  humanVerifier?: HumanVerifier
+} = {}): CollectionConfig => ({
   slug: EMAIL_CONFIRMATIONS,
-  endpoints: [confirmEndpoint(onConfirmed)],
+  endpoints: [confirmEndpoint(onConfirmed, humanVerifier)],
   access: {
     read: isAdmin,
     create: isAdmin,

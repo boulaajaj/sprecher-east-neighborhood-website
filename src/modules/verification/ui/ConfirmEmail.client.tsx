@@ -6,6 +6,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Alert } from '@/platform/ui/Alert'
 import { ConfirmedEmailContext } from '@/platform/ui/ConfirmedEmail.client'
 import { Button, Link } from '@/platform/ui'
+import { TurnstileWidget } from '@/platform/turnstile/TurnstileWidget.client'
+import { useRobotCheck } from '@/platform/turnstile/useRobotCheck.client'
 
 import { postConfirmation, type ConfirmAnswer } from './api'
 import { isLinkDone, isSettled, toConfirmMessage } from './confirmMessages'
@@ -14,7 +16,9 @@ type Answer = ConfirmAnswer | 'offline'
 
 /**
  * The confirm page's action: one button that confirms the email the link was sent to. Nothing
- * happens on page load, because mail scanners open links too. `token` is `null` when the link
+ * happens on page load, because mail scanners open links too, and some run the page's script
+ * (#303). The button also needs the robot check (Turnstile, decision 0003) to pass, so a scanner
+ * that presses it confirms nothing. `token` is `null` when the link
  * has none, or one that can't be ours. `retryHref` is where a person with a dead link can ask
  * for a new one (the contact form). `children` shows once the email is confirmed (the account
  * offer, #187), and can read the confirmed address with `useConfirmedEmail`.
@@ -34,6 +38,14 @@ export function ConfirmEmail({
   // Counts answers to clicks, so focus moves to the message after each one (not on page load)
   const [answers, setAnswers] = useState(0)
   const messageRef = useRef<HTMLDivElement>(null)
+  // Why the button can't send yet (the robot check is still running or couldn't load)
+  const [waitMessage, setWaitMessage] = useState<string | null>(null)
+  const robotCheck = useRobotCheck()
+
+  useEffect(() => {
+    // The check finished after a press that had to wait: the reason no longer holds
+    if (robotCheck.token) setWaitMessage(null)
+  }, [robotCheck.token])
 
   useEffect(() => {
     // The button that had focus is gone or reset: put keyboard and screen reader users on the
@@ -43,15 +55,20 @@ export function ConfirmEmail({
 
   const confirm = async () => {
     if (!token || sending) return
+    const pending = robotCheck.pendingMessage()
+    setWaitMessage(pending)
+    if (pending) return
     setSending(true)
     let next: Answer
     try {
-      const reply = await postConfirmation(token)
+      // Turnstile tokens are single use: each press sends one, then asks for a fresh one
+      const reply = await postConfirmation(token, robotCheck.token)
       next = reply.answer
       setEmail(reply.email)
     } catch {
       next = 'offline'
     }
+    robotCheck.renewToken()
     // The link is done with: keep its token out of the address bar and the history
     if (isLinkDone(next)) window.history.replaceState(null, '', window.location.pathname)
     setAnswer(next)
@@ -75,6 +92,8 @@ export function ConfirmEmail({
           )}
         </div>
       )}
+      {canConfirm && waitMessage && <Alert variant="error">{waitMessage}</Alert>}
+      {canConfirm && robotCheck.enabled && <TurnstileWidget {...robotCheck.widgetProps} />}
       {canConfirm && (
         <Button
           type="button"
