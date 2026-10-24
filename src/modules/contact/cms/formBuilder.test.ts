@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { anyone } from '@/platform/payload/anyone'
 import { isAdmin, isAdminOrEditor } from '@/platform/payload/roles'
 
+import { acknowledgeConfirmedSender } from './acknowledgeSender'
 import { createFormBuilderOptions } from './formBuilder'
 import { guardFormEmails } from './guardFormEmails'
 import { limitSubmissionSize } from './limitSubmissionSize'
@@ -47,19 +48,22 @@ describe('formBuilderOptions: safeguards', () => {
     expect(data).toMatchObject({ senderEmail: 'ana@example.com', emailConfirmed: false })
 
     const afterChange = submissions?.hooks?.afterChange ?? []
-    expect(afterChange).toHaveLength(1)
+    expect(afterChange).toHaveLength(2)
+    expect(afterChange[1]).toBe(acknowledgeConfirmedSender)
     const req = { context: {} }
     await afterChange[0]?.({ data, doc: {}, operation: 'create', req } as never)
     expect(emailConfirmer.request).toHaveBeenCalledWith('ana@example.com', req)
   })
 
-  it('adds the sender fields to submissions', () => {
+  it('adds the sender and retention hold fields to submissions', () => {
     const fields = submissions?.fields
     const names = typeof fields === 'function' ? fields({ defaultFields: [] }) : []
     expect(names.map((f) => ('name' in f ? f.name : ''))).toEqual([
       'senderEmail',
       'emailConfirmed',
       'heldEmails',
+      'retentionHold',
+      'retentionHoldReason',
     ])
   })
 

@@ -1,4 +1,5 @@
 // Payload entry: the users collection, for payload.config.ts. Nothing here may be server-only,
 // because the Payload CLI (migrations, seed) loads it outside Next.js.
+export { keepAccountEmails } from './cms/keepAccountEmails'
 export { Users } from './cms/users'
 export { noVerifyMutation } from './cms/verifyFromSiteOnly'

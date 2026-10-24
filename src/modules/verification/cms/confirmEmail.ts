@@ -4,12 +4,12 @@ import { getServerSideURL } from '@/platform/lib/getURL'
 import type { EmailConfirmedListener } from '@/platform/payload/emailConfirmer'
 
 import { toWelcomeEmail } from '../domain/emails'
-import { checkLink, toUnconfirmedCutoff } from '../domain/rules'
+import { checkLink } from '../domain/rules'
 import { hashConfirmationToken } from './token'
 import { parseConfirmationToken } from '../domain/tokenFormat'
 import type { ConfirmResult } from '../domain/types'
 import { logFailure } from './logFailure'
-import { deleteUnconfirmedBefore, getConfirmationByTokenHash, markConfirmed } from './store'
+import { getConfirmationByTokenHash, markConfirmed } from './store'
 
 /**
  * Follows a confirmation link. The first valid click within 24 hours confirms the address, runs
@@ -26,8 +26,6 @@ export async function confirmEmail(
   if (!token) return { outcome: 'invalid' }
 
   const now = Date.now()
-  await deleteUnconfirmedBefore(req, toUnconfirmedCutoff(now))
-
   const record = await getConfirmationByTokenHash(req, hashConfirmationToken(token))
   if (!record) return { outcome: 'invalid' }
 

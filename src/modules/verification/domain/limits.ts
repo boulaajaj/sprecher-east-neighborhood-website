@@ -20,6 +20,4 @@ export const CONFIRMATION_LIMITS = {
   siteWideWindowMs: HOUR,
   /** Clicks on "Confirm my email" per hour from one connection. */
   confirmAttemptsPerConnection: 20,
-  /** An unconfirmed address is deleted this long after its last link was sent. */
-  keepUnconfirmedMs: 7 * DAY,
 } as const

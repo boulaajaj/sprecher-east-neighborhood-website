@@ -5,9 +5,11 @@ import { anyone } from '@/platform/payload/anyone'
 import type { EmailConfirmer } from '@/platform/payload/emailConfirmer'
 import { isAdmin, isAdminOrEditor, isAdminOrEditorFieldAccess } from '@/platform/payload/roles'
 
+import { acknowledgeConfirmedSender } from './acknowledgeSender'
 import { guardFormEmails } from './guardFormEmails'
 import { limitSubmissionSize } from './limitSubmissionSize'
 import { rateLimitSubmissions } from './rateLimits'
+import { retentionHoldFields } from './retentionHold'
 import { recordSenderEmail, requestSenderConfirmation, senderEmailFields } from './senderEmail'
 import { TurnstileVerifier } from '@/platform/turnstile/turnstileVerifier'
 import { verifyHumanSubmission } from './verifyHumanSubmission'
@@ -74,10 +76,11 @@ export const createFormBuilderOptions = ({
         recordSenderEmail(emailConfirmer),
       ],
       // After the plugin's own email step, which held an unconfirmed sender's emails: stores
-      // them and asks the sender to confirm. The owner gets the message once they do (#274, #287)
-      afterChange: [requestSenderConfirmation(emailConfirmer)],
+      // them and asks the sender to confirm. The owner gets the message once they do (#274, #287).
+      // A sender confirmed before gets the "we received your message" email instead (#274)
+      afterChange: [requestSenderConfirmation(emailConfirmer), acknowledgeConfirmedSender],
     },
-    fields: ({ defaultFields }) => [...defaultFields, ...senderEmailFields],
+    fields: ({ defaultFields }) => [...defaultFields, ...senderEmailFields, ...retentionHoldFields],
     access: {
       create: () => true,
       read: isAdmin,

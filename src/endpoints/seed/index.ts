@@ -36,7 +36,8 @@ const collections: CollectionSlug[] = [
   'search',
 ]
 
-const globals: GlobalSlug[] = ['header', 'footer']
+// The navigation globals; Payload's own `payload-jobs-stats` is left alone
+const globals = ['header', 'footer'] as const satisfies readonly GlobalSlug[]
 
 // Next.js revalidation errors are normal when seeding the database without a server running
 // i.e. running `yarn seed` locally instead of using the admin UI within an active app

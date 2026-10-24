@@ -124,10 +124,12 @@ export interface Config {
   globals: {
     header: Header
     footer: Footer
+    'payload-jobs-stats': PayloadJobsStat
   }
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>
     footer: FooterSelect<false> | FooterSelect<true>
+    'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>
   }
   locale: null
   widgets: {
@@ -136,6 +138,8 @@ export interface Config {
   user: User
   jobs: {
     tasks: {
+      deleteExpiredContactMessages: TaskDeleteExpiredContactMessages
+      deleteExpiredEmailConfirmations: TaskDeleteExpiredEmailConfirmations
       schedulePublish: TaskSchedulePublish
       inline: {
         input: unknown
@@ -937,7 +941,7 @@ export interface Faq {
   _status?: ('draft' | 'published') | null
 }
 /**
- * Addresses typed into a public form, and when they were confirmed by link. Unconfirmed ones are deleted 7 days after their last link. To remove a confirmed address on request, delete it here.
+ * Addresses typed into a public form, and when they were confirmed by link. Unconfirmed ones are deleted automatically 48 hours after their last link. A confirmed one is deleted automatically 12 months after the person’s last message, unless they have an account or a message on hold. To remove an address on request sooner, delete it here.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "email-confirmations".
@@ -1018,6 +1022,14 @@ export interface FormSubmission {
     | number
     | boolean
     | null
+  /**
+   * Keep this message past the automatic deletion (48 hours if never confirmed, otherwise 12 months after the sender’s last message), for an active matter or a retention requirement. Untick it when that no longer applies.
+   */
+  retentionHold?: boolean | null
+  /**
+   * Why it is kept longer.
+   */
+  retentionHoldReason?: string | null
   updatedAt: string
   createdAt: string
 }
@@ -1126,7 +1138,11 @@ export interface PayloadJob {
     | {
         executedAt: string
         completedAt: string
-        taskSlug: 'inline' | 'schedulePublish'
+        taskSlug:
+          | 'inline'
+          | 'deleteExpiredContactMessages'
+          | 'deleteExpiredEmailConfirmations'
+          | 'schedulePublish'
         taskID: string
         input?:
           | {
@@ -1159,10 +1175,26 @@ export interface PayloadJob {
         id?: string | null
       }[]
     | null
-  taskSlug?: ('inline' | 'schedulePublish') | null
+  taskSlug?:
+    | (
+        | 'inline'
+        | 'deleteExpiredContactMessages'
+        | 'deleteExpiredEmailConfirmations'
+        | 'schedulePublish'
+      )
+    | null
   queue?: string | null
   waitUntil?: string | null
   processing?: boolean | null
+  meta?:
+    | {
+        [k: string]: unknown
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null
   updatedAt: string
   createdAt: string
 }
@@ -1847,6 +1879,8 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
   senderEmail?: T
   emailConfirmed?: T
   heldEmails?: T
+  retentionHold?: T
+  retentionHoldReason?: T
   updatedAt?: T
   createdAt?: T
 }
@@ -1913,6 +1947,7 @@ export interface PayloadJobsSelect<T extends boolean = true> {
   queue?: T
   waitUntil?: T
   processing?: T
+  meta?: T
   updatedAt?: T
   createdAt?: T
 }
@@ -2020,6 +2055,24 @@ export interface Footer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs-stats".
+ */
+export interface PayloadJobsStat {
+  id: number
+  stats?:
+    | {
+        [k: string]: unknown
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null
+  updatedAt?: string | null
+  createdAt?: string | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
@@ -2066,6 +2119,16 @@ export interface FooterSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs-stats_select".
+ */
+export interface PayloadJobsStatsSelect<T extends boolean = true> {
+  stats?: T
+  updatedAt?: T
+  createdAt?: T
+  globalType?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "collections_widget".
  */
 export interface CollectionsWidget {
@@ -2073,6 +2136,22 @@ export interface CollectionsWidget {
     [k: string]: unknown
   }
   width: 'full'
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskDeleteExpiredContactMessages".
+ */
+export interface TaskDeleteExpiredContactMessages {
+  input?: unknown
+  output?: unknown
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskDeleteExpiredEmailConfirmations".
+ */
+export interface TaskDeleteExpiredEmailConfirmations {
+  input?: unknown
+  output?: unknown
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

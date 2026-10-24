@@ -24,3 +24,13 @@ export interface EmailConfirmer {
  * (trimmed, lowercase).
  */
 export type EmailConfirmedListener = (email: string, req: PayloadRequest) => Promise<void>
+
+/**
+ * Asked before a confirmed address is deleted for retention (#274): of these addresses, which
+ * does a module still need (a message that is still kept, an account)? Those stay.
+ * `payload.config.ts` hands these to the verification module. The addresses are normalized.
+ */
+export type ConfirmedEmailKeeper = (
+  emails: readonly string[],
+  req: PayloadRequest,
+) => Promise<ReadonlySet<string>>

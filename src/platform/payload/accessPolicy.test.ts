@@ -197,6 +197,17 @@ describe('jobs', () => {
     expect(await (access.run as AccessFn)(editor)).toBe(false)
     expect(await (access.run as AccessFn)(admin)).toBe(true)
   })
+
+  it('run only the retention queue in the app, where both retention tasks are scheduled (#274)', () => {
+    expect(config.jobs.autoRun).toEqual([{ cron: '*/10 * * * *', queue: 'retention' }])
+    const scheduled = (config.jobs.tasks ?? [])
+      .filter((task) => task.schedule?.some((schedule) => schedule.queue === 'retention'))
+      .map((task) => task.slug)
+    expect(scheduled.sort()).toEqual([
+      'deleteExpiredContactMessages',
+      'deleteExpiredEmailConfirmations',
+    ])
+  })
 })
 
 describe('server-only fields', () => {
@@ -266,6 +277,9 @@ describe('private fields', () => {
     // Would tell a visitor whether the address they typed is confirmed (#183)
     ['form-submissions', 'senderEmail'],
     ['form-submissions', 'emailConfirmed'],
+    // Staff's reasons for keeping a message longer (#274)
+    ['form-submissions', 'retentionHold'],
+    ['form-submissions', 'retentionHoldReason'],
   ])('%s.%s is hidden from visitors and residents', async (collection, name) => {
     const read = fieldReadAccess(collection, name)
     expect(await allows(read, 'visitor')).toBe(false)

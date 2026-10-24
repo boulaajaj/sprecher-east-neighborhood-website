@@ -88,7 +88,7 @@ describe('confirmEndpoint', () => {
   it('answers 500 with a fixed message when the database fails', async () => {
     const endpoint = await load()
     const fake = fakeRequest()
-    fake.payload.delete.mockRejectedValueOnce(new Error('SQLITE_BUSY'))
+    fake.payload.find.mockRejectedValueOnce(new Error('SQLITE_BUSY'))
     const response = await endpoint.handler(post({ token: 'a'.repeat(43) }, fake))
     expect(response.status).toBe(500)
     expect(await response.json()).toEqual({ error: 'Something went wrong.' })
