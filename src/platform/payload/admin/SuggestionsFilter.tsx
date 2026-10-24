@@ -26,6 +26,8 @@ const SuggestionsFilter = async ({
     <div className={baseClass}>
       {filtered ? (
         <a href={listUrl}>Show everything</a>
+      ) : totalDocs === 0 ? (
+        <span>No suggestions waiting for review</span>
       ) : (
         <a href={`${listUrl}?${encodeURIComponent(FILTER_KEY)}=suggested`}>
           {totalDocs === 1 ? '1 suggestion' : `${totalDocs} suggestions`} waiting for review

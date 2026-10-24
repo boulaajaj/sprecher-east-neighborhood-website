@@ -31,10 +31,14 @@ timezone. Moving to Payload's timezone-aware date fields is a later decision (#2
   `suggested`, it becomes `approved`, so it leaves the queue.
 - **Anyone else**, through REST, GraphQL, MCP or a Local API call made as their user: a create
   is stored as a draft with status `suggested` whatever it sent, and is refused (400) without
-  `sourceName` and an http(s) `sourceUrl`. Any other write is stored as a draft. Collection access
-  already lets only staff update, so only staff can publish.
+  `sourceName` and an http(s) `sourceUrl`. Any other write from them (an update, a publish) is
+  refused (403), so live content is never unpublished or changed. Collection access already lets
+  only staff update; the hook keeps it so even if access is loosened.
 - **Our own server code** calling the Local API with no user (the seed) is not a creator, and
   is left alone.
+
+Admin's **Duplicate** doesn't copy `moderationStatus`, `externalId` or `contentHash`
+(`beforeDuplicate`), so a copy is staff content, not a second suggestion with the same identity.
 
 Why a status beside `_status`: a draft can be an editor's work in progress, a suggestion waiting
 for review, or a suggestion staff turned down. Drafts alone can't tell those apart.
@@ -49,11 +53,12 @@ stored as NULL, which SQLite allows any number of times, so items without them n
 ## In Admin
 
 The events and posts lists show a "Review status" column and, above the table, a link to the
-suggestions waiting for review (`SuggestionsFilter`, the list's `beforeListTable` slot). The link
+suggestions waiting for review, or plain text when there are none (`SuggestionsFilter`, the list's `beforeListTable` slot). The link
 uses the list view's own filter (`?where[moderationStatus][equals]=suggested`). The count reads
 each item's latest draft (`countSuggestions`, `draft: true`), as the list does: a status changed
 with Save Draft is stored only in the version history, not on the collection row. Each item shows
 its source in the sidebar.
 
-Tests: `src/platform/lib/reviewQueue.test.ts` (the rules) and
-`src/payload.config.reviewQueue.test.ts` (the hook and the unique indexes, on in-memory SQLite).
+Tests: `src/platform/lib/reviewQueue.test.ts` (the rules), `src/payload.config.reviewQueue.test.ts`
+(the hook, the count and the unique indexes) and `src/payload.config.reviewQueueApi.test.ts` (a
+non-staff publish over REST and GraphQL, Duplicate), both on in-memory SQLite.

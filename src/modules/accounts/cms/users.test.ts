@@ -10,6 +10,7 @@ import {
 
 import { forgotPasswordFromSiteOnly } from './forgotPasswordFromSiteOnly'
 import { noResetEmailWhileUnverified } from './noResetEmailWhileUnverified'
+import { noPasswordSignInForAgents } from './noPasswordSignInForAgents'
 import { requireCurrentPassword } from './requireCurrentPassword'
 import { Users } from './users'
 
@@ -70,6 +71,7 @@ describe('Users', () => {
   it('asks for the current password before anyone changes their own (#233), takes forgot password from the site only (#282), and sends no reset email to an unverified account (#187)', () => {
     expect(Users.hooks).toEqual({
       beforeChange: [requireCurrentPassword],
+      beforeLogin: [noPasswordSignInForAgents],
       beforeOperation: [forgotPasswordFromSiteOnly, noResetEmailWhileUnverified],
     })
   })
@@ -84,6 +86,7 @@ describe('Users', () => {
         { label: 'Admin', value: 'admin' },
         { label: 'Editor', value: 'editor' },
         { label: 'Resident', value: 'resident' },
+        { label: 'Agent', value: 'agent' },
       ],
       access: { create: isAdminFieldAccess, update: isAdminFieldAccess },
     })
@@ -110,7 +113,8 @@ async function signInCookie(nodeEnv: string) {
   })
 }
 
-describe('the sign-in cookie', () => {
+// Each test re-imports the whole Payload config, plugins included, which can take seconds
+describe('the sign-in cookie', { timeout: 30_000 }, () => {
   afterEach(() => {
     vi.unstubAllEnvs()
   })

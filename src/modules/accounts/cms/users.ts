@@ -15,6 +15,7 @@ import { USERS } from '../domain/usersCollection'
 import { toVerifyAccountEmail, toVerifyAccountLink } from '../domain/verifyAccountEmail'
 import { forgotPasswordFromSiteOnly } from './forgotPasswordFromSiteOnly'
 import { verifyEndpointFromSiteOnly } from './verifyFromSiteOnly'
+import { noPasswordSignInForAgents } from './noPasswordSignInForAgents'
 import { noResetEmailWhileUnverified } from './noResetEmailWhileUnverified'
 import { requireCurrentPassword } from './requireCurrentPassword'
 
@@ -70,6 +71,8 @@ export const Users: CollectionConfig = {
   hooks: {
     // Your own password changes only on /account, after your current one is checked (#233)
     beforeChange: [requireCurrentPassword],
+    // An agent's MCP API key is its only credential (#336)
+    beforeLogin: [noPasswordSignInForAgents],
     // Forgot password only from the site's page (#282), then no reset email to an account whose
     // email isn't verified yet (#187). The site-only check runs first, so a refused request never
     // reaches the account lookup.
@@ -89,6 +92,9 @@ export const Users: CollectionConfig = {
         { label: 'Admin', value: ROLES.admin },
         { label: 'Editor', value: ROLES.editor },
         { label: 'Resident', value: ROLES.resident },
+        // Suggests events and posts through its MCP API key only; no admin panel, no password
+        // sign-in (#336)
+        { label: 'Agent', value: ROLES.agent },
       ],
       access: {
         create: isAdminFieldAccess,

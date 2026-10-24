@@ -64,6 +64,7 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations
+    'payload-mcp-api-keys': PayloadMcpApiKeyAuthOperations
   }
   blocks: {}
   collections: {
@@ -77,10 +78,12 @@ export interface Config {
     categories: Category
     users: User
     'email-confirmations': EmailConfirmation
+    'agent-runs': AgentRun
     redirects: Redirect
     forms: Form
     'form-submissions': FormSubmission
     search: Search
+    'payload-mcp-api-keys': PayloadMcpApiKey
     'payload-kv': PayloadKv
     'payload-jobs': PayloadJob
     'payload-folders': FolderInterface
@@ -104,10 +107,12 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>
     users: UsersSelect<false> | UsersSelect<true>
     'email-confirmations': EmailConfirmationsSelect<false> | EmailConfirmationsSelect<true>
+    'agent-runs': AgentRunsSelect<false> | AgentRunsSelect<true>
     redirects: RedirectsSelect<false> | RedirectsSelect<true>
     forms: FormsSelect<false> | FormsSelect<true>
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>
     search: SearchSelect<false> | SearchSelect<true>
+    'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>
     'payload-folders': PayloadFoldersSelect<false> | PayloadFoldersSelect<true>
@@ -135,7 +140,7 @@ export interface Config {
   widgets: {
     collections: CollectionsWidget
   }
-  user: User
+  user: User | PayloadMcpApiKey
   jobs: {
     tasks: {
       deleteExpiredContactMessages: TaskDeleteExpiredContactMessages
@@ -150,6 +155,24 @@ export interface Config {
   }
 }
 export interface UserAuthOperations {
+  forgotPassword: {
+    email: string
+    password: string
+  }
+  login: {
+    email: string
+    password: string
+  }
+  registerFirstUser: {
+    email: string
+    password: string
+  }
+  unlock: {
+    email: string
+    password: string
+  }
+}
+export interface PayloadMcpApiKeyAuthOperations {
   forgotPassword: {
     email: string
     password: string
@@ -459,7 +482,7 @@ export interface User {
   /**
    * Controls access level. Only admins can change roles.
    */
-  role: 'admin' | 'editor' | 'resident'
+  role: 'admin' | 'editor' | 'resident' | 'agent'
   verificationResends?: number | null
   verificationResendsSince?: string | null
   verificationSetsPassword?: boolean | null
@@ -1010,6 +1033,74 @@ export interface EmailConfirmation {
   createdAt: string
 }
 /**
+ * What each neighborhood agent run checked and suggested (read-only history).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "agent-runs".
+ */
+export interface AgentRun {
+  id: number
+  /**
+   * Set from the API key.
+   */
+  agent?: (number | null) | User
+  agentName: string
+  /**
+   * The commit of the agents’ prompts and code this run used.
+   */
+  repoCommit: string
+  status?: ('running' | 'succeeded' | 'failed') | null
+  startedAt: string
+  finishedAt?: string | null
+  /**
+   * Each source checked, with the cursor to resume from next time.
+   */
+  sources?:
+    | {
+        name: string
+        url?: string | null
+        cursor?: string | null
+        checkedAt?: string | null
+        id?: string | null
+      }[]
+    | null
+  counts?: {
+    seen?: number | null
+    proposed?: number | null
+    rejected?: number | null
+    duplicates?: number | null
+  }
+  errorMessages?:
+    | {
+        message: string
+        id?: string | null
+      }[]
+    | null
+  /**
+   * In US dollars.
+   */
+  cost?: number | null
+  /**
+   * What the agent asks an editor to look at. It never changed the content.
+   */
+  reviewItems?:
+    | {
+        kind: 'needs-review' | 'update' | 'cancel' | 'rejected-invalid'
+        targetCollection?: ('events' | 'posts') | null
+        targetId?: number | null
+        externalId?: string | null
+        summary: string
+        evidence?: string[] | null
+        flags?: string[] | null
+        sourceUrl: string
+        reportedAt?: string | null
+        id?: string | null
+      }[]
+    | null
+  updatedAt: string
+  createdAt: string
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -1112,6 +1203,76 @@ export interface Search {
     | null
   updatedAt: string
   createdAt: string
+}
+/**
+ * API keys control which collections, resources, tools, and prompts MCP clients can access
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-mcp-api-keys".
+ */
+export interface PayloadMcpApiKey {
+  id: number
+  /**
+   * The user that the API key is associated with.
+   */
+  user: number | User
+  /**
+   * A useful label for the API key.
+   */
+  label?: string | null
+  /**
+   * The purpose of the API key.
+   */
+  description?: string | null
+  events?: {
+    /**
+     * Allow clients to find events.
+     */
+    find?: boolean | null
+  }
+  posts?: {
+    /**
+     * Allow clients to find posts.
+     */
+    find?: boolean | null
+  }
+  categories?: {
+    /**
+     * Allow clients to find categories.
+     */
+    find?: boolean | null
+  }
+  agentRuns?: {
+    /**
+     * Allow clients to find agent-runs.
+     */
+    find?: boolean | null
+    /**
+     * Allow clients to create agent-runs.
+     */
+    create?: boolean | null
+    /**
+     * Allow clients to update agent-runs.
+     */
+    update?: boolean | null
+  }
+  'payload-mcp-tool'?: {
+    /**
+     * Suggest an event or a news post. It is stored as an unpublished draft for staff to review, never published. Answers {"status":"created","id"} or, when the same externalId or contentHash is already stored, {"status":"duplicate","id"}.
+     */
+    submitSuggestion?: boolean | null
+    /**
+     * Report something for an editor on your current run: needs-review, update, cancel or rejected-invalid, with a summary, evidence and the source link. It never changes the content it points at.
+     */
+    reportItem?: boolean | null
+  }
+  updatedAt: string
+  createdAt: string
+  enableAPIKey?: boolean | null
+  apiKey?: string | null
+  apiKeyIndex?: string | null
+  hasAPIKey?: boolean | null
+  collection: 'payload-mcp-api-keys'
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1290,6 +1451,10 @@ export interface PayloadLockedDocument {
         value: number | EmailConfirmation
       } | null)
     | ({
+        relationTo: 'agent-runs'
+        value: number | AgentRun
+      } | null)
+    | ({
         relationTo: 'redirects'
         value: number | Redirect
       } | null)
@@ -1306,14 +1471,23 @@ export interface PayloadLockedDocument {
         value: number | Search
       } | null)
     | ({
+        relationTo: 'payload-mcp-api-keys'
+        value: number | PayloadMcpApiKey
+      } | null)
+    | ({
         relationTo: 'payload-folders'
         value: number | FolderInterface
       } | null)
   globalSlug?: string | null
-  user: {
-    relationTo: 'users'
-    value: number | User
-  }
+  user:
+    | {
+        relationTo: 'users'
+        value: number | User
+      }
+    | {
+        relationTo: 'payload-mcp-api-keys'
+        value: number | PayloadMcpApiKey
+      }
   updatedAt: string
   createdAt: string
 }
@@ -1323,10 +1497,15 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number
-  user: {
-    relationTo: 'users'
-    value: number | User
-  }
+  user:
+    | {
+        relationTo: 'users'
+        value: number | User
+      }
+    | {
+        relationTo: 'payload-mcp-api-keys'
+        value: number | PayloadMcpApiKey
+      }
   key?: string | null
   value?:
     | {
@@ -1773,6 +1952,58 @@ export interface EmailConfirmationsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "agent-runs_select".
+ */
+export interface AgentRunsSelect<T extends boolean = true> {
+  agent?: T
+  agentName?: T
+  repoCommit?: T
+  status?: T
+  startedAt?: T
+  finishedAt?: T
+  sources?:
+    | T
+    | {
+        name?: T
+        url?: T
+        cursor?: T
+        checkedAt?: T
+        id?: T
+      }
+  counts?:
+    | T
+    | {
+        seen?: T
+        proposed?: T
+        rejected?: T
+        duplicates?: T
+      }
+  errorMessages?:
+    | T
+    | {
+        message?: T
+        id?: T
+      }
+  cost?: T
+  reviewItems?:
+    | T
+    | {
+        kind?: T
+        targetCollection?: T
+        targetId?: T
+        externalId?: T
+        summary?: T
+        evidence?: T
+        flags?: T
+        sourceUrl?: T
+        reportedAt?: T
+        id?: T
+      }
+  updatedAt?: T
+  createdAt?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects_select".
  */
 export interface RedirectsSelect<T extends boolean = true> {
@@ -1967,6 +2198,49 @@ export interface SearchSelect<T extends boolean = true> {
       }
   updatedAt?: T
   createdAt?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-mcp-api-keys_select".
+ */
+export interface PayloadMcpApiKeysSelect<T extends boolean = true> {
+  user?: T
+  label?: T
+  description?: T
+  events?:
+    | T
+    | {
+        find?: T
+      }
+  posts?:
+    | T
+    | {
+        find?: T
+      }
+  categories?:
+    | T
+    | {
+        find?: T
+      }
+  agentRuns?:
+    | T
+    | {
+        find?: T
+        create?: T
+        update?: T
+      }
+  'payload-mcp-tool'?:
+    | T
+    | {
+        submitSuggestion?: T
+        reportItem?: T
+      }
+  updatedAt?: T
+  createdAt?: T
+  enableAPIKey?: T
+  apiKey?: T
+  apiKeyIndex?: T
+  hasAPIKey?: T
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2232,10 +2506,15 @@ export interface TaskSchedulePublish {
           value: number | Event
         } | null)
     global?: string | null
-    user?: {
-      relationTo: 'users'
-      value: number | User
-    } | null
+    user?:
+      | ({
+          relationTo: 'users'
+          value: number | User
+        } | null)
+      | ({
+          relationTo: 'payload-mcp-api-keys'
+          value: number | PayloadMcpApiKey
+        } | null)
   }
   output?: unknown
 }

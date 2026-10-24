@@ -23,6 +23,7 @@ flowchart TD
     news[news]
     contact[contact]
     accounts[accounts]
+    agents[agents]
     directory[directory]
     site[site]
     verification[verification]
@@ -54,6 +55,7 @@ grows should split its top level "into domain oriented modules which are interna
 | `accounts`     | Who is signed in, sign-up and verification, sign-in and password flows, the role field | `users`                                          | `/login`, `/account`, `/forgot-password`, `/reset-password`, `/sign-up`, `/verify-account` |
 | `directory`    | FAQ, local resources, team members                                                     | `faq`, `resources`, `team-members`               | `/faq`, `/resources`                                                                       |
 | `site`         | CMS pages, page-builder blocks, heroes, header, footer, redirects                      | `pages`, `redirects`, globals `header`, `footer` | `/[slug]`, home, sitemap entries                                                           |
+| `agents`       | Agent access over MCP (keys, limits, what the model sees), the agents' run history     | `agent-runs`, `payload-mcp-api-keys` (plugin)    | `/api/mcp` (plugin)                                                                        |
 | `verification` | Confirming an email by link: the token, its expiry, the limits, the emails             | `email-confirmations`                            | `/confirm-email`                                                                           |
 | `comments`     | Resident comments (future)                                                             | (future)                                         | (future)                                                                                   |
 
@@ -237,4 +239,5 @@ The seed script (`src/endpoints/seed/index.ts`) is the one hand-written file abo
 - [Glossary](glossary.md): business terms, defined once.
 - [Data model](data-model.md): every collection and global, its fields and its access rules.
 - [Review queue](review-queue.md): how suggested events and posts wait for staff.
+- [Agent access](agent-access.md): how agents read content and suggest it over MCP.
 - [Decision records](decisions/README.md): why things are the way they are.

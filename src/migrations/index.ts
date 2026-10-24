@@ -10,6 +10,7 @@ import * as migration_20261023_211151_verification_resends from './20261023_2111
 import * as migration_20261023_214345_held_form_emails from './20261023_214345_held_form_emails'
 import * as migration_20261024_141700_contact_retention from './20261024_141700_contact_retention'
 import * as migration_20261024_164157_review_queue from './20261024_164157_review_queue'
+import * as migration_20261024_172437_agent_mcp_access from './20261024_172437_agent_mcp_access'
 
 export const migrations = [
   {
@@ -71,5 +72,10 @@ export const migrations = [
     up: migration_20261024_164157_review_queue.up,
     down: migration_20261024_164157_review_queue.down,
     name: '20261024_164157_review_queue',
+  },
+  {
+    up: migration_20261024_172437_agent_mcp_access.up,
+    down: migration_20261024_172437_agent_mcp_access.down,
+    name: '20261024_172437_agent_mcp_access',
   },
 ]

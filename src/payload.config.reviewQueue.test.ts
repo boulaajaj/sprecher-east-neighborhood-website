@@ -1,8 +1,14 @@
 import type { Payload } from 'payload'
-import { beforeAll, describe, expect, it, vi } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 
-import type { User } from '@/payload-types'
 import { countSuggestions } from '@/platform/payload/reviewQueue'
+import {
+  type Account,
+  bootPayload,
+  createAccount,
+  NO_REVALIDATE,
+  paragraph,
+} from '@/platform/payload/testing/inMemoryPayload'
 
 /**
  * The review queue on events and posts (#123), through the Local API on Payload booted on an
@@ -12,12 +18,10 @@ import { countSuggestions } from '@/platform/payload/reviewQueue'
  */
 
 let payload: Payload
-let editor: User & { collection: 'users' }
-let resident: User & { collection: 'users' }
+let editor: Account
+let resident: Account
 
 const source = { sourceName: 'City of Madison', sourceUrl: 'https://www.cityofmadison.com/e/1' }
-// Publishing refreshes cached pages, which needs Next.js
-const NO_REVALIDATE = { disableRevalidate: true }
 let next = 0
 const event = (extra: Record<string, unknown> = {}) => ({
   title: `Park cleanup ${++next}`,
@@ -28,27 +32,23 @@ const event = (extra: Record<string, unknown> = {}) => ({
 
 // Our own server code: the Local API with no user, as the seed writes
 const serverCreate = (data: Record<string, unknown>) =>
-  payload.create({ collection: 'events', data: event(data), overrideAccess: true })
-
-const account = async (role: User['role']) => {
-  const user = await payload.create({
-    collection: 'users',
-    data: { email: `${role}@example.com`, password: `${role}-password-for-tests`, role },
-    disableVerificationEmail: true,
+  payload.create({
+    collection: 'events',
+    data: event(data),
     overrideAccess: true,
+    context: NO_REVALIDATE,
   })
-  return { ...user, collection: 'users' as const }
-}
+
+/** The database's refusal of a second item with the same value, on that field. */
+const unique = (path: string) => ({
+  name: 'ValidationError',
+  data: { errors: [expect.objectContaining({ path, message: 'Value must be unique' })] },
+})
 
 beforeAll(async () => {
-  vi.stubEnv('DATABASE_URI', 'file::memory:')
-  vi.stubEnv('PAYLOAD_SECRET', 'review-queue-test-secret-0123456789')
-  vi.stubEnv('SMTP_HOST', '')
-  const { getPayload } = await import('payload')
-  const config = await (await import('@payload-config')).default
-  payload = await getPayload({ config })
-  editor = await account('editor')
-  resident = await account('resident')
+  ;({ payload } = await bootPayload())
+  editor = await createAccount(payload, 'editor', 'editor')
+  resident = await createAccount(payload, 'resident', 'resident')
 }, 60_000)
 
 describe('a create that doesn’t come from staff', () => {
@@ -83,6 +83,44 @@ describe('a create that doesn’t come from staff', () => {
         overrideAccess: true,
       }),
     ).rejects.toThrow(/sourceUrl|Source link/)
+  })
+})
+
+describe('posts', () => {
+  it('hold a create that doesn’t come from staff the same way', async () => {
+    const created = await payload.create({
+      collection: 'posts',
+      data: {
+        title: 'Road work',
+        slug: 'road-work',
+        content: paragraph('Lanes closed.'),
+        _status: 'published',
+        ...source,
+      },
+      user: resident,
+      overrideAccess: true,
+    })
+    expect(created).toMatchObject({ _status: 'draft', moderationStatus: 'suggested', ...source })
+  })
+})
+
+describe('a change that doesn’t come from staff', () => {
+  // Access is skipped, so only the hook stands between it and the live row
+  it('is refused, so live content is never unpublished or changed', async () => {
+    const live = await serverCreate({ _status: 'published' })
+    await expect(
+      payload.update({
+        collection: 'events',
+        id: live.id,
+        data: { title: 'Changed' },
+        user: resident,
+        overrideAccess: true,
+        context: NO_REVALIDATE,
+      }),
+    ).rejects.toMatchObject({ name: 'Forbidden' })
+    expect(
+      await payload.findByID({ collection: 'events', id: live.id, overrideAccess: true }),
+    ).toMatchObject({ _status: 'published', title: live.title })
   })
 })
 
@@ -121,7 +159,9 @@ describe('staff', () => {
 describe('de-duplication', () => {
   it('refuses a second event with the same source ID', async () => {
     await serverCreate({ externalId: 'city-42' })
-    await expect(serverCreate({ externalId: 'city-42' })).rejects.toThrow()
+    await expect(serverCreate({ externalId: 'city-42' })).rejects.toMatchObject(
+      unique('externalId'),
+    )
     const { totalDocs } = await payload.count({
       collection: 'events',
       where: { externalId: { equals: 'city-42' } },
@@ -133,7 +173,7 @@ describe('de-duplication', () => {
   it('refuses a second event with the same content fingerprint', async () => {
     const contentHash = 'a'.repeat(64)
     await serverCreate({ contentHash })
-    await expect(serverCreate({ contentHash })).rejects.toThrow()
+    await expect(serverCreate({ contentHash })).rejects.toMatchObject(unique('contentHash'))
   })
 
   it('lets any number of items leave them blank', async () => {
