@@ -54,7 +54,11 @@
   },
   "overrides": {
     "payload": {
-      "ajv": "8.18.0"
+      "ajv": "8.18.0",
+      "undici": "7.30.1"
+    },
+    "@lexical/headless": {
+      "happy-dom": "21.0.4"
     },
     "eslint-plugin-boundaries": {
       "handlebars": "4.7.10"
