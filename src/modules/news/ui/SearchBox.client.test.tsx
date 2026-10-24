@@ -67,6 +67,21 @@ describe('SearchBox (#200)', () => {
     expect(push).not.toHaveBeenCalled()
   })
 
+  it('follows typing that brings back the previous query right after Back (Copilot, #349)', () => {
+    const { rerender } = render(<SearchBox initialQuery="council" />)
+    type('park')
+    expect(push).toHaveBeenLastCalledWith('/search?q=park')
+    rerender(<SearchBox initialQuery="park" />)
+    // Back: the address shows council again
+    rerender(<SearchBox initialQuery="council" />)
+    expect(box().value).toBe('council')
+    // Within the pause, the person types park again
+    fireEvent.change(box(), { target: { value: 'park' } })
+    act(() => vi.advanceTimersByTime(300))
+    expect(push).toHaveBeenLastCalledWith('/search?q=park')
+    expect(push).toHaveBeenCalledTimes(2)
+  })
+
   it('is accessible', async () => {
     vi.useRealTimers()
     const { container } = render(<SearchBox initialQuery="council" />)

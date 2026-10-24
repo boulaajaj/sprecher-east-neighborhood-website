@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 
 import { Field } from '@/platform/ui'
-import { useDebounce } from './useDebounce'
 
 import { toSearchHref } from '../domain/search'
+
+/** How long typing pauses before the results follow it. */
+const SEARCH_PAUSE_MS = 200
 
 /** The search box: results follow what's typed, after a short pause. */
 export const SearchBox: React.FC<{ initialQuery?: string }> = ({ initialQuery = '' }) => {
@@ -17,14 +19,17 @@ export const SearchBox: React.FC<{ initialQuery?: string }> = ({ initialQuery = 
   // /search?q=… doesn't navigate again, and a space typed between words doesn't either
   const shownQuery = useRef(initialQuery)
 
-  const debouncedValue = useDebounce(value)
-
+  // Each change restarts the pause, and is compared with what the address shows when the pause
+  // ends; a query the box was set to from the address cancels a pause still running
   useEffect(() => {
-    const query = debouncedValue.trim()
+    const query = value.trim()
     if (query === shownQuery.current) return
-    shownQuery.current = query
-    router.push(toSearchHref(query))
-  }, [debouncedValue, router])
+    const pause = setTimeout(() => {
+      shownQuery.current = query
+      router.push(toSearchHref(query))
+    }, SEARCH_PAUSE_MS)
+    return () => clearTimeout(pause)
+  }, [value, router])
 
   // The address changed without the box (back, forward, a search link): show its query. The
   // box's own navigation brings back the query it already shows, so typing is never undone.
