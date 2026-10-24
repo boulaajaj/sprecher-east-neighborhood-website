@@ -22,21 +22,29 @@ part of it may be merged; the PRs still open above are rebased by GitHub
 
 ## 2. Check the deploy and the site
 
-A merge of code to `main` starts `Deploy to VPS` (`.github/workflows/deploy.yml`; docs-only
-merges don't deploy).
+A merge to `main` deploys from inside its **CI** run: once `Type-check & Build` passes, CI calls
+`.github/workflows/deploy.yml`, whose jobs show as `Deploy / Preflight`, `Deploy / Build release`
+and `Deploy / Deploy` (#245). There is no separate deploy run for a merge. Preflight decides
+whether anything deploys: docs-only changes, and commits older than the live one, don't.
 
-1. Find the run for the merge commit and wait for it:
-   `gh run list --workflow deploy.yml --commit <merge_commit_sha>`, then `gh run watch <id>`.
-   Where the Actions API is blocked, ask for the deploy's check run by name (a `main` commit
-   collects many other check runs):
-   `gh api "repos/{owner}/{repo}/commits/<merge_commit_sha>/check-runs?check_name=Deploy"`.
-   Its `id` is the job id for the next step.
-2. Read its annotations (the `::notice` / `::warning` / `::error` lines the server scripts print):
+1. Find the CI run for the merge commit and wait for it:
+   `gh run list --workflow ci.yml --commit <merge_commit_sha>`, then `gh run watch <id>`.
+   Where the Actions API is blocked, ask for the deploy's check runs by name (a `main` commit
+   collects many other check runs), for example
+   `gh api "repos/{owner}/{repo}/commits/<merge_commit_sha>/check-runs?check_name=Deploy%20%2F%20Deploy"`.
+   Each check run's `id` is the job id for the next step.
+2. Read the annotations (the `::notice` / `::warning` / `::error` lines the scripts print):
    `gh api repos/{owner}/{repo}/check-runs/<job id>/annotations`.
+   - `Deploy / Preflight`: the plan, for example "nothing is deployed" for docs only. When it
+     says nothing deploys, `Build release` and `Deploy` are skipped, and that's the result.
+   - `Deploy / Build release`: the release built, and its Node version.
+   - `Deploy / Deploy`: the server's results ("release … is live", backups, Caddy) and the
+     checks from the internet.
 3. Open https://sprechereast.com and check the behavior the PRs changed.
 
-Never re-run or start the deploy yourself (it can be started by hand). A failed deploy gets a new
-issue and is fixed or reverted through a PR. Never fix it on the server.
+Never re-run or start the deploy yourself (it can be started by hand: Actions → Deploy to VPS →
+Run workflow, on `main`). A failed deploy gets a new issue and is fixed or reverted through a PR.
+Never fix it on the server.
 
 ## 3. Close the loop on the issues
 

@@ -45,9 +45,13 @@ jobs:
         if: steps.filter.outputs.code == 'true'
         run: npm ci
 
+      # `next typegen` writes the route types in .next/types (page, layout and route handler props),
+      # which tsconfig.json includes, so `tsc` checks them too (#248)
       - name: Type-check
         if: steps.filter.outputs.code == 'true'
-        run: npx tsc --noEmit
+        run: |
+          npx next typegen
+          npx tsc --noEmit
 
       - name: Unit tests
         if: steps.filter.outputs.code == 'true'
@@ -68,3 +72,15 @@ jobs:
           PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET || 'ci-build-placeholder-secret-32chars!' }}
           DATABASE_URI: file:./data/payload.db
           NEXT_PUBLIC_SERVER_URL: http://localhost:3000
+
+  # Pushes to main deploy once the build above has passed; the deploy also waits for the Lint
+  # checks (#245). Pull requests skip this job.
+  deploy:
+    name: Deploy
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      actions: read
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit

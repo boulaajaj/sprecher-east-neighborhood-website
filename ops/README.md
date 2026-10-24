@@ -1,22 +1,105 @@
 # Server operations
 
-Scripts the deploy workflow (`.github/workflows/deploy.yml`) runs on the VPS. Nothing here is
-run by hand during a normal deploy. Changes to the server still follow `AGENTS.md`: an `infra`
-issue first, then a pull request.
+Scripts the deploy workflow (`.github/workflows/deploy.yml`) runs on the GitHub Actions runner and
+on the VPS. Nothing here is run by hand during a normal deploy. Changes to the server still follow
+`AGENTS.md`: an `infra` issue first, then a pull request.
 
-| Script            | What it does                                                                                                                                                                             | Issue      |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| `backup.sh`       | Archives the database, uploaded media and `.env.local`; keeps 7 daily, 5 weekly, 5 pre-deploy                                                                                            | #148       |
-| `backup-db.mjs`   | Copies the live SQLite database with `VACUUM INTO` and checks the copy                                                                                                                   | #148       |
-| `install-cron.sh` | Installs the daily backup job (08:15 UTC) in `/etc/cron.d/sprecher-east-backup`                                                                                                          | #148       |
-| `restart-app.sh`  | Restarts the app so it listens on `127.0.0.1:3000` only; puts it back if the site stops answering. First deletes old sitemap and robots files in `public/` that would hide the app's own | #118, #267 |
-| `caddy-limits.sh` | Caps request bodies on the public form endpoints at Caddy (`caddy/form-limits.caddy`)                                                                                                    | #124       |
-| `lib.sh`          | Shared helpers: annotations, reading non-secret settings, checking the site through Caddy                                                                                                |            |
+| Script              | Where  | What it does                                                                                                                                             | Issue      |
+| ------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| `server-facts.sh`   | VPS    | Prints the server's Node version, its public `NEXT_PUBLIC_*` settings and the live commit, for the build                                                 | #245       |
+| `build-release.sh`  | runner | Builds a release in the folder it will run from on the server, with the server's Node and settings, and packs it                                         | #245       |
+| `deploy-release.sh` | VPS    | Checks the release, links the shared files, backs up, migrates, switches `current`, checks the site and switches back if it fails                        | #245       |
+| `rollback.sh`       | VPS    | By hand: puts an earlier release back live                                                                                                               | #245       |
+| `backup.sh`         | VPS    | Archives the database, uploaded media and `.env.local`; keeps 7 daily, 5 weekly, 5 pre-deploy                                                            | #148       |
+| `backup-db.mjs`     | VPS    | Copies the live SQLite database with `VACUUM INTO` and checks the copy                                                                                   | #148       |
+| `install-cron.sh`   | VPS    | Installs the daily backup job (08:15 UTC) in `/etc/cron.d/sprecher-east-backup`                                                                          | #148       |
+| `restart-app.sh`    | VPS    | Reloads the app under PM2; starts it fresh, with a way back, when its start settings change. Listens on `127.0.0.1:3000` only. Deletes old sitemap files | #118, #267 |
+| `caddy-limits.sh`   | VPS    | Caps request bodies on the public form endpoints at Caddy (`caddy/form-limits.caddy`)                                                                    | #124       |
+| `lib.sh`            | VPS    | Shared helpers: annotations, reading non-secret settings, checking the site through Caddy, the `current` link                                            |            |
 
 The scripts print `::notice` and `::warning` lines, which appear as annotations on the deploy run
 whether it succeeds or fails, so the result can be read without opening the logs. The deploy log
 is public, so the scripts never print secrets or file contents. The site address they check comes
 from `NEXT_PUBLIC_SERVER_URL` in `.env.local`, and the check goes to Caddy on the server itself.
+
+## How a deploy runs
+
+CI calls the deploy once its `Type-check & Build` job passes on a push to `main`. It can also be
+started by hand (Actions → Deploy to VPS → Run workflow, on `main`).
+
+1. **Preflight** waits until the required checks (`Type-check & Build`, `Prettier`, `ESLint`,
+   `Dependency Audit`) have passed on the commit, then reads the server's facts over SSH. It skips
+   the deploy when that commit, or a newer one, is already live, or when only docs and repo
+   tooling changed since the live commit.
+2. **Build release** runs on Ubuntu 24.04 with the server's exact Node version, without any
+   secret. It builds in `/var/www/sprecher-east/releases/<commit>`, the folder the release will run
+   from, so the paths the build writes are right on the server. The build gets only the public
+   `NEXT_PUBLIC_*` values from the server's `.env.local`, a throwaway database and placeholders.
+   Production `node_modules` ship with it; their native parts (sharp, libsql) are prebuilt for
+   Linux x64 and load on any Node of the same version.
+3. **Deploy** uploads the archive into `releases/.incoming-<commit>`, renames it, and runs
+   `deploy-release.sh` from the release:
+   - checks the release was built with this server's Node and settings, and that its native
+     modules load
+   - links `.env.local`, `data/` and `public/media` from `/var/www/sprecher-east` into it
+   - backs up (`backup.sh pre-deploy`) and runs `payload migrate`, while the live release serves
+   - drops the pages prerendered in CI (their database was empty); each page renders from the
+     live database on its first visit and is cached from then on
+   - switches `current` to the release in one step and reloads PM2 (`restart-app.sh`)
+   - checks the home page answers 200 through Caddy and `/api/version` reports the new build; if
+     not, switches `current` back and reloads
+   - then installs the backup job, applies the Caddy limits, and keeps the newest 3 releases
+     (a release that failed is the first to go)
+
+Until the switch, a failure stops the deploy and the live release keeps serving. The reload is the
+only moment the site is unavailable: the few seconds Next takes to start.
+
+## Releases
+
+```text
+/var/www/sprecher-east/
+  .env.local, data/, public/media/   shared by every release, never replaced by a deploy
+  releases/<commit>/                 one build each: code, .next, node_modules, .release-info
+  current -> releases/<commit>       the live one; PM2 runs the app from here
+  src/, .next/, node_modules/, …     the old checkout, from before #245 (see below)
+```
+
+`.release-info` in each release says which commit, Node version and public settings it was built
+with. `readlink /var/www/sprecher-east/current` shows the live one.
+
+**Moving to releases (the first deploy after #245).** Nothing is moved: the shared files stay
+where they are, and the first deploy only adds `releases/` and `current`, then restarts PM2 from
+`current` instead of the checkout. If the new release doesn't answer, `restart-app.sh` restarts
+PM2 from the checkout again and `current` is removed. The checkout is left as it was, as the way
+back, until a later cleanup removes it.
+
+## Roll back
+
+- **Automatic:** a deploy whose release doesn't answer switches back by itself (see above).
+- **To an earlier release:** run the copy of `rollback.sh` in the release to go back to, as root:
+
+  ```bash
+  ls -lt /var/www/sprecher-east/releases            # newest first
+  bash /var/www/sprecher-east/releases/<commit>/ops/rollback.sh
+  ```
+
+  It drops that release's cached pages, switches `current`, reloads, and checks it answers with
+  its build; if not, the release that was live comes back. The database stays as it is: if the
+  newer release ran a migration the older code can't read, restore the pre-deploy backup too
+  (below). The next deploy to `main` replaces it again, so revert the bad change in a PR.
+
+- **Back to the old checkout** (undoing the move to releases), as root:
+
+  ```bash
+  cd /var/www/sprecher-east
+  pm2 delete sprecher-east
+  pm2 start ecosystem.config.cjs --only sprecher-east    # the checkout's own copy: cwd is the checkout
+  pm2 save
+  rm current
+  bash ops/install-cron.sh                               # the backup job runs the checkout's script again
+  ```
+
+  Then revert #245's pull request, so the next deploy works the old way.
 
 ## Caddy request limits
 
@@ -41,7 +124,8 @@ exists off the machine.
 
 - Daily at 08:15 UTC, kept 7 days; Sunday's is also kept as a weekly, 5 weeks.
 - Before every deploy, the 5 most recent kept.
-- By hand, never deleted automatically: `sudo bash ops/backup.sh manual`. Delete old ones yourself.
+- By hand, never deleted automatically: `sudo bash /var/www/sprecher-east/current/ops/backup.sh manual`.
+  Delete old ones yourself.
 
 A run refuses to start unless the disk has room for the copy plus 1 GB to spare, so a backup
 never fills the disk the live site writes to. The daily job logs to
@@ -53,14 +137,14 @@ Run on the VPS as root. This replaces the site's current content with the archiv
 
 ```bash
 cd /var/www/sprecher-east
-bash ops/backup.sh manual                 # keep a copy of what you are about to replace
+bash current/ops/backup.sh manual         # keep a copy of what you are about to replace
 mkdir -p /root/restore && tar -C /root/restore -xzf /var/backups/sprecher-east/daily/<archive>.tar.gz
 pm2 stop sprecher-east
 cp /root/restore/payload.db data/payload.db
 rm -f data/payload.db-wal data/payload.db-shm data/payload.db-journal
 # Only if media should be restored too: keep the current folder aside, then copy the archive's.
 mv public/media public/media.before-restore && cp -a /root/restore/media public/media
-npx payload migrate                       # brings an older archive up to the current schema
+(cd current && npx payload migrate)       # brings an older archive up to the current schema
 pm2 start sprecher-east
 rm -rf /root/restore                      # it holds a copy of .env.local
 ```

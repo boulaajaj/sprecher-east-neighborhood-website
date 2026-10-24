@@ -77,7 +77,7 @@ work=$(mktemp -d "$BACKUP_ROOT/.work-XXXXXX")
 trap 'rm -rf "$work"' EXIT
 
 notes=()
-node "$APP_DIR/ops/backup-db.mjs" "$db_path" "$work/payload.db"
+node "$CODE_DIR/ops/backup-db.mjs" "$db_path" "$work/payload.db"
 members=(payload.db)
 if [ -f "$APP_DIR/.env.local" ]; then
   cp "$APP_DIR/.env.local" "$work/env.local"
