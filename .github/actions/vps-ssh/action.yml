@@ -1,0 +1,53 @@
+name: SSH to the VPS
+description: >-
+  Sets up `ssh vps` for the rest of the job: the deploy key in a file only this user can read,
+  keep-alives for long steps, and the host key pinned when VPS_KNOWN_HOSTS is set (#245).
+
+inputs:
+  host:
+    required: true
+  user:
+    required: true
+  port:
+    required: false
+    default: '22'
+  key:
+    required: true
+  known-hosts:
+    description: Lines for known_hosts (`ssh-keyscan` output). Without them the first key seen is trusted.
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        HOST: ${{ inputs.host }}
+        USER_NAME: ${{ inputs.user }}
+        PORT: ${{ inputs.port }}
+        KEY: ${{ inputs.key }}
+        KNOWN_HOSTS: ${{ inputs.known-hosts }}
+      run: |
+        set -euo pipefail
+        install -d -m 700 ~/.ssh
+        (umask 077 && printf '%s\n' "$KEY" > ~/.ssh/vps_key)
+        if [ -n "$KNOWN_HOSTS" ]; then
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          strict=yes
+        else
+          echo "::warning title=SSH::VPS_KNOWN_HOSTS is not set, so the server's host key is not checked"
+          strict=accept-new
+        fi
+        cat > ~/.ssh/config <<EOF
+        Host vps
+          HostName $HOST
+          User $USER_NAME
+          Port ${PORT:-22}
+          IdentityFile ~/.ssh/vps_key
+          IdentitiesOnly yes
+          BatchMode yes
+          StrictHostKeyChecking $strict
+          ServerAliveInterval 30
+          ServerAliveCountMax 10
+        EOF

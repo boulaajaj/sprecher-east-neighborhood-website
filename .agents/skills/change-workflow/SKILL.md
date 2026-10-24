@@ -137,7 +137,9 @@ A `409` means a merge of this PR is already running: poll it instead of starting
 - **A stack merges one layer at a time, from the bottom.** Merge the lowest open layer. GitHub
   then retargets the next layer to `main` and rebases it. Wait for that layer's checks on its new
   head, and, if the previous merge started a deploy, for it to succeed, before merging it.
-- The merge triggers `Deploy to VPS` (docs-only changes don't deploy). Then run
+- The merge's CI run deploys it, in its `Deploy / …` jobs, once the required checks pass
+  (docs-only changes don't deploy; [`wrapped`](../wrapped/SKILL.md) step 2 says where to look).
+  Then run
   [`wrapped`](../wrapped/SKILL.md): verify the merge, read the deploy's annotations, check the
   site (`https://sprechereast.com`) and the behavior that changed, and report.
 - A failed deploy is fixed or reverted through a new PR, never on the server.
