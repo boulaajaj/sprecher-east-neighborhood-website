@@ -7,6 +7,7 @@ export { escapeMarkup } from './escapeMarkup'
 export { toEmailHtml, type OutgoingEmail } from './emailLayout'
 export { MAX_PAGE, parsePageNumber, toPageNumbers, type FeedPage } from './paging'
 export { RETENTION, toConfirmedCutoff, toUnconfirmedCutoff } from './retention'
+export { AUDIENCES, MODERATION_STATUSES, type Audience, type ModerationStatus } from './reviewQueue'
 export { ROLES, type Role } from './roles'
 export { SlidingWindowCounter } from './slidingWindow'
 export {
