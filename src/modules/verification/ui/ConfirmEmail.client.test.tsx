@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import React from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useConfirmedEmail } from '@/platform/ui/ConfirmedEmail.client'
@@ -22,10 +23,10 @@ afterEach(cleanup)
 const answer = (status: number, body: unknown) =>
   fetchMock.mockResolvedValue(new Response(JSON.stringify(body), { status }))
 
-const clickConfirm = () => userEvent.click(screen.getByRole('button', { name: 'Confirm my email' }))
+const clickTryAgain = () => userEvent.click(screen.getByRole('button', { name: 'Try Again' }))
 
 describe('ConfirmEmail', () => {
-  it('does nothing until the button is clicked, then posts the token', async () => {
+  it('confirms as soon as the page loads, without a click (#300)', async () => {
     answer(200, { outcome: 'confirmed' })
     render(
       <main>
@@ -34,18 +35,18 @@ describe('ConfirmEmail', () => {
         </ConfirmEmail>
       </main>,
     )
-    await expectAccessible(document.body)
-    expect(fetchMock).not.toHaveBeenCalled()
+    expect(screen.getByRole('status').textContent).toContain('Confirming your email')
     expect(screen.queryByText('Account offer')).toBeNull()
+    await expectAccessible(document.body)
 
-    await clickConfirm()
-
+    await screen.findByText(/your email is confirmed/)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
     const [url, init] = fetchMock.mock.calls[0] ?? []
     expect(String(url)).toMatch(/\/api\/email-confirmations\/confirm$/)
     expect(init).toMatchObject({ method: 'POST', body: JSON.stringify({ token: TOKEN }) })
-    const status = await screen.findByRole('status')
-    expect(status.textContent).toContain('your email is confirmed')
-    expect(status.parentElement?.contains(document.activeElement)).toBe(true)
+    // The same live region that said "Confirming" now holds the answer, so it is announced
+    expect(screen.getByRole('status').textContent).toContain('your email is confirmed')
+    expect(document.activeElement).toBe(document.body) // nothing steals focus on page load
     expect(window.location.search).toBe('')
     expect(screen.queryByRole('button')).toBeNull()
     expect(screen.getByText('Account offer')).toBeTruthy()
@@ -60,7 +61,6 @@ describe('ConfirmEmail', () => {
         <Slot />
       </ConfirmEmail>,
     )
-    await clickConfirm()
     expect(await screen.findByText('Offer for ana@example.com')).toBeTruthy()
   })
 
@@ -72,7 +72,6 @@ describe('ConfirmEmail', () => {
         <Slot />
       </ConfirmEmail>,
     )
-    await clickConfirm()
     expect(await screen.findByText('Offer for nobody')).toBeTruthy()
   })
 
@@ -83,8 +82,7 @@ describe('ConfirmEmail', () => {
         <p>Account offer</p>
       </ConfirmEmail>,
     )
-    await clickConfirm()
-    expect((await screen.findByRole('status')).textContent).toContain('already confirmed')
+    expect(await screen.findByText(/already confirmed/)).toBeTruthy()
     expect(screen.getByText('Account offer')).toBeTruthy()
   })
 
@@ -96,10 +94,8 @@ describe('ConfirmEmail', () => {
     async (_, status, body, text) => {
       answer(status, body)
       render(<ConfirmEmail token={TOKEN} retryHref="/contact" />)
-      await clickConfirm()
       const alert = await screen.findByRole('alert')
       expect(alert.textContent).toContain(text)
-      expect(alert.parentElement?.contains(document.activeElement)).toBe(true)
       expect(
         screen.getByRole('link', { name: 'Go to the contact form' }).getAttribute('href'),
       ).toBe('/contact')
@@ -116,12 +112,37 @@ describe('ConfirmEmail', () => {
   ])('lets the person try again after %s', async (_, setUp, text) => {
     setUp()
     render(<ConfirmEmail token={TOKEN} retryHref="/contact" />)
-    await clickConfirm()
-    const alert = await screen.findByRole('alert')
-    expect(alert.textContent).toContain(text)
-    expect(alert.parentElement?.contains(document.activeElement)).toBe(true)
+    expect((await screen.findByRole('alert')).textContent).toContain(text)
     expect(window.location.search).toBe(`?token=${TOKEN}`)
-    expect(screen.getByRole('button', { name: 'Confirm my email' })).toBeTruthy()
+
+    answer(200, { outcome: 'confirmed' })
+    await clickTryAgain()
+    await screen.findByText(/your email is confirmed/)
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(document.activeElement).toBe(screen.getByRole('status'))
+    expect(screen.queryByRole('button')).toBeNull()
+  })
+
+  it('ignores an answer that arrives after the person left the page', async () => {
+    let reply: (r: Response) => void = () => {}
+    fetchMock.mockReturnValue(new Promise<Response>((r) => (reply = r)))
+    const { unmount } = render(<ConfirmEmail token={TOKEN} retryHref="/contact" />)
+    unmount()
+    window.history.replaceState(null, '', '/search?q=garden')
+    reply(new Response(JSON.stringify({ outcome: 'confirmed' }), { status: 200 }))
+    await new Promise((r) => setTimeout(r, 0))
+    expect(window.location.search).toBe('?q=garden')
+  })
+
+  it('confirms once even when React runs the page-load effect twice (strict mode)', async () => {
+    answer(200, { outcome: 'confirmed' })
+    render(
+      <React.StrictMode>
+        <ConfirmEmail token={TOKEN} retryHref="/contact" />
+      </React.StrictMode>,
+    )
+    await screen.findByText(/your email is confirmed/)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 
   it('says a link without a usable token isn’t valid, without asking the server', async () => {
