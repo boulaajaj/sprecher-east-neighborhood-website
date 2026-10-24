@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/eval-cases.schema.json",
+  "title": "Evaluation cases (evals/cases.yaml)",
+  "type": "object",
+  "required": ["version", "asOf", "cases"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "asOf": {
+      "description": "The date the expected results assume as today.",
+      "$ref": "common.schema.json#/$defs/date"
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "decidedBy", "input", "expected", "why"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Starts with the case's category, from #255's list: similar, outside, core, catchment, citywide-useful, citywide-noise, missing-address, missing-date, duplicate, update, cancellation, past, injection, partisan, unverified.",
+            "type": "string",
+            "pattern": "^(similar|outside|core|catchment|citywide-useful|citywide-noise|missing-address|missing-date|duplicate|update|cancellation|past|injection|partisan|unverified)(-[a-z0-9]+)*$"
+          },
+          "decidedBy": {
+            "enum": ["scout", "verify", "curate", "draft", "submit"]
+          },
+          "input": {
+            "description": "A candidate with only the fields the case needs. Field names and formats are the candidate's. A missing sourceStatus means scheduled.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["sourceId", "title", "startsAt", "locationText"],
+            "properties": {
+              "sourceId": {
+                "$ref": "candidate.schema.json#/properties/sourceId"
+              },
+              "externalId": {
+                "$ref": "candidate.schema.json#/properties/externalId"
+              },
+              "contentHash": {
+                "$ref": "candidate.schema.json#/properties/contentHash"
+              },
+              "kind": {
+                "$ref": "candidate.schema.json#/properties/kind"
+              },
+              "title": {
+                "$ref": "candidate.schema.json#/properties/title"
+              },
+              "sourceText": {
+                "$ref": "candidate.schema.json#/properties/sourceText"
+              },
+              "startsAt": {
+                "$ref": "candidate.schema.json#/properties/startsAt"
+              },
+              "locationText": {
+                "$ref": "candidate.schema.json#/properties/locationText"
+              },
+              "sourceStatus": {
+                "$ref": "candidate.schema.json#/properties/sourceStatus"
+              },
+              "change": {
+                "$ref": "candidate.schema.json#/properties/change"
+              }
+            }
+          },
+          "known": {
+            "$ref": "item.schema.json#/properties/known"
+          },
+          "expected": {
+            "type": "object",
+            "required": ["decision", "coverage", "route"],
+            "additionalProperties": false,
+            "properties": {
+              "decision": {
+                "$ref": "common.schema.json#/$defs/decision"
+              },
+              "coverage": {
+                "$ref": "common.schema.json#/$defs/coverage"
+              },
+              "flags": {
+                "type": "array",
+                "items": {
+                  "$ref": "common.schema.json#/$defs/flag"
+                },
+                "uniqueItems": true
+              },
+              "route": {
+                "description": "The MCP tool the submit stage calls: accept \u2192 submitSuggestion; needs-review, update, cancel \u2192 reportItem; reject, duplicate \u2192 none.",
+                "enum": ["submitSuggestion", "reportItem", "none"]
+              },
+              "targetCollection": {
+                "$ref": "curation.schema.json#/properties/targetCollection"
+              },
+              "targetId": {
+                "$ref": "curation.schema.json#/properties/targetId"
+              }
+            }
+          },
+          "why": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 400
+          }
+        }
+      },
+      "minItems": 20
+    }
+  }
+}

@@ -119,6 +119,7 @@ src/
 | `src/platform/theme/`               | Light and dark mode providers and init script           |
 | `ecosystem.config.cjs`              | PM2 config for VPS (CommonJS: package is ESM)           |
 | `eslint.boundaries.config.mjs`      | Dependency rules as lint errors (#137)                  |
+| `intelligence/`                     | Intelligence agents: sources, prompts, schemas (#337)   |
 
 ## Design Tokens
 

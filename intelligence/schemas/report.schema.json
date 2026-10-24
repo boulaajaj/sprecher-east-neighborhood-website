@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/report.schema.json",
+  "title": "reportItem arguments (#336)",
+  "description": "Stores one editor-facing review item on the run in agent-runs, visible in Admin. An update or cancellation names the existing document in targetId and never changes it.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "runId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "kind": {
+      "enum": ["needs-review", "update", "cancel", "rejected-invalid"]
+    },
+    "targetCollection": {
+      "anyOf": [
+        {
+          "$ref": "common.schema.json#/$defs/collection"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "targetId": {
+      "anyOf": [
+        {
+          "$ref": "common.schema.json#/$defs/documentId"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "externalId": {
+      "anyOf": [
+        {
+          "$ref": "provenance.schema.json#/properties/externalId"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "evidence": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "$ref": "verification.schema.json#/properties/evidence/items"
+      }
+    },
+    "flags": {
+      "$ref": "common.schema.json#/$defs/flags"
+    },
+    "sourceUrl": {
+      "$ref": "provenance.schema.json#/properties/sourceUrl"
+    }
+  },
+  "required": ["runId", "kind", "summary", "evidence", "flags", "sourceUrl"],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "enum": ["update", "cancel"]
+          }
+        }
+      },
+      "then": {
+        "required": ["targetCollection", "targetId"],
+        "properties": {
+          "targetCollection": {
+            "$ref": "common.schema.json#/$defs/collection"
+          },
+          "targetId": {
+            "$ref": "common.schema.json#/$defs/documentId"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["targetId"],
+        "properties": {
+          "targetId": {
+            "type": "integer"
+          }
+        }
+      },
+      "then": {
+        "required": ["targetCollection"],
+        "properties": {
+          "targetCollection": {
+            "$ref": "common.schema.json#/$defs/collection"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/sources.schema.json",
+  "title": "Source registry (sources.yaml)",
+  "type": "object",
+  "required": ["version", "checkedOn", "sources"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "type": "integer", "minimum": 1 },
+    "checkedOn": { "$ref": "common.schema.json#/$defs/date" },
+    "sources": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/source" } }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "owner",
+        "canonicalUrl",
+        "feedUrl",
+        "format",
+        "scope",
+        "audiences",
+        "reliability",
+        "access",
+        "cadence",
+        "lastChecked",
+        "result",
+        "pilotRank",
+        "treatment",
+        "example"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/sourceId" },
+        "name": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string", "minLength": 1 },
+        "canonicalUrl": { "$ref": "common.schema.json#/$defs/httpUrl" },
+        "feedUrl": {
+          "anyOf": [{ "$ref": "common.schema.json#/$defs/httpUrl" }, { "type": "null" }]
+        },
+        "format": { "enum": ["json-api", "ics", "rss", "atom", "html"] },
+        "scope": { "type": "string", "minLength": 1 },
+        "audiences": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "common.schema.json#/$defs/audience" }
+        },
+        "reliability": { "enum": ["official", "established-media", "community"] },
+        "access": { "type": "string", "minLength": 1 },
+        "cadence": { "enum": ["daily", "weekly", "none"] },
+        "lastChecked": { "$ref": "common.schema.json#/$defs/date" },
+        "result": { "enum": ["valid", "invalid", "restricted", "pending"] },
+        "pilotRank": { "anyOf": [{ "type": "integer", "minimum": 1 }, { "type": "null" }] },
+        "treatment": { "type": "string", "minLength": 1 },
+        "example": {
+          "anyOf": [
+            {
+              "type": "object",
+              "required": ["title", "date", "url"],
+              "additionalProperties": false,
+              "properties": {
+                "title": { "type": "string", "minLength": 1 },
+                "date": { "$ref": "common.schema.json#/$defs/date" },
+                "url": { "$ref": "common.schema.json#/$defs/httpUrl" }
+              }
+            },
+            { "type": "null" }
+          ]
+        },
+        "notes": { "type": "string" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "pilotRank": { "type": "integer" } } },
+          "then": {
+            "properties": {
+              "result": { "const": "valid" },
+              "cadence": { "not": { "const": "none" } }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "result": { "const": "valid" } } },
+          "then": { "properties": { "feedUrl": { "type": "string" } } }
+        }
+      ]
+    }
+  }
+}
