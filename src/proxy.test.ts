@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server'
 import { describe, expect, it } from 'vitest'
 
 import { MAX_PAGE } from '@/platform/lib'
-import { ADMIN_FORGOT_PATH } from '@/platform/payload/adminRoutes'
+import { ADMIN_FORGOT_PATH, ADMIN_VERIFY_PREFIX } from '@/platform/payload/adminRoutes'
 
 import { config, isValidPagingPath, proxy } from './proxy'
 
@@ -52,6 +52,16 @@ describe('proxy', () => {
     expect(response.headers.get('location')).toBe('https://sprechereast.example/forgot-password')
   })
 
+  it('sends the admin panel’s verify page to the site’s, with the token (#303)', () => {
+    const response = proxy(
+      new NextRequest('https://sprechereast.example/admin/users/verify/abc123'),
+    )
+    expect(response.status).toBe(307)
+    expect(response.headers.get('location')).toBe(
+      'https://sprechereast.example/verify-account?token=abc123',
+    )
+  })
+
   it('passes a valid paging URL on to the page', () => {
     const response = proxy(new NextRequest('https://sprechereast.example/posts/page/2'))
     expect(response.headers.get('x-middleware-next')).toBe('1')
@@ -63,6 +73,10 @@ describe('matcher', () => {
     expect(config.matcher).toContain(ADMIN_FORGOT_PATH)
   })
 
+  it('lists the admin panel’s verify page from its prefix (#303)', () => {
+    expect(config.matcher).toContain(`${ADMIN_VERIFY_PREFIX}:path+`)
+  })
+
   const runsOn = (path: string) =>
     unstable_doesMiddlewareMatch({ config, url: `https://sprechereast.example${path}` })
 
@@ -72,6 +86,7 @@ describe('matcher', () => {
     '/events/list/upcoming/1',
     '/events/list/x1/1',
     '/admin/forgot',
+    '/admin/users/verify/abc123',
   ])('runs on %s', (path) => {
     expect(runsOn(path)).toBe(true)
   })

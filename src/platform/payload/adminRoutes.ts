@@ -10,3 +10,10 @@ export const ADMIN_FORGOT_ROUTE = '/forgot'
 
 /** The full path of the admin panel's forgot-password page (#282 redirects it to the site's). */
 export const ADMIN_FORGOT_PATH = `${ADMIN_ROUTE}${ADMIN_FORGOT_ROUTE}`
+
+/**
+ * The admin panel's verify-email page, `/admin/<auth collection>/verify/<token>`, for the users
+ * collection (`users`, the only one with logins). It verifies on page load with no robot check,
+ * so #303 redirects it to the site's page. Ends with `/`: the token follows.
+ */
+export const ADMIN_VERIFY_PREFIX = `${ADMIN_ROUTE}/users/verify/`
