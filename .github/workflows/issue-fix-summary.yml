@@ -42,7 +42,7 @@ jobs:
             const comment = (heading) =>
               [
                 heading,
-                `Merged into \`main\` as ${pr.merge_commit_sha}. Code changes deploy to production automatically ("Deploy to VPS").`,
+                `Merged into \`main\` as ${pr.merge_commit_sha}. Code changes deploy to production automatically (the CI run's "Deploy / …" jobs).`,
                 '',
                 '**What changed**',
                 pick('what changed'),

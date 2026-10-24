@@ -170,7 +170,7 @@ jobs:
             [ \"\$(readlink current 2>/dev/null)\" != releases/$RELEASE ] || { echo 'release $RELEASE is live; not replacing it' >&2; exit 1; }
             rm -rf releases/.incoming-$RELEASE releases/$RELEASE
             mkdir releases/.incoming-$RELEASE
-            tar -xzf - -C releases/.incoming-$RELEASE
+            tar --no-same-owner -xzf - -C releases/.incoming-$RELEASE
             mv -T releases/.incoming-$RELEASE releases/$RELEASE" < "$RUNNER_TEMP/release.tar.gz"
 
       # ops/deploy-release.sh prints `::notice` / `::warning` lines, which GitHub shows as

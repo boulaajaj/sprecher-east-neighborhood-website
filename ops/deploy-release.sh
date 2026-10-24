@@ -45,6 +45,8 @@ on_unexpected_error() {
 trap 'on_unexpected_error $LINENO' ERR
 
 stop() {
+  # Oldest, so it's pruned first; kept until then to look into. Only inside releases/.
+  case "$RELEASE" in "$RELEASES"/*) touch -d @0 "$RELEASE" 2>/dev/null || true ;; esac
   report "ERROR: $*; the live site was not changed (release $name)"
   exit 1
 }
