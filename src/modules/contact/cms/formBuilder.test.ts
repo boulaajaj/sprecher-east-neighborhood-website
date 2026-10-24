@@ -48,7 +48,7 @@ describe('formBuilderOptions: safeguards', () => {
 
     const afterChange = submissions?.hooks?.afterChange ?? []
     expect(afterChange).toHaveLength(1)
-    const req = {}
+    const req = { context: {} }
     await afterChange[0]?.({ data, doc: {}, operation: 'create', req } as never)
     expect(emailConfirmer.request).toHaveBeenCalledWith('ana@example.com', req)
   })
@@ -56,7 +56,11 @@ describe('formBuilderOptions: safeguards', () => {
   it('adds the sender fields to submissions', () => {
     const fields = submissions?.fields
     const names = typeof fields === 'function' ? fields({ defaultFields: [] }) : []
-    expect(names.map((f) => ('name' in f ? f.name : ''))).toEqual(['senderEmail', 'emailConfirmed'])
+    expect(names.map((f) => ('name' in f ? f.name : ''))).toEqual([
+      'senderEmail',
+      'emailConfirmed',
+      'heldEmails',
+    ])
   })
 
   it('runs the robot check second: off without keys', async () => {

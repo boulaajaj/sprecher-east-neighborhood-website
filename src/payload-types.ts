@@ -1009,6 +1009,15 @@ export interface FormSubmission {
    * Ticked once the sender clicks the confirmation link we email them.
    */
   emailConfirmed?: boolean | null
+  heldEmails?:
+    | {
+        [k: string]: unknown
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null
   updatedAt: string
   createdAt: string
 }
@@ -1837,6 +1846,7 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
       }
   senderEmail?: T
   emailConfirmed?: T
+  heldEmails?: T
   updatedAt?: T
   createdAt?: T
 }

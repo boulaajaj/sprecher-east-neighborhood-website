@@ -7,6 +7,7 @@ import * as migration_20261022_211619_email_confirmations from './20261022_21161
 import * as migration_20261022_213133_contact_sender_email from './20261022_213133_contact_sender_email'
 import * as migration_20261023_183632_account_verification from './20261023_183632_account_verification'
 import * as migration_20261023_211151_verification_resends from './20261023_211151_verification_resends'
+import * as migration_20261023_214345_held_form_emails from './20261023_214345_held_form_emails'
 
 export const migrations = [
   {
@@ -53,5 +54,10 @@ export const migrations = [
     up: migration_20261023_211151_verification_resends.up,
     down: migration_20261023_211151_verification_resends.down,
     name: '20261023_211151_verification_resends',
+  },
+  {
+    up: migration_20261023_214345_held_form_emails.up,
+    down: migration_20261023_214345_held_form_emails.down,
+    name: '20261023_214345_held_form_emails',
   },
 ]

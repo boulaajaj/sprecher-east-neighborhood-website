@@ -73,8 +73,8 @@ export const createFormBuilderOptions = ({
         verifyHumanSubmission(new TurnstileVerifier()),
         recordSenderEmail(emailConfirmer),
       ],
-      // After the plugin's own hook has sent the owner notification: the message reaches him
-      // right away, marked confirmed or not (open question for the owner on #183)
+      // After the plugin's own email step, which held an unconfirmed sender's emails: stores
+      // them and asks the sender to confirm. The owner gets the message once they do (#274, #287)
       afterChange: [requestSenderConfirmation(emailConfirmer)],
     },
     fields: ({ defaultFields }) => [...defaultFields, ...senderEmailFields],
