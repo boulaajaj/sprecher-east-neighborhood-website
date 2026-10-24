@@ -201,7 +201,7 @@ describe('jobs', () => {
   it('run the retention queue and scheduled publishing in the app (#274, #141)', () => {
     expect(config.jobs.autoRun).toEqual([
       { cron: '*/10 * * * *', queue: 'retention' },
-      { cron: '* * * * *', queue: 'default', limit: 10 },
+      { cron: '* * * * *', queue: 'default', limit: 10, disableScheduling: true },
     ])
     const scheduled = (config.jobs.tasks ?? [])
       .filter((task) => task.schedule?.some((schedule) => schedule.queue === 'retention'))

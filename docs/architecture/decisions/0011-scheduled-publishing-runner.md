@@ -24,7 +24,15 @@ request. Those pages had no time limit, so an unpublished post would have stayed
   precision), at most 10 jobs a run, in the app's one PM2 process. One publish is one document
   update; a run takes milliseconds, and Payload never starts a run while the previous one is
   still going. The runners are listed in one place, `src/platform/payload/jobRunners.ts`, pinned by
-  its test. No runner takes every queue: work nobody decided to run stays queued.
+  its test. No runner takes every queue: work nobody decided to run stays queued. The runner
+  skips Payload's scheduling pass (`disableScheduling`): the Admin queues these jobs itself, and
+  no task schedules into `default`.
+- **Schedules missed while nothing ran them are cancelled, not run.** Every publish or unpublish
+  scheduled before this change is still waiting in production, and Admin lists only schedules
+  still ahead, so editors can't see them. Run all at once, an unpublish someone forgot would take
+  a live page down. A one-time migration (`20261024_180000_cancel_missed_scheduled_publishes`,
+  run by the deploy) marks each one already due as failed, with a message to schedule it again
+  if still wanted, and prints only the count as a deploy notice. Schedules still ahead run.
 - **Pages, posts, events and the home page re-render at most every 10 minutes**
   (`revalidate = 600`), as the lists already do, and the sitemap's cached lists expire after 10
   minutes too. So a scheduled change reaches every page and the sitemap within 10 minutes, and
@@ -44,6 +52,11 @@ request. Those pages had no time limit, so an unpublished post would have stayed
 - Every visited page re-renders at most once every 10 minutes: negligible load.
 - A scheduled publish that fails validation (a required field left empty) fails once and stays
   in the job's error; the item stays a draft.
+- A job runs as the editor who scheduled it. If that account is deleted, or loses the right to
+  publish, before the time, the job fails (Payload fails closed) and the item stays as it was.
+- A job cut off mid-run by a restart stays "processing": Payload 3.91 has no timeout, and
+  `releaseStuckJobs` covers only the retention schedule. A run takes milliseconds, so this is
+  unlikely; #350 tracks releasing such jobs too.
 
 ## Links
 

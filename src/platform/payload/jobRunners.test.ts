@@ -10,7 +10,7 @@ describe('JOB_RUNNERS', () => {
   it('runs the retention queue every 10 minutes and scheduled publishing every minute', () => {
     expect(JOB_RUNNERS).toEqual([
       { cron: '*/10 * * * *', queue: 'retention' },
-      { cron: '* * * * *', queue: 'default', limit: 10 },
+      { cron: '* * * * *', queue: 'default', limit: 10, disableScheduling: true },
     ])
   })
 

@@ -33,5 +33,8 @@ export const JOB_RUNNERS: RunnerConfig[] = [
     cron: SCHEDULED_PUBLISH_RUNNER_CRON,
     queue: SCHEDULED_PUBLISH_QUEUE,
     limit: SCHEDULED_PUBLISH_RUN_LIMIT,
+    // The Admin queues these jobs itself, and no task schedules into this queue (pinned by
+    // `accessPolicy.test.ts`), so skip Payload's scheduling pass and its stats read every minute
+    disableScheduling: true,
   },
 ]
