@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { findSenderEmail, holdsForConfirmation, toSenderEmailNote } from './senderEmail'
+import { findSenderEmail, toEmailDelivery, toSenderEmailNote } from './senderEmail'
 
 const FIELDS = [
   { blockType: 'text', name: 'name' },
@@ -45,16 +45,36 @@ describe('findSenderEmail', () => {
   })
 })
 
-describe('holdsForConfirmation', () => {
+describe('toEmailDelivery', () => {
+  const withEmail = [
+    { blockType: 'text', name: 'name' },
+    { blockType: 'email', name: 'email' },
+  ]
+  const withoutEmail = [{ blockType: 'text', name: 'name' }]
+
   it('holds a message whose sender hasn’t confirmed their address yet (#287)', () => {
-    expect(holdsForConfirmation('ana@example.com', false)).toBe(true)
-    expect(holdsForConfirmation('ana@example.com', undefined)).toBe(true)
+    expect(
+      toEmailDelivery({ senderEmail: 'ana@example.com', confirmed: false, fields: withEmail }),
+    ).toBe('hold')
+    expect(
+      toEmailDelivery({ senderEmail: 'ana@example.com', confirmed: undefined, fields: withEmail }),
+    ).toBe('hold')
   })
 
-  it('sends at once when the address is confirmed, or there is none to confirm', () => {
-    expect(holdsForConfirmation('ana@example.com', true)).toBe(false)
-    expect(holdsForConfirmation(null, false)).toBe(false)
-    expect(holdsForConfirmation('', false)).toBe(false)
+  it('sends at once when the address is confirmed, or the form asks for no email', () => {
+    expect(
+      toEmailDelivery({ senderEmail: 'ana@example.com', confirmed: true, fields: withEmail }),
+    ).toBe('send')
+    expect(toEmailDelivery({ senderEmail: null, confirmed: false, fields: withoutEmail })).toBe(
+      'send',
+    )
+    expect(toEmailDelivery({ senderEmail: null, confirmed: false, fields: undefined })).toBe('send')
+  })
+
+  it('sends nothing when the form asks for an email but the message has none', () => {
+    // A request built by hand can leave the email out to skip the confirmation
+    expect(toEmailDelivery({ senderEmail: null, confirmed: false, fields: withEmail })).toBe('drop')
+    expect(toEmailDelivery({ senderEmail: '', confirmed: true, fields: withEmail })).toBe('drop')
   })
 })
 

@@ -172,6 +172,26 @@ describe('guardFormEmails', () => {
     expect(context.heldFormEmails).toEqual([email()])
   })
 
+  it('sends nothing when the form asks for an email but the message has none (#287)', async () => {
+    const g = await loadGuards()
+    const warn = vi.fn()
+    const findByID = vi.fn(async () => ({
+      id: 1,
+      emails: [{ emailTo: 'info@example.org' }],
+      fields: [{ blockType: 'email', name: 'email' }],
+    }))
+    const context: Record<string, unknown> = {}
+    const result = await g.guardFormEmails([email()], {
+      data: { form: 1, senderEmail: null, emailConfirmed: false },
+      req: { context, payload: { findByID, logger: { warn } } },
+    } as unknown as BeforeEmailArgs[1])
+    expect(result).toEqual([])
+    expect(context.heldFormEmails).toBeUndefined()
+    expect(warn).toHaveBeenCalledWith(
+      'Form message without the email its form asks for: no email sent',
+    )
+  })
+
   it('adds no line when the submission has no sender address', async () => {
     const { result } = await send([email()], [{ emailTo: 'info@example.org' }])
     expect(result[0]?.html).toBe('<p>Hello</p>')

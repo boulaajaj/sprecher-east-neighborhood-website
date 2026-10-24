@@ -32,13 +32,30 @@ export function findSenderEmail(
 /** The fixed line a held message's emails get when they go out (#183, #287). */
 export const SENDER_CONFIRMED_NOTE = 'Sender’s email: confirmed.'
 
+/** What happens to a message's emails when it's submitted (#287). */
+export type EmailDelivery = 'send' | 'hold' | 'drop'
+
 /**
- * Whether a message's emails wait for its sender to confirm their address (#287). The owner
- * decided on #274 that a contact message reaches him only after that click. A message from an
- * address already confirmed, or from a form with no email field (nobody to ask), goes out at once.
+ * What happens to a message's emails when it's submitted (#287). The owner decided on #274 that a
+ * contact message reaches him only after its sender confirms their address:
+ * - `send`: the address is already confirmed, or the form asks for no email (nobody to confirm);
+ * - `hold`: kept until the address is confirmed;
+ * - `drop`: the form asks for an email but the message has no valid one. A request built by hand
+ *   can leave it out; sending at once would skip the confirmation. The message is still stored.
  */
-export function holdsForConfirmation(senderEmail: unknown, confirmed: unknown): boolean {
-  return typeof senderEmail === 'string' && senderEmail !== '' && confirmed !== true
+export function toEmailDelivery({
+  senderEmail,
+  confirmed,
+  fields,
+}: {
+  senderEmail: unknown
+  confirmed: unknown
+  fields: readonly FormFieldShape[] | null | undefined
+}): EmailDelivery {
+  if (typeof senderEmail === 'string' && senderEmail !== '') {
+    return confirmed === true ? 'send' : 'hold'
+  }
+  return (fields ?? []).some((field) => field.blockType === 'email') ? 'drop' : 'send'
 }
 
 /** The line added to a message's emails when they go out: `null` when it has no sender address. */
