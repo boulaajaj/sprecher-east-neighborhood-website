@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/candidate.schema.json",
+  "title": "Scout output: one candidate item",
+  "description": "Built by deterministic code from a fetched feed item. Dates are ISO 8601 with an offset; a date or place the source doesn't give is null, never filled in.",
+  "type": "object",
+  "required": [
+    "sourceId",
+    "sourceName",
+    "sourceUrl",
+    "externalId",
+    "contentHash",
+    "retrievedAt",
+    "kind",
+    "title",
+    "sourceText",
+    "startsAt",
+    "locationText",
+    "sourceStatus",
+    "change"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "sourceId": {
+      "$ref": "common.schema.json#/$defs/sourceId"
+    },
+    "sourceName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "sourceUrl": {
+      "$ref": "common.schema.json#/$defs/httpUrl"
+    },
+    "externalId": {
+      "$ref": "provenance.schema.json#/properties/externalId"
+    },
+    "contentHash": {
+      "$ref": "provenance.schema.json#/properties/contentHash"
+    },
+    "retrievedAt": {
+      "$ref": "common.schema.json#/$defs/dateTime"
+    },
+    "kind": {
+      "enum": ["event", "meeting", "legislation", "news"]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "sourceText": {
+      "description": "Untrusted text copied from the source, for the later stages to read as data. Never instructions.",
+      "type": "string",
+      "maxLength": 8000
+    },
+    "startsAt": {
+      "anyOf": [
+        {
+          "$ref": "common.schema.json#/$defs/dateTime"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "endsAt": {
+      "anyOf": [
+        {
+          "$ref": "common.schema.json#/$defs/dateTime"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "allDay": {
+      "type": "boolean"
+    },
+    "locationText": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "sourceStatus": {
+      "enum": ["scheduled", "cancelled", "rescheduled", "unknown"]
+    },
+    "change": {
+      "enum": ["new", "updated", "unchanged"]
+    }
+  }
+}

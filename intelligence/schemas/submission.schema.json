@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/submission.schema.json",
+  "title": "Submit stage output: one suggested draft",
+  "description": "Sent to the CMS over Payload MCP (#336). Never publishes: the CMS keeps it a draft with moderationStatus suggested.",
+  "type": "object",
+  "required": ["collection", "action", "skipReason", "fields", "provenance", "runId"],
+  "additionalProperties": false,
+  "properties": {
+    "collection": {
+      "enum": ["events", "posts"]
+    },
+    "action": {
+      "enum": ["create", "skip"]
+    },
+    "skipReason": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "fields": {
+      "description": "The draft's collection fields, written to the Events or Posts document.",
+      "$ref": "draft.schema.json"
+    },
+    "provenance": {
+      "description": "Written on the same document (#123 fields).",
+      "$ref": "provenance.schema.json"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "action": {
+            "const": "skip"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "skipReason": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ]
+}

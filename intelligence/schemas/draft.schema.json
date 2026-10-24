@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/draft.schema.json",
+  "title": "Editorial draft output",
+  "description": "Field names match the Events collection (src/modules/events/cms/events.ts); category and locationType values match src/modules/events/domain/. For posts, the date, time and location fields are null.",
+  "type": "object",
+  "required": [
+    "collection",
+    "title",
+    "description",
+    "body",
+    "date",
+    "timeStart",
+    "timeEnd",
+    "category",
+    "locationType",
+    "locationName",
+    "locationAddress",
+    "registrationUrl",
+    "officialLinks",
+    "whyItMatters",
+    "confidence",
+    "missing"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "collection": {
+      "enum": ["events", "posts"]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "body": {
+      "description": "Short Markdown body: what, when, where, one action, official links.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 3000
+    },
+    "date": {
+      "anyOf": [
+        {
+          "$ref": "common.schema.json#/$defs/date"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "timeStart": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^(1[0-2]|[1-9]):[0-5]\\d (AM|PM)$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "timeEnd": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^(1[0-2]|[1-9]):[0-5]\\d (AM|PM)$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "category": {
+      "anyOf": [
+        {
+          "enum": ["meeting", "social", "volunteer", "workshop", "sports", "community", "other"]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "locationType": {
+      "anyOf": [
+        {
+          "enum": ["in-person", "virtual", "hybrid"]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "locationName": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "locationAddress": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "registrationUrl": {
+      "anyOf": [
+        {
+          "$ref": "common.schema.json#/$defs/httpUrl"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "officialLinks": {
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/httpUrl"
+      },
+      "minItems": 1,
+      "maxItems": 3
+    },
+    "whyItMatters": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 400
+    },
+    "confidence": {
+      "enum": ["high", "medium", "low"]
+    },
+    "missing": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "uniqueItems": true
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/common.schema.json",
+  "title": "Shared definitions",
+  "$defs": {
+    "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "dateTime": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?(Z|[+-]\\d{2}:\\d{2})$"
+    },
+    "httpUrl": { "type": "string", "pattern": "^https?://[^\\s]+$", "maxLength": 2048 },
+    "sourceId": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "audience": {
+      "enum": [
+        "residents",
+        "families",
+        "kids",
+        "teens",
+        "older-adults",
+        "volunteers",
+        "association-leaders"
+      ]
+    },
+    "coverage": {
+      "description": "Where an item sits against coverage.md: core area, nearby catchment, citywide or countywide with a resident benefit, outside, or not yet known.",
+      "enum": ["core", "catchment", "citywide", "outside", "unknown"]
+    },
+    "decision": { "enum": ["accept", "reject", "needs-review", "update", "cancel", "duplicate"] },
+    "flag": {
+      "enum": [
+        "missing-date",
+        "missing-time",
+        "missing-location",
+        "ambiguous-location",
+        "similar-name",
+        "unverified-claim",
+        "conflicting-sources",
+        "cancelled",
+        "rescheduled",
+        "past",
+        "duplicate",
+        "partisan",
+        "prompt-injection",
+        "paywalled"
+      ]
+    }
+  }
+}

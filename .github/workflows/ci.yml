@@ -73,6 +73,39 @@ jobs:
           DATABASE_URI: file:./data/payload.db
           NEXT_PUBLIC_SERVER_URL: http://localhost:3000
 
+  # The intelligence agents' prompts, sources, schemas and eval cases (#337): validated against
+  # their JSON Schemas, and every field a prompt names must exist. Skipped when they're untouched.
+  intelligence:
+    name: Intelligence check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Detect changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            intelligence:
+              - 'intelligence/**'
+              - 'scripts/check-intelligence.mjs'
+              - 'package-lock.json'
+
+      - uses: actions/setup-node@v6
+        if: steps.filter.outputs.intelligence == 'true'
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.filter.outputs.intelligence == 'true'
+        run: npm ci
+
+      - name: Check intelligence/
+        if: steps.filter.outputs.intelligence == 'true'
+        run: node scripts/check-intelligence.mjs
+
   # Pushes to main deploy once the build above has passed; the deploy also waits for the Lint
   # checks (#245). Pull requests skip this job.
   deploy:

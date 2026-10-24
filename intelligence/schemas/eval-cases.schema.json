@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/eval-cases.schema.json",
+  "title": "Evaluation cases (evals/cases.yaml)",
+  "type": "object",
+  "required": ["version", "asOf", "cases"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "asOf": {
+      "description": "The date the expected results assume as today.",
+      "$ref": "common.schema.json#/$defs/date"
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "category", "decidedBy", "input", "expected", "why"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "common.schema.json#/$defs/sourceId"
+          },
+          "category": {
+            "enum": [
+              "similar-name",
+              "outside",
+              "core",
+              "catchment",
+              "citywide-useful",
+              "citywide-noise",
+              "missing-address",
+              "missing-date",
+              "duplicate",
+              "update",
+              "cancellation",
+              "past",
+              "injection",
+              "partisan",
+              "unverified"
+            ]
+          },
+          "decidedBy": {
+            "enum": ["scout", "verify", "curate", "draft", "submit"]
+          },
+          "input": {
+            "description": "A candidate with only the fields the case needs. Field names and formats are the candidate's. A missing sourceStatus means scheduled.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["sourceId", "title", "startsAt", "locationText"],
+            "properties": {
+              "sourceId": {
+                "$ref": "candidate.schema.json#/properties/sourceId"
+              },
+              "externalId": {
+                "$ref": "candidate.schema.json#/properties/externalId"
+              },
+              "contentHash": {
+                "$ref": "candidate.schema.json#/properties/contentHash"
+              },
+              "kind": {
+                "$ref": "candidate.schema.json#/properties/kind"
+              },
+              "title": {
+                "$ref": "candidate.schema.json#/properties/title"
+              },
+              "sourceText": {
+                "$ref": "candidate.schema.json#/properties/sourceText"
+              },
+              "startsAt": {
+                "$ref": "candidate.schema.json#/properties/startsAt"
+              },
+              "locationText": {
+                "$ref": "candidate.schema.json#/properties/locationText"
+              },
+              "sourceStatus": {
+                "$ref": "candidate.schema.json#/properties/sourceStatus"
+              },
+              "change": {
+                "$ref": "candidate.schema.json#/properties/change"
+              }
+            }
+          },
+          "known": {
+            "description": "What the CMS already holds for this externalId, if anything.",
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["externalId", "contentHash"],
+                "properties": {
+                  "externalId": {
+                    "$ref": "candidate.schema.json#/properties/externalId"
+                  },
+                  "contentHash": {
+                    "$ref": "candidate.schema.json#/properties/contentHash"
+                  },
+                  "status": {
+                    "enum": ["scheduled", "cancelled"]
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expected": {
+            "type": "object",
+            "required": ["decision", "coverage"],
+            "additionalProperties": false,
+            "properties": {
+              "decision": {
+                "$ref": "common.schema.json#/$defs/decision"
+              },
+              "coverage": {
+                "$ref": "common.schema.json#/$defs/coverage"
+              },
+              "flags": {
+                "type": "array",
+                "items": {
+                  "$ref": "common.schema.json#/$defs/flag"
+                },
+                "uniqueItems": true
+              }
+            }
+          },
+          "why": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 400
+          }
+        }
+      },
+      "minItems": 20
+    }
+  }
+}

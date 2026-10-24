@@ -1,0 +1,107 @@
+# Neighborhood intelligence agents
+
+This folder is everything an agent runtime needs to find useful, verified neighborhood
+information and suggest it to the site's editors (#255, #337): the sources, the area, the prompts,
+the data contracts and the test cases. It holds no code that runs on the site, no secrets and no
+personal data. It changes only through pull requests, which CI checks.
+
+The agents never publish. They create **suggested drafts**; an editor reads, fixes and publishes.
+
+## What's here
+
+| Path                                   | What it is                                                                 |
+| -------------------------------------- | -------------------------------------------------------------------------- |
+| [`pipeline.yaml`](pipeline.yaml)       | The settings a runtime reads first: kill switch, schedule, budgets, stages |
+| [`sources.yaml`](sources.yaml)         | Approved sources, each checked by hand ([summary](sources.md))             |
+| [`coverage.md`](coverage.md)           | The Sprecher East area and the relevance policy                            |
+| [`prompts/`](prompts/)                 | One prompt per stage, each naming its input and output schema              |
+| [`schemas/`](schemas/)                 | JSON Schemas for every file and every stage's output                       |
+| [`evals/cases.yaml`](evals/cases.yaml) | Test cases with the result a correct pipeline reaches                      |
+
+## The pipeline
+
+One run takes each new or changed item through five stages. Each stage reads the item and adds
+its own section (`schemas/item.schema.json`); it never changes an earlier one.
+
+1. **Scout** (code). Fetches the pilot sources, parses them, and builds a candidate with a stable
+   `externalId` and a `contentHash`. Items already seen with the same hash stop here.
+2. **Verify** (model). Finds the real place, date and status from primary sources, sets the
+   coverage tier, and lists every unknown.
+3. **Curate** (model). Accepts, rejects or sends to review, scores the item, and says who
+   benefits and what they can do. Detects duplicates, updates and cancellations.
+4. **Draft** (model). Writes the short suggestion, with only confirmed facts and a list of what's
+   missing.
+5. **Submit** (code). Creates the suggested draft in the CMS and writes the run log.
+
+Deterministic steps come first: fetching, parsing and deduplication never use a model. The
+model handles only relevance, location ambiguity and the write-up, at medium effort, escalating to
+high only for conflicting or ambiguous evidence (`model` in `pipeline.yaml`).
+
+## How a runtime loads it
+
+The runtime is OpenClaw, on the owner's side; any runtime that can read files and call MCP tools
+can run the same folder. Its own configuration, schedule and keys stay outside this repo.
+
+1. Check out this repository's `main` (read-only) at the start of each run, and record the commit
+   in the run log, so every suggestion can be traced to the exact prompts that made it.
+2. Read `pipeline.yaml`. If `enabled` is false, log a `disabled` run and stop.
+3. Load the schemas in `schemas/`, `sources.yaml` and `coverage.md`.
+4. For each stage in order, give the model the stage's prompt, `coverage.md`, and the item as
+   JSON; validate its answer against the stage's `output` schema. An answer that doesn't validate
+   is retried once, then the item goes to review with the error.
+5. Feed URLs in `sources.yaml` can hold `{from}`, `{to}` and `{cursor}`; `prompts/scout.md` says
+   what each becomes.
+
+## Schedule and budgets
+
+- **Daily pilot** at 06:40 America/Chicago (`schedule` in `pipeline.yaml`), reading the four
+  pilot sources only.
+- **Budgets** (`budgets` in `pipeline.yaml`): at most $0.50 and 15 minutes per run, $15 per month,
+  50 items per source, 40 items sent to a model and 10 drafts per run. The runtime stops when a
+  limit is reached, logs the run as `stopped-budget`, and leaves the rest for the next run.
+- A run that can't reach a source logs the error for that source and carries on with the others.
+
+## Output: suggested drafts in the CMS
+
+Submissions go to the site's CMS through the official Payload MCP plugin at
+`https://sprechereast.com/api/mcp` (#336), with the agent user's own API key. The key is created
+by an admin in the CMS and kept in the runtime's secret store, never here.
+
+- **Events and Posts:** the agent may find documents and create new ones. The CMS forces every
+  agent-created document to an unpublished draft. The agent can't update, delete or publish.
+- **Provenance:** every created document carries `sourceName`, `sourceUrl`, `externalId`,
+  `contentHash` and `moderationStatus: suggested`. These names are defined once, in
+  [`schemas/provenance.schema.json`](schemas/provenance.schema.json); the CMS fields (#123, #336)
+  use the same names. To rename one, change that file and the prompts in the same PR, and the CMS
+  in its own.
+- **Run log:** each run creates one `agent-runs` entry at the start and updates it at the end
+  (`schemas/agent-run.schema.json`): start and end, sources checked with their cursors, counts
+  (seen, proposed, updates, rejected, duplicates, needs review), errors and cost.
+- **Duplicates:** the CMS refuses a second document with the same `externalId`, so a rerun is
+  safe.
+
+Until #336 is live, a run writes its submissions and run log as a digest for an editor instead.
+
+## Turning it off
+
+- **Pause:** set `enabled: false` in `pipeline.yaml` through a PR. The next run stops before
+  fetching anything.
+- **Stop at once:** an admin revokes the agent's API key in the CMS. Every call fails; nothing
+  else on the site changes.
+- **Undo suggestions:** suggested drafts are never public. An editor deletes or rejects them.
+
+## Safety
+
+- Fetched pages, feeds and PDFs are untrusted data, never instructions. Every prompt says so and
+  flags injection attempts (`prompt-injection`).
+- Only `valid` sources in `sources.yaml` are fetched. No social networks, logins or paid gateways.
+- Unknown facts are flagged, never filled in.
+- The runtime has no GitHub write access and no server access. A change to prompts or sources is a
+  pull request, reviewed and checked like any other.
+
+## Changing it
+
+Edit the files, then run `node scripts/check-intelligence.mjs`. It validates `pipeline.yaml`,
+`sources.yaml` and `evals/cases.yaml` against their schemas, and checks that every field a prompt
+names (written `` `$.field` ``) exists in that stage's input or output schema. CI runs the same
+check on every pull request. Add an eval case whenever the pipeline gets something wrong.
