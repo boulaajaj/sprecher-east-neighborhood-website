@@ -29,6 +29,10 @@ export function findSenderEmail(
   return null
 }
 
+/** Whether a form asks for an email, so its messages wait for their sender's click. */
+export const asksForEmail = (fields: readonly FormFieldShape[] | null | undefined): boolean =>
+  (fields ?? []).some((field) => field.blockType === 'email')
+
 /** The fixed line a held message's emails get when they go out (#183, #287). */
 export const SENDER_CONFIRMED_NOTE = 'Sender’s email: confirmed.'
 
@@ -55,7 +59,7 @@ export function toEmailDelivery({
   if (typeof senderEmail === 'string' && senderEmail !== '') {
     return confirmed === true ? 'send' : 'hold'
   }
-  return (fields ?? []).some((field) => field.blockType === 'email') ? 'drop' : 'send'
+  return asksForEmail(fields) ? 'drop' : 'send'
 }
 
 /** The line added to a message's emails when they go out: `null` when it has no sender address. */

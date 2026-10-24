@@ -1,4 +1,4 @@
-import type { PayloadRequest } from 'payload'
+import type { PayloadRequest, Where } from 'payload'
 
 import type { EmailConfirmation } from '@/payload-types'
 
@@ -7,8 +7,9 @@ import { EMAIL_CONFIRMATIONS } from '../domain/paths'
 
 // Every call here runs for a visitor who may not read this collection (it is admin-only), or for
 // the retention task, which runs as nobody, so access is bypassed on purpose: the server decides
-// what to do, and the visitor never sees the record. Each call passes `req`, as Payload expects inside a request. No transaction runs today
-// (the SQLite adapter has no `transactionOptions`); callers outside this folder go through
+// what to do, and the visitor never sees the record. Each call passes `req`, as Payload expects
+// inside a request. No transaction runs today (the SQLite adapter has no `transactionOptions`);
+// callers outside this folder go through
 // `withOwnTransaction`, so if one ever does, a failure here can't undo the caller's work.
 
 /** Maps a stored document to the record the rules read. */
@@ -116,24 +117,56 @@ export async function saveLinkSent(
 }
 
 /**
+ * Deletes the records among `ids` that still match `where`, in one DELETE statement, so the
+ * conditions are checked again as the rows go (Payload's `delete` finds first, then deletes each
+ * id). Says how many went. The collection has no delete hooks or versions to skip.
+ */
+async function deleteStillMatching(
+  req: PayloadRequest,
+  ids: readonly number[],
+  where: Where,
+): Promise<number> {
+  if (ids.length === 0) return 0
+  const batch: Where = { id: { in: [...ids] } }
+  await req.payload.db.deleteMany({
+    collection: EMAIL_CONFIRMATIONS,
+    where: { and: [batch, where] },
+    req,
+  })
+  const { totalDocs: left } = await req.payload.count({
+    collection: EMAIL_CONFIRMATIONS,
+    where: batch,
+    overrideAccess: true,
+    req,
+  })
+  return ids.length - left
+}
+
+/**
  * Deletes unconfirmed records whose last link went out before `cutoff` (an ISO date), and says
- * how many.
+ * how many. A record that got a new link, or was confirmed, in the meantime stays.
  */
 export async function deleteUnconfirmedBefore(
   req: PayloadRequest,
   cutoff: string,
 ): Promise<number> {
-  const { docs } = await req.payload.delete({
+  const expired: Where = {
+    and: [{ confirmedAt: { exists: false } }, { lastSentAt: { less_than: cutoff } }],
+  }
+  const { docs } = await req.payload.find({
     collection: EMAIL_CONFIRMATIONS,
-    where: {
-      and: [{ confirmedAt: { exists: false } }, { lastSentAt: { less_than: cutoff } }],
-    },
+    where: expired,
+    pagination: false,
     depth: 0,
     select: { email: true },
     overrideAccess: true,
     req,
   })
-  return docs.length
+  return deleteStillMatching(
+    req,
+    docs.map(({ id }) => id),
+    expired,
+  )
 }
 
 /** Every record confirmed before `cutoff` (an ISO date): the address and its id. */
@@ -153,19 +186,11 @@ export async function findConfirmedBefore(
   return docs.map(({ id, email }) => ({ id, email }))
 }
 
-/** Deletes these records, and says how many. */
+/** Deletes these records if they were still confirmed before `cutoff`, and says how many. */
 export async function deleteConfirmations(
   req: PayloadRequest,
   ids: readonly number[],
+  cutoff: string,
 ): Promise<number> {
-  if (ids.length === 0) return 0
-  const { docs } = await req.payload.delete({
-    collection: EMAIL_CONFIRMATIONS,
-    where: { id: { in: [...ids] } },
-    depth: 0,
-    select: { email: true },
-    overrideAccess: true,
-    req,
-  })
-  return docs.length
+  return deleteStillMatching(req, ids, { confirmedAt: { less_than: cutoff } })
 }

@@ -72,6 +72,25 @@ describe('deleteExpiredConfirmations (#274)', () => {
     expect(accounts).toHaveBeenCalledWith(asked, req)
   })
 
+  it('keeps an unconfirmed address that got a new link between the check and the delete', async () => {
+    const { docs, payload, req } = fakeRequest()
+    docs.push({
+      id: 1,
+      email: 'ben@example.com',
+      confirmedAt: null,
+      lastSentAt: iso(NOW - 49 * HOUR),
+    })
+    const deleteRows = payload.db.deleteMany.getMockImplementation()
+    payload.db.deleteMany.mockImplementationOnce(async (args) => {
+      // Ben sends the form again while the task runs
+      Object.assign(docs[0] ?? {}, { lastSentAt: iso(NOW) })
+      await deleteRows?.(args)
+    })
+
+    expect(await deleteExpiredConfirmations(req, [], NOW)).toEqual({ unconfirmed: 0, confirmed: 0 })
+    expect(docs).toHaveLength(1)
+  })
+
   it('deletes nothing confirmed when a keeper fails, so the next run tries again', async () => {
     const { docs, req } = fakeRequest()
     docs.push({ id: 1, email: 'old@example.com', confirmedAt: iso(YEAR_AGO - 1), lastSentAt: null })
@@ -95,7 +114,7 @@ describe('createConfirmationRetentionTask', () => {
   it('runs every hour in the retention queue and logs counts, never an address', async () => {
     const task = createConfirmationRetentionTask({ keepers: [keeping()] })
     expect(task.slug).toBe(CONFIRMATION_RETENTION_TASK)
-    expect(task.schedule).toEqual([{ cron: '0 * * * *', queue: 'retention' }])
+    expect(task.schedule).toMatchObject([{ cron: '0 * * * *', queue: 'retention' }])
 
     const { docs, payload, req } = fakeRequest()
     docs.push({ id: 1, email: 'old@example.com', confirmedAt: iso(0), lastSentAt: null })

@@ -54,9 +54,13 @@ export function fakeRequest({ ip = '203.0.113.7' as string | null } = {}) {
       for (const doc of gone) docs.splice(docs.indexOf(doc), 1)
       return { docs: gone }
     }),
-    // The adapter: like SQL's UPDATE … WHERE, the condition and the write happen in one step, so
-    // of two calls at once only the first can match
+    count: vi.fn(async (args: Args) => ({ totalDocs: selected(args).length })),
+    // The adapter: like SQL's UPDATE … WHERE and DELETE … WHERE, the condition and the write
+    // happen in one step, so of two calls at once only the first can match
     db: {
+      deleteMany: vi.fn(async (args: Args) => {
+        for (const doc of selected(args)) docs.splice(docs.indexOf(doc), 1)
+      }),
       updateOne: vi.fn(async (args: Args) => {
         const doc = selected(args)[0]
         if (!doc) return null

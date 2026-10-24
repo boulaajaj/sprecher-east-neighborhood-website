@@ -43,12 +43,52 @@ describe('deleteExpiredSubmissions (#274)', () => {
     expect(docs.map((doc) => doc.id)).toEqual([2, 4, 5, 7, 8])
   })
 
+  it.each([
+    ['a hold set', { retentionHold: true }],
+    ['a confirmation made', { emailConfirmed: true }],
+  ])('keeps a message when %s between the check and the delete', async (_, change) => {
+    const { docs, payload, req } = fakeSubmissions([
+      message(1, NOW - 49 * HOUR, { emailConfirmed: false }),
+      message(2, NOW - 49 * HOUR, { emailConfirmed: false, senderEmail: 'ben@example.com' }),
+    ])
+    const deleteRows = payload.db.deleteMany.getMockImplementation()
+    payload.db.deleteMany.mockImplementationOnce(async (args) => {
+      // Staff tick "Keep longer", or Ana clicks her link, while the task runs
+      Object.assign(docs[0] ?? {}, change)
+      await deleteRows?.(args)
+    })
+
+    expect(await deleteExpiredSubmissions(req, NOW)).toBe(1)
+    expect(docs.map((doc) => doc.id)).toEqual([1])
+  })
+
+  it('deletes a message stored before #183 after 48 hours, as its form asked for an email', async () => {
+    const contactForm = { id: 1, fields: [{ blockType: 'email', name: 'email' }] }
+    const old = { senderEmail: null, emailConfirmed: null, form: 1 }
+    const { docs, req } = fakeSubmissions(
+      [message(1, NOW - 49 * HOUR, old), message(2, NOW - 47 * HOUR, old)],
+      contactForm,
+    )
+    expect(await deleteExpiredSubmissions(req, NOW)).toBe(1)
+    expect(docs.map((doc) => doc.id)).toEqual([2])
+  })
+
+  it('keeps a message from a form with no email field until 12 months', async () => {
+    const survey = { id: 1, fields: [{ blockType: 'text', name: 'name' }] }
+    const { docs, req } = fakeSubmissions(
+      [message(1, NOW - 49 * HOUR, { senderEmail: null, emailConfirmed: false, form: 1 })],
+      survey,
+    )
+    expect(await deleteExpiredSubmissions(req, NOW)).toBe(0)
+    expect(docs).toHaveLength(1)
+  })
+
   it('deletes nothing when nothing is old enough, without looking up recent senders', async () => {
     const { docs, payload, req } = fakeSubmissions([message(1, NOW - HOUR)])
     expect(await deleteExpiredSubmissions(req, NOW)).toBe(0)
     expect(docs).toHaveLength(1)
     expect(payload.find).toHaveBeenCalledOnce()
-    expect(payload.delete).not.toHaveBeenCalled()
+    expect(payload.db.deleteMany).not.toHaveBeenCalled()
   })
 
   it('reads with access bypassed, and only the fields the rules need', async () => {
@@ -58,7 +98,13 @@ describe('deleteExpiredSubmissions (#274)', () => {
       expect.objectContaining({
         collection: 'form-submissions',
         overrideAccess: true,
-        select: { createdAt: true, senderEmail: true, emailConfirmed: true, retentionHold: true },
+        select: {
+          createdAt: true,
+          form: true,
+          senderEmail: true,
+          emailConfirmed: true,
+          retentionHold: true,
+        },
       }),
     )
   })
@@ -81,7 +127,7 @@ describe('keepSendersWithMessages', () => {
 describe('contactRetentionTask', () => {
   it('runs every hour in the retention queue and logs a count only', async () => {
     expect(contactRetentionTask.slug).toBe(CONTACT_RETENTION_TASK)
-    expect(contactRetentionTask.schedule).toEqual([{ cron: '0 * * * *', queue: 'retention' }])
+    expect(contactRetentionTask.schedule).toMatchObject([{ cron: '0 * * * *', queue: 'retention' }])
 
     const { payload, req } = fakeSubmissions([message(1, 0, { emailConfirmed: false })])
     const handler = contactRetentionTask.handler as TaskHandler<{ input: object; output: object }>
@@ -89,5 +135,24 @@ describe('contactRetentionTask', () => {
       output: { deleted: 1 },
     })
     expect(payload.logger.info).toHaveBeenCalledWith('Retention: deleted 1 contact messages')
+  })
+
+  it('fails with a message that holds no address when a query fails', async () => {
+    const { payload, req } = fakeSubmissions([message(1, 0, { emailConfirmed: false })])
+    const cause = Object.assign(new Error('database is locked'), { code: 'SQLITE_BUSY' })
+    payload.find.mockRejectedValueOnce(
+      Object.assign(new Error('Failed query: params: ana@example.com'), {
+        name: 'DrizzleQueryError',
+        cause,
+      }),
+    )
+    const handler = contactRetentionTask.handler as TaskHandler<{ input: object; output: object }>
+    const error = await Promise.resolve(handler({ req } as Parameters<typeof handler>[0])).catch(
+      (e: unknown) => e as Error,
+    )
+    expect((error as Error).message).toBe(
+      'Retention task deleteExpiredContactMessages failed (DrizzleQueryError SQLITE_BUSY)',
+    )
+    expect((error as Error).stack).not.toContain('@example.com')
   })
 })

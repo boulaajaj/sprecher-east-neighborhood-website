@@ -2,7 +2,7 @@ import type { PayloadRequest, TaskConfig } from 'payload'
 
 import { toConfirmedCutoff, toUnconfirmedCutoff } from '@/platform/lib'
 import type { ConfirmedEmailKeeper } from '@/platform/payload/emailConfirmer'
-import { RETENTION_SCHEDULE } from '@/platform/payload/retentionJobs'
+import { RETENTION_SCHEDULE, withoutPersonalData } from '@/platform/payload/retentionJobs'
 
 import { deleteConfirmations, deleteUnconfirmedBefore, findConfirmedBefore } from './store'
 
@@ -24,7 +24,8 @@ export async function deleteExpiredConfirmations(
 ): Promise<ConfirmationsDeleted> {
   const unconfirmed = await deleteUnconfirmedBefore(req, toUnconfirmedCutoff(now))
 
-  const candidates = await findConfirmedBefore(req, toConfirmedCutoff(now))
+  const cutoff = toConfirmedCutoff(now)
+  const candidates = await findConfirmedBefore(req, cutoff)
   if (candidates.length === 0) return { unconfirmed, confirmed: 0 }
 
   const emails = candidates.map(({ email }) => email)
@@ -33,7 +34,11 @@ export async function deleteExpiredConfirmations(
     for (const email of await keeper(emails, req)) kept.add(email)
   }
   const expired = candidates.filter(({ email }) => !kept.has(email)).map(({ id }) => id)
-  return { unconfirmed, confirmed: await deleteConfirmations(req, expired) }
+  // A message stored while the keepers run, after they answered, isn't seen: its sender keeps
+  // that message but may be asked to confirm once more next time. Accepted on #327 (a window of
+  // milliseconds in an hourly run; closing it would mean writing to the confirmation on every
+  // message)
+  return { unconfirmed, confirmed: await deleteConfirmations(req, expired, cutoff) }
 }
 
 /** The task's slug in Payload's jobs queue. */
@@ -52,7 +57,9 @@ export const createConfirmationRetentionTask = ({
   label: 'Delete expired email confirmations',
   schedule: RETENTION_SCHEDULE,
   handler: async ({ req }) => {
-    const deleted = await deleteExpiredConfirmations(req, keepers)
+    const deleted = await withoutPersonalData(CONFIRMATION_RETENTION_TASK, () =>
+      deleteExpiredConfirmations(req, keepers),
+    )
     req.payload.logger.info(
       `Retention: deleted ${deleted.unconfirmed} unconfirmed and ${deleted.confirmed} confirmed email confirmations`,
     )

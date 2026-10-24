@@ -40,17 +40,27 @@ function matches(doc: Doc, where: Where | undefined): boolean {
   })
 }
 
-type Args = { where?: Where; id?: number | string; data?: Record<string, unknown> }
+type Args = {
+  collection?: string
+  where?: Where
+  id?: number | string
+  data?: Record<string, unknown>
+}
 
 /**
  * A fake request: `docs` is the collection, `sent` every email, `req` what the code receives.
- * `form` is what `findByID` answers (the form a message was sent with).
+ * `form` is the one form: what `findByID` answers, and the `forms` collection.
  */
 export function fakeSubmissions(docs: Doc[] = [], form: Record<string, unknown> | null = null) {
   const sent: Array<Record<string, unknown>> = []
   const payload = {
-    find: vi.fn(async ({ where }: Args) => ({
-      docs: docs.filter((doc) => matches(doc, where)).map((doc) => ({ ...doc })),
+    find: vi.fn(async ({ collection, where }: Args) => ({
+      docs:
+        collection === 'forms'
+          ? form
+            ? [form]
+            : []
+          : docs.filter((doc) => matches(doc, where)).map((doc) => ({ ...doc })),
     })),
     findByID: vi.fn(async () => form),
     update: vi.fn(async ({ where, data }: Args) => {
@@ -58,7 +68,14 @@ export function fakeSubmissions(docs: Doc[] = [], form: Record<string, unknown> 
       for (const doc of changed) Object.assign(doc, data)
       return { docs: changed.map((doc) => ({ ...doc })) }
     }),
+    count: vi.fn(async ({ where }: Args) => ({
+      totalDocs: docs.filter((doc) => matches(doc, where)).length,
+    })),
     db: {
+      // One statement in the real adapter: the conditions are checked as the rows are deleted
+      deleteMany: vi.fn(async ({ where }: Args) => {
+        for (const doc of docs.filter((d) => matches(d, where))) docs.splice(docs.indexOf(doc), 1)
+      }),
       updateOne: vi.fn(async ({ id, data }: Args) => {
         const doc = docs.find((d) => d.id === id)
         if (doc) Object.assign(doc, data)
