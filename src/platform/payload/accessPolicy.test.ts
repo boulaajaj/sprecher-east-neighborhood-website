@@ -187,6 +187,58 @@ describe('jobs', () => {
   })
 })
 
+describe('server-only fields', () => {
+  type Node = {
+    name?: string
+    hidden?: boolean
+    access?: Partial<Record<'create' | 'update', unknown>>
+    fields?: Node[]
+    tabs?: Node[]
+    blocks?: Node[]
+  }
+
+  /** Every field below `fields`, nested ones included, as [path, field]. */
+  const allFields = (fields: Node[], path: string): [string, Node][] =>
+    fields.flatMap((field) => {
+      const here = field.name ? `${path}.${field.name}` : path
+      const children = [...(field.fields ?? []), ...(field.tabs ?? []), ...(field.blocks ?? [])]
+      return [[here, field] as [string, Node], ...allFields(children, here)]
+    })
+
+  const STAFF = [
+    { id: 2, role: 'editor', collection: 'users' },
+    { id: 1, role: 'admin', collection: 'users' },
+  ]
+
+  // `hidden: true` hides a field from reads only: Payload still accepts writes to it (#299)
+  it('refuse writes to every hidden field, for everyone', async () => {
+    const owners = [...config.collections, ...config.globals]
+    const hidden = owners.flatMap((owner) =>
+      allFields(owner.fields as Node[], owner.slug).filter(([, field]) => field.hidden),
+    )
+    expect(hidden.length).toBeGreaterThan(0)
+    const problems: string[] = []
+    for (const [path, field] of hidden) {
+      for (const operation of ['create', 'update'] as const) {
+        const access = field.access?.[operation]
+        if (typeof access !== 'function') {
+          problems.push(`${path}: no ${operation} access`)
+          continue
+        }
+        for (const audience of Object.keys(AUDIENCES) as Audience[]) {
+          if (await allows(access, audience)) problems.push(`${path}.${operation} for ${audience}`)
+        }
+        for (const user of STAFF) {
+          if ((await (access as AccessFn)({ req: { user } })) !== false) {
+            problems.push(`${path}.${operation} for ${user.role}`)
+          }
+        }
+      }
+    }
+    expect(problems).toEqual([])
+  })
+})
+
 describe('private fields', () => {
   /** The field's own read rule, or undefined when the field has none. */
   const fieldReadAccess = (collection: string, name: string): unknown => {

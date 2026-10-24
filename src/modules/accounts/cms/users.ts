@@ -7,6 +7,7 @@ import {
   isAdminFieldAccess,
   isAdminOrEditorBoolean,
   isAdminOrSelf,
+  serverOnlyFieldAccess,
 } from '@/platform/payload/roles'
 
 import { toResetPasswordEmail, toResetPasswordLink } from '../domain/resetEmail'
@@ -100,12 +101,25 @@ export const Users: CollectionConfig = {
       },
     },
     // How often this account's verification email was sent again, and since when (#289). Only
-    // the server reads and writes them: hidden from the API and the admin panel.
-    { name: 'verificationResends', type: 'number', defaultValue: 0, hidden: true },
-    { name: 'verificationResendsSince', type: 'date', hidden: true },
+    // the server reads and writes them: hidden from the API and the admin panel, and a resident's
+    // own update can't set them (#299).
+    {
+      name: 'verificationResends',
+      type: 'number',
+      defaultValue: 0,
+      hidden: true,
+      access: serverOnlyFieldAccess,
+    },
+    { name: 'verificationResendsSince', type: 'date', hidden: true, access: serverOnlyFieldAccess },
     // Set when a link is resent: the password from the first sign-up may not be this person's,
     // so the verify page has them choose one before the account opens (#289)
-    { name: 'verificationSetsPassword', type: 'checkbox', defaultValue: false, hidden: true },
+    {
+      name: 'verificationSetsPassword',
+      type: 'checkbox',
+      defaultValue: false,
+      hidden: true,
+      access: serverOnlyFieldAccess,
+    },
   ],
   timestamps: true,
 }

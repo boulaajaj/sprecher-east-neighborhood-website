@@ -58,3 +58,12 @@ export const isAdminFieldAccess: FieldAccess = ({ req: { user } }) => hasAdmin(u
  * Used to hide internal fields (e.g. form email routing) on publicly readable documents.
  */
 export const isAdminOrEditorFieldAccess: FieldAccess = ({ req: { user } }) => hasAdminOrEditor(user)
+
+const nobody: FieldAccess = () => false
+
+/**
+ * Field-level: no one, through any API. For a field only the server sets: `hidden: true` hides it
+ * from reads only, and Payload still accepts writes to it (#299). The server writes it with
+ * `overrideAccess: true` or the database adapter, which skip field access.
+ */
+export const serverOnlyFieldAccess = { create: nobody, read: nobody, update: nobody }

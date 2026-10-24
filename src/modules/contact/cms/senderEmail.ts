@@ -1,7 +1,7 @@
 import type { CollectionAfterChangeHook, CollectionBeforeChangeHook, Field } from 'payload'
 
 import type { EmailConfirmedListener, EmailConfirmer } from '@/platform/payload/emailConfirmer'
-import { isAdminFieldAccess } from '@/platform/payload/roles'
+import { isAdminFieldAccess, serverOnlyFieldAccess } from '@/platform/payload/roles'
 
 import { FORM_SUBMISSIONS, findSenderEmail, type SubmittedRow } from '../domain/senderEmail'
 import { holdEmails, releaseHeldEmails, takeHeldEmails } from './heldEmails'
@@ -41,7 +41,7 @@ export const senderEmailFields: Field[] = [
     name: 'heldEmails',
     type: 'json',
     hidden: true,
-    access: { create: () => false, update: () => false, read: () => false },
+    access: serverOnlyFieldAccess,
   },
 ]
 
