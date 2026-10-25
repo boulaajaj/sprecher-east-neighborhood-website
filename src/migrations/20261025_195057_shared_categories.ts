@@ -89,7 +89,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   )) as Row[]
   if (!categoryColumns.some(({ name }) => name === 'default_image_id')) {
     await db.run(
-      sql`ALTER TABLE \`categories\` ADD \`default_image_id\` integer REFERENCES media(id);`,
+      sql`ALTER TABLE \`categories\` ADD \`default_image_id\` integer REFERENCES media(id) ON DELETE SET NULL ON UPDATE NO ACTION;`,
     )
   }
   await db.run(
