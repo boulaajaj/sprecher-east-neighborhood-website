@@ -8,8 +8,22 @@ import {
 import path from 'path'
 import { fileURLToPath } from 'url'
 
+import { isHttpUrl } from '@/platform/lib/reviewQueue'
 import { anyone } from '@/platform/payload/anyone'
 import { isAdmin, isAdminOrEditor } from '@/platform/payload/roles'
+
+/**
+ * Under what terms the site may show an image (#362). Agents never upload images; an editor
+ * records this when adding one, so every photo can be credited and its use checked.
+ */
+export const MEDIA_LICENSES = [
+  { value: 'own', label: 'Our own photo' },
+  { value: 'permission', label: 'Used with permission' },
+  { value: 'cc-by', label: 'CC BY' },
+  { value: 'cc-by-sa', label: 'CC BY-SA' },
+  { value: 'cc0', label: 'CC0 or public domain' },
+  { value: 'other', label: 'Other (say which in the credit)' },
+] as const
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -37,6 +51,33 @@ export const Media: CollectionConfig = {
           return [...rootFeatures, FixedToolbarFeature(), InlineToolbarFeature()]
         },
       }),
+    },
+    {
+      name: 'credit',
+      type: 'text',
+      maxLength: 200,
+      admin: {
+        description: 'Who made the image, as it should be credited, for example "Jane Doe".',
+      },
+    },
+    {
+      name: 'license',
+      type: 'select',
+      options: [...MEDIA_LICENSES],
+      admin: { description: 'Under what terms the site may show it.' },
+    },
+    {
+      name: 'sourceUrl',
+      type: 'text',
+      label: 'Source link',
+      maxLength: 2048,
+      validate: (value: unknown) =>
+        value === null ||
+        value === undefined ||
+        value === '' ||
+        isHttpUrl(value) ||
+        'Enter a full http(s) link.',
+      admin: { description: 'Where the image came from, when it isn’t our own.' },
     },
   ],
   upload: {

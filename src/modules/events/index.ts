@@ -2,7 +2,7 @@
 // pulling in React or Payload. Use cases and the components pages render are in server.ts; the
 // collection is in cms.ts.
 export { EVENTS_SITEMAP_CACHE_TAG } from './domain/cacheTags'
-export type { EventCategory } from './domain/categories'
+export type { EventCategoryRef } from './domain/categories'
 export type { EventLocationType } from './domain/locationTypes'
 export { isEventScope, type EventScope } from './domain/scope'
 export type { EventDetail, EventSitemapEntry, EventSummary } from './domain/types'

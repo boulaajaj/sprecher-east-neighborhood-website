@@ -1,19 +1,18 @@
 import React from 'react'
 
 import { Media } from '@/platform/ui/Media'
-import { cn } from '@/platform/lib/cn'
 import { categoryPillClassName } from '@/platform/ui/categoryPill'
 import { formatDateTime, toDateTimeAttr } from '@/platform/lib/formatDateTime'
 import { siteTimeZoneLabel } from '@/platform/lib/timezone'
 
-import { formatEventCategory } from '../domain/categories'
+import { formatEventCategories } from '../domain/categories'
 import { formatEventLocationType } from '../domain/locationTypes'
 import type { EventDetail } from '../domain/types'
 
 export const EventHero: React.FC<{
   event: EventDetail
 }> = ({ event }) => {
-  const { category, date, image, locationType, timeEnd, timeStart, title } = event
+  const { categories, date, image, locationType, timeEnd, timeStart, title } = event
 
   const locationTypeLabel = locationType ? formatEventLocationType(locationType) : null
 
@@ -23,9 +22,9 @@ export const EventHero: React.FC<{
       <div className="relative -mt-[var(--header-height)] flex items-end">
         <div className="relative z-10 container pt-[var(--header-height)] pb-8 text-white lg:grid lg:grid-cols-[1fr_48rem_1fr]">
           <div className="col-span-1 col-start-1 md:col-span-2 md:col-start-2">
-            {category && (
+            {categories.length > 0 && (
               <div className="mb-4 text-sm tracking-widest uppercase opacity-90">
-                {formatEventCategory(category)}
+                {formatEventCategories(categories)}
               </div>
             )}
 
@@ -69,8 +68,14 @@ export const EventHero: React.FC<{
   return (
     <div className="container pt-32 pb-10">
       <div className="max-w-3xl">
-        {category && (
-          <span className={cn('mb-4', categoryPillClassName)}>{formatEventCategory(category)}</span>
+        {categories.length > 0 && (
+          <div className="mb-4 flex flex-wrap gap-2">
+            {categories.map((category) => (
+              <span key={category.id} className={categoryPillClassName}>
+                {category.title}
+              </span>
+            ))}
+          </div>
         )}
 
         <h1 className="mb-6 text-4xl font-bold md:text-5xl">{title}</h1>

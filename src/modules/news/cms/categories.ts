@@ -23,5 +23,15 @@ export const Categories: CollectionConfig = {
     slugField({
       position: undefined,
     }),
+    {
+      name: 'defaultImage',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description:
+          'Shown on agent suggestions in this category until an editor picks another image. ' +
+          'Use a photo we own or may use, with its credit filled in.',
+      },
+    },
   ],
 }
