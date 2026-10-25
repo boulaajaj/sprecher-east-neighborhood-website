@@ -71,12 +71,12 @@ export function robotsAllows(robotsText, url) {
  * `{ status, body, etag, lastModified, retries, error }`, status being `ok`, `not-modified`,
  * `blocked` or `error`.
  */
-/** Retry-After in seconds or as an HTTP date, as a wait in milliseconds, capped. */
+/** Retry-After in seconds or as an HTTP date, as a wait in milliseconds. */
 export function retryWait(header, now = Date.now()) {
   if (!header) return 0
   const seconds = Number(header)
   const ms = Number.isFinite(seconds) ? seconds * 1000 : Date.parse(header) - now
-  return Number.isFinite(ms) ? Math.min(Math.max(ms, 0), MAX_RETRY_WAIT_MS) : 0
+  return Number.isFinite(ms) ? Math.max(ms, 0) : 0
 }
 
 export async function fetchDirect(url, { http = fetch, etag, lastModified, robots } = {}) {
@@ -123,7 +123,16 @@ export async function fetchDirect(url, { http = fetch, etag, lastModified, robot
     if (code === 429 || code >= 500) {
       if (retries === 0) {
         retries = 1
-        await sleep(retryWait(response.headers.get('retry-after')))
+        // A server asking for a longer wait than a run can spend is left for the next run
+        const wait = retryWait(response.headers.get('retry-after'))
+        if (wait > MAX_RETRY_WAIT_MS) {
+          return {
+            status: 'error',
+            retries,
+            error: `${code}, asked to wait ${Math.round(wait / 1000)} s`,
+          }
+        }
+        await sleep(wait)
         continue
       }
       return { status: 'error', retries, error: `${code} after one retry` }
@@ -132,7 +141,17 @@ export async function fetchDirect(url, { http = fetch, etag, lastModified, robot
     const declared = Number(response.headers.get('content-length'))
     if (declared > MAX_BODY_BYTES)
       return { status: 'error', retries, error: `body over ${MAX_BODY_BYTES} bytes` }
-    const body = await response.text()
+    let body
+    try {
+      body = await response.text()
+    } catch (error) {
+      // The connection dropped or timed out while the body came in: retried like no answer
+      if (retries === 0) {
+        retries = 1
+        continue
+      }
+      return { status: 'error', retries, error: `body not received: ${error.message ?? error}` }
+    }
     if (body.length > MAX_BODY_BYTES)
       return { status: 'error', retries, error: `body over ${MAX_BODY_BYTES} bytes` }
     return {

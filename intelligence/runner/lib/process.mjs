@@ -1,5 +1,5 @@
 import { pilotSources } from './contract.mjs'
-import { mergeAcrossSources, scoutSource } from './scout.mjs'
+import { mergeAcrossSources, mergedCopies, scoutSource } from './scout.mjs'
 import { runStage, runVerify, StageError } from './stages.mjs'
 import { markSeen } from './state.mjs'
 import { sendReport, submitItem } from './submit.mjs'
@@ -33,6 +33,19 @@ export async function processRun({
   const validateCandidate = contract.validator('schemas/candidate.schema.json')
   const validateEnvelope = contract.validator('schemas/submission.schema.json')
   const context = { cms, runId, validate: validateEnvelope, calls }
+
+  // 0. Follow-up reports an earlier run couldn't send (the suggestion they point at is stored)
+  const waiting = state.pendingReports ?? []
+  state.pendingReports = []
+  for (const args of waiting) {
+    try {
+      await cms.reportItem({ ...args, runId })
+      calls.push({ tool: 'reportItem', arguments: { ...args, runId } })
+    } catch (error) {
+      state.pendingReports.push(args)
+      addError(`a follow-up report from an earlier run is still waiting: ${error.message}`)
+    }
+  }
 
   // 1. Scout, in rank order
   const scouted = []
@@ -85,9 +98,11 @@ export async function processRun({
   let failuresInARow = 0
   let stopped = null
   for (const candidate of candidates) {
+    const copies = mergedCopies(candidate)
     const defer = () => {
       counts.deferred++
       deferredSources.add(candidate.sourceId)
+      for (const copy of copies) deferredSources.add(copy.sourceId)
     }
     if (stopped || Date.now() > deadline || modelItems >= (budgets.maxModelItemsPerRun ?? 40)) {
       stopped ??= 'stopped-budget'
@@ -120,6 +135,9 @@ export async function processRun({
         const result = await submitItem(item, { cms, runId, validate: validateEnvelope, route })
         calls.push(...result.calls)
         for (const warning of result.warnings) addError(warning)
+        if (result.pending?.length) {
+          state.pendingReports = [...(state.pendingReports ?? []), ...result.pending].slice(-50)
+        }
         if (result.outcome === 'deferred')
           throw new Error('the CMS took neither the suggestion nor a report')
         if (result.outcome === 'created') counts.proposed++
@@ -162,6 +180,7 @@ export async function processRun({
     failuresInARow = 0
     counts.seen++
     markSeen(state, candidate.externalId, candidate.contentHash)
+    for (const copy of copies) markSeen(state, copy.externalId, copy.contentHash)
   }
 
   // 3. A source's ETag and cursor move on only when all of its items were handled

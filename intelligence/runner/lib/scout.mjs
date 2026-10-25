@@ -168,6 +168,14 @@ export async function scoutSource(
   return { check, candidates, invalid, fetchState, deferred }
 }
 
+/** The copies merged into `candidate` from lower-ranked sources (not part of its JSON). */
+export function mergedCopies(candidate) {
+  if (!Object.hasOwn(candidate, 'mergedCopies')) {
+    Object.defineProperty(candidate, 'mergedCopies', { value: [], enumerable: false })
+  }
+  return candidate.mergedCopies
+}
+
 /**
  * Same item from two pilot sources (scout.md step 6): one candidate from the higher-ranked
  * source, the others listed in `alsoReportedBy`. `bySource` is in rank order.
@@ -188,6 +196,13 @@ export function mergeAcrossSources(bySource) {
             externalId: candidate.externalId,
           },
         ].slice(0, 5)
+        // The copies it absorbed, kept out of the item's JSON: they're marked handled with it,
+        // and their sources' checkpoints wait with its own when it's deferred
+        mergedCopies(first).push({
+          sourceId: candidate.sourceId,
+          externalId: candidate.externalId,
+          contentHash: candidate.contentHash,
+        })
         continue
       }
       if (key) kept.set(key, candidate)

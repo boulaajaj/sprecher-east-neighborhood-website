@@ -129,11 +129,15 @@ export async function submitItem(item, { cms, runId, validate, route }) {
   const warnings = []
   const report = (kind, options) => sendReport(item, { cms, runId, validate, calls }, kind, options)
   /** A follow-up on a stored suggestion: its failure is logged, never undoes the suggestion. */
+  const pending = []
   const followUp = async (kind, options) => {
     try {
       await report(kind, options)
     } catch (error) {
       warnings.push(`${item.candidate.externalId}: follow-up report not sent: ${error.message}`)
+      // Sent at the start of the next run (state.pendingReports), unless it can't pass its schema
+      const last = calls.at(-1)
+      if (!error.invalid && last?.tool === 'reportItem') pending.push(last.arguments)
     }
   }
 
@@ -188,5 +192,5 @@ export async function submitItem(item, { cms, runId, validate, route }) {
       note: 'The source shows an image. Ask for permission before using it, or keep the category image.',
     })
   }
-  return { outcome: 'created', id: answer.id, calls, warnings }
+  return { outcome: 'created', id: answer.id, calls, warnings, pending }
 }

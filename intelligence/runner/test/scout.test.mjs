@@ -2,7 +2,13 @@ import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 
 import { pilotSources } from '../lib/contract.mjs'
-import { keepItem, mergeAcrossSources, scoutSource, sourceUrl } from '../lib/scout.mjs'
+import {
+  keepItem,
+  mergeAcrossSources,
+  mergedCopies,
+  scoutSource,
+  sourceUrl,
+} from '../lib/scout.mjs'
 import { atNoon, budgets, contract, evalCases, fakeHttp, grade } from './helpers.mjs'
 
 // The scout evals (evals/scout.yaml) as unit tests: scout is code, so each case's fetch answers go
@@ -161,6 +167,12 @@ describe('scout', () => {
     }
     const merged = mergeAcrossSources([[a], [b]])
     assert.equal(merged.length, 1)
+    // The absorbed copy is tracked for the state, but never sent to the model
+    assert.deepEqual(
+      mergedCopies(merged[0]).map((c) => c.externalId),
+      [b.externalId],
+    )
+    assert.ok(!JSON.stringify(merged[0]).includes('mergedCopies'))
     assert.deepEqual(merged[0].alsoReportedBy, [
       { sourceId: b.sourceId, sourceUrl: b.sourceUrl, externalId: b.externalId },
     ])

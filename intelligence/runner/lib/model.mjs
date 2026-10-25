@@ -47,7 +47,7 @@ export function extractJson(text) {
 export function childEnv(base = process.env, extra = {}) {
   return Object.fromEntries(
     Object.entries({ ...base, ...extra }).filter(
-      ([name]) => !/^SPRECHER_EAST_/.test(name) && !/MCP_KEY|API_KEY$/i.test(name),
+      ([name]) => !/^SPRECHER_EAST_/i.test(name) && !/MCP_KEY|API_KEY$/i.test(name),
     ),
   )
 }

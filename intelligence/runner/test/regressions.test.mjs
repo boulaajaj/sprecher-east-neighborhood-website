@@ -90,3 +90,41 @@ describe('fixes from the re-check', () => {
     assert.equal(second.deferred, 0)
   })
 })
+
+describe('follow-up reports that fail', () => {
+  it('are kept in the state and sent at the start of the next run', async () => {
+    const state = { sources: {}, seen: {} }
+    const down = dryRunCms(null)
+    down.taxonomy = async () => [{ slug: 'community', title: 'Community', parent: null }]
+    down.reportItem = async () => {
+      throw new Error('fetch failed: 503')
+    }
+    await runPipeline({
+      contract,
+      cms: down,
+      ask: accepting,
+      state,
+      http: feedsHttp(),
+      robots: async () => true,
+      repoCommit: 'a'.repeat(40),
+    })
+    assert.equal(state.pendingReports.length, 1)
+    assert.deepEqual(state.pendingReports[0].flags, ['image-candidate'])
+
+    const up = dryRunCms(null)
+    up.taxonomy = down.taxonomy
+    const { log } = await runPipeline({
+      contract,
+      cms: up,
+      ask: accepting,
+      state,
+      http: feedsHttp(),
+      robots: async () => true,
+      repoCommit: 'a'.repeat(40),
+    })
+    const sent = up.writes.filter((w) => w.tool === 'reportItem')
+    assert.equal(sent.length, 1)
+    assert.equal(sent[0].arguments.runId, log.runId)
+    assert.deepEqual(state.pendingReports, [])
+  })
+})
