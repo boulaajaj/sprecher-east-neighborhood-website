@@ -38,15 +38,15 @@ function textToLexical(text: string) {
   }
 }
 
-// Map JSON categories to Payload event category options
-const eventCategoryMap: Record<string, string> = {
-  government: 'meeting',
-  community: 'community',
-  social: 'social',
-  volunteer: 'volunteer',
-  workshop: 'workshop',
-  sports: 'sports',
-  other: 'other',
+// Map JSON categories to the slugs and titles of the category tree events share with posts (#362)
+const eventCategoryMap: Record<string, { slug: string; title: string }> = {
+  government: { slug: 'meeting', title: 'Meeting' },
+  community: { slug: 'community', title: 'Community' },
+  social: { slug: 'social', title: 'Social' },
+  volunteer: { slug: 'volunteer', title: 'Volunteer' },
+  workshop: { slug: 'workshop', title: 'Workshop' },
+  sports: { slug: 'sports', title: 'Sports & Recreation' },
+  other: { slug: 'other', title: 'Other' },
 }
 
 async function seed() {
@@ -57,6 +57,32 @@ async function seed() {
   const eventsData = await import('../data/events.json')
   const rawEvents = eventsData.default as { events: any[] }
   const events = Array.isArray(rawEvents) ? rawEvents : (rawEvents.events ?? [])
+
+  // The category with this slug, created the first time it's needed
+  const categoryIds = new Map<string, number>()
+  async function categoryIdFor(jsonCategory: string): Promise<number> {
+    const { slug, title } = eventCategoryMap[jsonCategory] ?? eventCategoryMap.community
+    const known = categoryIds.get(slug)
+    if (known !== undefined) return known
+    const { docs } = await payload.find({
+      collection: 'categories',
+      where: { slug: { equals: slug } },
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    })
+    const id =
+      docs[0]?.id ??
+      (
+        await payload.create({
+          collection: 'categories',
+          data: { title, slug },
+          overrideAccess: true,
+        })
+      ).id
+    categoryIds.set(slug, id)
+    return id
+  }
 
   console.log(`  -> Seeding ${events.length} events...`)
   for (const e of events) {
@@ -71,14 +97,7 @@ async function seed() {
           date: e.date,
           timeStart: e.time_start ?? e.timeStart ?? undefined,
           timeEnd: e.time_end ?? e.timeEnd ?? undefined,
-          category: (eventCategoryMap[e.category] ?? 'community') as
-            | 'meeting'
-            | 'community'
-            | 'social'
-            | 'volunteer'
-            | 'workshop'
-            | 'sports'
-            | 'other',
+          categories: [await categoryIdFor(e.category)],
           locationType: e.location?.type ?? e.locationType ?? 'in-person',
           locationName: e.location?.name ?? e.locationName ?? undefined,
           locationAddress: e.location?.address ?? e.locationAddress ?? undefined,

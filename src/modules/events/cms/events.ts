@@ -22,7 +22,6 @@ import {
   SUGGESTIONS_FILTER,
 } from '@/platform/payload/reviewQueue'
 
-import { EVENT_CATEGORIES } from '../domain/categories'
 import { EVENT_LOCATION_TYPES } from '../domain/locationTypes'
 import { revalidateDelete, revalidateEvent } from './revalidateEvent'
 
@@ -35,7 +34,7 @@ export const Events: CollectionConfig<'events'> = {
     date: true,
     timeStart: true,
     timeEnd: true,
-    category: true,
+    categories: true,
     description: true,
     locationName: true,
     heroImage: true,
@@ -46,7 +45,7 @@ export const Events: CollectionConfig<'events'> = {
   },
   admin: {
     components: { beforeListTable: [SUGGESTIONS_FILTER] },
-    defaultColumns: ['title', 'date', 'category', '_status', 'moderationStatus', 'updatedAt'],
+    defaultColumns: ['title', 'date', 'categories', '_status', 'moderationStatus', 'updatedAt'],
     useAsTitle: 'title',
   },
   fields: [
@@ -90,12 +89,6 @@ export const Events: CollectionConfig<'events'> = {
               type: 'checkbox',
               defaultValue: false,
               admin: { description: 'A cancelled event stays listed and is marked as cancelled.' },
-            },
-            {
-              name: 'category',
-              type: 'select',
-              options: [...EVENT_CATEGORIES],
-              defaultValue: 'community',
             },
             {
               name: 'featured',
@@ -203,6 +196,14 @@ export const Events: CollectionConfig<'events'> = {
         date: { pickerAppearance: 'dayAndTime' },
         position: 'sidebar',
       },
+    },
+    {
+      // The same category tree as posts, subcategories included (#362)
+      name: 'categories',
+      type: 'relationship',
+      relationTo: 'categories',
+      hasMany: true,
+      admin: { position: 'sidebar' },
     },
     slugField(),
     ...REVIEW_QUEUE_FIELDS,

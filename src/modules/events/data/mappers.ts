@@ -3,6 +3,7 @@ import 'server-only'
 import type { Event } from '@/payload-types'
 import { toImageRef } from '@/platform/payload/imageRef'
 
+import type { EventCategoryRef } from '../domain/categories'
 import { toMapsHref } from '../domain/maps'
 import type { EventDetail, EventSummary } from '../domain/types'
 
@@ -13,13 +14,22 @@ export const SUMMARY_FIELDS = {
   date: true,
   timeStart: true,
   timeEnd: true,
-  category: true,
+  categories: true,
   description: true,
   locationName: true,
   heroImage: true,
 } as const
 
 type SummaryDoc = Pick<Event, 'id' | keyof typeof SUMMARY_FIELDS>
+
+/** The loaded categories; a category that is only an id (not loaded) is left out. */
+function toCategories(values: Event['categories']): EventCategoryRef[] {
+  return (values ?? []).flatMap((category) =>
+    typeof category === 'object' && category !== null
+      ? [{ id: category.id, title: category.title || 'Untitled category' }]
+      : [],
+  )
+}
 
 /** An event document as a card or list item shows it. */
 export function toEventSummary(doc: SummaryDoc): EventSummary {
@@ -30,7 +40,7 @@ export function toEventSummary(doc: SummaryDoc): EventSummary {
     date: doc.date,
     timeStart: doc.timeStart ?? null,
     timeEnd: doc.timeEnd ?? null,
-    category: doc.category ?? null,
+    categories: toCategories(doc.categories),
     description: doc.description ?? null,
     locationName: doc.locationName ?? null,
     image: toImageRef(doc.heroImage),

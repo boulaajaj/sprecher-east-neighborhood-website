@@ -356,6 +356,18 @@ export interface Media {
     }
     [k: string]: unknown
   } | null
+  /**
+   * Who made the image, as it should be credited, for example "Jane Doe".
+   */
+  credit?: string | null
+  /**
+   * Under what terms the site may show it.
+   */
+  license?: ('own' | 'permission' | 'cc-by' | 'cc-by-sa' | 'cc0' | 'other') | null
+  /**
+   * Where the image came from, when it isn’t our own.
+   */
+  sourceUrl?: string | null
   folder?: (number | null) | FolderInterface
   updatedAt: string
   createdAt: string
@@ -465,6 +477,10 @@ export interface Category {
    */
   generateSlug?: boolean | null
   slug: string
+  /**
+   * Shown on agent suggestions in this category until an editor picks another image. A subcategory without one uses its parent’s. Use a photo we own or may use.
+   */
+  defaultImage?: (number | null) | Media
   parent?: (number | null) | Category
   breadcrumbs?:
     | {
@@ -860,9 +876,6 @@ export interface Event {
    * A cancelled event stays listed and is marked as cancelled.
    */
   cancelled?: boolean | null
-  category?:
-    | ('meeting' | 'social' | 'volunteer' | 'workshop' | 'sports' | 'community' | 'other')
-    | null
   /**
    * Featured events appear prominently on the homepage
    */
@@ -901,6 +914,7 @@ export interface Event {
     description?: string | null
   }
   publishedAt?: string | null
+  categories?: (number | Category)[] | null
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
@@ -1756,7 +1770,6 @@ export interface EventsSelect<T extends boolean = true> {
   timeStart?: T
   timeEnd?: T
   cancelled?: T
-  category?: T
   featured?: T
   locationType?: T
   locationName?: T
@@ -1774,6 +1787,7 @@ export interface EventsSelect<T extends boolean = true> {
         description?: T
       }
   publishedAt?: T
+  categories?: T
   generateSlug?: T
   slug?: T
   moderationStatus?: T
@@ -1841,6 +1855,9 @@ export interface FaqSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T
   caption?: T
+  credit?: T
+  license?: T
+  sourceUrl?: T
   folder?: T
   updatedAt?: T
   createdAt?: T
@@ -1936,6 +1953,7 @@ export interface CategoriesSelect<T extends boolean = true> {
   title?: T
   generateSlug?: T
   slug?: T
+  defaultImage?: T
   parent?: T
   breadcrumbs?:
     | T

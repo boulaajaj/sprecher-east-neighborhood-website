@@ -1,10 +1,22 @@
+/** The categories the seed's events use, by slug, in the tree events share with posts (#362). */
+export const eventCategories = {
+  meeting: 'Meeting',
+  social: 'Social',
+  volunteer: 'Volunteer',
+  workshop: 'Workshop',
+  sports: 'Sports & Recreation',
+  community: 'Community',
+  other: 'Other',
+} as const
+
 type EventItem = {
   title: string
   slug: string
   date: string
   timeStart?: string
   timeEnd?: string
-  category: 'meeting' | 'social' | 'volunteer' | 'workshop' | 'sports' | 'community' | 'other'
+  /** A slug in `eventCategories`: the seed creates those categories first (#362) */
+  category: keyof typeof eventCategories
   featured: boolean
   locationType: 'in-person' | 'virtual' | 'hybrid'
   locationName?: string

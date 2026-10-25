@@ -3,7 +3,7 @@ import React from 'react'
 
 import { formatDateBadge } from '@/platform/lib/formatDateTime'
 
-import { formatEventCategory } from '../domain/categories'
+import { formatEventCategories } from '../domain/categories'
 import type { EventSummary } from '../domain/types'
 
 export const SidebarEvents: React.FC<{
@@ -32,9 +32,9 @@ export const SidebarEvents: React.FC<{
                   <span className="block text-sm leading-snug font-medium text-foreground group-hover:text-primary">
                     {event.title}
                   </span>
-                  {event.category && (
+                  {event.categories.length > 0 && (
                     <span className="text-xs text-muted-foreground">
-                      {formatEventCategory(event.category)}
+                      {formatEventCategories(event.categories)}
                     </span>
                   )}
                 </div>

@@ -1,6 +1,6 @@
 import type { ImageRef, RichTextValue } from '@/platform/lib'
 
-import type { EventCategory } from './categories'
+import type { EventCategoryRef } from './categories'
 import type { EventLocationType } from './locationTypes'
 
 /** What an event card or list item shows. */
@@ -13,7 +13,8 @@ export type EventSummary = {
   /** Free text in site time, for example "6:00 PM" */
   timeStart: string | null
   timeEnd: string | null
-  category: EventCategory | null
+  /** The loaded categories, in the order the editor set them */
+  categories: EventCategoryRef[]
   description: string | null
   locationName: string | null
   image: ImageRef | null

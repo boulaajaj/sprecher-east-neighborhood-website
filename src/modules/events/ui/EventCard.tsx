@@ -7,7 +7,6 @@ import { cn } from '@/platform/lib/cn'
 import { categoryPillClassName } from '@/platform/ui/categoryPill'
 import { formatDateShort, formatDateBadge, toDateTimeAttr } from '@/platform/lib/formatDateTime'
 
-import { formatEventCategory } from '../domain/categories'
 import type { EventSummary } from '../domain/types'
 
 /**
@@ -49,7 +48,7 @@ export const EventCard: React.FC<{
   event: EventSummary
   compact?: boolean
 }> = ({ event, compact }) => {
-  const { slug, title, date, timeStart, timeEnd, category, description, locationName, image } =
+  const { slug, title, date, timeStart, timeEnd, categories, description, locationName, image } =
     event
 
   if (!slug) return null
@@ -126,10 +125,14 @@ export const EventCard: React.FC<{
           </p>
         )}
 
-        {category && (
-          <span className={cn(categoryPillClassName, 'mt-auto self-start')}>
-            {formatEventCategory(category)}
-          </span>
+        {categories.length > 0 && (
+          <div className="mt-auto flex flex-wrap gap-2">
+            {categories.map((category) => (
+              <span key={category.id} className={categoryPillClassName}>
+                {category.title}
+              </span>
+            ))}
+          </div>
         )}
       </div>
     </article>

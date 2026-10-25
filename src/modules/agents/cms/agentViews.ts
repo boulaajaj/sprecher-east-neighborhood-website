@@ -31,7 +31,7 @@ const EVENT_VIEW = [
   'timeStart',
   'timeEnd',
   'cancelled',
-  'category',
+  'categories',
   'locationType',
   'locationName',
   'locationAddress',
