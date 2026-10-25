@@ -43,26 +43,41 @@ export function extractJson(text) {
   return JSON.parse(unfenced.slice(start, end + 1))
 }
 
+/** The environment for the model process: ours without the CMS key or any other secret of ours. */
+export function childEnv(base = process.env, extra = {}) {
+  return Object.fromEntries(
+    Object.entries({ ...base, ...extra }).filter(
+      ([name]) => !/^SPRECHER_EAST_/.test(name) && !/MCP_KEY|API_KEY$/i.test(name),
+    ),
+  )
+}
+
+/** The adapter's own failure: the model or OpenClaw is down, not the answer's fault (defer). */
+export class AdapterError extends Error {}
+
 const run = (file, args, { timeoutMs, env }) =>
   new Promise((resolve, reject) => {
     execFile(
       file,
       args,
-      {
-        timeout: timeoutMs,
-        maxBuffer: 16 * 1024 * 1024,
-        env: { ...process.env, ...env },
-        windowsHide: true,
+      { timeout: timeoutMs, maxBuffer: 16 * 1024 * 1024, env, windowsHide: true },
+      (error, stdout, stderr) => {
+        if (!error) return resolve(stdout)
+        // No argv or paths in the message: it ends up in the run log
+        const why = error.killed ? 'timed out' : `exited with ${error.code ?? 'an error'}`
+        const detail = String(stderr ?? '')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .slice(0, 200)
+        reject(new AdapterError(`OpenClaw ${why}${detail ? `: ${detail}` : ''}`))
       },
-      (error, stdout, stderr) =>
-        error ? reject(Object.assign(error, { stdout, stderr })) : resolve(stdout),
     )
   })
 
 /**
  * Asks an OpenClaw agent through the Gateway (`openclaw agent --agent <id> --json`), one fresh
  * session per call so no memory carries from item to item. `command` is the argv that starts the
- * OpenClaw CLI, for example `["node", "C:/.../openclaw.mjs"]`.
+ * OpenClaw CLI, for example `["node", "C:/.../openclaw.mjs"]`. The CMS key is not passed on.
  */
 export function openclawAdapter({
   command = ['openclaw'],
@@ -70,7 +85,11 @@ export function openclawAdapter({
   timeoutSec = 300,
   env = {},
 } = {}) {
-  return async ({ message, thinking }) => {
+  return async ({ message, thinking, deadline }) => {
+    // Never past the run's own deadline (pipeline.yaml maxMinutesPerRun)
+    const left = deadline ? Math.floor((deadline - Date.now()) / 1000) - 30 : timeoutSec
+    const seconds = Math.min(timeoutSec, left)
+    if (seconds < 30) throw new AdapterError('no time left in the run for another model call')
     const folder = mkdtempSync(path.join(tmpdir(), 'sprecher-east-intel-'))
     const file = path.join(folder, 'message.md')
     writeFileSync(file, message)
@@ -85,23 +104,35 @@ export function openclawAdapter({
         '--message-file',
         file,
         '--timeout',
-        String(timeoutSec),
+        String(seconds),
         '--json',
       ]
       if (thinking) args.push('--thinking', thinking)
-      const stdout = await run(command[0], args, { timeoutMs: (timeoutSec + 30) * 1000, env })
-      const envelope = JSON.parse(stdout)
-      if (envelope.ok === false || envelope.status === 'error') {
-        throw new Error(`OpenClaw: ${envelope.error?.message ?? 'the run failed'}`)
+      const stdout = await run(command[0], args, {
+        timeoutMs: (seconds + 30) * 1000,
+        env: childEnv(process.env, env),
+      })
+      let envelope
+      try {
+        envelope = JSON.parse(stdout)
+      } catch {
+        throw new AdapterError('OpenClaw answered something other than its JSON envelope')
+      }
+      if (envelope.ok === false || envelope.status === 'error' || envelope.status === 'timeout') {
+        throw new AdapterError(
+          `OpenClaw: ${String(envelope.error?.message ?? 'the run failed').slice(0, 200)}`,
+        )
       }
       const payloads = envelope.payloads ?? envelope.result?.payloads ?? []
       const text = payloads.map((p) => p.text ?? '').join('\n')
+      if (!text.trim()) throw new AdapterError('OpenClaw returned an empty answer')
+      // Token counts only when OpenClaw reports them; the subscription has no per-call price
       const usage = envelope.usage ?? envelope.meta?.agentMeta?.usage ?? {}
       return {
         text,
         usage: {
-          input: usage.input ?? usage.inputTokens ?? 0,
-          output: usage.output ?? usage.outputTokens ?? 0,
+          input: Number(usage.input ?? usage.inputTokens ?? 0) || 0,
+          output: Number(usage.output ?? usage.outputTokens ?? 0) || 0,
         },
       }
     } finally {

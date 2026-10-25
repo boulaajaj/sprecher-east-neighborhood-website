@@ -118,7 +118,10 @@ run the same folder.
   pilot sources only.
 - **Budgets** (`budgets` in `pipeline.yaml`): at most $0.50 and 15 minutes per run, $15 per month,
   50 items per source, 40 items sent to a model and 10 drafts per run. The runtime stops when a
-  limit is reached, logs the run as `stopped-budget`, and leaves the rest for the next run.
+  limit is reached, logs the run as `stopped-budget`, and leaves the rest for the next run. The
+  dollar limits apply to a runtime billed per call; on the owner's flat subscription a run costs
+  nothing per call, so the runner logs `usd: 0` and the time and item limits are the ones that
+  stop it.
 - A run that can't reach a source logs the error for that source and carries on with the others.
 
 ## Output: suggestions and review items in the CMS

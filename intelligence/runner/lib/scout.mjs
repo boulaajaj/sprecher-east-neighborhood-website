@@ -90,30 +90,36 @@ export async function scoutSource(
     return { check, candidates: [], invalid: [] }
   }
 
+  const host = new URL(source.canonicalUrl).hostname.replace(/^www\./, '')
   let items
   try {
-    items = parse(answer.body, { from: today })
+    items = parse(answer.body, { from: today, host }).filter((item) => keepItem(source, item))
   } catch (error) {
     check.status = 'error'
     check.error = `parse failed: ${error.message}`.slice(0, 500)
     return { check, candidates: [], invalid: [] }
   }
-  const nextCursor = source.feedUrl?.includes('{cursor}') ? newestModified(items) : null
+  // A cursor source keeps its oldest changes first and moves its cursor only past those, so the
+  // rest come back next run; any other source keeps its soonest events and reports the rest as
+  // over the cap, so its ETag isn't saved and they come back too (scout.md step 7)
+  const cursorSource = Boolean(source.feedUrl?.includes('{cursor}'))
+  const ordered = items
+    .map((item, index) => ({ item, index }))
+    .sort((a, b) =>
+      cursorSource
+        ? String(a.item.modified ?? '').localeCompare(String(b.item.modified ?? ''))
+        : (a.item.startsAt ?? '\uffff').localeCompare(b.item.startsAt ?? '\uffff') ||
+          a.index - b.index,
+    )
+    .map(({ item }) => item)
+  const kept = ordered.slice(0, budgets.maxItemsPerSource)
+  const overCap = ordered.length - kept.length
+  const nextCursor = cursorSource ? newestModified(kept) : null
   if (nextCursor) check.cursor = nextCursor
   const retrievedAt = isoNow(now)
   const candidates = []
   const invalid = []
-  // Soonest first, so the per-source cap keeps the nearest events; undated items keep feed order
-  const ordered = items
-    .map((item, index) => ({ item, index }))
-    .sort(
-      (a, b) =>
-        (a.item.startsAt ?? '\uffff').localeCompare(b.item.startsAt ?? '\uffff') ||
-        a.index - b.index,
-    )
-    .map(({ item }) => item)
-  for (const item of ordered.slice(0, budgets.maxItemsPerSource)) {
-    if (!keepItem(source, item)) continue
+  for (const item of kept) {
     const fields = {
       title: item.title,
       sourceText: item.sourceText,
@@ -136,17 +142,19 @@ export async function scoutSource(
       ...fields,
       change: changeOf(state, externalId, hash),
     }
-    if (candidate.change === 'unchanged') continue
-    const errors = validate(candidate)
+    // Unchanged items are dropped after the cross-source merge, so a lower-ranked copy of an
+    // item already handled can't come through as new (mergeAcrossSources)
+    const errors = candidate.change === 'unchanged' ? [] : validate(candidate)
     if (errors.length > 0) invalid.push({ candidate, errors })
     else candidates.push(candidate)
   }
+  const deferred = cursorSource ? 0 : overCap
   const fetchState = {
     etag: answer.etag,
     lastModified: answer.lastModified,
     cursor: nextCursor ?? saved.cursor ?? null,
   }
-  return { check, candidates, invalid, fetchState }
+  return { check, candidates, invalid, fetchState, deferred }
 }
 
 /**

@@ -90,18 +90,53 @@ async function send(fn) {
  * envelope built (for the dry-run digest), and outcome is one of `created`, `duplicate`,
  * `reported`, `rejected-invalid`, `review` (sent for review after a failure) or `deferred`.
  */
+/**
+ * A report envelope, validated (submit.md step 3). One that fails its schema is rebuilt without
+ * its evidence and flags, the parts that come from the model. Answers `{ call, errors }`; with
+ * errors left, the call is marked `skip` and must not be sent.
+ */
+export function buildReport(item, runId, kind, options, validate) {
+  let call = envelope('reportItem', runId, reportArguments(item, runId, kind, options))
+  let errors = validate(call)
+  if (errors.length > 0) {
+    const plain = reportArguments(item, runId, kind, { ...options, evidence: [], flags: [] })
+    call = envelope('reportItem', runId, plain)
+    errors = validate(call)
+  }
+  if (errors.length > 0) {
+    call.action = 'skip'
+    call.skipReason = clip(errors.join('; '), 300)
+  }
+  return { call, errors }
+}
+
+/** Builds, validates and sends a report; throws when it can't be sent. */
+export async function sendReport(item, { cms, runId, validate, calls }, kind, options) {
+  const { call, errors } = buildReport(item, runId, kind, options, validate)
+  calls.push(call)
+  if (errors.length > 0) {
+    throw new Error(`the ${kind} report failed its schema: ${errors.slice(0, 2).join('; ')}`)
+  }
+  await send(() => cms.reportItem(call.arguments))
+}
+
 export async function submitItem(item, { cms, runId, validate, route }) {
   const calls = []
-  const report = async (kind, options) => {
-    const call = envelope('reportItem', runId, reportArguments(item, runId, kind, options))
-    calls.push(call)
-    await send(() => cms.reportItem(call.arguments))
+  const warnings = []
+  const report = (kind, options) => sendReport(item, { cms, runId, validate, calls }, kind, options)
+  /** A follow-up on a stored suggestion: its failure is logged, never undoes the suggestion. */
+  const followUp = async (kind, options) => {
+    try {
+      await report(kind, options)
+    } catch (error) {
+      warnings.push(`${item.candidate.externalId}: follow-up report not sent: ${error.message}`)
+    }
   }
 
   if (route === 'reportItem') {
     const kind = item.curation.decision === 'needs-review' ? 'needs-review' : item.curation.decision
     await report(kind)
-    return { outcome: 'reported', calls }
+    return { outcome: 'reported', calls, warnings }
   }
 
   const call = envelope('submitSuggestion', runId, suggestionArguments(item, runId))
@@ -114,7 +149,7 @@ export async function submitItem(item, { cms, runId, validate, route }) {
       note: `Invalid suggestion: ${errors.slice(0, 3).join('; ')}.`,
       flags: [],
     })
-    return { outcome: 'rejected-invalid', calls }
+    return { outcome: 'rejected-invalid', calls, warnings }
   }
 
   let answer
@@ -125,29 +160,29 @@ export async function submitItem(item, { cms, runId, validate, route }) {
       await report('needs-review', {
         note: `Could not store the suggestion: ${String(error.message).slice(0, 200)}.`,
       })
-      return { outcome: 'review', calls }
+      return { outcome: 'review', calls, warnings }
     } catch {
-      return { outcome: 'deferred', calls }
+      return { outcome: 'deferred', calls, warnings }
     }
   }
-  if (answer.status === 'duplicate') return { outcome: 'duplicate', id: answer.id, calls }
+  if (answer.status === 'duplicate') return { outcome: 'duplicate', id: answer.id, calls, warnings }
 
   const target = { collection: item.draft.collection, id: answer.id }
   const missing = item.draft.missing ?? []
   if (missing.length > 0 || item.draft.confidence === 'low') {
-    await report('needs-review', {
+    await followUp('needs-review', {
       target,
       note: `Check before publishing: ${missing.join(', ') || 'low confidence'}.`,
     })
   }
   const images = imageEvidence(item)
   if (images.length > 0) {
-    await report('needs-review', {
+    await followUp('needs-review', {
       target,
       flags: ['image-candidate'],
       evidence: images,
       note: 'The source shows an image. Ask for permission before using it, or keep the category image.',
     })
   }
-  return { outcome: 'created', id: answer.id, calls }
+  return { outcome: 'created', id: answer.id, calls, warnings }
 }

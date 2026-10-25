@@ -10,25 +10,60 @@ export const USER_AGENT =
 const TIMEOUT_MS = 30_000
 const MAX_HOPS = 3
 const MAX_RETRY_WAIT_MS = 30_000
+const MAX_BODY_BYTES = 10 * 1024 * 1024
 const GATE_URL = /tollbit|captcha|challenge|\/login|\/signin|sign-in|paywall|subscribe/i
 const GATE_STATUS = new Set([401, 403, 451])
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-/** Whether robots.txt lets any user agent fetch `url`'s path (simple Disallow prefixes). */
+/** A robots.txt path pattern (`*` anywhere, `$` at the end) as a regular expression. */
+const robotsPattern = (rule) =>
+  new RegExp(
+    `^${rule
+      .replace(/[.+?^{}()|[\]\\]/g, '\\$&')
+      .replace(/\*/g, '.*')
+      .replace(/\\\$$/, '$')}`,
+  )
+
+/**
+ * Whether robots.txt lets our user agent fetch `url`'s path: the group for `*` (no group names
+ * us), its Allow and Disallow rules with `*` and `$`, the longest match winning, Allow on a tie.
+ * `null` (robots.txt itself failed with a 5xx) disallows everything, as RFC 9309 says.
+ */
 export function robotsAllows(robotsText, url) {
+  if (robotsText === null) return false
   const { pathname, search } = new URL(url)
   const target = `${pathname}${search}`
-  let applies = false
-  const disallowed = []
+  const rules = []
+  let groupAgents = []
+  let inRules = false
   for (const raw of robotsText.split(/\r?\n/)) {
     const line = raw.replace(/#.*/, '').trim()
-    const [field, ...rest] = line.split(':')
-    const value = rest.join(':').trim()
-    if (/^user-agent$/i.test(field)) applies = value === '*'
-    else if (applies && /^disallow$/i.test(field) && value) disallowed.push(value)
+    const colon = line.indexOf(':')
+    if (colon === -1) continue
+    const field = line.slice(0, colon).trim().toLowerCase()
+    const value = line.slice(colon + 1).trim()
+    if (field === 'user-agent') {
+      if (inRules) groupAgents = []
+      inRules = false
+      groupAgents.push(value.toLowerCase())
+    } else if (field === 'allow' || field === 'disallow') {
+      inRules = true
+      if (groupAgents.includes('*') && value) rules.push({ allow: field === 'allow', value })
+    }
   }
-  return !disallowed.some((prefix) => target.startsWith(prefix))
+  let best = null
+  for (const rule of rules) {
+    if (!robotsPattern(rule.value).test(target)) continue
+    if (
+      !best ||
+      rule.value.length > best.value.length ||
+      (rule.value.length === best.value.length && rule.allow)
+    ) {
+      best = rule
+    }
+  }
+  return best ? best.allow : true
 }
 
 /**
@@ -36,13 +71,22 @@ export function robotsAllows(robotsText, url) {
  * `{ status, body, etag, lastModified, retries, error }`, status being `ok`, `not-modified`,
  * `blocked` or `error`.
  */
+/** Retry-After in seconds or as an HTTP date, as a wait in milliseconds, capped. */
+export function retryWait(header, now = Date.now()) {
+  if (!header) return 0
+  const seconds = Number(header)
+  const ms = Number.isFinite(seconds) ? seconds * 1000 : Date.parse(header) - now
+  return Number.isFinite(ms) ? Math.min(Math.max(ms, 0), MAX_RETRY_WAIT_MS) : 0
+}
+
 export async function fetchDirect(url, { http = fetch, etag, lastModified, robots } = {}) {
-  if (robots && !(await robots(url))) {
-    return { status: 'blocked', retries: 0, error: 'robots.txt disallows this path' }
-  }
   let current = url
   let retries = 0
   for (let hop = 0; hop <= MAX_HOPS; ) {
+    // robots.txt is checked for every URL fetched, redirect targets included
+    if (robots && !(await robots(current))) {
+      return { status: 'blocked', retries, error: `robots.txt disallows ${current}` }
+    }
     const headers = { 'user-agent': USER_AGENT, accept: '*/*' }
     if (etag) headers['if-none-match'] = etag
     if (lastModified) headers['if-modified-since'] = lastModified
@@ -76,14 +120,18 @@ export async function fetchDirect(url, { http = fetch, etag, lastModified, robot
     if (code === 429 || code >= 500) {
       if (retries === 0) {
         retries = 1
-        const after = Number(response.headers.get('retry-after'))
-        await sleep(Number.isFinite(after) ? Math.min(after * 1000, MAX_RETRY_WAIT_MS) : 0)
+        await sleep(retryWait(response.headers.get('retry-after')))
         continue
       }
       return { status: 'error', retries, error: `${code} after one retry` }
     }
     if (code >= 400) return { status: 'error', retries, error: `${code}` }
+    const declared = Number(response.headers.get('content-length'))
+    if (declared > MAX_BODY_BYTES)
+      return { status: 'error', retries, error: `body over ${MAX_BODY_BYTES} bytes` }
     const body = await response.text()
+    if (body.length > MAX_BODY_BYTES)
+      return { status: 'error', retries, error: `body over ${MAX_BODY_BYTES} bytes` }
     return {
       status: 'ok',
       retries,
@@ -108,7 +156,8 @@ export function robotsChecker(http = fetch) {
           headers: { 'user-agent': USER_AGENT },
           signal: AbortSignal.timeout(TIMEOUT_MS),
         })
-          .then((r) => (r.ok ? r.text() : ''))
+          // A missing robots.txt allows everything; a server error disallows (RFC 9309)
+          .then((r) => (r.ok ? r.text() : r.status >= 500 ? null : ''))
           .catch(() => ''),
       )
     }

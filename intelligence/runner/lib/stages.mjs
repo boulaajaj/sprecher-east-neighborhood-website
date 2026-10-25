@@ -19,7 +19,7 @@ const THINKING = { low: 'low', medium: 'medium', high: 'high' }
  * Runs `stageId` on `item` with `ask` (a model adapter). Answers `{ output, usage, attempts }`.
  * `effort` overrides the stage's own level, as verify's escalation does.
  */
-export async function runStage(contract, ask, stageId, item, { effort } = {}) {
+export async function runStage(contract, ask, stageId, item, { effort, deadline } = {}) {
   const stage = contract.stage(stageId)
   const validate = contract.validator(stage.output)
   const base = composeMessage({
@@ -34,7 +34,13 @@ export async function runStage(contract, ask, stageId, item, { effort } = {}) {
   let message = base
   let errors = []
   for (let attempt = 1; attempt <= 2; attempt++) {
-    const answer = await ask({ stageId, message, item, thinking: THINKING[effort ?? stage.model] })
+    const answer = await ask({
+      stageId,
+      message,
+      item,
+      deadline,
+      thinking: THINKING[effort ?? stage.model],
+    })
     usage.input += answer.usage?.input ?? 0
     usage.output += answer.usage?.output ?? 0
     let output
@@ -54,11 +60,11 @@ export async function runStage(contract, ask, stageId, item, { effort } = {}) {
  * Verify, rerun once at high effort when its confidence is below the pipeline's threshold
  * (`escalation` in pipeline.yaml). Answers the stage result and whether it escalated.
  */
-export async function runVerify(contract, ask, item) {
-  const first = await runStage(contract, ask, 'verify', item)
+export async function runVerify(contract, ask, item, { deadline } = {}) {
+  const first = await runStage(contract, ask, 'verify', item, { deadline })
   const { verifyBelowConfidence = 0.6, to = 'high' } = contract.pipeline.escalation ?? {}
   if (first.output.confidence >= verifyBelowConfidence) return { ...first, escalated: false }
-  const second = await runStage(contract, ask, 'verify', item, { effort: to })
+  const second = await runStage(contract, ask, 'verify', item, { effort: to, deadline })
   const usage = {
     input: first.usage.input + second.usage.input,
     output: first.usage.output + second.usage.output,

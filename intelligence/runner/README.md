@@ -25,26 +25,33 @@ npm test                                       # unit tests and the scout and su
 | `SPRECHER_EAST_AGENT_ID`      | The OpenClaw agent for the model stages, default `sprecher-east`                               |
 | `SPRECHER_EAST_STATE`         | State file (ETags, cursors, items handled), default `~/.sprecher-east-intelligence/state.json` |
 
+On Windows, set `SPRECHER_EAST_MODEL_COMMAND` to the node and `openclaw.mjs` paths (npm's
+`openclaw.cmd` shim can't be started without a shell, which the runner never uses). Update the
+checkout before each run (`git pull --ff-only`), so `repoCommit` names the prompts on `main`; a
+real run refuses to start outside a git checkout.
+
 The run prints one line (what was suggested, sent for review, deferred, and errors) and exits 1
 only when the run failed; the run log is in Admin → Agents → Agent Runs.
 
 ## How the parts fit
 
-| File                  | Does                                                                                   |
-| --------------------- | -------------------------------------------------------------------------------------- |
-| `lib/contract.mjs`    | Loads `pipeline.yaml`, `sources.yaml`, `coverage.md`, the prompts and the JSON Schemas |
-| `lib/fetchSource.mjs` | Direct fetch: ETag and Last-Modified, 3 redirects, one retry, gates, robots.txt        |
-| `lib/parsers.mjs`     | Legistar events and matters (JSON), iCalendar (recurrences expanded), RSS and Atom     |
-| `lib/scout.mjs`       | Candidates with `externalId`, `contentHash` and `change`; the Legistar area filter     |
-| `lib/model.mjs`       | The model adapter: OpenClaw (`openclaw agent --agent … --json`), or a fake for tests   |
-| `lib/stages.mjs`      | One stage: prompt + coverage + item, schema check, one retry; verify's escalation      |
-| `lib/submit.mjs`      | Routing, the MCP envelope, validation, one retry, follow-up review and image reports   |
-| `lib/cms.mjs`         | The MCP client with the key, and the dry-run CMS that records writes                   |
-| `lib/pipeline.mjs`    | One run: budgets, the kill switch, state and the run log                               |
+| File                  | Does                                                                                     |
+| --------------------- | ---------------------------------------------------------------------------------------- |
+| `lib/contract.mjs`    | Loads `pipeline.yaml`, `sources.yaml`, `coverage.md`, the prompts and the JSON Schemas   |
+| `lib/fetchSource.mjs` | Direct fetch: ETag and Last-Modified, 3 redirects, one retry, gates, robots.txt          |
+| `lib/parsers.mjs`     | Legistar events and matters (JSON), RSS and Atom; `lib/ics.mjs`: iCalendar via ical.js   |
+| `lib/scout.mjs`       | Candidates with `externalId`, `contentHash` and `change`; the Legistar area filter       |
+| `lib/model.mjs`       | The model adapter: OpenClaw (`openclaw agent --agent … --json`), or a fake for tests     |
+| `lib/stages.mjs`      | One stage: prompt + coverage + item, schema check, one retry; verify's escalation        |
+| `lib/submit.mjs`      | Routing, the MCP envelope, validation, one retry, follow-up review and image reports     |
+| `lib/cms.mjs`         | The MCP client with the key, and the dry-run CMS that records writes                     |
+| `lib/pipeline.mjs`    | One run: kill switch and the run log; `lib/process.mjs`: budgets, state, items, failures |
 
 ## Not built yet
 
 - **The Playwright fallback** (#352) and **HTML sources**: no pilot source needs them. A source
   without a parser is logged as `skipped`, and its evals are skipped in the tests.
 - **Cost in dollars**: runs use the owner's flat subscription, so `cost.usd` is 0; token counts
-  are logged when OpenClaw reports them.
+  are logged only if OpenClaw reports them, which its docs don't promise.
+- **A code guard on low verify confidence** after the rerun: curate's prompt sends such items to
+  review today.

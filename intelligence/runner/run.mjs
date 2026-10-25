@@ -37,11 +37,13 @@ const statePath =
   env.SPRECHER_EAST_STATE ??
   path.join(homedir(), '.sprecher-east-intelligence', 'state.json')
 
+/** The commit the run loads (the run log's `repoCommit`); a real run needs a git checkout. */
 function repoCommit(dir) {
   try {
     return execFileSync('git', ['-C', dir, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
   } catch {
-    return '0'.repeat(40)
+    if (dryRun) return '0'.repeat(40)
+    throw new Error(`${dir} is not a git checkout, so the run can't record which prompts it used.`)
   }
 }
 
@@ -66,8 +68,9 @@ async function main() {
     command: modelCommand(),
     agentId: env.SPRECHER_EAST_AGENT_ID ?? 'sprecher-east',
   })
+  let result
   try {
-    const { log, calls } = await runPipeline({
+    result = await runPipeline({
       contract,
       cms,
       ask,
@@ -76,20 +79,22 @@ async function main() {
       robots: robotsChecker(fetch),
       repoCommit: repoCommit(flags.intelligence),
     })
-    if (!dryRun) saveState(statePath, state)
-    if (flags.digest)
-      writeFileSync(flags.digest, `${JSON.stringify({ dryRun, log, calls }, null, 2)}\n`)
-    const c = log.counts
-    console.log(
-      `Sprecher East intelligence ${dryRun ? 'dry run' : 'run'} ${log.runId}: ${log.status}. ` +
-        `${c.proposed} suggested, ${c.needsReview} for review, ${c.updates} updates, ${c.rejected} rejected, ` +
-        `${c.duplicates} duplicates, ${c.deferred} deferred.` +
-        (log.errors.length ? ` Errors: ${log.errors.slice(0, 3).join(' | ')}` : ''),
-    )
-    process.exitCode = log.status === 'failed' ? 1 : 0
   } finally {
+    // What was handled is kept even when the run stopped part way
+    if (!dryRun) saveState(statePath, state)
     await cms?.close?.()
   }
+  const { log, calls } = result
+  if (flags.digest)
+    writeFileSync(flags.digest, `${JSON.stringify({ dryRun, log, calls }, null, 2)}\n`)
+  const c = log.counts
+  console.log(
+    `Sprecher East intelligence ${dryRun ? 'dry run' : 'run'} ${log.runId}: ${log.status}. ` +
+      `${c.proposed} suggested, ${c.needsReview} for review, ${c.updates} updates, ${c.rejected} rejected, ` +
+      `${c.duplicates} duplicates, ${c.deferred} deferred.` +
+      (log.errors.length ? ` Errors: ${log.errors.slice(0, 3).join(' | ')}` : ''),
+  )
+  process.exitCode = log.status === 'failed' ? 1 : 0
 }
 
 main().catch((error) => {

@@ -17,8 +17,22 @@ export function loadState(file) {
   }
 }
 
+/** How long an item stays remembered after it was last handled. */
+export const KEEP_SEEN_DAYS = 180
+
+/** Forgets items not handled for `KEEP_SEEN_DAYS`, so the file doesn't grow forever. */
+export function pruneSeen(state, now = new Date()) {
+  const cutoff = new Date(now.getTime() - KEEP_SEEN_DAYS * 86_400_000).toISOString()
+  state.seen = Object.fromEntries(
+    Object.entries(state.seen).filter(
+      ([, entry]) => typeof entry !== 'object' || entry === null || entry.at >= cutoff,
+    ),
+  )
+}
+
 /** Written to a temporary file first, so a crash never leaves half a state file. */
 export function saveState(file, state) {
+  pruneSeen(state)
   mkdirSync(path.dirname(file), { recursive: true })
   const temporary = `${file}.${process.pid}.tmp`
   writeFileSync(temporary, `${JSON.stringify(state, null, 2)}\n`)
@@ -29,9 +43,10 @@ export function saveState(file, state) {
 export function changeOf(state, externalId, hash) {
   const before = state.seen[externalId]
   if (before === undefined) return 'new'
-  return before === hash ? 'unchanged' : 'updated'
+  const seenHash = typeof before === 'string' ? before : before?.hash
+  return seenHash === hash ? 'unchanged' : 'updated'
 }
 
-export const markSeen = (state, externalId, hash) => {
-  state.seen[externalId] = hash
+export const markSeen = (state, externalId, hash, now = new Date()) => {
+  state.seen[externalId] = { hash, at: now.toISOString() }
 }

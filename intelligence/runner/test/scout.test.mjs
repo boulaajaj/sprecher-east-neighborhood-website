@@ -25,6 +25,9 @@ describe('scout evals', () => {
       const override = c.given?.sources?.find((s) => s.id === c.input.sourceId) ?? {}
       const source = { ...registered, ...override }
       const polled = source.result === 'valid' && Number.isInteger(source.pilotRank)
+      // A source that isn't valid with a rank never reaches the fetch, by pilotSources
+      const pilots = pilotSources({ sources: [source] })
+      assert.equal(pilots.length, polled ? 1 : 0)
       const http = fakeHttp(c.input.responses)
       const result = polled
         ? await scoutSource(source, {
@@ -110,7 +113,10 @@ describe('scout', () => {
       state: seen,
       http: fakeHttp([{ status: 200, body }]),
     })
-    assert.equal(again.candidates.length, 0)
+    assert.deepEqual(
+      again.candidates.map((c) => c.change),
+      ['unchanged'],
+    )
     const changed = { sources: {}, seen: { [candidate.externalId]: 'f'.repeat(64) } }
     const updated = await scoutSource(source, {
       ...options,

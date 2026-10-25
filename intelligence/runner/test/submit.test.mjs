@@ -116,12 +116,8 @@ describe('submit evals', () => {
       }
       if (c.input.sourceUrl === null) built.candidate.sourceUrl = null
       const cms = cmsWith(given.run?.mcpAnswers)
-      const route =
-        c.expected.route === 'reportItem' && !c.expected.reportKind
-          ? 'reportItem'
-          : given.draft
-            ? 'submitSuggestion'
-            : 'reportItem'
+      // The route comes from pipeline.yaml, as in a run
+      const route = contract.pipeline.routes[built.curation.decision]
       const result = await submitItem(built, { cms, runId, validate, route })
       if (c.expected.reportKind) {
         const report = cms.writes.find((w) => w.tool === 'reportItem')
