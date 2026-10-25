@@ -1,0 +1,179 @@
+import { fetchDirect } from './fetchSource.mjs'
+import { parserFor } from './parsers.mjs'
+import { changeOf } from './state.mjs'
+import { contentHash, matchKey } from './text.mjs'
+import { addDays, dateIn, isoNow } from './time.mjs'
+
+// Scout (scout.md): fetch each pilot source, parse it, and build candidates with a stable
+// externalId, a contentHash and the change since earlier runs. Code only, no model.
+
+/**
+ * Places in or next to the area, from coverage.md, for the sources whose treatment says to match
+ * text on our side (Legistar). The model stages still decide; this only keeps routine citywide
+ * meetings and legislation from using the run's model budget. Keep it in step with coverage.md.
+ */
+export const AREA_TERMS = [
+  'sprecher',
+  'door creek',
+  'cottage grove road',
+  'cottage grove rd',
+  'district 16',
+  'pinney',
+  'elvehjem',
+  'blooming grove',
+  'reston heights',
+  'owl creek',
+]
+const namesArea = (text) => AREA_TERMS.some((term) => text.toLowerCase().includes(term))
+
+/** The per-source rules from sources.yaml `treatment` that code can apply. */
+export function keepItem(source, item) {
+  const text = `${item.title} ${item.sourceText} ${item.locationText ?? ''}`
+  if (source.id === 'legistar-events') {
+    return /common council/i.test(item.title) || /public hearing/i.test(text) || namesArea(text)
+  }
+  if (source.id === 'legistar-matters') return namesArea(text)
+  return true
+}
+
+/** The source's URL with `{from}`, `{to}` and `{cursor}` filled in (scout.md step 1). */
+export function sourceUrl(source, { today, cursor }) {
+  const template = source.feedUrl ?? source.canonicalUrl
+  return template
+    .replaceAll('{from}', today)
+    .replaceAll('{to}', addDays(today, 14))
+    .replaceAll('{cursor}', cursor ?? `${addDays(today, -7)}T00:00:00`)
+}
+
+/** The newest modification time among the items: the next cursor for a cursor source. */
+const newestModified = (items) =>
+  items
+    .map((i) => i.modified)
+    .filter((m) => typeof m === 'string' && /^\d{4}-/.test(m))
+    .sort()
+    .at(-1) ?? null
+
+/**
+ * Scouts one source. Answers its run-log entry (`check`), its candidates, the candidates that
+ * failed the schema, and the fetch state to save once its items are all handled.
+ */
+export async function scoutSource(
+  source,
+  { state, http, robots, budgets, validate, now = new Date() },
+) {
+  const check = {
+    sourceId: source.id,
+    fetchStrategy: 'none',
+    cursor: null,
+    status: 'skipped',
+    error: null,
+  }
+  const saved = state.sources[source.id] ?? {}
+  if (source.cadence === 'none') return { check, candidates: [], invalid: [] }
+  const today = dateIn(now)
+  const url = sourceUrl(source, { today, cursor: saved.cursor })
+  check.fetchStrategy = 'direct'
+  const answer = await fetchDirect(url, {
+    http,
+    robots,
+    etag: saved.etag,
+    lastModified: saved.lastModified,
+  })
+  check.status = answer.status
+  check.error = answer.error ? String(answer.error).slice(0, 500) : null
+  check.cursor = saved.cursor ?? null
+  if (answer.status !== 'ok') return { check, candidates: [], invalid: [] }
+  const parse = parserFor(source)
+  if (!parse) {
+    check.status = 'skipped'
+    check.error = `no parser for ${source.format} yet (#364)`
+    return { check, candidates: [], invalid: [] }
+  }
+
+  let items
+  try {
+    items = parse(answer.body, { from: today })
+  } catch (error) {
+    check.status = 'error'
+    check.error = `parse failed: ${error.message}`.slice(0, 500)
+    return { check, candidates: [], invalid: [] }
+  }
+  const nextCursor = source.feedUrl?.includes('{cursor}') ? newestModified(items) : null
+  if (nextCursor) check.cursor = nextCursor
+  const retrievedAt = isoNow(now)
+  const candidates = []
+  const invalid = []
+  // Soonest first, so the per-source cap keeps the nearest events; undated items keep feed order
+  const ordered = items
+    .map((item, index) => ({ item, index }))
+    .sort(
+      (a, b) =>
+        (a.item.startsAt ?? '\uffff').localeCompare(b.item.startsAt ?? '\uffff') ||
+        a.index - b.index,
+    )
+    .map(({ item }) => item)
+  for (const item of ordered.slice(0, budgets.maxItemsPerSource)) {
+    if (!keepItem(source, item)) continue
+    const fields = {
+      title: item.title,
+      sourceText: item.sourceText,
+      startsAt: item.startsAt,
+      endsAt: item.endsAt,
+      allDay: item.allDay,
+      locationText: item.locationText,
+      sourceStatus: item.sourceStatus,
+    }
+    const hash = contentHash(fields)
+    const externalId = `${source.id}:${item.ownId}`.slice(0, 200)
+    const candidate = {
+      sourceId: source.id,
+      sourceName: source.name,
+      sourceUrl: item.url ?? source.canonicalUrl,
+      externalId,
+      contentHash: hash,
+      retrievedAt,
+      kind: item.kind,
+      ...fields,
+      change: changeOf(state, externalId, hash),
+    }
+    if (candidate.change === 'unchanged') continue
+    const errors = validate(candidate)
+    if (errors.length > 0) invalid.push({ candidate, errors })
+    else candidates.push(candidate)
+  }
+  const fetchState = {
+    etag: answer.etag,
+    lastModified: answer.lastModified,
+    cursor: nextCursor ?? saved.cursor ?? null,
+  }
+  return { check, candidates, invalid, fetchState }
+}
+
+/**
+ * Same item from two pilot sources (scout.md step 6): one candidate from the higher-ranked
+ * source, the others listed in `alsoReportedBy`. `bySource` is in rank order.
+ */
+export function mergeAcrossSources(bySource) {
+  const kept = new Map()
+  const out = []
+  for (const candidates of bySource) {
+    for (const candidate of candidates) {
+      const key = candidate.startsAt ? matchKey(candidate) : null
+      const first = key ? kept.get(key) : undefined
+      if (first && first.sourceId !== candidate.sourceId) {
+        first.alsoReportedBy = [
+          ...(first.alsoReportedBy ?? []),
+          {
+            sourceId: candidate.sourceId,
+            sourceUrl: candidate.sourceUrl,
+            externalId: candidate.externalId,
+          },
+        ].slice(0, 5)
+        continue
+      }
+      if (key) kept.set(key, candidate)
+      out.push(candidate)
+    }
+  }
+  return out
+}

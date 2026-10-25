@@ -103,23 +103,23 @@ src/
 
 ## Key Files
 
-| File                                | Purpose                                                 |
-| ----------------------------------- | ------------------------------------------------------- |
-| `src/payload.config.ts`             | Payload CMS config (SQLite, collections, plugins)       |
-| `src/app/(frontend)/globals.css`    | Tailwind v4 `@theme` block — all design tokens          |
-| `src/modules/site/cms/pages.ts`     | Pages collection with layout builder blocks             |
-| `src/modules/news/cms/posts.ts`     | News posts collection                                   |
-| `src/modules/events/cms/events.ts`  | Events collection (custom)                              |
-| `src/modules/accounts/cms/users.ts` | Users collection with Payload native auth               |
-| `src/modules/verification/cms/`     | Email confirmations collection and confirmation service |
-| `src/platform/payload/media.ts`     | Media uploads with size variants                        |
-| `src/modules/site/cms/`             | Block, hero and link field configs, globals             |
-| `src/modules/site/ui/`              | Blocks, heroes, header and footer components            |
-| `src/platform/payload/roles.ts`     | Role checks and access functions                        |
-| `src/platform/theme/`               | Light and dark mode providers and init script           |
-| `ecosystem.config.cjs`              | PM2 config for VPS (CommonJS: package is ESM)           |
-| `eslint.boundaries.config.mjs`      | Dependency rules as lint errors (#137)                  |
-| `intelligence/`                     | Intelligence agents: sources, prompts, schemas (#337)   |
+| File                                | Purpose                                                                                                             |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `src/payload.config.ts`             | Payload CMS config (SQLite, collections, plugins)                                                                   |
+| `src/app/(frontend)/globals.css`    | Tailwind v4 `@theme` block — all design tokens                                                                      |
+| `src/modules/site/cms/pages.ts`     | Pages collection with layout builder blocks                                                                         |
+| `src/modules/news/cms/posts.ts`     | News posts collection                                                                                               |
+| `src/modules/events/cms/events.ts`  | Events collection (custom)                                                                                          |
+| `src/modules/accounts/cms/users.ts` | Users collection with Payload native auth                                                                           |
+| `src/modules/verification/cms/`     | Email confirmations collection and confirmation service                                                             |
+| `src/platform/payload/media.ts`     | Media uploads with size variants                                                                                    |
+| `src/modules/site/cms/`             | Block, hero and link field configs, globals                                                                         |
+| `src/modules/site/ui/`              | Blocks, heroes, header and footer components                                                                        |
+| `src/platform/payload/roles.ts`     | Role checks and access functions                                                                                    |
+| `src/platform/theme/`               | Light and dark mode providers and init script                                                                       |
+| `ecosystem.config.cjs`              | PM2 config for VPS (CommonJS: package is ESM)                                                                       |
+| `eslint.boundaries.config.mjs`      | Dependency rules as lint errors (#137)                                                                              |
+| `intelligence/`                     | Intelligence agents: sources, prompts, schemas (#337), and the runner that runs them (`intelligence/runner/`, #364) |
 
 ## Design Tokens
 
