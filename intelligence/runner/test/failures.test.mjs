@@ -3,41 +3,14 @@ import { describe, it } from 'node:test'
 
 import { dryRunCms } from '../lib/cms.mjs'
 import { fetchDirect } from '../lib/fetchSource.mjs'
-import { AdapterError, childEnv, fakeAdapter, openclawAdapter } from '../lib/model.mjs'
+import { AdapterError, childEnv, openclawAdapter } from '../lib/model.mjs'
 import { runPipeline } from '../lib/pipeline.mjs'
 import { scoutSource } from '../lib/scout.mjs'
-import { curation, draft, FEEDS, feedsHttp, verification } from './fixtures.mjs'
+import { accepting, FEEDS, feedsHttp } from './fixtures.mjs'
 import { atNoon, budgets, contract } from './helpers.mjs'
 
 // What happens when things go wrong: the CMS or the model is down mid-run, a follow-up report
 // fails, a feed has more items than the cap, a redirect leads somewhere it shouldn't.
-
-const accepting = fakeAdapter(({ stageId, item }) => {
-  if (stageId === 'verify') return verification()
-  if (stageId === 'curate')
-    return /Silent Book Club|Sprecher Road/.test(item.candidate.title)
-      ? curation()
-      : curation({ decision: 'reject' })
-  return item.candidate.kind === 'legislation'
-    ? draft({
-        collection: 'posts',
-        title: 'Sidewalks for Sprecher Road',
-        startsAt: null,
-        endsAt: null,
-        allDay: null,
-        venue: null,
-        address: null,
-      })
-    : draft({
-        imageCandidates: [
-          {
-            imageUrl: 'https://www.madisonpubliclibrary.org/i.jpg',
-            pageUrl: 'https://www.madisonpubliclibrary.org/events/1',
-            credit: 'MPL',
-          },
-        ],
-      })
-})
 
 const run = async (cms, { ask = accepting, state = { sources: {}, seen: {} } } = {}) => {
   cms.taxonomy ??= async () => [{ slug: 'community', title: 'Community', parent: null }]

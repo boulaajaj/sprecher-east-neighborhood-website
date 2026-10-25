@@ -10,7 +10,15 @@ const EMPTY = { version: 1, sources: {}, seen: {} }
 export function loadState(file) {
   try {
     const parsed = JSON.parse(readFileSync(file, 'utf8'))
-    return { ...EMPTY, ...parsed, sources: parsed.sources ?? {}, seen: parsed.seen ?? {} }
+    // Entries from before dates were kept start their 180 days now
+    const now = new Date().toISOString()
+    const seen = Object.fromEntries(
+      Object.entries(parsed.seen ?? {}).map(([id, entry]) => [
+        id,
+        typeof entry === 'string' ? { hash: entry, at: now } : entry,
+      ]),
+    )
+    return { ...EMPTY, ...parsed, sources: parsed.sources ?? {}, seen }
   } catch (error) {
     if (error.code === 'ENOENT') return structuredClone(EMPTY)
     throw new Error(`State file ${file} is unreadable: ${error.message}`)

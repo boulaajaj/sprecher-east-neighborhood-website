@@ -65,8 +65,12 @@ export async function processRun({
         markSeen(state, candidate.externalId, candidate.contentHash)
       } catch (error) {
         addError(`${candidate.externalId}: ${error.message}`)
-        counts.deferred++
-        deferredSources.add(source.id)
+        if (error.invalid) {
+          markSeen(state, candidate.externalId, candidate.contentHash)
+        } else {
+          counts.deferred++
+          deferredSources.add(source.id)
+        }
       }
     }
     scouted.push({ source, ...result })
@@ -136,15 +140,22 @@ export async function processRun({
           counts.needsReview++
         } catch (reportError) {
           addError(`${candidate.externalId}: ${reportError.message}`)
-          defer()
-          if (++failuresInARow >= MAX_FAILURES_IN_A_ROW) stopped = 'partial'
-          continue
+          if (!reportError.invalid) {
+            defer()
+            stopped ??= stopAfter(++failuresInARow, deadline)
+            continue
+          }
+          counts.rejected++
         }
+      } else if (error.invalid) {
+        // A report that can't pass its schema even without the model's parts: logged, handled
+        addError(`${candidate.externalId}: ${error.message}`)
+        counts.rejected++
       } else {
-        // The model or the CMS is down: keep the item for the next run, and stop after a few
+        // The model or the CMS is down, or time ran out: keep the item for the next run
         addError(`${candidate.externalId}: ${error.message}`)
         defer()
-        if (++failuresInARow >= MAX_FAILURES_IN_A_ROW) stopped = 'partial'
+        stopped ??= stopAfter(++failuresInARow, deadline)
         continue
       }
     }
@@ -158,6 +169,12 @@ export async function processRun({
     if (s.fetchState && !deferredSources.has(s.source.id)) state.sources[s.source.id] = s.fetchState
   }
   return stopped
+}
+
+/** After a failure: out of time is a budget stop; three failures in a row stop the run. */
+function stopAfter(failuresInARow, deadline) {
+  if (Date.now() > deadline - 60_000) return 'stopped-budget'
+  return failuresInARow >= MAX_FAILURES_IN_A_ROW ? 'partial' : null
 }
 
 function addUsage(cost, ...usages) {

@@ -112,6 +112,9 @@ export async function fetchDirect(url, { http = fetch, etag, lastModified, robot
       const next = new URL(location, current).toString()
       if (GATE_URL.test(next))
         return { status: 'blocked', retries, error: `redirect to a gate: ${next}` }
+      if (current.startsWith('https:') && !next.startsWith('https:')) {
+        return { status: 'error', retries, error: `redirect from https to ${next}` }
+      }
       current = next
       hop++
       continue

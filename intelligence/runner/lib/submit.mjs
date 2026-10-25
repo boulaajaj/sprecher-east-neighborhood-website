@@ -115,7 +115,11 @@ export async function sendReport(item, { cms, runId, validate, calls }, kind, op
   const { call, errors } = buildReport(item, runId, kind, options, validate)
   calls.push(call)
   if (errors.length > 0) {
-    throw new Error(`the ${kind} report failed its schema: ${errors.slice(0, 2).join('; ')}`)
+    // Marked, so the caller logs it and moves on: retrying tomorrow would fail the same way
+    throw Object.assign(
+      new Error(`the ${kind} report failed its schema: ${errors.slice(0, 2).join('; ')}`),
+      { invalid: true },
+    )
   }
   await send(() => cms.reportItem(call.arguments))
 }

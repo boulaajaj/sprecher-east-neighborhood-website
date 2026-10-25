@@ -112,14 +112,14 @@ export async function scoutSource(
           a.index - b.index,
     )
     .map(({ item }) => item)
-  const kept = ordered.slice(0, budgets.maxItemsPerSource)
-  const overCap = ordered.length - kept.length
-  const nextCursor = cursorSource ? newestModified(kept) : null
-  if (nextCursor) check.cursor = nextCursor
+  // The cap counts new and changed items only: unchanged ones cost nothing downstream
   const retrievedAt = isoNow(now)
   const candidates = []
   const invalid = []
-  for (const item of kept) {
+  const included = []
+  let changedKept = 0
+  let overCap = 0
+  for (const item of ordered) {
     const fields = {
       title: item.title,
       sourceText: item.sourceText,
@@ -131,6 +131,15 @@ export async function scoutSource(
     }
     const hash = contentHash(fields)
     const externalId = `${source.id}:${item.ownId}`.slice(0, 200)
+    const change = changeOf(state, externalId, hash)
+    if (change !== 'unchanged' && changedKept >= budgets.maxItemsPerSource) {
+      overCap++
+      // A cursor source stops here, so its cursor never passes an item it didn't take
+      if (cursorSource) break
+      continue
+    }
+    if (change !== 'unchanged') changedKept++
+    included.push(item)
     const candidate = {
       sourceId: source.id,
       sourceName: source.name,
@@ -140,14 +149,16 @@ export async function scoutSource(
       retrievedAt,
       kind: item.kind,
       ...fields,
-      change: changeOf(state, externalId, hash),
+      change,
     }
     // Unchanged items are dropped after the cross-source merge, so a lower-ranked copy of an
     // item already handled can't come through as new (mergeAcrossSources)
-    const errors = candidate.change === 'unchanged' ? [] : validate(candidate)
+    const errors = change === 'unchanged' ? [] : validate(candidate)
     if (errors.length > 0) invalid.push({ candidate, errors })
     else candidates.push(candidate)
   }
+  const nextCursor = cursorSource ? newestModified(included) : null
+  if (nextCursor) check.cursor = nextCursor
   const deferred = cursorSource ? 0 : overCap
   const fetchState = {
     etag: answer.etag,

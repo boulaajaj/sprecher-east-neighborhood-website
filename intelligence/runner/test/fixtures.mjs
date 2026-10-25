@@ -1,3 +1,5 @@
+import { fakeAdapter } from '../lib/model.mjs'
+
 // Stage answers that validate against their schemas, for a fake model, and the four pilot
 // sources' feeds as the sites publish them (synthetic content, real shapes).
 
@@ -141,3 +143,31 @@ export function feedsHttp(feeds = FEEDS, { etag = '"v1"' } = {}) {
   }
   return Object.assign(http, { requested })
 }
+
+/** A model that accepts the library event and the Sprecher Road item, with an image candidate. */
+export const accepting = fakeAdapter(({ stageId, item }) => {
+  if (stageId === 'verify') return verification()
+  if (stageId === 'curate')
+    return /Silent Book Club|Sprecher Road/.test(item.candidate.title)
+      ? curation()
+      : curation({ decision: 'reject' })
+  return item.candidate.kind === 'legislation'
+    ? draft({
+        collection: 'posts',
+        title: 'Sidewalks for Sprecher Road',
+        startsAt: null,
+        endsAt: null,
+        allDay: null,
+        venue: null,
+        address: null,
+      })
+    : draft({
+        imageCandidates: [
+          {
+            imageUrl: 'https://www.madisonpubliclibrary.org/i.jpg',
+            pageUrl: 'https://www.madisonpubliclibrary.org/events/1',
+            credit: 'MPL',
+          },
+        ],
+      })
+})
