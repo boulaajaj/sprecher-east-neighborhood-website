@@ -45,7 +45,7 @@ async function linkEventsToCategories({ db }: Pick<MigrateUpArgs, 'db'>): Promis
   }
 }
 
-export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
+export async function up({ db }: MigrateUpArgs): Promise<void> {
   await db.run(sql`CREATE TABLE \`events_rels\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
   	\`order\` integer,
@@ -83,53 +83,46 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.run(sql`ALTER TABLE \`media\` ADD \`credit\` text;`)
   await db.run(sql`ALTER TABLE \`media\` ADD \`license\` text;`)
   await db.run(sql`ALTER TABLE \`media\` ADD \`source_url\` text;`)
+  // `down` keeps this column (see there), so a second `up` finds it already in place
+  const categoryColumns = (await db.all(
+    sql`SELECT name FROM pragma_table_info('categories')`,
+  )) as Row[]
+  if (!categoryColumns.some(({ name }) => name === 'default_image_id')) {
+    await db.run(
+      sql`ALTER TABLE \`categories\` ADD \`default_image_id\` integer REFERENCES media(id);`,
+    )
+  }
   await db.run(
-    sql`ALTER TABLE \`categories\` ADD \`default_image_id\` integer REFERENCES media(id);`,
-  )
-  await db.run(
-    sql`CREATE INDEX \`categories_default_image_idx\` ON \`categories\` (\`default_image_id\`);`,
+    sql`CREATE INDEX IF NOT EXISTS \`categories_default_image_idx\` ON \`categories\` (\`default_image_id\`);`,
   )
   await linkEventsToCategories({ db })
   await db.run(sql`ALTER TABLE \`events\` DROP COLUMN \`category\`;`)
   await db.run(sql`ALTER TABLE \`_events_v\` DROP COLUMN \`version_category\`;`)
 }
 
-export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
-  // Put back each event's first category slug that is one of the old values, before the links go
+export async function down({ db }: MigrateDownArgs): Promise<void> {
+  // Put back each event's first linked category that is one of the old values (none: null),
+  // before the links go. No table is rebuilt, so this is safe with foreign keys enforced in a
+  // transaction: a rebuild of `categories` there would cascade-delete every post's links.
+  const legacy = sql.join(
+    Object.keys(LEGACY_EVENT_CATEGORIES).map((slug) => sql`${slug}`),
+    sql`, `,
+  )
   await db.run(sql`ALTER TABLE \`events\` ADD \`category\` text DEFAULT 'community';`)
   await db.run(sql`ALTER TABLE \`_events_v\` ADD \`version_category\` text DEFAULT 'community';`)
-  for (const slug of Object.keys(LEGACY_EVENT_CATEGORIES)) {
-    await db.run(sql`UPDATE events SET category = ${slug} WHERE id IN (
-      SELECT r.parent_id FROM events_rels r JOIN categories c ON c.id = r.categories_id
-      WHERE r.path = 'categories' AND c.slug = ${slug})`)
-    await db.run(sql`UPDATE _events_v SET version_category = ${slug} WHERE id IN (
-      SELECT r.parent_id FROM _events_v_rels r JOIN categories c ON c.id = r.categories_id
-      WHERE r.path = 'version.categories' AND c.slug = ${slug})`)
-  }
+  await db.run(sql`UPDATE events SET category = (
+    SELECT c.slug FROM events_rels r JOIN categories c ON c.id = r.categories_id
+    WHERE r.parent_id = events.id AND r.path = 'categories' AND c.slug IN (${legacy})
+    ORDER BY r."order", r.id LIMIT 1)`)
+  await db.run(sql`UPDATE _events_v SET version_category = (
+    SELECT c.slug FROM _events_v_rels r JOIN categories c ON c.id = r.categories_id
+    WHERE r.parent_id = _events_v.id AND r.path = 'version.categories' AND c.slug IN (${legacy})
+    ORDER BY r."order", r.id LIMIT 1)`)
   await db.run(sql`DROP TABLE \`events_rels\`;`)
   await db.run(sql`DROP TABLE \`_events_v_rels\`;`)
-  await db.run(sql`PRAGMA foreign_keys=OFF;`)
-  await db.run(sql`CREATE TABLE \`__new_categories\` (
-  	\`id\` integer PRIMARY KEY NOT NULL,
-  	\`title\` text NOT NULL,
-  	\`generate_slug\` integer DEFAULT true,
-  	\`slug\` text NOT NULL,
-  	\`parent_id\` integer,
-  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
-  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
-  	FOREIGN KEY (\`parent_id\`) REFERENCES \`categories\`(\`id\`) ON UPDATE no action ON DELETE set null
-  );
-  `)
-  await db.run(
-    sql`INSERT INTO \`__new_categories\`("id", "title", "generate_slug", "slug", "parent_id", "updated_at", "created_at") SELECT "id", "title", "generate_slug", "slug", "parent_id", "updated_at", "created_at" FROM \`categories\`;`,
-  )
-  await db.run(sql`DROP TABLE \`categories\`;`)
-  await db.run(sql`ALTER TABLE \`__new_categories\` RENAME TO \`categories\`;`)
-  await db.run(sql`PRAGMA foreign_keys=ON;`)
-  await db.run(sql`CREATE UNIQUE INDEX \`categories_slug_idx\` ON \`categories\` (\`slug\`);`)
-  await db.run(sql`CREATE INDEX \`categories_parent_idx\` ON \`categories\` (\`parent_id\`);`)
-  await db.run(sql`CREATE INDEX \`categories_updated_at_idx\` ON \`categories\` (\`updated_at\`);`)
-  await db.run(sql`CREATE INDEX \`categories_created_at_idx\` ON \`categories\` (\`created_at\`);`)
+  // `categories.default_image_id` stays, emptied: SQLite can't drop a column that has a foreign
+  // key, and rebuilding the table would cascade-delete the links to it. The old schema ignores it.
+  await db.run(sql`UPDATE categories SET default_image_id = NULL`)
   await db.run(sql`ALTER TABLE \`media\` DROP COLUMN \`credit\`;`)
   await db.run(sql`ALTER TABLE \`media\` DROP COLUMN \`license\`;`)
   await db.run(sql`ALTER TABLE \`media\` DROP COLUMN \`source_url\`;`)

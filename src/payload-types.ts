@@ -478,7 +478,7 @@ export interface Category {
   generateSlug?: boolean | null
   slug: string
   /**
-   * Shown on agent suggestions in this category until an editor picks another image. A subcategory without one uses its parent’s. Use a photo we own or may use.
+   * Shown on agent suggestions in this category until an editor picks another image. Use a photo we own or may use, with its credit filled in.
    */
   defaultImage?: (number | null) | Media
   parent?: (number | null) | Category

@@ -70,6 +70,7 @@ export const Media: CollectionConfig = {
       name: 'sourceUrl',
       type: 'text',
       label: 'Source link',
+      maxLength: 2048,
       validate: (value: unknown) =>
         value === null ||
         value === undefined ||

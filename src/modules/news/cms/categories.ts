@@ -30,7 +30,7 @@ export const Categories: CollectionConfig = {
       admin: {
         description:
           'Shown on agent suggestions in this category until an editor picks another image. ' +
-          'A subcategory without one uses its parent’s. Use a photo we own or may use.',
+          'Use a photo we own or may use, with its credit filled in.',
       },
     },
   ],

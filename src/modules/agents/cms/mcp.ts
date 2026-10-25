@@ -70,7 +70,8 @@ export const mcpOptions: MCPPluginConfig = {
     },
     categories: {
       enabled: { find: true },
-      description: 'Post categories, to file a suggested post under.',
+      description:
+        'Categories shared by events and posts (parent = the broader category), to file a suggestion under.',
       overrideResponse: answerFor('categories'),
     },
     [AGENT_RUNS]: {
