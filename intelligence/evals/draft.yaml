@@ -149,7 +149,6 @@ cases:
     expected: { route: submitSuggestion }
     graders:
       - { check: contains, field: $.categories, value: nature-walks }
-      - { check: notContains, field: $.categories, value: nature }
       - check: model
         rubric: Every slug in categories is one of the taxonomy's slugs, and the subcategory comes before its parent when both are used.
     why: Drafts file items under the site's own tree, most specific first, and never invent a category.

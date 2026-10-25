@@ -46,8 +46,9 @@ README.md describes the contract.
    (`kind: needs-review`, `targetCollection` and `targetId` = the new document) listing what's
    missing. When `$.draft.imageCandidates` is not empty, follow it with one more `reportItem`
    (`kind: needs-review`, the same target, flag `image-candidate`): one `evidence` entry per
-   image, its `url` the `pageUrl` and its `says` the `imageUrl` and the credit, and a summary
-   asking the editor to get permission or keep the category's image. The image is never
+   image, its `url` the `pageUrl`, its `says` the `imageUrl`, " — credit: " and the credit, and
+   its `retrievedAt` from `$.candidate.retrievedAt`, and a summary asking the editor to get
+   permission or keep the category's image. The image is never
    downloaded or uploaded.
 5. Stop at `maxDraftsPerRun` suggestions (`pipeline.yaml`). The rest are deferred: counted in
    the run log, not marked as seen, and picked up by the next run.

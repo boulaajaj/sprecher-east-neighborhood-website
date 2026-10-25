@@ -61,9 +61,10 @@ export default async function EventPage({ params: paramsPromise }: Args) {
       <PayloadRedirects disableNotFound url={url} />
 
       {draft && <LivePreviewListener />}
-      {draft && <EventCardPreview event={event} />}
 
       <EventHero event={event} />
+
+      {draft && <EventCardPreview event={event} />}
 
       <div className={hasHeroImage ? 'pt-8' : 'pt-4'}>
         <div className="container">

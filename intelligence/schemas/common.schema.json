@@ -46,9 +46,9 @@
     },
     "collection": { "enum": ["events", "posts"] },
     "categorySlug": {
-      "description": "A category's slug in the CMS category tree that events and posts share (#362).",
+      "description": "A category's slug in the CMS category tree that events and posts share (#362), as Payload's slug field makes it (lowercase letters, digits, - and _; \"Sports & Recreation\" becomes sports--recreation).",
       "type": "string",
-      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "pattern": "^[a-z0-9_-]+$",
       "maxLength": 100
     },
     "taxonomy": {

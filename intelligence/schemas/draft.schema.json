@@ -115,7 +115,10 @@
         "required": ["imageUrl", "pageUrl", "credit"],
         "properties": {
           "imageUrl": {
-            "$ref": "common.schema.json#/$defs/httpUrl"
+            "description": "At most 280 characters, so the link and the credit fit one report evidence line (500).",
+            "type": "string",
+            "pattern": "^https?://[^\\s]+$",
+            "maxLength": 280
           },
           "pageUrl": {
             "$ref": "common.schema.json#/$defs/httpUrl"

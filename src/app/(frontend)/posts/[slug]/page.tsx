@@ -68,9 +68,10 @@ export default async function Post({ params: paramsPromise }: Args) {
       <PayloadRedirects disableNotFound url={url} />
 
       {draft && <LivePreviewListener />}
-      {draft && <PostCardPreview post={post} />}
 
       <PostHero post={post} />
+
+      {draft && <PostCardPreview post={post} />}
 
       <div className="pt-8">
         <div className="container">

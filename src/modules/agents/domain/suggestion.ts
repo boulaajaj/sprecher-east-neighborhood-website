@@ -31,8 +31,11 @@ export const EXTERNAL_ID = /^[a-z0-9-]+:.+$/
 export const CONTENT_HASH = /^[a-f0-9]{64}$/
 /** A date-time with seconds optional and a zone (`Z` or an offset). */
 export const DATE_TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$/
-/** `common.schema.json#/$defs/categorySlug`: a category's slug in the shared tree (#362). */
-export const CATEGORY_SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/
+/**
+ * `common.schema.json#/$defs/categorySlug`: a category's slug in the shared tree (#362), as
+ * Payload's slug field makes it ("Sports & Recreation" becomes `sports--recreation`).
+ */
+export const CATEGORY_SLUG = /^[a-z0-9_-]+$/
 /** An absolute http(s) link with no spaces. */
 export const HTTP_URL = /^https?:\/\/[^\s]+$/
 
@@ -133,7 +136,7 @@ export type CategoryNode = {
 }
 
 /** How far up the tree the rule looks; deeper trees, or a loop, stop here. */
-const MAX_CATEGORY_DEPTH = 5
+export const MAX_CATEGORY_DEPTH = 5
 
 /**
  * The image a suggestion gets (#363): the first chosen category's default image, or the nearest

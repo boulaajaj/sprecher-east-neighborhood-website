@@ -45,7 +45,8 @@ One item with `$.candidate`, `$.taxonomy` (the site's category tree), `$.verific
    `$.missing` ("no matching category").
 7. List `$.imageCandidates`: at most two images shown on the source's own pages (the page in
    `$.candidate` or an official link), each with `imageUrl`, the `pageUrl` it appears on, and the
-   `credit` exactly as the source states it ("not stated" when it doesn't). Only images the source
+   `credit` exactly as the source states it ("not stated" when it doesn't). Leave out an image
+   whose link is longer than 280 characters. Only images the source
    itself publishes about this item: no logos, ads, stock banners or images from other sites. They
    are links for the editor to ask about; the site never copies them. Leave it empty when there
    are none.

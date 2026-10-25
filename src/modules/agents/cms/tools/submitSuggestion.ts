@@ -11,6 +11,7 @@ import { SITE_TIMEZONE } from '@/platform/lib/timezone'
 
 import {
   type CategoryNode,
+  MAX_CATEGORY_DEPTH,
   pickDefaultImage,
   toEventSchedule,
   toSuggestionSlug,
@@ -74,7 +75,7 @@ async function resolveCategories(req: PayloadRequest, slugs: readonly string[]) 
   }
   const byId = new Map<number, CategoryNode>(found.map((node) => [node.id, node]))
   // Load the parents, a level at a time, until every chain ends (the rule stops at its depth)
-  for (let level = 0; level < 5; level++) {
+  for (let level = 0; level < MAX_CATEGORY_DEPTH; level++) {
     const missing = [...byId.values()]
       .map((node) => node.parentId)
       .filter((id): id is number => id !== null && !byId.has(id))
@@ -82,7 +83,7 @@ async function resolveCategories(req: PayloadRequest, slugs: readonly string[]) 
     for (const node of await findCategoryNodes(req, { id: { in: missing } }))
       byId.set(node.id, node)
   }
-  const ids = slugs.map((slug) => bySlug.get(slug)!.id)
+  const ids = slugs.flatMap((slug) => bySlug.get(slug)?.id ?? [])
   return { ids, imageId: pickDefaultImage(ids, byId) }
 }
 
