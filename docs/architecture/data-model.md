@@ -90,13 +90,13 @@ Also present, added by Payload or its plugins rather than defined here: `payload
 
 ### categories
 
-| Field                  | Type                                        | Required  | Notes                                                          |
-| ---------------------- | ------------------------------------------- | --------- | -------------------------------------------------------------- |
-| `title`                | text                                        | Yes       |                                                                |
-| `generateSlug`, `slug` | checkbox, text                              | slug: Yes | `slugField()`. No drafts                                       |
-| `parent`               | → categories (one)                          | No        | Added by nested-docs plugin                                    |
-| `breadcrumbs`          | array of `doc` → categories, `url`, `label` | No        | Read-only; filled by nested-docs (URL = slugs joined with `/`) |
-| `defaultImage`         | upload → media                              | No        | The image agent suggestions in this category get (#362)        |
+| Field                  | Type                                        | Required  | Notes                                                                                       |
+| ---------------------- | ------------------------------------------- | --------- | ------------------------------------------------------------------------------------------- |
+| `title`                | text                                        | Yes       |                                                                                             |
+| `generateSlug`, `slug` | checkbox, text                              | slug: Yes | `slugField()`. No drafts                                                                    |
+| `parent`               | → categories (one)                          | No        | Added by nested-docs plugin                                                                 |
+| `breadcrumbs`          | array of `doc` → categories, `url`, `label` | No        | Read-only; filled by nested-docs (URL = slugs joined with `/`)                              |
+| `defaultImage`         | upload → media                              | No        | The image agent suggestions in this category get, or a subcategory without one (#362, #363) |
 
 ### media
 

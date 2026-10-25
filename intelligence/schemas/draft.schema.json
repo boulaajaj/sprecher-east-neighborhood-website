@@ -20,6 +20,22 @@
       "minLength": 1,
       "maxLength": 3000
     },
+    "summary": {
+      "description": "The card text residents see first: one or two plain sentences, no Markdown, no links. Stored as a post's meta description or an event's description.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "categories": {
+      "description": "One or two slugs from $.taxonomy, most specific first (a subcategory over its parent).",
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/categorySlug"
+      },
+      "minItems": 1,
+      "maxItems": 2,
+      "uniqueItems": true
+    },
     "startsAt": {
       "anyOf": [
         {
@@ -89,6 +105,33 @@
       "minItems": 1,
       "maxItems": 3
     },
+    "imageCandidates": {
+      "description": "Images on the source's own pages an editor could ask to use, with the credit the source gives. Links only: never uploaded, never stored on the draft (#363). Empty when the source shows none.",
+      "type": "array",
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["imageUrl", "pageUrl", "credit"],
+        "properties": {
+          "imageUrl": {
+            "description": "At most 280 characters, so the link and the credit fit one report evidence line (500).",
+            "type": "string",
+            "pattern": "^https?://[^\\s]+$",
+            "maxLength": 280
+          },
+          "pageUrl": {
+            "$ref": "common.schema.json#/$defs/httpUrl"
+          },
+          "credit": {
+            "description": "The credit as the source states it, or 'not stated'.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        }
+      }
+    },
     "confidence": {
       "enum": ["high", "medium", "low"]
     },
@@ -106,6 +149,8 @@
     "collection",
     "title",
     "bodyMarkdown",
+    "summary",
+    "categories",
     "startsAt",
     "endsAt",
     "allDay",
@@ -113,6 +158,7 @@
     "address",
     "audience",
     "officialLinks",
+    "imageCandidates",
     "confidence",
     "missing"
   ],

@@ -93,7 +93,10 @@ can run the same folder. Its own configuration, schedule and keys stay outside t
 1. Check out this repository's `main` (read-only) at the start of each run, and record its commit
    as `repoCommit` in the run log, so every suggestion can be traced to the exact prompts that made it.
 2. Read `pipeline.yaml`. If `enabled` is false, log a `disabled` run and stop.
-3. Load the schemas in `schemas/`, `sources.yaml` and `coverage.md`.
+3. Load the schemas in `schemas/`, `sources.yaml` and `coverage.md`, and read the category tree
+   with the MCP find tool (`categories`: slug, title, parent) into each item's `taxonomy`
+   (`common.schema.json#/$defs/taxonomy`), so the draft stage picks only existing categories
+   (#363).
 4. For each stage in order, give the model the stage's prompt, `coverage.md`, and the item as
    JSON; validate its answer against the stage's `output` schema. When verify's `confidence` is below
    `escalation.verifyBelowConfidence` (0.6), run verify once more at high effort. An answer that doesn't validate
@@ -122,9 +125,12 @@ the find tool and two custom tools from #336; it can't create, update, delete or
 documents directly.
 
 - **`submitSuggestion`** (`schemas/suggestion.schema.json`) for accepted items: the collection
-  (`events` or `posts`), title, `bodyMarkdown`, start, end, all-day, venue, address, audience,
-  provenance and run ID. The server converts the Markdown with Payload's own converter, forces an
-  unpublished draft with `moderationStatus: suggested`, refuses a duplicate, and answers
+  (`events` or `posts`), title, `bodyMarkdown`, the card `summary`, one or two `categories`
+  (slugs from the run's `taxonomy`), start, end, all-day, venue, address, audience, provenance and
+  run ID. The server converts the Markdown with Payload's own converter, stores the summary as the
+  card text, links the categories (an unknown slug is refused), gives the draft the first
+  category's default image (or its parent's), forces an unpublished draft with
+  `moderationStatus: suggested`, refuses a duplicate, and answers
   `{ id, status: created | duplicate }`.
 - **`reportItem`** (`schemas/report.schema.json`) for everything an editor must look at without
   a new draft: `needs-review` items, `update` and `cancel` of a known document (by

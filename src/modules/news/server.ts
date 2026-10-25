@@ -10,6 +10,7 @@ export { listPostPageNumbers } from './use-cases/listPostPageNumbers'
 export { listPostSlugs } from './use-cases/listPostSlugs'
 
 export { PostGrid } from './ui/PostGrid'
+export { PostCardPreview } from './ui/PostCardPreview'
 export { PostHero } from './ui/PostHero'
 export { postJsonLd } from './ui/postJsonLd'
 export { PostsFeed } from './ui/PostsFeed.client'

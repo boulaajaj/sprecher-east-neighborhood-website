@@ -15,6 +15,7 @@ import {
   findRecentPosts,
   getPostBySlug,
   listPostSlugs,
+  PostCardPreview,
   PostHero,
   postJsonLd,
   SidebarPosts,
@@ -69,6 +70,8 @@ export default async function Post({ params: paramsPromise }: Args) {
       {draft && <LivePreviewListener />}
 
       <PostHero post={post} />
+
+      {draft && <PostCardPreview post={post} />}
 
       <div className="pt-8">
         <div className="container">

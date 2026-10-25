@@ -44,6 +44,8 @@ export const PostCard: React.FC<{
         {image && (
           <div className="aspect-video overflow-hidden">
             <Media
+              className="h-full"
+              pictureClassName="h-full"
               resource={image}
               size="33vw"
               imgClassName="h-full w-full object-cover transition-transform duration-300 motion-safe:group-hover:scale-105"

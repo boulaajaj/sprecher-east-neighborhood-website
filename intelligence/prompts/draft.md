@@ -12,7 +12,8 @@ as review items from the submit stage.
 
 ## Input
 
-One item with `$.candidate`, `$.verification` and `$.curation`. Use only facts that are in
+One item with `$.candidate`, `$.taxonomy` (the site's category tree), `$.verification` and
+`$.curation`. Use only facts that are in
 `$.candidate`, confirmed in `$.verification`, or reasoned in `$.curation.whyItMatters` and
 `$.curation.residentAction`.
 
@@ -34,9 +35,24 @@ One item with `$.candidate`, `$.verification` and `$.curation`. Use only facts t
 4. Copy `$.curation.audiences` into `$.audience`. Put the official pages in `$.officialLinks` (at
    most three, primary sources first, a registration page when the source gives one) and link
    them in the body too.
-5. Set `$.confidence`: `high` when everything is confirmed, `medium` with minor gaps, `low`
+5. Write `$.summary`: the card text residents see first, one or two plain sentences under 160
+   characters, no Markdown and no links. Say what it is and why a neighbor would care, in everyday
+   words (no agency names or jargon a resident wouldn't use); the date and place are shown
+   separately on the card.
+6. Pick `$.categories`: one or two slugs from `$.taxonomy`, the most specific first (a
+   subcategory such as `nature-walks` over its parent `parks`). Use only slugs that are in
+   `$.taxonomy`, never a new one; if none fits, use the closest broader one and say so in
+   `$.missing` ("no matching category").
+7. List `$.imageCandidates`: at most two images shown on the source's own pages (the page in
+   `$.candidate` or an official link), each with `imageUrl`, the `pageUrl` it appears on, and the
+   `credit` exactly as the source states it ("not stated" when it doesn't). Leave out an image
+   whose link is longer than 280 characters. Only images the source
+   itself publishes about this item: no logos, ads, stock banners or images from other sites. They
+   are links for the editor to ask about; the site never copies them. Leave it empty when there
+   are none.
+8. Set `$.confidence`: `high` when everything is confirmed, `medium` with minor gaps, `low`
    otherwise.
-6. Never state an end time, duration, address or price the input doesn't give. List every
+9. Never state an end time, duration, address or price the input doesn't give. List every
    missing or unconfirmed fact in `$.missing`, in plain words ("start time not
    published", "address not confirmed"), from `$.verification.unknowns`. The submit stage sends
    these to the editor as a review note.

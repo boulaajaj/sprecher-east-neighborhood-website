@@ -1,14 +1,17 @@
 import type { Metadata } from 'next'
 
+import { draftMode } from 'next/headers'
 import { ArrowRight } from 'lucide-react'
 import React from 'react'
 
 import { Breadcrumbs } from '@/platform/ui/Breadcrumbs'
 import { JsonLd } from '@/platform/ui/JsonLd'
+import { LivePreviewListener } from '@/platform/ui/LivePreviewListener.client'
 import { PayloadRedirects } from '@/modules/site/server'
 import { RichText } from '@/platform/richtext/RichText'
 import { SidebarCTA } from '@/platform/ui/SidebarCTA'
 import {
+  EventCardPreview,
   EventHero,
   EventLocation,
   SidebarEvents,
@@ -40,6 +43,7 @@ type Args = {
 }
 
 export default async function EventPage({ params: paramsPromise }: Args) {
+  const { isEnabled: draft } = await draftMode()
   const { slug = '' } = await paramsPromise
   const decodedSlug = decodeURIComponent(slug)
   const url = '/events/' + decodedSlug
@@ -56,7 +60,11 @@ export default async function EventPage({ params: paramsPromise }: Args) {
       <JsonLd data={eventJsonLd(event)} />
       <PayloadRedirects disableNotFound url={url} />
 
+      {draft && <LivePreviewListener />}
+
       <EventHero event={event} />
+
+      {draft && <EventCardPreview event={event} />}
 
       <div className={hasHeroImage ? 'pt-8' : 'pt-4'}>
         <div className="container">

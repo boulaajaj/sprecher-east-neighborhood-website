@@ -478,7 +478,7 @@ export interface Category {
   generateSlug?: boolean | null
   slug: string
   /**
-   * Shown on agent suggestions in this category until an editor picks another image. Use a photo we own or may use, with its credit filled in.
+   * Shown on agent suggestions in this category until an editor picks another image. A subcategory without one uses its parent’s. Use a photo we own or may use, with its credit filled in.
    */
   defaultImage?: (number | null) | Media
   parent?: (number | null) | Category
@@ -1148,6 +1148,7 @@ export interface AgentReviewItem {
         | 'prompt-injection'
         | 'needs-date'
         | 'wrong-offset'
+        | 'image-candidate'
       )[]
     | null
   sourceUrl?: string | null
@@ -1312,7 +1313,7 @@ export interface PayloadMcpApiKey {
   }
   'payload-mcp-tool'?: {
     /**
-     * Suggest an event or a news post. It is stored as an unpublished draft for staff to review, never published. Answers {"status":"created","id"} or, when the same externalId or contentHash is already stored, {"status":"duplicate","id"}.
+     * Suggest an event or a news post, with its card summary and one or two category slugs from the categories find. It is stored as an unpublished draft for staff to review, never published, with the first category’s default image. Answers {"status":"created","id"} or, when the same externalId or contentHash is already stored, {"status":"duplicate","id"}.
      */
     submitSuggestion?: boolean | null
     /**

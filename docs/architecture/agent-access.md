@@ -31,14 +31,22 @@ values and the run fields match, so the two can't drift apart silently.
 
 ### `submitSuggestion`
 
-Arguments: `collection` (`events` | `posts`), `title`, `bodyMarkdown`, `startsAt`, `endsAt`,
+Arguments: `collection` (`events` | `posts`), `title`, `bodyMarkdown`, `summary` (1–160
+characters, the card text), `categories` (1–2 category slugs), `startsAt`, `endsAt`,
 `allDay`, `venue`, `address`, `sourceName`, `sourceUrl`, `externalId` (`<source id>:<id>`),
 `contentHash` (sha256, lowercase hex), `audience` (the `AUDIENCES` values, each once) and `runId`
 (the `runId` of one of its own runs). The Markdown becomes the collection's `content` through
 Payload's converter (`convertMarkdownToLexical`) with that field's own editor config. For an
 event, `startsAt` is required (a date-time with a zone); it gives `date` and, unless `allDay`,
 `timeStart` and `timeEnd` in the site timezone (`toEventSchedule`); `venue` and `address` give
-`locationName` and `locationAddress`. It runs as the agent (`overrideAccess: false`), and
+`locationName` and `locationAddress`. The summary becomes an event's `description` or a post's
+`meta.description`, the text cards show (#363). The slugs are looked up in the category tree events
+and posts share (#362); one that isn't there refuses the whole call, and the agent never creates
+a category. The draft gets the first category's `defaultImage`, or the nearest one up its parents,
+then the same for the second category (`pickDefaultImage`), as `heroImage` and, for a post,
+`meta.image`; with none, cards show the placeholder until an editor picks one. Images on the
+source's pages only reach the editor as links in a `reportItem` with the `image-candidate` flag;
+the agent never uploads media. It runs as the agent (`overrideAccess: false`), and
 `holdSuggestions` keeps it a draft. It answers `{"status":"created","id"}`, or
 `{"status":"duplicate","id"}` when an item with the same `externalId` or `contentHash` is stored.
 The run's counts are the agent's to keep in its run log; the tool doesn't change them.

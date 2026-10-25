@@ -8,6 +8,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "taxonomy": { "$ref": "item.schema.json#/properties/taxonomy" },
         "verification": {
           "type": "object",
           "additionalProperties": false,
@@ -44,6 +45,8 @@
             "collection": { "$ref": "draft.schema.json#/properties/collection" },
             "title": { "$ref": "draft.schema.json#/properties/title" },
             "bodyMarkdown": { "$ref": "draft.schema.json#/properties/bodyMarkdown" },
+            "summary": { "$ref": "draft.schema.json#/properties/summary" },
+            "categories": { "$ref": "draft.schema.json#/properties/categories" },
             "startsAt": { "$ref": "draft.schema.json#/properties/startsAt" },
             "endsAt": { "$ref": "draft.schema.json#/properties/endsAt" },
             "allDay": { "$ref": "draft.schema.json#/properties/allDay" },
@@ -51,6 +54,7 @@
             "address": { "$ref": "draft.schema.json#/properties/address" },
             "audience": { "$ref": "draft.schema.json#/properties/audience" },
             "officialLinks": { "$ref": "draft.schema.json#/properties/officialLinks" },
+            "imageCandidates": { "$ref": "draft.schema.json#/properties/imageCandidates" },
             "confidence": { "$ref": "draft.schema.json#/properties/confidence" },
             "missing": { "$ref": "draft.schema.json#/properties/missing" }
           }

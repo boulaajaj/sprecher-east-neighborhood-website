@@ -6,6 +6,7 @@ export { findUpcomingEvents } from './use-cases/findUpcomingEvents'
 export { getEventBySlug } from './use-cases/getEventBySlug'
 export { listEventSlugs } from './use-cases/listEventSlugs'
 
+export { EventCardPreview } from './ui/EventCardPreview'
 export { EventHero } from './ui/EventHero'
 export { eventJsonLd } from './ui/eventJsonLd'
 export { EventLocation } from './ui/EventLocation'

@@ -51,6 +51,8 @@ const SUGGESTION = {
   collection: 'events',
   title: 'Silent Book Club at Pinney Library',
   bodyMarkdown: 'Bring a book and read together.',
+  summary: 'A quiet hour of reading with neighbors. Free.',
+  categories: ['community'],
   startsAt: '2026-11-17T19:00:00-06:00',
   endsAt: null,
   allDay: false,
@@ -116,6 +118,16 @@ describe('submitSuggestion arguments', () => {
     ['an unknown audience', { ...SUGGESTION, audience: ['kids'] }],
     ['a day without a time', { ...SUGGESTION, startsAt: '2026-11-17' }],
     ['no title', { ...SUGGESTION, title: undefined }],
+    ['a long summary', { ...SUGGESTION, summary: long(160) }],
+    ['no summary', { ...SUGGESTION, summary: undefined }],
+    ['no category', { ...SUGGESTION, categories: [] }],
+    ['three categories', { ...SUGGESTION, categories: ['parks', 'social', 'community'] }],
+    ['a subcategory and its parent', { ...SUGGESTION, categories: ['nature-walks', 'parks'] }],
+    ['a repeated category', { ...SUGGESTION, categories: ['parks', 'parks'] }],
+    ['a category that isn’t a slug', { ...SUGGESTION, categories: ['Parks & Rec'] }],
+    ['a long category slug', { ...SUGGESTION, categories: [`p${'-a'.repeat(50)}`] }],
+    // What Payload's slug field makes of "Sports & Recreation" and "Kids_Club"
+    ['slugs Payload makes', { ...SUGGESTION, categories: ['sports--recreation', 'kids_club'] }],
   ]
 
   it('found the evals’ suggestions', () => {
@@ -146,10 +158,29 @@ describe('reportItem arguments', () => {
     ['an unknown flag', { ...REPORT, flags: ['urgent'] }],
     ['a repeated flag', { ...REPORT, flags: ['past', 'past'] }],
     ['an external id without a source', { ...REPORT, externalId: '29400' }],
+    [
+      // The submit stage's image-candidate report at the longest image link and credit (#363)
+      'the longest image-candidate report',
+      {
+        ...REPORT,
+        flags: ['image-candidate'],
+        evidence: [
+          {
+            ...evidence,
+            says: `https://e.com/${'x'.repeat(266)} — credit: ${'c'.repeat(200)}`,
+          },
+        ],
+      },
+    ],
   ]
 
   it.each(samples)('get the same verdict for %s', (_, sample) => {
     expect(reportItemInput.safeParse(sample).success).toBe(reportValid(sample))
+  })
+
+  it('fit the longest image candidate in one evidence line', () => {
+    const longest = samples.find(([name]) => name === 'the longest image-candidate report')
+    expect(longest && reportValid(longest[1])).toBe(true)
   })
 })
 
