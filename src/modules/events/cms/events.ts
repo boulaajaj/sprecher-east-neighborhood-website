@@ -15,6 +15,7 @@ import {
 } from '@payloadcms/plugin-seo/fields'
 
 import { suggestibleContentAccess } from '@/platform/payload/draftContentAccess'
+import { generatePreviewPath } from '@/platform/payload/generatePreviewPath'
 import { populatePublishedAt } from '@/platform/payload/populatePublishedAt'
 import {
   holdSuggestions,
@@ -46,6 +47,16 @@ export const Events: CollectionConfig<'events'> = {
   admin: {
     components: { beforeListTable: [SUGGESTIONS_FILTER] },
     defaultColumns: ['title', 'date', 'categories', '_status', 'moderationStatus', 'updatedAt'],
+    // The real event page from the draft, with its card on top, as for posts (#363)
+    livePreview: {
+      url: ({ data, req }) => generatePreviewPath({ slug: data?.slug, collection: 'events', req }),
+    },
+    preview: (data, { req }) =>
+      generatePreviewPath({
+        slug: typeof data?.slug === 'string' ? data.slug : undefined,
+        collection: 'events',
+        req,
+      }),
     useAsTitle: 'title',
   },
   fields: [

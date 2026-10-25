@@ -22,7 +22,8 @@ README.md describes the contract.
 2. **Build the whole envelope first**: `$.tool`, `$.action` set to `call`, `$.skipReason` set
    to null, `$.runId`, and `$.arguments` complete:
    - for `submitSuggestion`: `$.arguments.collection`, `$.arguments.title`,
-     `$.arguments.bodyMarkdown`, `$.arguments.startsAt`, `$.arguments.endsAt`,
+     `$.arguments.bodyMarkdown`, `$.arguments.summary`, `$.arguments.categories`,
+     `$.arguments.startsAt`, `$.arguments.endsAt`,
      `$.arguments.allDay`, `$.arguments.venue`, `$.arguments.address` and
      `$.arguments.audience` from `$.draft`; `$.arguments.sourceName`, `$.arguments.sourceUrl`,
      `$.arguments.externalId` and `$.arguments.contentHash` from `$.candidate`; and
@@ -43,7 +44,11 @@ README.md describes the contract.
    envelope that was sent doesn't change. When the draft's `$.draft.missing` is not empty or
    `$.draft.confidence` is `low`, follow a created suggestion with a `reportItem`
    (`kind: needs-review`, `targetCollection` and `targetId` = the new document) listing what's
-   missing.
+   missing. When `$.draft.imageCandidates` is not empty, follow it with one more `reportItem`
+   (`kind: needs-review`, the same target, flag `image-candidate`): one `evidence` entry per
+   image, its `url` the `pageUrl` and its `says` the `imageUrl` and the credit, and a summary
+   asking the editor to get permission or keep the category's image. The image is never
+   downloaded or uploaded.
 5. Stop at `maxDraftsPerRun` suggestions (`pipeline.yaml`). The rest are deferred: counted in
    the run log, not marked as seen, and picked up by the next run.
 6. Write the run log to `agent-runs` at the start and the end of the run

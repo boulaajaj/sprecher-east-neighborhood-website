@@ -21,6 +21,8 @@ cases:
         collection: events
         title: Silent Book Club at Pinney Library
         bodyMarkdown: Bring a book and read together. Free; no registration.
+        summary: A quiet hour of reading with neighbors at Pinney Library. Free.
+        categories: [community]
         audience: [everyone]
       run: { mcpAnswers: [created] }
     expected: { route: submitSuggestion }
@@ -110,3 +112,35 @@ cases:
       run: { draftsSoFar: 10 }
     expected: { route: none, deferred: true }
     why: At maxDraftsPerRun (10) the item waits for the next run. It isn't dropped or marked as seen.
+  - id: submit-image-candidate-reported
+    ref: SB5
+    stage: submit
+    tags: [images, copyright]
+    input:
+      sourceId: mpl-pinney-events
+      externalId: mpl-pinney-events:3c1e7a52-1d1b-4c55-9a0e-2f6b8f0c9d11
+      contentHash: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+      title: Pinney Library winter craft fair
+      startsAt: 2026-12-05T10:00:00-06:00
+      locationText: Pinney Library
+    given:
+      curation: { decision: accept, audiences: [everyone] }
+      draft:
+        collection: events
+        title: Winter craft fair at Pinney Library
+        bodyMarkdown: Local makers sell handmade gifts. Free to attend.
+        summary: Handmade gifts from local makers, a short walk from Sprecher East. Free.
+        categories: [community]
+        audience: [everyone]
+        imageCandidates:
+          - imageUrl: https://www.madisonpubliclibrary.org/images/craft-fair-2025.jpg
+            pageUrl: https://www.madisonpubliclibrary.org/events/winter-craft-fair
+            credit: Pat Lee, courtesy of Madison Public Library
+      run: { mcpAnswers: [created] }
+    expected: { route: submitSuggestion }
+    graders:
+      - { check: equals, field: $.tool, value: submitSuggestion }
+      - { check: contains, field: $.arguments.categories, value: community }
+      - check: model
+        rubric: The suggestion is sent without any image; a follow-up needs-review report on the new document carries the image-candidate flag and one evidence entry with the page link, the image link and the credit.
+    why: Source images reach the editor only as links with their credit, never as an upload.

@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { toEventSchedule, toSuggestionSlug } from './suggestion'
+import {
+  type CategoryNode,
+  pickDefaultImage,
+  toEventSchedule,
+  toSuggestionSlug,
+} from './suggestion'
 
 const CHICAGO = 'America/Chicago'
 
@@ -49,5 +54,36 @@ describe('toSuggestionSlug', () => {
   it('stays short and never empty', () => {
     expect(toSuggestionSlug('x'.repeat(300), 'ff').length).toBeLessThanOrEqual(63)
     expect(toSuggestionSlug('!!!', '12')).toBe('suggestion-12')
+  })
+})
+
+describe('pickDefaultImage', () => {
+  const node = (id: number, parentId: number | null, defaultImageId: number | null) =>
+    [id, { id, parentId, defaultImageId }] as [number, CategoryNode]
+  const tree = new Map([
+    node(1, null, 10), // Parks, with an image
+    node(2, 1, null), // Nature walks, under Parks, without one
+    node(3, null, null), // Volunteer, without one
+    node(4, null, 40), // Community, with one
+    node(5, 6, null), // a loop: 5 → 6 → 5
+    node(6, 5, null),
+  ])
+
+  it('uses the first category’s own image', () => {
+    expect(pickDefaultImage([4, 1], tree)).toBe(40)
+  })
+
+  it('falls back to the parent’s image', () => {
+    expect(pickDefaultImage([2], tree)).toBe(10)
+  })
+
+  it('tries the next category when the first has none up its tree', () => {
+    expect(pickDefaultImage([3, 4], tree)).toBe(40)
+  })
+
+  it('is null when none has one, and stops on a loop', () => {
+    expect(pickDefaultImage([3], tree)).toBeNull()
+    expect(pickDefaultImage([5], tree)).toBeNull()
+    expect(pickDefaultImage([99], tree)).toBeNull()
   })
 })

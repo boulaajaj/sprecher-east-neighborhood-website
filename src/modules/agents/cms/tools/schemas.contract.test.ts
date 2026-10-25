@@ -51,6 +51,8 @@ const SUGGESTION = {
   collection: 'events',
   title: 'Silent Book Club at Pinney Library',
   bodyMarkdown: 'Bring a book and read together.',
+  summary: 'A quiet hour of reading with neighbors. Free.',
+  categories: ['community'],
   startsAt: '2026-11-17T19:00:00-06:00',
   endsAt: null,
   allDay: false,
@@ -116,6 +118,14 @@ describe('submitSuggestion arguments', () => {
     ['an unknown audience', { ...SUGGESTION, audience: ['kids'] }],
     ['a day without a time', { ...SUGGESTION, startsAt: '2026-11-17' }],
     ['no title', { ...SUGGESTION, title: undefined }],
+    ['a long summary', { ...SUGGESTION, summary: long(160) }],
+    ['no summary', { ...SUGGESTION, summary: undefined }],
+    ['no category', { ...SUGGESTION, categories: [] }],
+    ['three categories', { ...SUGGESTION, categories: ['parks', 'social', 'community'] }],
+    ['a subcategory and its parent', { ...SUGGESTION, categories: ['nature-walks', 'parks'] }],
+    ['a repeated category', { ...SUGGESTION, categories: ['parks', 'parks'] }],
+    ['a category that isn’t a slug', { ...SUGGESTION, categories: ['Parks & Rec'] }],
+    ['a long category slug', { ...SUGGESTION, categories: [`p${'-a'.repeat(50)}`] }],
   ]
 
   it('found the evals’ suggestions', () => {

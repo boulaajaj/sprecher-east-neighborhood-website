@@ -15,6 +15,7 @@ import {
   findRecentPosts,
   getPostBySlug,
   listPostSlugs,
+  PostCardPreview,
   PostHero,
   postJsonLd,
   SidebarPosts,
@@ -67,6 +68,7 @@ export default async function Post({ params: paramsPromise }: Args) {
       <PayloadRedirects disableNotFound url={url} />
 
       {draft && <LivePreviewListener />}
+      {draft && <PostCardPreview post={post} />}
 
       <PostHero post={post} />
 

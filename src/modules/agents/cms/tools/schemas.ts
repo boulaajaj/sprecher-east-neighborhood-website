@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { AUDIENCES, type Audience } from '@/platform/lib'
 
 import {
+  CATEGORY_SLUG,
   CONTENT_HASH,
   DATE_TIME,
   EXTERNAL_ID,
@@ -35,6 +36,15 @@ export const submitSuggestionShape = {
   collection: z.enum(SUGGESTION_COLLECTIONS).describe('Where it goes: an event or a news post.'),
   title: text(CAPS.title),
   bodyMarkdown: text(CAPS.bodyMarkdown).describe('The full text, in Markdown.'),
+  summary: text(CAPS.cardSummary).describe(
+    'The card text: one or two plain sentences, no Markdown or links.',
+  ),
+  categories: z
+    .array(z.string().max(CAPS.categorySlug).regex(CATEGORY_SLUG))
+    .min(1)
+    .max(CAPS.categories)
+    .refine(unique, 'Each category once')
+    .describe('One or two category slugs from the categories find, most specific first.'),
   startsAt: optional(dateTime).describe('Events: required, a date-time with a zone.'),
   endsAt: optional(dateTime),
   allDay: optional(z.boolean()),

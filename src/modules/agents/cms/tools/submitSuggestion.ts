@@ -1,9 +1,20 @@
 import { convertMarkdownToLexical, editorConfigFactory } from '@payloadcms/richtext-lexical'
-import { APIError, type PayloadRequest, type RichTextField, ValidationError } from 'payload'
+import {
+  APIError,
+  type PayloadRequest,
+  type RichTextField,
+  ValidationError,
+  type Where,
+} from 'payload'
 
 import { SITE_TIMEZONE } from '@/platform/lib/timezone'
 
-import { toEventSchedule, toSuggestionSlug } from '../../domain/suggestion'
+import {
+  type CategoryNode,
+  pickDefaultImage,
+  toEventSchedule,
+  toSuggestionSlug,
+} from '../../domain/suggestion'
 import { findOwnRun, toToolAnswer } from './runs'
 import { submitSuggestionInput, submitSuggestionShape, type SubmitSuggestionInput } from './schemas'
 
@@ -19,12 +30,77 @@ function toContent(req: PayloadRequest, input: SubmitSuggestionInput) {
   return convertMarkdownToLexical({ editorConfig, markdown: input.bodyMarkdown })
 }
 
-/** The fields to store: the content, the provenance, and for an event its day, times and place. */
-function toData(req: PayloadRequest, input: SubmitSuggestionInput): Record<string, unknown> {
+const idOf = (value: unknown): number | null => {
+  if (typeof value === 'number') return value
+  if (value && typeof value === 'object' && 'id' in value && typeof value.id === 'number') {
+    return value.id
+  }
+  return null
+}
+
+/** The categories found by slug, each with its parent and default image. */
+async function findCategoryNodes(
+  req: PayloadRequest,
+  where: Where,
+): Promise<(CategoryNode & { slug: string })[]> {
+  const { docs } = await req.payload.find({
+    collection: 'categories',
+    where,
+    depth: 0,
+    limit: 100,
+    pagination: false,
+    select: { slug: true, parent: true, defaultImage: true },
+    overrideAccess: false,
+    user: req.user,
+  })
+  return docs.map((doc) => ({
+    id: doc.id,
+    slug: doc.slug,
+    parentId: idOf(doc.parent),
+    defaultImageId: idOf(doc.defaultImage),
+  }))
+}
+
+/**
+ * The chosen categories' ids, in the agent's order, and the image the suggestion gets (#363): the
+ * first category's default image, or its parent's. An unknown slug is refused, never created.
+ */
+async function resolveCategories(req: PayloadRequest, slugs: readonly string[]) {
+  const found = await findCategoryNodes(req, { slug: { in: [...slugs] } })
+  const bySlug = new Map(found.map((node) => [node.slug, node]))
+  const unknown = slugs.filter((slug) => !bySlug.has(slug))
+  if (unknown.length > 0) {
+    throw new APIError(`Unknown category: ${unknown.join(', ')}.`, 400, null, true)
+  }
+  const byId = new Map<number, CategoryNode>(found.map((node) => [node.id, node]))
+  // Load the parents, a level at a time, until every chain ends (the rule stops at its depth)
+  for (let level = 0; level < 5; level++) {
+    const missing = [...byId.values()]
+      .map((node) => node.parentId)
+      .filter((id): id is number => id !== null && !byId.has(id))
+    if (missing.length === 0) break
+    for (const node of await findCategoryNodes(req, { id: { in: missing } }))
+      byId.set(node.id, node)
+  }
+  const ids = slugs.map((slug) => bySlug.get(slug)!.id)
+  return { ids, imageId: pickDefaultImage(ids, byId) }
+}
+
+/**
+ * The fields to store: the content, the card text, the categories and their image, the
+ * provenance, and for an event its day, times and place.
+ */
+async function toData(
+  req: PayloadRequest,
+  input: SubmitSuggestionInput,
+): Promise<Record<string, unknown>> {
+  const { ids, imageId } = await resolveCategories(req, input.categories)
   const shared = {
     title: input.title,
     slug: toSuggestionSlug(input.title, input.contentHash),
     content: toContent(req, input),
+    categories: ids,
+    heroImage: imageId,
     _status: 'draft',
     moderationStatus: 'suggested',
     sourceName: input.sourceName,
@@ -33,10 +109,14 @@ function toData(req: PayloadRequest, input: SubmitSuggestionInput): Record<strin
     contentHash: input.contentHash,
     audience: input.audience,
   }
-  if (input.collection === 'posts') return shared
+  // Cards show a post's search-engine description and share image, and an event's description
+  if (input.collection === 'posts') {
+    return { ...shared, meta: { description: input.summary, image: imageId } }
+  }
   if (!input.startsAt) throw new APIError('An event needs startsAt.', 400, null, true)
   return {
     ...shared,
+    description: input.summary,
     ...toEventSchedule({ ...input, startsAt: input.startsAt }, SITE_TIMEZONE),
     locationName: input.venue || null,
     locationAddress: input.address || null,
@@ -84,7 +164,7 @@ export async function submitSuggestion(
   try {
     const doc = await req.payload.create({
       collection: input.collection,
-      data: toData(req, input),
+      data: await toData(req, input),
       draft: true,
       depth: 0,
       overrideAccess: false,
@@ -102,9 +182,10 @@ export async function submitSuggestion(
 export const submitSuggestionTool = {
   name: 'submitSuggestion',
   description:
-    'Suggest an event or a news post. It is stored as an unpublished draft for staff to review, ' +
-    'never published. Answers {"status":"created","id"} or, when the same externalId or ' +
-    'contentHash is already stored, {"status":"duplicate","id"}.',
+    'Suggest an event or a news post, with its card summary and one or two category slugs from ' +
+    'the categories find. It is stored as an unpublished draft for staff to review, never ' +
+    'published, with the first category’s default image. Answers {"status":"created","id"} ' +
+    'or, when the same externalId or contentHash is already stored, {"status":"duplicate","id"}.',
   parameters: submitSuggestionShape,
   handler: async (args: Record<string, unknown>, req: PayloadRequest) =>
     toToolAnswer(await submitSuggestion(req, submitSuggestionInput.parse(args))),

@@ -131,3 +131,74 @@ cases:
       run: { modelAnswers: [invalid, invalid] }
     expected: { route: reportItem, reportKind: needs-review, retries: 1 }
     why: The model's answer fails the draft schema twice; after one retry, the item goes to review with the errors.
+  - id: draft-category-from-taxonomy
+    ref: D8
+    stage: draft
+    tags: [taxonomy]
+    input:
+      sourceId: mpl-pinney-events
+      title: Guided nature walk at Door Creek Park
+      startsAt: 2026-11-14T09:00:00-06:00
+      locationText: Door Creek Park
+    given:
+      taxonomy:
+        - { slug: parks, title: Parks, parent: null }
+        - { slug: nature-walks, title: Nature walks, parent: parks }
+        - { slug: volunteer, title: Volunteer, parent: null }
+      curation: { decision: accept, audiences: [families] }
+    expected: { route: submitSuggestion }
+    graders:
+      - { check: contains, field: $.categories, value: nature-walks }
+      - { check: notContains, field: $.categories, value: nature }
+      - check: model
+        rubric: Every slug in categories is one of the taxonomy's slugs, and the subcategory comes before its parent when both are used.
+    why: Drafts file items under the site's own tree, most specific first, and never invent a category.
+  - id: draft-plain-summary
+    ref: D9
+    stage: draft
+    tags: [plain-language]
+    input:
+      sourceId: madison365-news
+      title: Common Council to consider TID 51 amendment for Sprecher Road corridor
+      sourceText: >-
+        The Common Council will consider an amendment to Tax Increment District 51 that would fund
+        sidewalk and lighting work along Sprecher Road. Public comment is open until November 18.
+      startsAt: null
+      locationText: Madison
+    given:
+      taxonomy:
+        - { slug: city-decisions, title: City decisions, parent: null }
+      curation:
+        {
+          decision: accept,
+          audiences: [everyone],
+          whyItMatters: New sidewalks and lights on Sprecher Road.,
+        }
+    expected: { route: submitSuggestion }
+    graders:
+      - { check: notMatches, field: $.summary, value: '\bTID\b|Tax Increment|amendment' }
+      - check: model
+        rubric: The summary is one or two plain sentences a neighbor understands without knowing city jargon, says what changes for residents, and has no Markdown or links.
+    why: Card text explains the effect on residents in everyday words; the jargon stays in the linked source.
+  - id: draft-image-candidate-credit
+    ref: D10
+    stage: draft
+    tags: [images, copyright]
+    input:
+      sourceId: mpl-pinney-events
+      title: Pinney Library winter craft fair
+      sourceText: >-
+        Join us for a winter craft fair with local makers. Photo of last year's fair by Pat Lee,
+        courtesy of Madison Public Library.
+      startsAt: 2026-12-05T10:00:00-06:00
+      locationText: Pinney Library
+    given:
+      taxonomy:
+        - { slug: community, title: Community, parent: null }
+      curation: { decision: accept, audiences: [everyone] }
+    expected: { route: submitSuggestion }
+    graders:
+      - { check: present, field: $.imageCandidates }
+      - check: model
+        rubric: Each image candidate is an image the source page itself shows about this item, with the credit as the source states it ("Pat Lee, courtesy of Madison Public Library"); the body does not embed or link the image.
+    why: Source images are only suggested to the editor, with their credit; the site never copies them.

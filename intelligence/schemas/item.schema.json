@@ -10,6 +10,9 @@
     "candidate": {
       "$ref": "candidate.schema.json"
     },
+    "taxonomy": {
+      "$ref": "common.schema.json#/$defs/taxonomy"
+    },
     "known": {
       "description": "The CMS document the runtime's find returned for this externalId before curate, or null.",
       "anyOf": [

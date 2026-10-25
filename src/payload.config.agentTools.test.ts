@@ -30,6 +30,8 @@ const suggestion = (extra: Record<string, unknown> = {}) => ({
   collection: 'events',
   title: `Story time ${++next}`,
   bodyMarkdown: '## Story time\n\nBring a **blanket**. [Details](https://example.com/e/1)',
+  summary: 'Stories and songs for little ones at the library.',
+  categories: ['story-time'],
   startsAt: '2026-11-07T16:00:00-06:00',
   endsAt: '2026-11-07T17:00:00-06:00',
   venue: 'Pinney Library',
@@ -73,6 +75,11 @@ beforeAll(async () => {
   agent = await createAccount(payload, 'agent', 'scout')
   await createMcpKey(payload, admin, agent.id, KEY)
   runDocId = (await createRun(agent, RUN_ID)).id
+  // The category every suggestion names; categories and images: agentSuggestionCards.test.ts
+  await payload.create({
+    collection: 'categories',
+    data: { title: 'Story time', slug: 'story-time' },
+  })
 }, 60_000)
 
 describe('submitSuggestion', () => {
