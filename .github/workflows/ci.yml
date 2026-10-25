@@ -74,7 +74,9 @@ jobs:
           NEXT_PUBLIC_SERVER_URL: http://localhost:3000
 
   # The intelligence agents' prompts, sources, schemas and eval cases (#337): validated against
-  # their JSON Schemas, and every field a prompt names must exist. Skipped when they're untouched.
+  # their JSON Schemas, and every field a prompt names must exist. Then the runner's tests, which
+  # run the scout and submit evals as code, and an audit of its own dependencies (#364). Skipped
+  # when they're untouched.
   intelligence:
     name: Intelligence check
     runs-on: ubuntu-latest
@@ -95,8 +97,11 @@ jobs:
       - uses: actions/setup-node@v6
         if: steps.filter.outputs.intelligence == 'true'
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            intelligence/runner/package-lock.json
 
       - name: Install dependencies
         if: steps.filter.outputs.intelligence == 'true'
@@ -105,6 +110,14 @@ jobs:
       - name: Check intelligence/
         if: steps.filter.outputs.intelligence == 'true'
         run: node scripts/check-intelligence.mjs
+
+      - name: Runner tests and audit
+        if: steps.filter.outputs.intelligence == 'true'
+        working-directory: intelligence/runner
+        run: |
+          npm ci
+          npm test
+          npm audit --audit-level=high --omit=dev
 
   # Pushes to main deploy once the build above has passed; the deploy also waits for the Lint
   # checks (#245). Pull requests skip this job.

@@ -32,7 +32,7 @@ sources:
     name: City of Madison legislation (Legistar API)
     owner: City of Madison Clerk's Office (Legistar, by Granicus)
     canonicalUrl: https://madison.legistar.com/Legislation.aspx
-    feedUrl: "https://webapi.legistar.com/v1/madison/matters?$filter=MatterLastModifiedUtc%20gt%20datetime'{cursor}'&$orderby=MatterLastModifiedUtc%20desc"
+    feedUrl: "https://webapi.legistar.com/v1/madison/matters?$filter=MatterLastModifiedUtc%20ge%20datetime'{cursor}'&$orderby=MatterLastModifiedUtc%20asc"
     format: json-api
     scope: Ordinances, resolutions and other items before the Council and its committees
     audiences: [everyone, association-leaders]

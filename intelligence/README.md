@@ -87,8 +87,13 @@ rule: we still honor robots.txt by choice. This is the project's reasoning, not 
 
 ## How a runtime loads it
 
-The runtime is OpenClaw, on the owner's side; any runtime that can read files and call MCP tools
-can run the same folder. Its own configuration, schedule and keys stay outside this repo.
+[`runner/`](runner/README.md) runs it (#364): the code stages (scout and submit), the schema
+checks, routing, budgets and the run log are code there, and only verify, curate and draft go to a
+model, through one adapter. By default that's an OpenClaw agent on the owner's machine, on his
+flat ChatGPT subscription; the agent has no tools and never sees the CMS key, which only the
+runner holds. OpenClaw's own cron starts `node runner/run.mjs` daily. The OpenClaw configuration,
+schedule and key stay outside this repo; any runtime that can run a command or answer a prompt can
+run the same folder.
 
 1. Check out this repository's `main` (read-only) at the start of each run, and record its commit
    as `repoCommit` in the run log, so every suggestion can be traced to the exact prompts that made it.
@@ -113,7 +118,10 @@ can run the same folder. Its own configuration, schedule and keys stay outside t
   pilot sources only.
 - **Budgets** (`budgets` in `pipeline.yaml`): at most $0.50 and 15 minutes per run, $15 per month,
   50 items per source, 40 items sent to a model and 10 drafts per run. The runtime stops when a
-  limit is reached, logs the run as `stopped-budget`, and leaves the rest for the next run.
+  limit is reached, logs the run as `stopped-budget`, and leaves the rest for the next run. The
+  dollar limits apply to a runtime billed per call; on the owner's flat subscription a run costs
+  nothing per call, so the runner logs `usd: 0` and the time and item limits are the ones that
+  stop it.
 - A run that can't reach a source logs the error for that source and carries on with the others.
 
 ## Output: suggestions and review items in the CMS

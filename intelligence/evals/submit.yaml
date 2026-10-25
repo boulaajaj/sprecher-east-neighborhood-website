@@ -67,6 +67,8 @@ cases:
         collection: events
         title: Family Storytime at Pinney Library
         bodyMarkdown: Stories and songs for young children and their grown-ups.
+        summary: Stories and songs for little ones and their grown-ups at Pinney Library.
+        categories: [community]
         audience: [families]
       run: { mcpAnswers: [transient-error, transient-error, created] }
     expected: { route: reportItem, reportKind: needs-review, retries: 1 }
@@ -88,6 +90,8 @@ cases:
         collection: events
         title: Common Council meeting
         bodyMarkdown: The Council meets online; anyone can register to speak.
+        summary: The city council meets online, and anyone can sign up to speak.
+        categories: [meeting]
         audience: [everyone]
       run: { mcpAnswers: [created] }
     expected: { route: submitSuggestion }
