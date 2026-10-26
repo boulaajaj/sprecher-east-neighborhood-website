@@ -18,6 +18,7 @@ that supersedes the old one; don't edit history.
 | [0010](0010-contact-data-retention.md)            | Contact data is deleted on a schedule by Payload's jobs queue  | 2026-10-24 | Accepted                             |
 | [0011](0011-scheduled-publishing-runner.md)       | Scheduled publishing runs in the app; pages refresh in 10 min  | 2026-10-24 | Accepted                             |
 | [0012](0012-runtime-themes.md)                    | Themes switch at runtime, on two axes: mode and theme          | 2026-10-25 | Accepted                             |
+| [0013](0013-cms-content-through-mappers.md)       | Blocks and heroes take plain props, mapped from the CMS        | 2026-10-26 | Accepted                             |
 
 Template for a new record: **Context** (the problem and the forces), **Decision**, **Consequences**
 (what gets easier, what gets harder), **Links** (issues, PRs, sources).

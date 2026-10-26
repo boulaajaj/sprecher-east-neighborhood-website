@@ -105,13 +105,18 @@ The goal is **visual balance**, not visual symmetry. A left-aligned text block w
 
 ## Card Design
 
-Cards are the primary content container pattern:
+Cards are the primary content container pattern. Build them with the `Card` component
+([component set](../ui/component-set.md#display)), whose variants keep today's looks (the owner's
+choice, 2026-10-26, Claude Code session, quoted on #426):
 
-- **Background**: `bg-background` (not `bg-surface` — cards should feel elevated)
-- **Border**: `border border-border` or `shadow-sm` — never both
+- **Variants**: `elevated` (`bg-card`, `shadow-sm`, no border) for content cards; `outline`
+  (`bg-background`, `border border-border`, no shadow) for form boxes; `muted` (`bg-surface`, no
+  border or shadow) for panels inside a page; `tinted` (`bg-primary/10`) for a sidebar box
+- **Border or shadow**: a card has one or the other, never both
 - **Border radius**: `rounded-2xl` for cards, `rounded-xl` for smaller elements, `rounded-lg` for buttons
 - **Hover state**: `hover:shadow-md transition-shadow duration-200` for interactive cards
-- **Padding**: `p-6` minimum, `p-8` for spacious cards
+- **Padding**: `p-6` by default, `p-8` for spacious cards, `p-4` only for compact cards (a small
+  event card, a stat)
 - **Image in card**: Full-bleed at top with `rounded-t-2xl`, or inset with `rounded-xl`
 
 ## Button Design
