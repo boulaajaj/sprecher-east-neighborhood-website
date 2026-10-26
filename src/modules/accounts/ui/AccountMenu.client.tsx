@@ -11,9 +11,10 @@ import { useAccount } from './AccountProvider.client'
 
 /**
  * The header's account links: "Log In" and "Sign Up" for a visitor (#296); the account's name
- * and "Sign Out" when signed in, plus "Dashboard" (the admin) for an admin or editor (#378): the
- * footer is the same for everyone, and the admin bar is hidden on phones. `bar` is the desktop
- * header, `drawer` the mobile menu.
+ * and "Sign Out" when signed in. The mobile menu also has "Dashboard" (the admin) for an admin or
+ * editor (#378), as the admin bar is hidden on phones; on desktop the admin bar has it, and one
+ * more link in the bar would overflow it at 1024 px (#383). `bar` is the desktop header,
+ * `drawer` the mobile menu.
  */
 export function AccountMenu({ variant }: { variant: 'bar' | 'drawer' }) {
   const { account, loading, signOut } = useAccount()
@@ -56,14 +57,8 @@ export function AccountMenu({ variant }: { variant: 'bar' | 'drawer' }) {
   }
 
   const label = account.name || 'Account'
-  const dashboard = account.staff ? (
-    <Link href={ADMIN_ROUTE} variant="nav" size={bar ? 'sm' : undefined}>
-      Dashboard
-    </Link>
-  ) : null
   return bar ? (
     <>
-      {dashboard}
       {/* A long name is cut short so the bar never overflows; the full name is the title */}
       <Link
         href={ACCOUNT_PATH}
@@ -84,7 +79,11 @@ export function AccountMenu({ variant }: { variant: 'bar' | 'drawer' }) {
       <Link href={ACCOUNT_PATH} variant="nav" current={pathname === ACCOUNT_PATH}>
         {label}
       </Link>
-      {dashboard}
+      {account.staff ? (
+        <Link href={ADMIN_ROUTE} variant="nav">
+          Dashboard
+        </Link>
+      ) : null}
       <Button
         variant="ghost"
         fullWidth
