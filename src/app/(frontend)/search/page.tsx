@@ -35,7 +35,8 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
           <EmptyState
             variant="plain"
             title="No results found."
-            description="Try different words, or check the spelling."
+            // Only a search that was typed can be retried with other words
+            description={query ? 'Try different words, or check the spelling.' : undefined}
           />
         </div>
       )}
