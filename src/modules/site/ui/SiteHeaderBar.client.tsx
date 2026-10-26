@@ -1,12 +1,13 @@
 'use client'
 import NextLink from 'next/link'
 import { usePathname } from 'next/navigation'
-import React, { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
+import React, { type ReactNode, useCallback, useEffect, useState } from 'react'
 
 import type { Header } from '@/payload-types'
 
 import { Button } from '@/platform/ui'
-import { Menu, X } from 'lucide-react'
+import { Dialog } from '@/platform/ui/Dialog.client'
+import { Menu } from 'lucide-react'
 import { Logo } from './Logo'
 import { HeaderNav } from './HeaderNav.client'
 
@@ -26,12 +27,7 @@ export const SiteHeaderBar: React.FC<SiteHeaderBarProps> = ({
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
-  const toggleRef = useRef<HTMLButtonElement>(null)
-
-  const closeMobileMenu = useCallback((restoreFocus = false) => {
-    setMobileOpen(false)
-    if (restoreFocus) toggleRef.current?.focus()
-  }, [])
+  const closeMobileMenu = useCallback(() => setMobileOpen(false), [])
 
   const closeOnLinkOrButton = useCallback(
     (event: React.MouseEvent) => {
@@ -51,16 +47,6 @@ export const SiteHeaderBar: React.FC<SiteHeaderBarProps> = ({
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Escape closes the mobile menu and returns focus to the toggle
-  useEffect(() => {
-    if (!mobileOpen) return
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') closeMobileMenu(true)
-    }
-    document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
-  }, [mobileOpen, closeMobileMenu])
-
   // Close the mobile menu if the viewport grows past the desktop breakpoint (e.g. a tablet
   // rotated with the menu open): its close button hides there, and the scroll lock would stay
   useEffect(() => {
@@ -71,18 +57,6 @@ export const SiteHeaderBar: React.FC<SiteHeaderBarProps> = ({
     desktop.addEventListener('change', onChange)
     return () => desktop.removeEventListener('change', onChange)
   }, [])
-
-  // Lock body scroll when mobile menu is open
-  useEffect(() => {
-    if (mobileOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
-    }
-  }, [mobileOpen])
 
   return (
     <header
@@ -110,34 +84,28 @@ export const SiteHeaderBar: React.FC<SiteHeaderBarProps> = ({
           </Button>
         </div>
 
-        {/* Mobile hamburger */}
-        <Button
-          ref={toggleRef}
-          variant="ghost"
-          size="icon"
+        {/* The mobile menu: a full-screen sheet, with Radix's focus trap, Escape, scroll lock and
+            focus return (#437) */}
+        <Dialog
+          open={mobileOpen}
+          onOpenChange={setMobileOpen}
+          title="Menu"
+          hideTitle
+          closeLabel="Close menu"
+          start={
+            <NextLink href="/" className="shrink-0" onClick={closeMobileMenu}>
+              <Logo />
+            </NextLink>
+          }
           className="lg:hidden"
-          onClick={() => setMobileOpen((prev) => !prev)}
-          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={mobileOpen}
-          aria-controls="mobile-menu"
+          trigger={
+            <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
+              <Menu aria-hidden="true" />
+            </Button>
+          }
         >
-          {mobileOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
-        </Button>
-      </div>
-
-      {/* Mobile menu overlay */}
-      {mobileOpen && (
-        <div
-          id="mobile-menu"
-          className="max-h-[calc(100dvh-var(--header-height))] overflow-y-auto border-t border-border bg-background lg:hidden"
-        >
-          <div className="container flex flex-col gap-2 py-4">
-            <HeaderNav
-              data={data}
-              pathname={pathname}
-              mobile
-              onNavigate={() => closeMobileMenu()}
-            />
+          <div id="mobile-menu" className="container flex flex-col gap-2 py-4">
+            <HeaderNav data={data} pathname={pathname} mobile onNavigate={closeMobileMenu} />
             {/* Following a link or signing out in the account links closes the menu too */}
             <div className="contents" onClick={closeOnLinkOrButton}>
               {mobileAccountMenu}
@@ -145,15 +113,15 @@ export const SiteHeaderBar: React.FC<SiteHeaderBarProps> = ({
             <Button
               href="/contact"
               fullWidth
-              onClick={() => closeMobileMenu()}
+              onClick={closeMobileMenu}
               aria-current={pathname === '/contact' ? 'page' : undefined}
               className="mt-2"
             >
               Contact
             </Button>
           </div>
-        </div>
-      )}
+        </Dialog>
+      </div>
     </header>
   )
 }
