@@ -2,6 +2,7 @@
 // (Media, JsonLd, Breadcrumbs, LoadMore and the rest of this folder) are imported by their file,
 // so a client component that needs a Button does not bundle them.
 export { Alert, type AlertProps, type AlertTone } from './Alert'
+export { Badge, BadgeList, type BadgeProps } from './Badge'
 export { Button, type ButtonProps } from './Button'
 export { Field, type FieldProps } from './Field.client'
 export type { FieldCheckboxProps } from './FieldCheckbox.client'

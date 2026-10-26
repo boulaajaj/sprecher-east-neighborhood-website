@@ -4,7 +4,7 @@ import { MapPin, Clock, Calendar } from 'lucide-react'
 
 import { Media } from '@/platform/ui/Media'
 import { cn } from '@/platform/lib/cn'
-import { categoryPillClassName } from '@/platform/ui/categoryPill'
+import { Badge, BadgeList } from '@/platform/ui/Badge'
 import { formatDateShort, formatDateBadge, toDateTimeAttr } from '@/platform/lib/formatDateTime'
 
 import type { EventSummary } from '../domain/types'
@@ -126,13 +126,11 @@ export const EventCard: React.FC<{
         )}
 
         {categories.length > 0 && (
-          <div className="mt-auto flex flex-wrap gap-2">
+          <BadgeList className="mt-auto">
             {categories.map((category) => (
-              <span key={category.id} className={categoryPillClassName}>
-                {category.title}
-              </span>
+              <Badge key={category.id}>{category.title}</Badge>
             ))}
-          </div>
+          </BadgeList>
         )}
       </div>
     </article>

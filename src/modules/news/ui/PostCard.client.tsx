@@ -6,7 +6,7 @@ import React from 'react'
 import { Media } from '@/platform/ui/Media'
 import { formatDateShort } from '@/platform/lib/formatDateTime'
 import { cn } from '@/platform/lib/cn'
-import { categoryPillClassName } from '@/platform/ui/categoryPill'
+import { Badge } from '@/platform/ui/Badge'
 import useClickableCard from './useClickableCard'
 
 import type { PostSummary } from '../domain/types'
@@ -69,9 +69,7 @@ export const PostCard: React.FC<{
               </span>
             )}
             {categories.map((category) => (
-              <span key={category.id} className={categoryPillClassName}>
-                {category.title}
-              </span>
+              <Badge key={category.id}>{category.title}</Badge>
             ))}
           </div>
         )}
