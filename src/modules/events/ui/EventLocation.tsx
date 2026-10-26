@@ -2,6 +2,7 @@ import { ArrowRight } from 'lucide-react'
 import React from 'react'
 
 import { Link } from '@/platform/ui'
+import { Card } from '@/platform/ui/Card'
 
 import type { EventDetail } from '../domain/types'
 
@@ -12,7 +13,7 @@ export const EventLocation: React.FC<{
   if (!locationName && !locationAddress) return null
 
   return (
-    <div className="mb-8 rounded-lg border border-border bg-surface p-4">
+    <Card as="section" variant="muted" padding="sm" className="mb-8">
       <h2 className="mb-2 text-base font-semibold">Location</h2>
       {locationName && <p>{locationName}</p>}
       {locationAddress && <p className="text-sm text-muted-foreground">{locationAddress}</p>}
@@ -28,6 +29,6 @@ export const EventLocation: React.FC<{
           Open in Google Maps
         </Link>
       )}
-    </div>
+    </Card>
   )
 }

@@ -4,6 +4,7 @@ import React from 'react'
 import { toResourceSections } from '@/modules/directory'
 import { ResourceCard, findResources } from '@/modules/directory/server'
 import { mergeOpenGraph } from '@/platform/seo/mergeOpenGraph'
+import { CardGrid, CardGridItem } from '@/platform/ui/CardGrid'
 import { EmptyState } from '@/platform/ui/EmptyState'
 
 export const dynamic = 'force-static'
@@ -30,11 +31,13 @@ export default async function ResourcesPage() {
             <h2 className="mb-6 border-b border-border pb-3 text-xl font-semibold text-foreground">
               {label}
             </h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <CardGrid gap="sm">
               {items.map((resource) => (
-                <ResourceCard key={resource.id} resource={resource} />
+                <CardGridItem key={resource.id}>
+                  <ResourceCard resource={resource} />
+                </CardGridItem>
               ))}
-            </div>
+            </CardGrid>
           </section>
         ))}
 

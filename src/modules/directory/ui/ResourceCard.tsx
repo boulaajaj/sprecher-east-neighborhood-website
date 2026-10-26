@@ -2,18 +2,19 @@ import React from 'react'
 import { ExternalLink, Phone } from 'lucide-react'
 
 import { Link } from '@/platform/ui'
+import { Card, CardFooter, CardTitle } from '@/platform/ui/Card'
 
 import type { ResourceSummary } from '../domain/types'
 
 /** One entry in the resources directory: its name, what it is, and how to reach it. */
 export function ResourceCard({ resource }: { resource: ResourceSummary }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5 shadow-sm transition-all duration-200 hover:shadow-md motion-safe:hover:-translate-y-0.5">
-      <h3 className="mb-1.5 font-semibold text-foreground">{resource.title}</h3>
+    <Card as="article" className="flex h-full flex-col">
+      <CardTitle className="mb-1.5 text-base">{resource.title}</CardTitle>
       {resource.description && (
         <p className="mb-3 text-sm leading-relaxed text-muted-foreground">{resource.description}</p>
       )}
-      <div className="flex flex-wrap gap-3">
+      <CardFooter className="pt-0">
         {resource.url && (
           <Link
             href={resource.url}
@@ -29,7 +30,7 @@ export function ResourceCard({ resource }: { resource: ResourceSummary }) {
             {resource.phone}
           </Link>
         )}
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   )
 }

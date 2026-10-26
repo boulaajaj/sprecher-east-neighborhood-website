@@ -9,7 +9,7 @@ import { loadEventsPage } from '../actions'
 import type { EventSummary } from '../domain/types'
 import type { EventScope } from '../domain/scope'
 import { EventCard } from './EventCard'
-import { EVENT_GRID_CLASS } from './eventGridClasses'
+import { CardGrid, CardGridItem } from '@/platform/ui/CardGrid'
 
 /** Upcoming or past events grid that loads more events as the reader scrolls. */
 export const EventsFeed: React.FC<{
@@ -22,15 +22,13 @@ export const EventsFeed: React.FC<{
 
   return (
     <>
-      <ul className={compact ? 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3' : EVENT_GRID_CLASS}>
+      <CardGrid gap={compact ? 'sm' : 'md'}>
         {feed.items.map((event) => (
-          <li key={event.id} className="flex min-w-0">
-            <div className="w-full min-w-0">
-              <EventCard event={event} compact={compact} />
-            </div>
-          </li>
+          <CardGridItem key={event.id}>
+            <EventCard event={event} compact={compact} />
+          </CardGridItem>
         ))}
-      </ul>
+      </CardGrid>
       <LoadMoreFooter
         noun={scope === 'upcoming' ? 'upcoming events' : 'past events'}
         shownCount={feed.items.length}
