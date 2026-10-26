@@ -62,4 +62,25 @@ describe('SiteHeaderBar', () => {
 
     expect(document.getElementById('mobile-menu')).toBeNull()
   })
+
+  it('opens the menu as a dialog, and Escape closes it and returns focus to the toggle (#437)', async () => {
+    renderHeader()
+    const toggle = screen.getByRole('button', { name: 'Open menu' })
+    await userEvent.click(toggle)
+
+    expect(screen.getByRole('dialog', { name: 'Menu' })).toBeTruthy()
+    await userEvent.keyboard('{Escape}')
+
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(document.activeElement).toBe(toggle)
+  })
+
+  it('closes from its own close button', async () => {
+    renderHeader()
+    await userEvent.click(screen.getByRole('button', { name: 'Open menu' }))
+
+    await userEvent.click(screen.getByRole('button', { name: 'Close menu' }))
+
+    expect(screen.queryByRole('dialog')).toBeNull()
+  })
 })
