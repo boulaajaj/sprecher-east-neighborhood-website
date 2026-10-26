@@ -27,7 +27,7 @@ export function ImageCredit({
     <p className={cn('text-xs text-muted-foreground', className)}>
       Photo:{' '}
       {image.sourceUrl ? (
-        <Link href={image.sourceUrl} external className="font-normal text-muted-foreground">
+        <Link href={image.sourceUrl} external variant="caption">
           {credit}
         </Link>
       ) : (
@@ -37,7 +37,7 @@ export function ImageCredit({
         <>
           ,{' '}
           {image.licenseUrl ? (
-            <Link href={image.licenseUrl} external className="font-normal text-muted-foreground">
+            <Link href={image.licenseUrl} external variant="caption">
               {licenseName}
             </Link>
           ) : (

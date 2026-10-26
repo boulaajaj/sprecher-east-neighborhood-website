@@ -20,6 +20,14 @@ describe('toLicenseName', () => {
     expect(toLicenseName('cc-by', 'https://example.com/license')).toBe('CC BY')
   })
 
+  it('adds no version from a link to a different license', () => {
+    expect(toLicenseName('cc-by', 'https://creativecommons.org/licenses/by-sa/4.0/')).toBe('CC BY')
+    expect(toLicenseName('cc0', 'https://creativecommons.org/publicdomain/mark/1.0/')).toBe('CC0')
+    expect(toLicenseName('cc-by', 'https://example.com/creativecommons.org/licenses/by/4.0/')).toBe(
+      'CC BY',
+    )
+  })
+
   it('names no license for our own photos, permission, other or none', () => {
     expect(toLicenseName('own', null)).toBeNull()
     expect(toLicenseName('permission', null)).toBeNull()
