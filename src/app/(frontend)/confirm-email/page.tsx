@@ -5,7 +5,7 @@ import { parseConfirmationToken } from '@/modules/verification'
 import { ConfirmEmail, getConfirmationLinkStatus } from '@/modules/verification/server'
 import { NOT_INDEXED } from '@/platform/seo/notIndexed'
 import { PageHeader } from '@/platform/ui/PageHeader'
-import { FormPage } from '@/platform/ui/FormPage'
+import { Section } from '@/platform/ui/Section'
 
 export const metadata: Metadata = {
   title: 'Confirm Your Email',
@@ -28,7 +28,7 @@ export default async function ConfirmEmailPage({ searchParams }: Props) {
   const alreadyConfirmed = status === 'already-confirmed'
 
   return (
-    <FormPage>
+    <Section as="div" width="narrow" spacing="center">
       <PageHeader
         variant="compact"
         title={alreadyConfirmed ? 'Email Confirmed' : 'Confirm Your Email'}
@@ -42,6 +42,6 @@ export default async function ConfirmEmailPage({ searchParams }: Props) {
       <ConfirmEmail token={parseConfirmationToken(token)} status={status} retryHref="/contact">
         <AccountOffer />
       </ConfirmEmail>
-    </FormPage>
+    </Section>
   )
 }

@@ -6,7 +6,7 @@ import { getCurrentUser, SignUpForm } from '@/modules/accounts/server'
 import { parseEmailAddress } from '@/platform/lib'
 import { NOT_INDEXED } from '@/platform/seo/notIndexed'
 import { PageHeader } from '@/platform/ui/PageHeader'
-import { FormPage } from '@/platform/ui/FormPage'
+import { Section } from '@/platform/ui/Section'
 
 export const metadata: Metadata = {
   title: 'Create an Account',
@@ -29,13 +29,13 @@ export default async function SignUpPage({ searchParams }: Props) {
   const { email } = await searchParams
 
   return (
-    <FormPage>
+    <Section as="div" width="narrow" spacing="center">
       <PageHeader
         variant="compact"
         title="Create an Account"
         description="A free account for Sprecher East. We’ll send you an email to confirm it before you log in."
       />
       <SignUpForm email={parseEmailAddress(email)} />
-    </FormPage>
+    </Section>
   )
 }

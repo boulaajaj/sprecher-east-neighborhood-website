@@ -4,7 +4,7 @@ import { parseLinkToken } from '@/modules/accounts'
 import { ResetPasswordForm } from '@/modules/accounts/server'
 import { NOT_INDEXED } from '@/platform/seo/notIndexed'
 import { PageHeader } from '@/platform/ui/PageHeader'
-import { FormPage } from '@/platform/ui/FormPage'
+import { Section } from '@/platform/ui/Section'
 
 export const metadata: Metadata = {
   title: 'Choose a New Password',
@@ -21,13 +21,13 @@ export default async function ResetPasswordPage({ searchParams }: Props) {
   const { token } = await searchParams
 
   return (
-    <FormPage>
+    <Section as="div" width="narrow" spacing="center">
       <PageHeader
         variant="compact"
         title="Choose a New Password"
         description="Choose a new password for your account, then log in with it."
       />
       <ResetPasswordForm token={parseLinkToken(token)} />
-    </FormPage>
+    </Section>
   )
 }

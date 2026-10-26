@@ -4,7 +4,7 @@ import { parseLinkToken } from '@/modules/accounts'
 import { getVerificationLinkStatus, VerifyAccount } from '@/modules/accounts/server'
 import { NOT_INDEXED } from '@/platform/seo/notIndexed'
 import { PageHeader } from '@/platform/ui/PageHeader'
-import { FormPage } from '@/platform/ui/FormPage'
+import { Section } from '@/platform/ui/Section'
 
 export const metadata: Metadata = {
   title: 'Confirm Your Account',
@@ -27,7 +27,7 @@ export default async function VerifyAccountPage({ searchParams }: Props) {
   const alreadyVerified = status === 'already-verified'
 
   return (
-    <FormPage>
+    <Section as="div" width="narrow" spacing="center">
       <PageHeader
         variant="compact"
         title={alreadyVerified ? 'Account Confirmed' : 'Confirm Your Account'}
@@ -38,6 +38,6 @@ export default async function VerifyAccountPage({ searchParams }: Props) {
         }
       />
       <VerifyAccount token={parseLinkToken(token)} status={status} />
-    </FormPage>
+    </Section>
   )
 }

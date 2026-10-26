@@ -5,7 +5,7 @@ import { ACCOUNT_PATH } from '@/modules/accounts'
 import { ForgotPasswordForm, getCurrentUser } from '@/modules/accounts/server'
 import { NOT_INDEXED } from '@/platform/seo/notIndexed'
 import { PageHeader } from '@/platform/ui/PageHeader'
-import { FormPage } from '@/platform/ui/FormPage'
+import { Section } from '@/platform/ui/Section'
 
 export const metadata: Metadata = {
   title: 'Forgot Password',
@@ -19,13 +19,13 @@ export default async function ForgotPasswordPage() {
   if (await getCurrentUser()) redirect(ACCOUNT_PATH)
 
   return (
-    <FormPage>
+    <Section as="div" width="narrow" spacing="center">
       <PageHeader
         variant="compact"
         title="Forgot Your Password?"
         description="Enter the email you log in with. We’ll send you a link to choose a new password."
       />
       <ForgotPasswordForm />
-    </FormPage>
+    </Section>
   )
 }

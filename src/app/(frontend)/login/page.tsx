@@ -5,7 +5,7 @@ import { ACCOUNT_PATH } from '@/modules/accounts'
 import { getCurrentUser, SignInForm } from '@/modules/accounts/server'
 import { NOT_INDEXED } from '@/platform/seo/notIndexed'
 import { PageHeader } from '@/platform/ui/PageHeader'
-import { FormPage } from '@/platform/ui/FormPage'
+import { Section } from '@/platform/ui/Section'
 
 export const metadata: Metadata = {
   title: 'Log In',
@@ -18,13 +18,13 @@ export default async function LoginPage() {
   if (await getCurrentUser()) redirect(ACCOUNT_PATH)
 
   return (
-    <FormPage>
+    <Section as="div" width="narrow" spacing="center">
       <PageHeader
         variant="compact"
         title="Log In"
         description="Log in to your Sprecher East account."
       />
       <SignInForm />
-    </FormPage>
+    </Section>
   )
 }

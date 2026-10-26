@@ -5,7 +5,7 @@ import { NOT_INDEXED } from '@/platform/seo/notIndexed'
 import { Card } from '@/platform/ui/Card'
 import { MetaList } from '@/platform/ui/MetaList'
 import { PageHeader } from '@/platform/ui/PageHeader'
-import { FormPage } from '@/platform/ui/FormPage'
+import { Section } from '@/platform/ui/Section'
 
 export const metadata: Metadata = {
   title: 'Account',
@@ -17,7 +17,7 @@ export default async function AccountPage() {
   const user = await requireUser()
 
   return (
-    <FormPage width="lg" align="top">
+    <Section as="div" width="narrow">
       <PageHeader variant="compact" title="Account" />
 
       <Card as="section" variant="muted" className="mb-8">
@@ -34,6 +34,6 @@ export default async function AccountPage() {
         <h2 className="mb-4 text-lg font-semibold text-foreground">Change Password</h2>
         <ChangePasswordForm />
       </Card>
-    </FormPage>
+    </Section>
   )
 }
