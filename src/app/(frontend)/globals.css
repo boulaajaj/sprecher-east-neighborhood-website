@@ -41,12 +41,6 @@
 @source inline('hero-text-shadow');
 @source inline('hero-text-shadow-sm');
 @source inline('bg-card');
-@source inline('border-error');
-@source inline('bg-error/30');
-@source inline('border-success');
-@source inline('bg-success/30');
-@source inline('border-warning');
-@source inline('bg-warning/30');
 
 @theme {
   --breakpoint-sm: 40rem;

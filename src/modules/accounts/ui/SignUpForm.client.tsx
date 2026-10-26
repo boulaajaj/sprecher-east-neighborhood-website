@@ -66,7 +66,7 @@ export function SignUpForm({ email }: { email: string | null }) {
   if (status === 'success') {
     return (
       <div ref={doneRef} tabIndex={-1} className="space-y-6 outline-none">
-        <Alert variant="success">{SIGN_UP_SENT}</Alert>
+        <Alert tone="success">{SIGN_UP_SENT}</Alert>
         <Link href={SIGN_IN_PATH} variant="action">
           Go to log in
         </Link>

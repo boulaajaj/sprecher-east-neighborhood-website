@@ -99,17 +99,17 @@ export function VerifyAccount({
       {answer && (
         <div ref={messageRef} tabIndex={-1} className="outline-none">
           {answer === 'verified' ? (
-            <Alert variant="success">{ACCOUNT_VERIFIED}</Alert>
+            <Alert tone="success">{ACCOUNT_VERIFIED}</Alert>
           ) : answer === 'already-verified' ? (
-            <Alert variant="success">{ACCOUNT_ALREADY_VERIFIED}</Alert>
+            <Alert tone="success">{ACCOUNT_ALREADY_VERIFIED}</Alert>
           ) : answer === 'needs-password' ? (
             <p className="text-foreground">{CHOOSE_PASSWORD_TO_VERIFY}</p>
           ) : (
-            <Alert variant="error">{toVerifyAccountErrorMessage(answer)}</Alert>
+            <Alert tone="error">{toVerifyAccountErrorMessage(answer)}</Alert>
           )}
         </div>
       )}
-      {!done && waitMessage && <Alert variant="error">{waitMessage}</Alert>}
+      {!done && waitMessage && <Alert tone="error">{waitMessage}</Alert>}
       {!done && robotCheck.enabled && <TurnstileWidget {...robotCheck.widgetProps} />}
       {done ? (
         <Button href={SIGN_IN_PATH} fullWidth>

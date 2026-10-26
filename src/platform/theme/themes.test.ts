@@ -3,8 +3,15 @@ import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { CONTRAST_PAIRS, MIN_TEXT_CONTRAST, THEME_TOKENS, THEME_TOKEN_NAMES } from './tokens'
-import { contrastRatio, readThemeModes } from './themeFile'
+import {
+  CONTRAST_PAIRS,
+  MIN_TEXT_CONTRAST,
+  THEME_TOKENS,
+  THEME_TOKEN_NAMES,
+  TINT_ALPHA,
+  TINTED_PAIRS,
+} from './tokens'
+import { contrastRatio, mixOver, readThemeModes } from './themeFile'
 
 const THEMES_DIR = join(process.cwd(), 'src/themes')
 const themes = readdirSync(THEMES_DIR, { withFileTypes: true })
@@ -37,6 +44,15 @@ describe('theme files', () => {
           MIN_TEXT_CONTRAST,
         )
       })
+
+      it.each(TINTED_PAIRS)('%s on a %s tint over %s passes WCAG AA', (text, tint, background) => {
+        const tinted = mixOver(modes[mode][tint], modes[mode][background], TINT_ALPHA)
+        const ratio = contrastRatio(modes[mode][text], tinted)
+        expect(
+          ratio,
+          `--${text} on --${tint} over --${background}: ${ratio.toFixed(2)}:1`,
+        ).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST)
+      })
     })
   })
 })
@@ -64,6 +80,15 @@ describe('readThemeModes', () => {
     expect(() => readThemeModes(`/* ${light} */\n[data-theme='dark'] { --a: #000; }\n`)).toThrow(
       /light/,
     )
+  })
+})
+
+describe('mixOver', () => {
+  it('mixes in oklab, as Tailwind does', () => {
+    expect(mixOver('#000000', '#ffffff', 0)).toBe('#ffffff')
+    expect(mixOver('#000000', '#ffffff', 1)).toBe('#000000')
+    // Halfway in oklab is lighter than halfway in sRGB (#808080)
+    expect(mixOver('#000000', '#ffffff', 0.5)).toBe('#636363')
   })
 })
 
