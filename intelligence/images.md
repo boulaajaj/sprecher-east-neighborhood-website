@@ -38,6 +38,7 @@ so in the review notes. A missing image is better than a wrong one.
 ## Credit it
 
 Fill in `alt` (what the photo shows, for screen readers), `credit` (the author's name as the
-license asks for it, for example "Jane Doe"), `license`, and `sourceUrl` (the file's page, for
-example on Wikimedia Commons) unless it's our own photo. CC BY and CC BY-SA require the credit to be
-visible on the page where the photo appears; the site doesn't show it yet (#405).
+license asks for it, for example "Jane Doe"), `license`, `licenseUrl` (the license itself, for
+example `https://creativecommons.org/licenses/by-sa/4.0/`) and `sourceUrl` (the file's page, for
+example on Wikimedia Commons) unless it's our own photo. Event and post pages show the credit under
+the photo, linked to the source and the license, as CC BY and CC BY-SA require (#405).
