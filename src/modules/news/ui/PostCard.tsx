@@ -1,9 +1,9 @@
 import React from 'react'
 
 import { Media } from '@/platform/ui/Media'
-import { formatDateShort } from '@/platform/lib/formatDateTime'
 import { Badge } from '@/platform/ui/Badge'
 import { Card, CardBody, CardMedia, CardMeta, CardTitle } from '@/platform/ui/Card'
+import { DateTime } from '@/platform/ui/DateTime'
 
 import type { PostSummary } from '../domain/types'
 
@@ -45,11 +45,7 @@ export const PostCard: React.FC<{
       <CardBody>
         {(publishedAt || hasCategories) && (
           <CardMeta className="mb-3">
-            {publishedAt && (
-              <time className="text-xs font-medium" dateTime={publishedAt}>
-                {formatDateShort(publishedAt)}
-              </time>
-            )}
+            {publishedAt && <DateTime value={publishedAt} className="text-xs font-medium" />}
             {hasCategories && publishedAt && (
               <span className="text-muted-foreground/40" aria-hidden="true">
                 &middot;

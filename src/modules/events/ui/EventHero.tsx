@@ -3,7 +3,8 @@ import React from 'react'
 import { ImageCredit } from '@/platform/ui/ImageCredit'
 import { Media } from '@/platform/ui/Media'
 import { Badge, BadgeList } from '@/platform/ui/Badge'
-import { formatDateTime, toDateTimeAttr } from '@/platform/lib/formatDateTime'
+import { DateTime } from '@/platform/ui/DateTime'
+import { MetaList, type MetaItem } from '@/platform/ui/MetaList'
 import { siteTimeZoneLabel } from '@/platform/lib/timezone'
 
 import { formatEventLocationType } from '../domain/locationTypes'
@@ -15,6 +16,18 @@ export const EventHero: React.FC<{
   const { categories, date, image, locationType, timeEnd, timeStart, title } = event
 
   const locationTypeLabel = locationType ? formatEventLocationType(locationType) : null
+  const facts: MetaItem[] = [
+    { label: 'Date', value: <DateTime value={date} format="long" /> },
+    ...(timeStart
+      ? [
+          {
+            label: 'Time',
+            value: `${timeStart}${timeEnd ? ` – ${timeEnd}` : ''} ${siteTimeZoneLabel()}`,
+          },
+        ]
+      : []),
+    ...(locationTypeLabel ? [{ label: 'Format', value: locationTypeLabel }] : []),
+  ]
 
   if (image) {
     // Full-bleed hero with image, dark overlay, white text
@@ -35,29 +48,7 @@ export const EventHero: React.FC<{
 
               <h1 className="mb-6 text-3xl md:text-5xl lg:text-6xl">{title}</h1>
 
-              <div className="flex flex-wrap gap-6 text-sm">
-                <div className="flex flex-col gap-1">
-                  <span className="text-on-image/70">Date</span>
-                  <time dateTime={toDateTimeAttr(date)}>{formatDateTime(date)}</time>
-                </div>
-
-                {timeStart && (
-                  <div className="flex flex-col gap-1">
-                    <span className="text-on-image/70">Time</span>
-                    <span>
-                      {timeStart}
-                      {timeEnd ? ` – ${timeEnd}` : ''} {siteTimeZoneLabel()}
-                    </span>
-                  </div>
-                )}
-
-                {locationTypeLabel && (
-                  <div className="flex flex-col gap-1">
-                    <span className="text-on-image/70">Format</span>
-                    <span>{locationTypeLabel}</span>
-                  </div>
-                )}
-              </div>
+              <MetaList variant="on-image" items={facts} />
             </div>
           </div>
 
@@ -85,27 +76,7 @@ export const EventHero: React.FC<{
 
         <h1 className="mb-6 text-4xl font-bold md:text-5xl">{title}</h1>
 
-        <div className="flex flex-wrap gap-6 text-muted-foreground">
-          <div>
-            <span className="font-medium text-foreground">Date: </span>
-            <time dateTime={toDateTimeAttr(date)}>{formatDateTime(date)}</time>
-          </div>
-
-          {timeStart && (
-            <div>
-              <span className="font-medium text-foreground">Time: </span>
-              {timeStart}
-              {timeEnd ? ` – ${timeEnd}` : ''} {siteTimeZoneLabel()}
-            </div>
-          )}
-
-          {locationTypeLabel && (
-            <div>
-              <span className="font-medium text-foreground">Format: </span>
-              {locationTypeLabel}
-            </div>
-          )}
-        </div>
+        <MetaList variant="inline" items={facts} />
       </div>
     </div>
   )

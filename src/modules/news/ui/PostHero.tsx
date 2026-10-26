@@ -3,7 +3,8 @@ import React from 'react'
 import { Badge, BadgeList } from '@/platform/ui/Badge'
 import { ImageCredit } from '@/platform/ui/ImageCredit'
 import { Media } from '@/platform/ui/Media'
-import { formatDateTime } from '@/platform/lib/formatDateTime'
+import { DateTime } from '@/platform/ui/DateTime'
+import { MetaList, type MetaItem } from '@/platform/ui/MetaList'
 
 import { formatAuthors } from '../domain/authors'
 import type { PostDetail } from '../domain/types'
@@ -14,6 +15,12 @@ export const PostHero: React.FC<{
 }> = ({ post }) => {
   const { categories, heroImage, publishedAt, title } = post
   const byline = formatAuthors(post.authors)
+  const facts: MetaItem[] = [
+    ...(byline ? [{ label: 'Author', value: byline }] : []),
+    ...(publishedAt
+      ? [{ label: 'Date Published', value: <DateTime value={publishedAt} format="long" /> }]
+      : []),
+  ]
 
   return (
     <>
@@ -32,24 +39,7 @@ export const PostHero: React.FC<{
 
             <h1 className="mb-6 text-3xl md:text-5xl lg:text-6xl">{title}</h1>
 
-            <div className="flex flex-col gap-4 md:flex-row md:gap-16">
-              {byline && (
-                <div className="flex flex-col gap-4">
-                  <div className="flex flex-col gap-1">
-                    <p className="text-sm">Author</p>
-
-                    <p>{byline}</p>
-                  </div>
-                </div>
-              )}
-              {publishedAt && (
-                <div className="flex flex-col gap-1">
-                  <p className="text-sm">Date Published</p>
-
-                  <time dateTime={publishedAt}>{formatDateTime(publishedAt)}</time>
-                </div>
-              )}
-            </div>
+            <MetaList variant="on-image" items={facts} />
           </div>
         </div>
         <div className="min-h-[80vh] select-none">
