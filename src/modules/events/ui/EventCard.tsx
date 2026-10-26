@@ -5,7 +5,9 @@ import { Media } from '@/platform/ui/Media'
 import { cn } from '@/platform/lib/cn'
 import { Badge, BadgeList } from '@/platform/ui/Badge'
 import { Card, CardBody, CardFooter, CardMedia, CardTitle } from '@/platform/ui/Card'
-import { formatDateShort, formatDateBadge, toDateTimeAttr } from '@/platform/lib/formatDateTime'
+import { formatDateBadge } from '@/platform/lib/formatDateTime'
+import { DateTime } from '@/platform/ui/DateTime'
+import { MetaList, type IconMetaItem } from '@/platform/ui/MetaList'
 
 import type { EventSummary } from '../domain/types'
 
@@ -55,9 +57,7 @@ export const EventCard: React.FC<{
       <Card as="article" padding="sm" interactive className="flex items-center gap-4">
         <DateBadge date={date} className="bg-surface text-center" />
         <div className="min-w-0">
-          <time className="text-xs text-muted-foreground" dateTime={toDateTimeAttr(date)}>
-            {formatDateShort(date)}
-          </time>
+          <DateTime value={date} className="text-xs text-muted-foreground" />
           <CardTitle as={headingLevel} href={href} className="truncate text-base">
             {title}
           </CardTitle>
@@ -94,20 +94,23 @@ export const EventCard: React.FC<{
         </CardTitle>
 
         {/* Date (the badge above is decorative) and time — never invent a time */}
-        <p className="mb-1.5 flex items-center gap-1.5 text-sm text-muted-foreground">
-          <Clock aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
-          <span>
-            <time dateTime={toDateTimeAttr(date)}>{formatDateShort(date)}</time>
-            {timeStart ? ` · ${timeStart}${timeEnd ? ` – ${timeEnd}` : ''}` : ''}
-          </span>
-        </p>
-
-        {locationName && (
-          <p className="mb-3 flex items-center gap-1.5 text-sm text-muted-foreground">
-            <MapPin aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
-            <span>{locationName}</span>
-          </p>
-        )}
+        <MetaList
+          className="mb-3 gap-1.5 text-sm text-muted-foreground"
+          items={[
+            {
+              icon: <Clock />,
+              value: (
+                <>
+                  <DateTime value={date} />
+                  {timeStart ? ` · ${timeStart}${timeEnd ? ` – ${timeEnd}` : ''}` : ''}
+                </>
+              ),
+            },
+            ...(locationName
+              ? [{ icon: <MapPin />, value: locationName } satisfies IconMetaItem]
+              : []),
+          ]}
+        />
 
         {description && (
           <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">

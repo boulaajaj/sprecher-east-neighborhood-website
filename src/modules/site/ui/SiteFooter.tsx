@@ -4,6 +4,7 @@ import { MapPin, Mail } from 'lucide-react'
 
 import { resolveLink } from '@/platform/payload/resolveLink'
 import { Link } from '@/platform/ui'
+import { MetaList } from '@/platform/ui/MetaList'
 
 import { getFooterNav } from '../use-cases/getFooterNav'
 import { Logo } from './Logo'
@@ -57,18 +58,20 @@ export async function SiteFooter() {
             <h3 className="mb-5 text-xs font-bold tracking-widest text-muted-foreground uppercase">
               Get in Touch
             </h3>
-            <div className="space-y-3 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 shrink-0 text-primary" />
-                <span>Madison, WI</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 shrink-0 text-primary" />
-                <Link href="/contact" variant="muted" className="font-medium">
-                  Contact us
-                </Link>
-              </div>
-            </div>
+            <MetaList
+              className="text-sm text-muted-foreground"
+              items={[
+                { icon: <MapPin className="text-primary" />, value: 'Madison, WI' },
+                {
+                  icon: <Mail className="text-primary" />,
+                  value: (
+                    <Link href="/contact" variant="muted" className="font-medium">
+                      Contact us
+                    </Link>
+                  ),
+                },
+              ]}
+            />
           </div>
         </div>
 

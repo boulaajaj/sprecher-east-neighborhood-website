@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { ChangePasswordForm, requireUser } from '@/modules/accounts/server'
 import { NOT_INDEXED } from '@/platform/seo/notIndexed'
 import { Card } from '@/platform/ui/Card'
+import { MetaList } from '@/platform/ui/MetaList'
 
 export const metadata: Metadata = {
   title: 'Account',
@@ -20,16 +21,12 @@ export default async function AccountPage() {
 
         <Card as="section" variant="muted" className="mb-8">
           <h2 className="mb-4 text-lg font-semibold text-foreground">Profile</h2>
-          <dl className="space-y-3">
-            <div>
-              <dt className="text-sm font-medium text-muted-foreground">Name</dt>
-              <dd className="text-foreground">{user.name || 'Not set'}</dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-muted-foreground">Email</dt>
-              <dd className="wrap-anywhere text-foreground">{user.email}</dd>
-            </div>
-          </dl>
+          <MetaList
+            items={[
+              { label: 'Name', value: user.name || 'Not set' },
+              { label: 'Email', value: <span className="wrap-anywhere">{user.email}</span> },
+            ]}
+          />
         </Card>
 
         <Card as="section" variant="muted">
