@@ -36,7 +36,11 @@ What established practice says:
 1. **Blocks and heroes take plain typed props.** The props type (`ContentBlockProps`,
    `PageHeroProps`) lives in the owning module's `domain/`, so the component in `ui/` and the
    mapper in `data/` can both import it ([rule 1](../README.md#dependency-rules)). Like every
-   other component, the block never imports `@/payload-types`.
+   other component, the block never imports `@/payload-types`. `domain/` may import only
+   `platform/lib/`, so the value types a props type uses live there: `ImageRef` and
+   `RichTextValue` already do, and the `ResolvedLink` type moves from
+   `src/platform/payload/resolveLink.ts` to `src/platform/lib/content.ts` with the first block
+   that carries a link (`resolveLink()` itself stays in `platform/payload/`).
 2. **One mapper per block or hero**, `to…Props`, in the owning module's `data/mappers.ts` (next to
    the existing document mappers), turns the stored block into those props. Images go through
    `toImageRef()` (`src/platform/payload/imageRef.ts`), links through `resolveLink()`, and rich
@@ -49,8 +53,8 @@ What established practice says:
    the owning module exports from `server.ts` (a use case that calls its mapper). A block from
    `platform/` (the media block) is mapped by a function next to it in `platform/`.
 4. **Typing while blocks move.** The page's layout type is a union with one member per block
-   type: the plain props for a block that has moved, the generated block type for one that
-   hasn't yet. `PageBlockComponents` is keyed by `blockType` over that union, so `tsc` still
+   type: the plain props for a `site` block that has moved, and the stored (generated) block type
+   for one that hasn't yet or that another module owns, which the registry maps (point 3). `PageBlockComponents` is keyed by `blockType` over that union, so `tsc` still
    fails when a block type has no component, and each block moves on its own.
 5. **`RichText` and `Media` keep their value types.** `RichTextValue` (Lexical's editor state) and
    `ImageRef` (`src/platform/lib/content.ts`) are the platform's names for those values. They are
