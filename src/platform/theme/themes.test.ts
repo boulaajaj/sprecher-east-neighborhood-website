@@ -55,6 +55,16 @@ describe('readThemeModes', () => {
     expect(() => readThemeModes(":root, [data-theme='light'] { --a: #fff; }")).toThrow(/dark/)
     expect(() => readThemeModes("[data-theme='dark'] { --a: #fff; }")).toThrow(/light/)
   })
+
+  it('ignores a commented-out mode block', () => {
+    const light = ":root, [data-theme='light'] { --a: #fff; }\n"
+    expect(() => readThemeModes(`${light}/*\n[data-theme='dark'] { --a: #000; }\n*/\n`)).toThrow(
+      /dark/,
+    )
+    expect(() => readThemeModes(`/* ${light} */\n[data-theme='dark'] { --a: #000; }\n`)).toThrow(
+      /light/,
+    )
+  })
 })
 
 describe('contrastRatio', () => {

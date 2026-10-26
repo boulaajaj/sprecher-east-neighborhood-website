@@ -17,18 +17,21 @@ export interface ThemeModes {
 const LIGHT_BLOCK = /:root\s*,\s*\[data-theme='light'\]\s*\{([^}]*)\}/
 const DARK_BLOCK = /(?:^|\n)\[data-theme='dark'\]\s*\{([^}]*)\}/
 
+const COMMENT = /\/\*[\s\S]*?\*\//g
+
 function readDeclarations(body: string): TokenValues {
   const values: TokenValues = {}
-  const withoutComments = body.replace(/\/\*[\s\S]*?\*\//g, '')
-  for (const [, name, value] of withoutComments.matchAll(/--([\w-]+)\s*:\s*([^;]+);/g)) {
+  for (const [, name, value] of body.matchAll(/--([\w-]+)\s*:\s*([^;]+);/g)) {
     values[name] = value.trim()
   }
   return values
 }
 
 export function readThemeModes(css: string): ThemeModes {
-  const light = LIGHT_BLOCK.exec(css)
-  const dark = DARK_BLOCK.exec(css)
+  // Comments first: a commented-out block is ignored by the browser, so it must not count
+  const stylesheet = css.replace(COMMENT, '')
+  const light = LIGHT_BLOCK.exec(stylesheet)
+  const dark = DARK_BLOCK.exec(stylesheet)
   if (!light) throw new Error("The theme has no light block (:root, [data-theme='light'])")
   if (!dark) throw new Error("The theme has no dark block ([data-theme='dark'])")
   const lightValues = readDeclarations(light[1])
