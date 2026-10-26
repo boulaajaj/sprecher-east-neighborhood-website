@@ -76,7 +76,7 @@ grows should split its top level "into domain oriented modules which are interna
   contract (`tokens.ts`) and its Tailwind mapping (#146), and the theme options (#409): what a theme
   sets beyond tokens (`options.ts`, with defaults), the registry of themes and the active one
   (`registry.ts`), and the decoration slot the layout renders (`ThemeDecoration`,
-  `decorations.css`).
+  `decorations.css`), as [decision 0012](decisions/0012-runtime-themes.md) sets out.
 - `richtext/`: the `RichText` renderer and the blocks that can sit inside rich text (banner, code
   and media; only a post's content offers them). Pages reuse the media block from here.
   `richTextToPlainText` turns rich text into plain text (Payload's converter) for JSON-LD.

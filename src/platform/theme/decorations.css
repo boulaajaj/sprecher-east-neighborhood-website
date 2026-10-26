@@ -4,36 +4,39 @@
  * the person asks for reduced motion.
  */
 
-/* Three layers of flakes on tiles of unrelated sizes, so no grid shows */
+/*
+ * Three layers of flakes on tiles of unrelated widths, so no grid shows. The flakes sit on a
+ * layer one tile taller than the screen that moves down by one tile height (300px, which the
+ * 150px tile divides) and loops: moving it with a transform is composited, so the screen isn't
+ * repainted on every frame.
+ */
 .theme-decoration-snowfall {
+  overflow: hidden;
+  opacity: 0.35;
+}
+
+.theme-decoration-snowfall::before {
+  content: '';
+  position: absolute;
+  inset: -300px 0 0;
   background-image:
     radial-gradient(circle at 23% 31%, var(--on-image) 0 1.5px, transparent 2.5px),
     radial-gradient(circle at 71% 64%, var(--on-image) 0 1px, transparent 2px),
     radial-gradient(circle at 42% 87%, var(--on-image) 0 2px, transparent 3px);
   background-size:
-    211px 223px,
-    157px 149px,
-    293px 307px;
-  opacity: 0.35;
+    211px 300px,
+    157px 150px,
+    293px 300px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .theme-decoration-snowfall {
+  .theme-decoration-snowfall::before {
     animation: theme-snowfall 20s linear infinite;
   }
 }
 
 @keyframes theme-snowfall {
-  from {
-    background-position:
-      0 0,
-      0 0,
-      0 0;
-  }
   to {
-    background-position:
-      40px 223px,
-      -30px 298px,
-      60px 307px;
+    transform: translateY(300px);
   }
 }
