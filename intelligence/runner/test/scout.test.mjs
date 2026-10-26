@@ -111,7 +111,10 @@ describe('scout', () => {
     const namesArea = areaMatcher(contract.area)
     assert.ok(namesArea('Resurfacing on Cottage Grove Rd'))
     assert.ok(namesArea('North Star neighborhood association picnic'))
-    assert.ok(namesArea('High Crossing Blvd sidewalk hearing'))
+    assert.ok(namesArea('Richmond Hill homeowners meeting'))
+    // East Towne's High Crossing Blvd is outside (coverage.md)
+    assert.ok(!namesArea('High Crossing Blvd sidewalk hearing'))
+    assert.ok(namesArea('I-39/90/94 at Milwaukee St: open house'))
     // A highway alone names half the city
     assert.ok(!namesArea('I-94 lane closures overnight'))
     assert.ok(!namesArea('Milwaukee Street reconstruction near Fair Oaks'))
