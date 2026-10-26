@@ -50,6 +50,12 @@
   /* Error text: --destructive is 4.1:1 on --surface and 3.9:1 on its own tint; this is 5.5:1 on
      --surface, 6.1:1 on --background and 4.8:1 or more on the error tint */
   --destructive-strong: #b91c1c;
+  /* Text and overlays on photos: the same in both modes, as the photo doesn't change */
+  --on-image: #ffffff;
+  --scrim: #000000;
+  /* Dark chrome on any page (admin bar, code blocks) */
+  --inverse: #000000;
+  --inverse-foreground: #ffffff;
 }
 
 /* Sprecher East brand tokens — dark theme */
@@ -93,4 +99,9 @@
   --primary-strong: #5fb88e;
   /* 5.8:1 on --surface, 6.1:1 on --card, 6.8:1 on --background */
   --destructive-strong: #f87171;
+  --on-image: #ffffff;
+  --scrim: #000000;
+  /* Dark chrome on any page (admin bar, code blocks) */
+  --inverse: #000000;
+  --inverse-foreground: #ffffff;
 }

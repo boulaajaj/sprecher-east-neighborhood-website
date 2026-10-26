@@ -23,7 +23,7 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
       </div>
 
       {/* Gradient scrim — darkens the bottom-left where text is anchored */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-scrim/60 via-scrim/30 to-transparent" />
 
       {/* Content anchored to bottom-left with two-column layout */}
       <div
@@ -35,20 +35,20 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
           <div className="max-w-2xl">
             {heading && (
               <RichText
-                className="mb-0 [&_h1]:text-3xl [&_h1]:leading-tight [&_h1]:font-bold [&_h1]:tracking-tight [&_h1]:text-balance [&_h1]:text-white [&_h1]:[text-shadow:0_2px_4px_rgba(0,0,0,0.8),0_4px_16px_rgba(0,0,0,0.5)] sm:[&_h1]:text-4xl lg:[&_h1]:text-5xl"
+                className="mb-0 [&_h1]:text-3xl [&_h1]:leading-tight [&_h1]:font-bold [&_h1]:tracking-tight [&_h1]:text-balance [&_h1]:text-on-image [&_h1]:[text-shadow:0_2px_4px_color-mix(in_srgb,var(--scrim)_80%,transparent),0_4px_16px_color-mix(in_srgb,var(--scrim)_50%,transparent)] sm:[&_h1]:text-4xl lg:[&_h1]:text-5xl"
                 data={heading}
                 enableGutter={false}
               />
             )}
             {body && (
               // Description — frosted glass card
-              <div className="relative mt-3 overflow-hidden rounded-xl border border-white/20 bg-white/10 px-4 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-xl md:px-5 md:py-3.5">
+              <div className="relative mt-3 overflow-hidden rounded-xl border border-on-image/20 bg-on-image/10 px-4 py-3 shadow-[0_8px_32px_color-mix(in_srgb,var(--scrim)_30%,transparent),inset_0_1px_0_color-mix(in_srgb,var(--on-image)_20%,transparent)] backdrop-blur-xl md:px-5 md:py-3.5">
                 {/* Glass highlight sheen — top-left to bottom-right */}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-white/5" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-on-image/15 via-transparent to-on-image/5" />
                 {/* Inner glow along top edge */}
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-on-image/40 to-transparent" />
                 <RichText
-                  className="relative mb-0 [&_p]:mt-0 [&_p]:mb-0 [&_p]:text-base [&_p]:leading-relaxed [&_p]:text-white/90 md:[&_p]:text-lg"
+                  className="relative mb-0 [&_p]:mt-0 [&_p]:mb-0 [&_p]:text-base [&_p]:leading-relaxed [&_p]:text-on-image/90 md:[&_p]:text-lg"
                   data={body}
                   enableGutter={false}
                 />

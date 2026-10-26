@@ -17,7 +17,7 @@ export const CallToActionBlock: React.FC<CTABlockProps> = ({ links, richText }) 
           <div className="max-w-[48rem] flex-1">
             {richText && (
               <RichText
-                className="mb-0 text-white [&_h2]:text-3xl [&_h2]:font-bold [&_h2]:text-white [&_h3]:text-2xl [&_h3]:font-bold [&_h3]:text-white [&_p]:text-lg [&_p]:text-white/90 [&_strong]:text-white"
+                className="mb-0 text-primary-foreground [&_h2]:text-3xl [&_h2]:font-bold [&_h2]:text-primary-foreground [&_h3]:text-2xl [&_h3]:font-bold [&_h3]:text-primary-foreground [&_p]:text-lg [&_p]:text-primary-foreground/90 [&_strong]:text-primary-foreground"
                 data={richText}
                 enableGutter={false}
               />

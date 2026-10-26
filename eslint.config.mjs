@@ -3,6 +3,7 @@ import tseslint from 'typescript-eslint'
 import unusedImports from 'eslint-plugin-unused-imports'
 import eslintConfigPrettier from 'eslint-config-prettier'
 import { boundariesConfig } from './eslint.boundaries.config.mjs'
+import { themeTokensConfig } from './eslint.theme.config.mjs'
 
 export default [
   // ─── 1. Global ignores ───────────────────────────────────────────────────────
@@ -83,6 +84,9 @@ export default [
   // ─── 5. Architecture boundaries (errors since #137) ──────────────────────────
   boundariesConfig,
 
-  // ─── 6. Prettier must be last ────────────────────────────────────────────────
+  // ─── 6. Theme tokens only, no raw colours in classes (#146) ──────────────────
+  themeTokensConfig,
+
+  // ─── 7. Prettier must be last ────────────────────────────────────────────────
   eslintConfigPrettier,
 ]

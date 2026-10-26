@@ -97,6 +97,6 @@ These are specific implementation mistakes the designer should catch and prescri
 | Uniform cards       | All cards identical with no visual differentiation   | Add icons, images, or color accents per card                            |
 | Consecutive same-bg | Two sections with same background color              | Alternate `bg-background`/`bg-surface`, or insert a colored divider     |
 | Giant min-height    | `min-h-[80vh]` with 3 lines of content               | Reduce to `min-h-[60vh]` or use `py-24` instead                         |
-| Missing scrim       | White text on bright image with no gradient          | Add `bg-gradient-to-t from-black/60` below text area                    |
+| Missing scrim       | `text-on-image` on a bright image with no gradient   | Add `bg-gradient-to-t from-scrim/60` below text area                    |
 | Template buttons    | Generic "Learn More" or "Get Started"                | Use specific action words: "See Upcoming Events", "Join the Discussion" |
 | Orphan section      | A section with heading + one sentence + nothing else | Merge with adjacent section or add supporting content                   |

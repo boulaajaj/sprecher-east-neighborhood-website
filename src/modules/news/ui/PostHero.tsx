@@ -17,7 +17,7 @@ export const PostHero: React.FC<{
   return (
     <>
       <div className="relative -mt-[var(--header-height)] flex items-end">
-        <div className="relative z-10 container pt-[var(--header-height)] pb-8 text-white lg:grid lg:grid-cols-[1fr_48rem_1fr]">
+        <div className="relative z-10 container pt-[var(--header-height)] pb-8 text-on-image lg:grid lg:grid-cols-[1fr_48rem_1fr]">
           <div className="col-span-1 col-start-1 md:col-span-2 md:col-start-2">
             <div className="mb-6 text-sm uppercase">
               {categories.map((category, index) => (
@@ -54,7 +54,7 @@ export const PostHero: React.FC<{
           {heroImage && (
             <Media fill priority imgClassName="-z-10 object-cover" resource={heroImage} />
           )}
-          <div className="pointer-events-none absolute bottom-0 left-0 h-1/2 w-full bg-linear-to-t from-black to-transparent" />
+          <div className="pointer-events-none absolute bottom-0 left-0 h-1/2 w-full bg-linear-to-t from-scrim to-transparent" />
         </div>
       </div>
       <ImageCredit image={heroImage} className="container mt-2 text-right" />

@@ -10,7 +10,7 @@ them to the component, and hold them to [the same standards as production code](
 A frosted glass card for overlays, modals, or floating content.
 
 ```tsx
-<div className="rounded-2xl border border-white/20 bg-white/10 p-6 shadow-xl backdrop-blur-md">
+<div className="rounded-2xl border border-on-image/20 bg-on-image/10 p-6 shadow-xl backdrop-blur-md">
   {/* Card content */}
 </div>
 ```
@@ -18,7 +18,7 @@ A frosted glass card for overlays, modals, or floating content.
 **Dark variant (on dark backgrounds):**
 
 ```tsx
-<div className="rounded-2xl border border-white/10 bg-black/20 p-6 shadow-xl backdrop-blur-md">
+<div className="rounded-2xl border border-on-image/10 bg-scrim/20 p-6 shadow-xl backdrop-blur-md">
   {/* Card content */}
 </div>
 ```
@@ -36,7 +36,7 @@ A frosted glass card for overlays, modals, or floating content.
 Frosted glass header that shows content scrolling beneath.
 
 ```tsx
-<header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-background/80 backdrop-blur-lg">
+<header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
   <nav className="container flex h-[var(--header-height)] items-center justify-between">
     {/* Nav content */}
   </nav>
@@ -83,7 +83,7 @@ A full-bleed section where a photo is visible but tinted with the brand color. M
   </div>
   {/* Brand tint — photo visible but color-matched to the site */}
   <div className="absolute inset-0 bg-primary/80" />
-  <div className="relative z-10 container text-white">{/* Content */}</div>
+  <div className="relative z-10 container text-on-image">{/* Content */}</div>
 </section>
 ```
 

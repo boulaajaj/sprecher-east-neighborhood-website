@@ -26,6 +26,9 @@
 
 @plugin '@tailwindcss/typography';
 
+/* The contract's token names would otherwise turn into unused classes */
+@source not '../../platform/theme/tokens.ts';
+
 @source inline('lg:col-span-4');
 @source inline('lg:col-span-6');
 @source inline('lg:col-span-8');
@@ -93,11 +96,11 @@
 /* Hero text readability utilities — centralized so components stay clean */
 @layer utilities {
   .hero-text-shadow {
-    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
+    filter: drop-shadow(0 2px 8px color-mix(in srgb, var(--scrim) 60%, transparent));
   }
 
   .hero-text-shadow-sm {
-    filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(0 1px 4px color-mix(in srgb, var(--scrim) 50%, transparent));
   }
 }
 
