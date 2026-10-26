@@ -8,7 +8,8 @@ const DECORATION_CLASS: Record<Decoration, string> = {
 
 /**
  * The page's decoration slot (#409): the active theme's decorative layer, or nothing. It is
- * hidden from assistive technology, takes no clicks, and stands still with reduced motion.
+ * hidden from assistive technology, takes no clicks, stops moving within 5 seconds and stands
+ * still with reduced motion.
  * `decoration` overrides the active theme's, for tests and previews.
  */
 export function ThemeDecoration({ decoration }: { decoration?: Decoration | null }) {
