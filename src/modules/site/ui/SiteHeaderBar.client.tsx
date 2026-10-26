@@ -84,14 +84,19 @@ export const SiteHeaderBar: React.FC<SiteHeaderBarProps> = ({
           </Button>
         </div>
 
-        {/* The mobile menu: a sheet under the header, with Radix's focus trap, Escape, scroll lock
-            and focus return (#437) */}
+        {/* The mobile menu: a full-screen sheet, with Radix's focus trap, Escape, scroll lock and
+            focus return (#437) */}
         <Dialog
           open={mobileOpen}
           onOpenChange={setMobileOpen}
           title="Menu"
           hideTitle
           closeLabel="Close menu"
+          start={
+            <NextLink href="/" className="shrink-0" onClick={closeMobileMenu}>
+              <Logo />
+            </NextLink>
+          }
           className="lg:hidden"
           trigger={
             <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
@@ -99,7 +104,7 @@ export const SiteHeaderBar: React.FC<SiteHeaderBarProps> = ({
             </Button>
           }
         >
-          <div id="mobile-menu" className="container flex flex-col gap-2 pb-6">
+          <div id="mobile-menu" className="container flex flex-col gap-2 py-4">
             <HeaderNav data={data} pathname={pathname} mobile onNavigate={closeMobileMenu} />
             {/* Following a link or signing out in the account links closes the menu too */}
             <div className="contents" onClick={closeOnLinkOrButton}>
