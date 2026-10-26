@@ -32,8 +32,8 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     // On mount, read the visitor's theme, and set it on <html> too. InitTheme's script has
-    // usually set it already; it hasn't on a 404 for an unknown address, which Next serves as an
-    // error page without the layout's <head> and renders in the browser (#413)
+    // usually set it already; it hasn't on a 404 (a page calling notFound()), which Next serves
+    // as an error page without the layout's <head> and renders in the browser (#413)
     const stored = window.localStorage.getItem(themeLocalStorageKey)
     const resolved = themeIsValid(stored) ? stored : getImplicitPreference() || defaultTheme
     document.documentElement.setAttribute('data-theme', resolved)
