@@ -6,6 +6,7 @@ import { EventsFeed, findEventPage } from '@/modules/events/server'
 import { mergeOpenGraph } from '@/platform/seo/mergeOpenGraph'
 import { siteTimeZoneLabel } from '@/platform/lib/timezone'
 import { EmptyState } from '@/platform/ui/EmptyState'
+import { PageHeader } from '@/platform/ui/PageHeader'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
@@ -19,19 +20,11 @@ export default async function EventsPage() {
 
   return (
     <div className="pt-24 pb-24">
-      {/* Page header */}
-      <div className="container mb-12 md:mb-16">
-        <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">
-          Community Calendar
-        </p>
-        <h1 className="mb-4 text-4xl font-bold tracking-tight text-balance text-foreground md:text-5xl">
-          Community Events
-        </h1>
-        <p className="max-w-2xl text-lg text-muted-foreground">
-          Join your neighbors at upcoming events in and around the Sprecher East neighborhood. All
-          times are {siteTimeZoneLabel()}.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Community Calendar"
+        title="Community Events"
+        description={`Join your neighbors at upcoming events in and around the Sprecher East neighborhood. All times are ${siteTimeZoneLabel()}.`}
+      />
 
       {/* Upcoming events */}
       <section aria-labelledby="upcoming-heading" className="container mb-16">

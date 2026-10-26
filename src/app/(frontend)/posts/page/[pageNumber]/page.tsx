@@ -1,12 +1,11 @@
 import type { Metadata } from 'next/types'
 
-import { ArrowLeft } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
 import { findPostPage, listPostPageNumbers, PostsFeed } from '@/modules/news/server'
 import { parsePageNumber } from '@/platform/lib'
-import { Link } from '@/platform/ui'
+import { PageHeader } from '@/platform/ui/PageHeader'
 
 export const revalidate = 600
 
@@ -30,22 +29,11 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   return (
     <div className="pt-24 pb-24">
-      <div className="container mb-12 md:mb-16">
-        <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">
-          News · Page {page}
-        </p>
-        <h1 className="text-4xl font-bold tracking-tight text-balance text-foreground md:text-5xl">
-          News &amp; Updates
-        </h1>
-        <Link
-          href="/posts"
-          variant="action"
-          icon={<ArrowLeft aria-hidden="true" />}
-          className="mt-4"
-        >
-          Back to the latest news
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow={`News · Page ${page}`}
+        title="News & Updates"
+        backLink={{ href: '/posts', label: 'Back to the latest news' }}
+      />
 
       <PostsFeed initial={posts} />
     </div>

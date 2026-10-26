@@ -5,6 +5,7 @@ import React from 'react'
 import { parseSearchQuery } from '@/modules/news'
 import { findSearchResults, PostGrid, SearchBox } from '@/modules/news/server'
 import { EmptyState } from '@/platform/ui/EmptyState'
+import { PageHeader } from '@/platform/ui/PageHeader'
 
 type Args = {
   searchParams: Promise<{
@@ -19,14 +20,9 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
 
   return (
     <div className="pt-24 pb-24">
-      <div className="container mb-12 md:mb-16">
-        <h1 className="mb-6 text-4xl font-bold tracking-tight text-foreground md:text-5xl">
-          Search
-        </h1>
-        <div className="max-w-[50rem]">
-          <SearchBox initialQuery={query} />
-        </div>
-      </div>
+      <PageHeader title="Search">
+        <SearchBox initialQuery={query} />
+      </PageHeader>
 
       {results.length > 0 ? (
         <PostGrid posts={results} headingLevel="h2" />

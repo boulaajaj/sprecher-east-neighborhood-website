@@ -1,13 +1,12 @@
 import type { Metadata } from 'next/types'
 
-import { ArrowLeft } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
 import { isEventScope } from '@/modules/events'
 import { EventsFeed, findEventPage } from '@/modules/events/server'
 import { parsePageNumber } from '@/platform/lib'
-import { Link } from '@/platform/ui'
+import { PageHeader } from '@/platform/ui/PageHeader'
 
 export const revalidate = 600
 
@@ -36,22 +35,11 @@ export default async function EventsListPage({ params: paramsPromise }: Args) {
 
   return (
     <div className="pt-24 pb-24">
-      <div className="container mb-12">
-        <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">
-          Community Calendar · Page {page}
-        </p>
-        <h1 className="text-4xl font-bold tracking-tight text-balance text-foreground md:text-5xl">
-          {TITLES[scope]}
-        </h1>
-        <Link
-          href="/events"
-          variant="action"
-          icon={<ArrowLeft aria-hidden="true" />}
-          className="mt-4"
-        >
-          Back to all events
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow={`Community Calendar · Page ${page}`}
+        title={TITLES[scope]}
+        backLink={{ href: '/events', label: 'Back to all events' }}
+      />
       <section className="container">
         <EventsFeed scope={scope} initial={events} headingLevel="h2" />
       </section>
