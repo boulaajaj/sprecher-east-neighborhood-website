@@ -68,6 +68,7 @@ describe('fixes from the re-check', () => {
       now: atNoon('2026-10-25'),
     }
     const first = await scoutSource(library, {
+      area: contract.area,
       ...options,
       state: { sources: {}, seen: {} },
       http: async () => new Response(ics),
@@ -79,6 +80,7 @@ describe('fixes from the re-check', () => {
       ]),
     )
     const second = await scoutSource(library, {
+      area: contract.area,
       ...options,
       state: { sources: {}, seen },
       http: async () => new Response(ics),

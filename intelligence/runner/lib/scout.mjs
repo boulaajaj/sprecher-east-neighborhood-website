@@ -7,27 +7,29 @@ import { addDays, dateIn, isoNow } from './time.mjs'
 // Scout (scout.md): fetch each pilot source, parse it, and build candidates with a stable
 // externalId, a contentHash and the change since earlier runs. Code only, no model.
 
+const escape = (word) => word.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')
+const wordsPattern = (words) =>
+  new RegExp(`(?<![a-z0-9])(?:${words.map(escape).join('|')})(?![a-z0-9])`, 'i')
+
 /**
- * Places in or next to the area, from coverage.md, for the sources whose treatment says to match
- * text on our side (Legistar). The model stages still decide; this only keeps routine citywide
- * meetings and legislation from using the run's model budget. Keep it in step with coverage.md.
+ * Whether a text names the area, by area.yaml (#390): a place in or bounding it, a neighboring
+ * association, or a highway together with an interchange or a cross street at the area's edge.
+ * For the sources whose treatment says to match text on our side (Legistar). The model stages
+ * still decide; this only keeps routine citywide meetings and legislation from using the run's
+ * model budget.
  */
-export const AREA_TERMS = [
-  'sprecher',
-  'door creek',
-  'cottage grove road',
-  'cottage grove rd',
-  'district 16',
-  'pinney',
-  'elvehjem',
-  'blooming grove',
-  'reston heights',
-  'owl creek',
-]
-const namesArea = (text) => AREA_TERMS.some((term) => text.toLowerCase().includes(term))
+export function areaMatcher(area) {
+  const local = wordsPattern([...area.places, ...area.neighbors.names])
+  const highways = area.highways.map(({ names, with: near }) => [
+    wordsPattern(names),
+    wordsPattern(near),
+  ])
+  return (text) =>
+    local.test(text) || highways.some(([road, near]) => road.test(text) && near.test(text))
+}
 
 /** The per-source rules from sources.yaml `treatment` that code can apply. */
-export function keepItem(source, item) {
+export function keepItem(source, item, namesArea) {
   const text = `${item.title} ${item.sourceText} ${item.locationText ?? ''}`
   if (source.id === 'legistar-events') {
     return /common council/i.test(item.title) || /public hearing/i.test(text) || namesArea(text)
@@ -59,8 +61,9 @@ const newestModified = (items) =>
  */
 export async function scoutSource(
   source,
-  { state, http, robots, budgets, validate, now = new Date() },
+  { state, http, robots, budgets, validate, area, now = new Date() },
 ) {
+  const namesArea = areaMatcher(area)
   const check = {
     sourceId: source.id,
     fetchStrategy: 'none',
@@ -93,7 +96,9 @@ export async function scoutSource(
   const host = new URL(source.canonicalUrl).hostname.replace(/^www\./, '')
   let items
   try {
-    items = parse(answer.body, { from: today, host }).filter((item) => keepItem(source, item))
+    items = parse(answer.body, { from: today, host }).filter((item) =>
+      keepItem(source, item, namesArea),
+    )
   } catch (error) {
     check.status = 'error'
     check.error = `parse failed: ${error.message}`.slice(0, 500)

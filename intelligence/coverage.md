@@ -41,13 +41,13 @@ Facts to keep straight:
 
 Every verified item gets one `coverage` value (`schemas/common.schema.json`):
 
-| Value       | Means                                                                                                                                                                                                                               |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `core`      | The confirmed address or affected place is inside the area.                                                                                                                                                                         |
-| `catchment` | Close enough that residents use it: Pinney Library, Door Creek Park, Elvehjem Sanctuary, the stretches of Sprecher Road, Cottage Grove Road and I-94 that bound the area, and District 16 meetings that name a place near the area. |
-| `citywide`  | City of Madison or Dane County, not tied to a place, with a direct use for residents: a deadline, a service, a council decision, a free program open to everyone.                                                                   |
-| `outside`   | Somewhere else, including places with similar names.                                                                                                                                                                                |
-| `unknown`   | The location couldn't be confirmed from a primary source.                                                                                                                                                                           |
+| Value       | Means                                                                                                                                                                                                                                                                                                                   |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `core`      | The confirmed address or affected place is inside the area.                                                                                                                                                                                                                                                             |
+| `catchment` | Close enough that residents use it: Pinney Library, Door Creek Park, Elvehjem Sanctuary, the stretches of Sprecher Road, Cottage Grove Road and I-94 that bound the area, District 16 meetings that name a place near the area, and the major events and public matters of the neighboring associations in `area.yaml`. |
+| `citywide`  | City of Madison or Dane County, not tied to a place, with a direct use for residents: a deadline, a service, a council decision, a free program open to everyone.                                                                                                                                                       |
+| `outside`   | Somewhere else, including places with similar names.                                                                                                                                                                                                                                                                    |
+| `unknown`   | The location couldn't be confirmed from a primary source.                                                                                                                                                                                                                                                               |
 
 ## Known venues
 

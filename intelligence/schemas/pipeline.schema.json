@@ -10,6 +10,7 @@
     "budgets",
     "sources",
     "coverage",
+    "area",
     "stages",
     "escalation",
     "routes"
@@ -49,6 +50,7 @@
     },
     "sources": { "const": "sources.yaml" },
     "coverage": { "const": "coverage.md" },
+    "area": { "const": "area.yaml" },
     "stages": {
       "type": "array",
       "items": {

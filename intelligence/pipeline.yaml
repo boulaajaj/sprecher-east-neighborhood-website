@@ -28,6 +28,8 @@ routes:
   duplicate: none
 sources: sources.yaml
 coverage: coverage.md
+# The words code uses to spot the area in an item's text (#390).
+area: area.yaml
 stages:
   - id: scout
     prompt: prompts/scout.md
