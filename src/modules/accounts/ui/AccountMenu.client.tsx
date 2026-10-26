@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 import React from 'react'
 
+import { ADMIN_ROUTE } from '@/platform/payload/adminRoutes'
 import { Button, Link } from '@/platform/ui'
 
 import { ACCOUNT_PATH, SIGN_IN_PATH, SIGN_UP_PATH } from '../domain/paths'
@@ -10,7 +11,9 @@ import { useAccount } from './AccountProvider.client'
 
 /**
  * The header's account links: "Log In" and "Sign Up" for a visitor (#296); the account's name
- * and "Sign Out" when signed in. `bar` is the desktop header, `drawer` the mobile menu.
+ * and "Sign Out" when signed in, plus "Dashboard" (the admin) for an admin or editor (#378): the
+ * footer is the same for everyone, and the admin bar is hidden on phones. `bar` is the desktop
+ * header, `drawer` the mobile menu.
  */
 export function AccountMenu({ variant }: { variant: 'bar' | 'drawer' }) {
   const { account, loading, signOut } = useAccount()
@@ -53,8 +56,14 @@ export function AccountMenu({ variant }: { variant: 'bar' | 'drawer' }) {
   }
 
   const label = account.name || 'Account'
+  const dashboard = account.staff ? (
+    <Link href={ADMIN_ROUTE} variant="nav" size={bar ? 'sm' : undefined}>
+      Dashboard
+    </Link>
+  ) : null
   return bar ? (
     <>
+      {dashboard}
       {/* A long name is cut short so the bar never overflows; the full name is the title */}
       <Link
         href={ACCOUNT_PATH}
@@ -75,6 +84,7 @@ export function AccountMenu({ variant }: { variant: 'bar' | 'drawer' }) {
       <Link href={ACCOUNT_PATH} variant="nav" current={pathname === ACCOUNT_PATH}>
         {label}
       </Link>
+      {dashboard}
       <Button
         variant="ghost"
         fullWidth

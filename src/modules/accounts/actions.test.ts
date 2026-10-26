@@ -100,9 +100,18 @@ describe('signOut', () => {
 })
 
 describe('getSignedInAccount', () => {
-  it('gives the header only the account’s name', async () => {
+  it('gives the header only the account’s name and whether it is staff', async () => {
     edges.auth.mockResolvedValue({ user: resident })
-    expect(await getSignedInAccount()).toEqual({ name: 'Ada' })
+    expect(await getSignedInAccount()).toEqual({ name: 'Ada', staff: false })
+  })
+
+  it('marks admins and editors as staff, never sending the role (#378)', async () => {
+    for (const role of ['admin', 'editor']) {
+      edges.auth.mockResolvedValue({ user: { ...resident, role } })
+      expect(await getSignedInAccount()).toEqual({ name: 'Ada', staff: true })
+    }
+    edges.auth.mockResolvedValue({ user: { ...resident, role: 'agent' } })
+    expect(await getSignedInAccount()).toEqual({ name: 'Ada', staff: false })
   })
 
   it('is null for a visitor', async () => {
