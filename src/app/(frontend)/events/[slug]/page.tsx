@@ -22,6 +22,7 @@ import {
 } from '@/modules/events/server'
 import { Button } from '@/platform/ui'
 import { generateMeta } from '@/platform/seo/generateMeta'
+import { DetailLayout } from '@/platform/ui/DetailLayout'
 
 // A scheduled publish or unpublish runs outside a request, where Next can't refresh the cache, so
 // the page also re-renders every 10 minutes (#141, decision 0011)
@@ -74,41 +75,41 @@ export default async function EventPage({ params: paramsPromise }: Args) {
             ]}
           />
         </div>
-        <div className="container lg:grid lg:grid-cols-[1fr_18rem] lg:gap-8">
-          <div>
-            <EventLocation event={event} />
+        <DetailLayout
+          aside={
+            <>
+              <SidebarEvents events={upcomingEvents} title="Upcoming Events" />
+              <SidebarCTA
+                heading="Stay in the Loop"
+                description="Browse all upcoming events and find ways to connect with your neighbors."
+                buttonLabel="View All Events"
+                buttonHref="/events"
+              />
+            </>
+          }
+        >
+          <EventLocation event={event} />
 
-            {event.registrationUrl && (
-              <div className="mb-8">
-                <Button
-                  href={event.registrationUrl}
-                  external
-                  iconEnd={<ArrowRight aria-hidden="true" />}
-                >
-                  Register for This Event
-                </Button>
-              </div>
-            )}
+          {event.registrationUrl && (
+            <div className="mb-8">
+              <Button
+                href={event.registrationUrl}
+                external
+                iconEnd={<ArrowRight aria-hidden="true" />}
+              >
+                Register for This Event
+              </Button>
+            </div>
+          )}
 
-            {event.description && !hasHeroImage && (
-              <p className="mb-8 text-lg text-muted-foreground">{event.description}</p>
-            )}
+          {event.description && !hasHeroImage && (
+            <p className="mb-8 text-lg text-muted-foreground">{event.description}</p>
+          )}
 
-            {event.content && (
-              <RichText className="max-w-[48rem]" data={event.content} enableGutter={false} />
-            )}
-          </div>
-
-          <aside className="mt-12 space-y-6 lg:sticky lg:top-24 lg:mt-0 lg:self-start">
-            <SidebarEvents events={upcomingEvents} title="Upcoming Events" />
-            <SidebarCTA
-              heading="Stay in the Loop"
-              description="Browse all upcoming events and find ways to connect with your neighbors."
-              buttonLabel="View All Events"
-              buttonHref="/events"
-            />
-          </aside>
-        </div>
+          {event.content && (
+            <RichText className="max-w-[48rem]" data={event.content} enableGutter={false} />
+          )}
+        </DetailLayout>
       </div>
     </article>
   )
