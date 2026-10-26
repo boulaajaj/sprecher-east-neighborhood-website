@@ -115,6 +115,8 @@ describe('scout', () => {
     // East Towne's High Crossing Blvd is outside (coverage.md)
     assert.ok(!namesArea('High Crossing Blvd sidewalk hearing'))
     assert.ok(namesArea('I-39/90/94 at Milwaukee St: open house'))
+    assert.ok(namesArea('Milwaukee Street intersection with Highway 94'))
+    assert.ok(!namesArea('Highway 94 resurfacing'))
     // A highway alone names half the city
     assert.ok(!namesArea('I-94 lane closures overnight'))
     assert.ok(!namesArea('Milwaukee Street reconstruction near Fair Oaks'))

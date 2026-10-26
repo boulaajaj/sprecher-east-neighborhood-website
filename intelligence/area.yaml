@@ -18,7 +18,7 @@ places:
 # The immediately neighboring associations, from the City's Neighborhood Associations map layer
 # (official). Measured on 2026-10-25 with the layer's own query, buffering Sprecher East's polygon
 # (NA_ID 146): North Star touches it (within 50 m); Richmond Hill Homeowners is within 500 m.
-# Nothing else is within 800 m except High Crossing, which the layer marks inactive. Their major
+# Nothing else is within 800 m; at 1 km only High Crossing, which the layer marks inactive. Their major
 # events and public matters are catchment (coverage.md).
 neighbors:
   source: https://maps.cityofmadison.com/arcgis/rest/services/Public/OPEN_DATA/MapServer/12
@@ -29,6 +29,17 @@ neighbors:
 # A highway alone names half the city. It counts only when the same item also names one of `with`:
 # an interchange or a cross street at the area's edge.
 highways:
-  - names: [i-94, i 94, i94, interstate 94, interstate highway 94, i-90/94, i-39/90/94]
+  - names:
+      [
+        i-94,
+        i 94,
+        i94,
+        interstate 94,
+        interstate highway 94,
+        i-90/94,
+        i-39/90/94,
+        highway 94,
+        hwy 94,
+      ]
     # sprecher road is already a place word
     with: [interchange, milwaukee street, milwaukee st]
