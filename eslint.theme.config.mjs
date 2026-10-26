@@ -5,7 +5,7 @@
 // (src/platform/theme/tokens.ts lists them all).
 
 const PALETTE =
-  '\\b(bg|text|border|from|via|to|ring|ring-offset|fill|stroke|outline|decoration|divide|shadow|placeholder|caret|accent)-(white|black|slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)(-\\d+)?\\b'
+  '\\b(bg|text|border(?:-[trblxyse])?|from|via|to|ring(?:-offset)?|fill|stroke|outline|decoration|divide|shadow|inset-shadow|drop-shadow|placeholder|caret|accent)-(white|black|slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)(-\\d+)?\\b'
 const COLOUR_VALUE = '#[0-9a-fA-F]{3,8}\\b|\\brgba?\\(|\\bhsla?\\('
 // A colour inside a Tailwind arbitrary value (`shadow-[0_0_4px_#000]`), in any string: cva(), cn()
 const ARBITRARY_COLOUR = '\\[[^\\]]*(#[0-9a-fA-F]{3,8}\\b|rgba?\\(|hsla?\\()'
