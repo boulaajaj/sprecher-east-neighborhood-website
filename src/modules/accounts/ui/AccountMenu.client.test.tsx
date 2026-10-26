@@ -63,11 +63,19 @@ describe('AccountMenu', () => {
     expect(screen.queryByRole('link', { name: 'Sign Up' })).toBeNull()
   })
 
-  it('links admins and editors to the admin from both menus, and nobody else (#378)', async () => {
+  it('links admins and editors to the admin from the mobile menu only, and nobody else (#378, #383)', async () => {
     mocks.getSignedInAccount.mockResolvedValue({ name: 'Ada', staff: true })
     render(header())
-    const dashboard = await screen.findAllByRole('link', { name: 'Dashboard' })
-    expect(dashboard.map((link) => link.getAttribute('href'))).toEqual(['/admin', '/admin'])
+    const drawer = within(screen.getByRole('navigation', { name: 'Drawer' }))
+    expect((await drawer.findByRole('link', { name: 'Dashboard' })).getAttribute('href')).toBe(
+      '/admin',
+    )
+    // On desktop the admin bar has it
+    expect(
+      within(screen.getByRole('navigation', { name: 'Bar' })).queryByRole('link', {
+        name: 'Dashboard',
+      }),
+    ).toBeNull()
     cleanup()
 
     mocks.getSignedInAccount.mockResolvedValue({ name: 'Ada', staff: false })

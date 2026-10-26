@@ -31,7 +31,7 @@ page or layout in `src/app/` composes them ([0008](../architecture/decisions/000
 
 Compositions with no element of their own: `PostsFeed` and `EventsFeed` (a `CardGrid` of cards plus
 `LoadMore`), the search form in `news` (`Field · search` plus the URL), `AccountMenu` in
-`accounts` (`Link · nav` and `Button · ghost`; "Dashboard" for staff, #378), `SignInForm` and `ChangePasswordForm` (`Form`), and
+`accounts` (`Link · nav` and `Button · ghost`; "Dashboard" for staff in the mobile menu, #378), `SignInForm` and `ChangePasswordForm` (`Form`), and
 `VersionCheck` (`Toast`). Variants with no element of their own (`Card · elevated`,
 `Card · outline`, `CardGrid` columns `2` and `4`, `Section · brand`, `Button` size `sm`) are used inside the area components.
 
