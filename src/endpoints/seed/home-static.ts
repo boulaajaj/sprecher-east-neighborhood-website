@@ -1,5 +1,5 @@
 import type { RequiredDataFromCollectionSlug } from 'payload'
-import { heading, paragraph, text, linkNode, root } from './helpers/lexical'
+import { heading, paragraph, text, root } from './helpers/lexical'
 
 // Used for pre-seeded content so that the homepage is not empty
 export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
@@ -11,10 +11,8 @@ export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
       heading('h1', 'Sprecher East'),
       paragraph(
         text(
-          'Welcome to Sprecher East \u2014 a grassroots neighborhood initiative on Madison\u2019s Far East Side. ',
+          'Welcome to Sprecher East \u2014 a grassroots neighborhood initiative on Madison\u2019s Far East Side. The full site is on its way.',
         ),
-        linkNode('Visit the admin dashboard', '/admin'),
-        text(' to set up your account and seed the full site content.'),
       ),
     ]),
   },
