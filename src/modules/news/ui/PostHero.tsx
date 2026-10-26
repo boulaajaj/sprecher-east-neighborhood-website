@@ -1,12 +1,12 @@
 import React from 'react'
 
+import { Badge, BadgeList } from '@/platform/ui/Badge'
 import { ImageCredit } from '@/platform/ui/ImageCredit'
 import { Media } from '@/platform/ui/Media'
 import { formatDateTime } from '@/platform/lib/formatDateTime'
 
 import { formatAuthors } from '../domain/authors'
 import type { PostDetail } from '../domain/types'
-import { Badge, BadgeList } from '@/platform/ui/Badge'
 
 /** The top of a post's page: categories, title, byline and date over the hero image. */
 export const PostHero: React.FC<{

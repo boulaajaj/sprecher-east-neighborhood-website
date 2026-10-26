@@ -98,7 +98,7 @@ export const CONTRAST_PAIRS: ReadonlyArray<readonly [text: ThemeToken, backgroun
 
 /**
  * Text on a tint of a colour over a background, as `Alert` draws its tones (`bg-<tint>/10`):
- * [text, tint, background]. The test paints the tint at `TINT_ALPHA` opacity over the
+ * [text, tint, background, alpha]. The test paints the tint at that opacity over the
  * background, as the browser does, then checks the text against the result.
  */
 export const TINT_ALPHA = 0.1
@@ -110,9 +110,16 @@ const ALERT_TONES = [
 ] as const satisfies readonly (readonly [ThemeToken, ThemeToken])[]
 export const TINTED_PAIRS = ALERT_TONES.flatMap(([text, tint]) =>
   (['background', 'surface', 'card'] as const).map(
-    (background) => [text, tint, background] as const,
+    (background) => [text, tint, background, TINT_ALPHA] as const,
   ),
 )
+
+/**
+ * A badge on a photo (`Badge · on-image`, `bg-scrim/60`): its text on the scrim at
+ * `ON_IMAGE_SCRIM_ALPHA` over the brightest a photo can be, white, which `--on-image` stands for.
+ */
+export const ON_IMAGE_SCRIM_ALPHA = 0.6
+export const SCRIM_PAIRS = [['on-image', 'scrim', 'on-image', ON_IMAGE_SCRIM_ALPHA]] as const
 
 /** WCAG 2.x AA minimum for normal text. */
 export const MIN_TEXT_CONTRAST = 4.5

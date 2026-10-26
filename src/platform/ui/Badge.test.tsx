@@ -20,7 +20,7 @@ describe('Badge', () => {
     render(<Badge variant="on-image">Meeting</Badge>)
 
     expect(screen.getByText('Meeting').className).toContain('text-on-image')
-    expect(screen.getByText('Meeting').className).toContain('bg-scrim/40')
+    expect(screen.getByText('Meeting').className).toContain('bg-scrim/60')
   })
 
   it('lines badges up in a row that wraps, with no accessibility violations', async () => {
