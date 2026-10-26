@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 20
     outputs:
       deploy: ${{ steps.plan.outputs.deploy }}
-      release: ${{ steps.plan.outputs.release }}
+      redeploy: ${{ steps.plan.outputs.redeploy }}
       node: ${{ steps.facts.outputs.node }}
       server_url: ${{ steps.facts.outputs.server_url }}
       turnstile_site_key: ${{ steps.facts.outputs.turnstile_site_key }}
@@ -100,7 +100,7 @@ jobs:
 
       - name: Build
         env:
-          RELEASE_DIR: /var/www/sprecher-east/releases/${{ needs.preflight.outputs.release }}
+          RELEASE_DIR: /var/www/sprecher-east/releases/${{ needs.preflight.outputs.redeploy == 'true' && format('{0}-run{1}', github.sha, github.run_id) || github.sha }}
           SHA: ${{ github.sha }}
           NODE_VERSION: ${{ needs.preflight.outputs.node }}
           NEXT_PUBLIC_SERVER_URL: ${{ needs.preflight.outputs.server_url }}
@@ -161,9 +161,12 @@ jobs:
       - name: Upload the release
         if: steps.order.outputs.skip != 'true'
         env:
-          RELEASE: ${{ needs.preflight.outputs.release }}
+          RELEASE: ${{ needs.preflight.outputs.redeploy == 'true' && format('{0}-run{1}', github.sha, github.run_id) || github.sha }}
         run: |
           set -euo pipefail
+          # Never run the commands below with an empty or odd name: `rm -rf releases/$RELEASE`
+          # would remove every release (#382)
+          [[ "$RELEASE" =~ ^[0-9a-f]{40}(-run[0-9]+)?$ ]] || { echo "::error::bad release name '$RELEASE'"; exit 1; }
           # shellcheck disable=SC2029 # $RELEASE (a commit hash) is meant to expand here
           ssh vps "set -euo pipefail
             cd /var/www/sprecher-east && mkdir -p releases
@@ -178,8 +181,9 @@ jobs:
       - name: Put the release live
         if: steps.order.outputs.skip != 'true'
         env:
-          RELEASE: ${{ needs.preflight.outputs.release }}
+          RELEASE: ${{ needs.preflight.outputs.redeploy == 'true' && format('{0}-run{1}', github.sha, github.run_id) || github.sha }}
         run: |
+          [[ "$RELEASE" =~ ^[0-9a-f]{40}(-run[0-9]+)?$ ]] || { echo "::error::bad release name '$RELEASE'"; exit 1; }
           # shellcheck disable=SC2029 # $RELEASE (a commit hash) is meant to expand here
           ssh vps "bash /var/www/sprecher-east/releases/$RELEASE/ops/deploy-release.sh"
 
