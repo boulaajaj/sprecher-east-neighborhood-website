@@ -53,7 +53,7 @@ export default async function EventsListPage({ params: paramsPromise }: Args) {
         </Link>
       </div>
       <section className="container">
-        <EventsFeed scope={scope} initial={events} />
+        <EventsFeed scope={scope} initial={events} headingLevel="h2" />
       </section>
     </div>
   )

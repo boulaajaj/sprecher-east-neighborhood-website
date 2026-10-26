@@ -116,8 +116,9 @@ choice, 2026-10-26, Claude Code session, quoted on #426):
   because shadows barely show in dark mode
 - **Border radius**: `rounded-2xl` for every card variant (today's `rounded-lg` panels and compact
   cards move to it), `rounded-xl` for smaller elements, `rounded-lg` for buttons
-- **Hover state**: one for every interactive card: `hover:shadow-md motion-safe:hover:-translate-y-0.5
-transition-all duration-200` (the `Card`'s `interactive`). A card that isn't a link doesn't lift
+- **Hover state**: one for every interactive card, the `Card`'s `interactive`:
+  `hover:shadow-md motion-safe:hover:-translate-y-0.5 transition-all duration-200`. A card that
+  isn't a link doesn't lift
 - **Padding**: the `Card`'s `padding`: `md` (`p-6`) by default, `lg` (`p-6 md:p-8`) for spacious
   cards, `sm` (`p-4`) only for compact cards (a small event card, a stat), `none` when the card
   starts with a full-bleed image (`CardBody` pads). Today's `p-5` cards move to `p-6`

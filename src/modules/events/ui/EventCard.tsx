@@ -1,20 +1,13 @@
-import Link from 'next/link'
 import React from 'react'
 import { MapPin, Clock, Calendar } from 'lucide-react'
 
 import { Media } from '@/platform/ui/Media'
 import { cn } from '@/platform/lib/cn'
 import { Badge, BadgeList } from '@/platform/ui/Badge'
+import { Card, CardBody, CardFooter, CardMedia, CardTitle } from '@/platform/ui/Card'
 import { formatDateShort, formatDateBadge, toDateTimeAttr } from '@/platform/lib/formatDateTime'
 
 import type { EventSummary } from '../domain/types'
-
-/**
- * Stretches the title link over the whole card so the card stays clickable, while the
- * link's accessible name is just the event title (not every line of the card).
- */
-const stretchedLinkClassName =
-  'after:absolute after:inset-0 after:rounded-[inherit] after:content-[""] focus-visible:outline-none'
 
 const DateBadge: React.FC<{
   date: string
@@ -47,7 +40,9 @@ const DateBadge: React.FC<{
 export const EventCard: React.FC<{
   event: EventSummary
   compact?: boolean
-}> = ({ event, compact }) => {
+  /** `h2` where no heading sits between the page's `h1` and the list */
+  headingLevel?: 'h2' | 'h3'
+}> = ({ event, compact, headingLevel = 'h3' }) => {
   const { slug, title, date, timeStart, timeEnd, categories, description, locationName, image } =
     event
 
@@ -57,26 +52,24 @@ export const EventCard: React.FC<{
 
   if (compact) {
     return (
-      <article className="group relative flex min-w-0 items-center gap-4 rounded-xl border border-border bg-card p-4 shadow-sm transition-all duration-200 hover:shadow-md has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring motion-safe:hover:-translate-y-0.5">
+      <Card as="article" padding="sm" interactive className="flex items-center gap-4">
         <DateBadge date={date} className="bg-surface text-center" />
         <div className="min-w-0">
           <time className="text-xs text-muted-foreground" dateTime={toDateTimeAttr(date)}>
             {formatDateShort(date)}
           </time>
-          <h3 className="truncate font-semibold text-foreground group-hover:text-primary">
-            <Link href={href} className={stretchedLinkClassName}>
-              {title}
-            </Link>
-          </h3>
+          <CardTitle as={headingLevel} href={href} className="truncate text-base">
+            {title}
+          </CardTitle>
         </div>
-      </article>
+      </Card>
     )
   }
 
   return (
-    <article className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-md transition-all duration-200 hover:shadow-xl has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring motion-safe:hover:-translate-y-1">
+    <Card as="article" padding="none" interactive>
       {/* Image area with date badge overlay */}
-      <div className="relative aspect-[16/9] w-full overflow-hidden">
+      <CardMedia>
         {image ? (
           <Media
             resource={image}
@@ -93,15 +86,12 @@ export const EventCard: React.FC<{
           size="lg"
           className="absolute top-3 left-3 bg-card/95 shadow-lg backdrop-blur-sm"
         />
-      </div>
+      </CardMedia>
 
-      {/* Content area */}
-      <div className="flex flex-1 flex-col p-5 md:p-6">
-        <h3 className="mb-2 text-lg leading-snug font-semibold text-foreground group-hover:text-primary">
-          <Link href={href} className={stretchedLinkClassName}>
-            {title}
-          </Link>
-        </h3>
+      <CardBody>
+        <CardTitle as={headingLevel} href={href} className="mb-2">
+          {title}
+        </CardTitle>
 
         {/* Date (the badge above is decorative) and time — never invent a time */}
         <p className="mb-1.5 flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -126,13 +116,15 @@ export const EventCard: React.FC<{
         )}
 
         {categories.length > 0 && (
-          <BadgeList className="mt-auto">
-            {categories.map((category) => (
-              <Badge key={category.id}>{category.title}</Badge>
-            ))}
-          </BadgeList>
+          <CardFooter className="pt-0">
+            <BadgeList>
+              {categories.map((category) => (
+                <Badge key={category.id}>{category.title}</Badge>
+              ))}
+            </BadgeList>
+          </CardFooter>
         )}
-      </div>
-    </article>
+      </CardBody>
+    </Card>
   )
 }

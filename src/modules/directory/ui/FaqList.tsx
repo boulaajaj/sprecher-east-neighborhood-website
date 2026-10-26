@@ -2,6 +2,7 @@ import React from 'react'
 import { ChevronDown } from 'lucide-react'
 
 import { RichText } from '@/platform/richtext/RichText'
+import { Card } from '@/platform/ui/Card'
 
 import type { FaqEntry } from '../domain/types'
 
@@ -10,7 +11,7 @@ export function FaqList({ items }: { items: readonly FaqEntry[] }) {
   return (
     <div className="space-y-4">
       {items.map((faq) => (
-        <details key={faq.id} className="group rounded-lg border border-border bg-card p-4">
+        <Card as="details" key={faq.id} padding="sm" className="group">
           <summary className="cursor-pointer list-none font-medium">
             <span className="flex items-center justify-between">
               {faq.question}
@@ -23,7 +24,7 @@ export function FaqList({ items }: { items: readonly FaqEntry[] }) {
           <div className="mt-4 border-t border-border pt-4">
             <RichText data={faq.answer} enableGutter={false} />
           </div>
-        </details>
+        </Card>
       ))}
     </div>
   )

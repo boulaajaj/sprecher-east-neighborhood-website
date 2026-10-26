@@ -24,7 +24,7 @@ export const PostsFeed: React.FC<{ initial: FeedPage<PostSummary> }> = ({ initia
 
   return (
     <>
-      <PostGrid posts={feed.items} />
+      <PostGrid posts={feed.items} headingLevel="h2" />
       <div className="container">
         <LoadMoreFooter
           noun="posts"

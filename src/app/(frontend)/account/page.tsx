@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import { ChangePasswordForm, requireUser } from '@/modules/accounts/server'
 import { NOT_INDEXED } from '@/platform/seo/notIndexed'
+import { Card } from '@/platform/ui/Card'
 
 export const metadata: Metadata = {
   title: 'Account',
@@ -17,7 +18,7 @@ export default async function AccountPage() {
       <div className="mx-auto max-w-lg">
         <h1 className="mb-8 text-3xl font-bold text-foreground">Account</h1>
 
-        <div className="mb-8 rounded-lg border border-border bg-surface p-6">
+        <Card as="section" variant="muted" className="mb-8">
           <h2 className="mb-4 text-lg font-semibold text-foreground">Profile</h2>
           <dl className="space-y-3">
             <div>
@@ -26,15 +27,15 @@ export default async function AccountPage() {
             </div>
             <div>
               <dt className="text-sm font-medium text-muted-foreground">Email</dt>
-              <dd className="text-foreground">{user.email}</dd>
+              <dd className="wrap-anywhere text-foreground">{user.email}</dd>
             </div>
           </dl>
-        </div>
+        </Card>
 
-        <div className="rounded-lg border border-border bg-surface p-6">
+        <Card as="section" variant="muted">
           <h2 className="mb-4 text-lg font-semibold text-foreground">Change Password</h2>
           <ChangePasswordForm />
-        </div>
+        </Card>
       </div>
     </div>
   )
