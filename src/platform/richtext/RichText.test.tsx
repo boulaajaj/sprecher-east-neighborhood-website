@@ -144,6 +144,28 @@ describe('RichText', () => {
     expect(screen.getByText('See an old post').tagName).toBe('P')
   })
 
+  it('shows a link to a document that was not loaded (only its ID) as plain text', () => {
+    const unloaded = {
+      ...internalLink('posts', 'x', 'a draft'),
+      fields: { linkType: 'internal', newTab: false, doc: { relationTo: 'posts', value: 7 } },
+    }
+    render(<RichText data={doc(paragraph(unloaded))} />)
+
+    expect(screen.queryByRole('link')).toBeNull()
+  })
+
+  it('draws an address typed into the text (an autolink) with the shared Link', () => {
+    const autolink = {
+      ...customLink('https://example.com', 'example.com'),
+      type: 'autolink',
+    }
+    render(<RichText data={doc(paragraph(autolink))} />)
+
+    const link = screen.getByRole('link', { name: 'example.com' })
+    expect(link.getAttribute('href')).toBe('https://example.com')
+    expect(link.className).toContain('text-primary-strong')
+  })
+
   it('is a centred prose column by default, and full width without the gutter', () => {
     const { container, rerender } = render(<RichText data={doc(paragraph(text('a')))} />)
     const wrapper = () => container.firstElementChild?.className ?? ''

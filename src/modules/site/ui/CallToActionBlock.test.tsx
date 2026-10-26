@@ -46,5 +46,9 @@ describe('CallToActionBlock', () => {
     expect(screen.getByRole('link', { name: 'FAQ' }).closest('.prose')?.className).toContain(
       '[&_a]:text-primary-foreground',
     )
+    // And the focus outline, as the theme's green outline is under 3:1 on the band
+    expect(screen.getByRole('link', { name: 'FAQ' }).closest('.prose')?.className).toContain(
+      '[&_a:focus-visible]:outline-primary-foreground',
+    )
   })
 })
