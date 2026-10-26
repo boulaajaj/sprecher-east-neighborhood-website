@@ -1,15 +1,21 @@
 import type {
   DefaultNodeTypes,
+  SerializedAutoLinkNode,
   SerializedBlockNode,
   SerializedLinkNode,
 } from '@payloadcms/richtext-lexical'
-import type { JSXConverters, JSXConvertersFunction } from '@payloadcms/richtext-lexical/react'
-import { LinkJSXConverter, RichText as ConvertRichText } from '@payloadcms/richtext-lexical/react'
+import type {
+  JSXConverter,
+  JSXConverters,
+  JSXConvertersFunction,
+} from '@payloadcms/richtext-lexical/react'
+import { RichText as ConvertRichText } from '@payloadcms/richtext-lexical/react'
 import React from 'react'
 
 import { cn } from '@/platform/lib/cn'
 import type { RichTextValue } from '@/platform/lib'
 import { documentHref } from '@/platform/payload/documentHref'
+import { Link } from '@/platform/ui/Link'
 import type { BannerBlock, MediaBlock } from '@/payload-types'
 
 import type { CodeBlockProps } from './CodeBlock'
@@ -26,21 +32,47 @@ type NodeTypes = DefaultNodeTypes | RichTextBlockNode
  */
 export type RichTextBlocks = NonNullable<JSXConverters<NodeTypes>['blocks']>
 
-const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
-  const doc = linkNode.fields.doc
-  if (!doc) return '/'
-  const { value, relationTo } = doc
-  if (typeof value !== 'object') {
-    throw new Error('Expected value to be an object')
-  }
-  return documentHref(relationTo, typeof value.slug === 'string' ? value.slug : '')
+/**
+ * Where a rich-text link goes: a site address for a page or post, or the URL the editor typed.
+ * Null when there is nowhere to go, such as a link to a document that was deleted (#215).
+ */
+export function richTextLinkHref(fields: SerializedLinkNode['fields']): string | null {
+  if (fields.linkType !== 'internal') return fields.url || null
+  // A deleted document leaves the value null; an unpopulated one leaves its ID
+  const value = fields.doc?.value
+  const slug =
+    value && typeof value === 'object' && typeof value.slug === 'string' ? value.slug : ''
+  return fields.doc && slug ? documentHref(fields.doc.relationTo, slug) : null
+}
+
+// Links are the shared `Link` (inline), with its focus ring and new-tab note; one with nowhere
+// to go is plain text rather than a link to the home page
+const renderLink = (
+  node: SerializedLinkNode | SerializedAutoLinkNode,
+  children: React.ReactNode,
+): React.ReactNode => {
+  const href = richTextLinkHref(node.fields as SerializedLinkNode['fields'])
+  if (!href) return children
+  return (
+    <Link href={href} external={Boolean(node.fields.newTab)}>
+      {children}
+    </Link>
+  )
+}
+
+const linkConverters: {
+  link: JSXConverter<SerializedLinkNode>
+  autolink: JSXConverter<SerializedAutoLinkNode>
+} = {
+  link: ({ node, nodesToJSX }) => renderLink(node, nodesToJSX({ nodes: node.children })),
+  autolink: ({ node, nodesToJSX }) => renderLink(node, nodesToJSX({ nodes: node.children })),
 }
 
 const withBlocks =
   (blocks: RichTextBlocks): JSXConvertersFunction<NodeTypes> =>
   ({ defaultConverters }) => ({
     ...defaultConverters,
-    ...LinkJSXConverter({ internalDocToHref }),
+    ...linkConverters,
     blocks,
   })
 
