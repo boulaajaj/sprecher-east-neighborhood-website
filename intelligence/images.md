@@ -32,11 +32,12 @@ so in the review notes. A missing image is better than a wrong one.
   aisle or a road) is best.
 - **Sharp and well exposed.** Not blurry, not shot through a car window, not washed out, not
   oversaturated.
-- **Clear subject.** One obvious subject, not clutter. Wide enough to crop to the event card
-  (landscape, at least 1600 px wide).
+- **Clear subject.** One obvious subject, not clutter. Landscape, and at least 1920 px wide (the
+  largest size the site makes), so it stays sharp as a full-width hero.
 
 ## Credit it
 
-Fill in every field of the media item: `alt` (what the photo shows, for screen readers),
-`credit` ("<author>, via Wikimedia Commons"), `license` and `sourceUrl` (the file's page). CC BY and
-CC BY-SA require the credit to be visible on the page where the photo appears.
+Fill in `alt` (what the photo shows, for screen readers), `credit` (the author's name as the
+license asks for it, for example "Corey Coyle"), `license`, and `sourceUrl` (the file's page, for
+example on Wikimedia Commons) unless it's our own photo. CC BY and CC BY-SA require the credit to be
+visible on the page where the photo appears; the site doesn't show it yet (#405).
