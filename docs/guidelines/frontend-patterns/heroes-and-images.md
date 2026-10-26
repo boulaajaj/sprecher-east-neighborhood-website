@@ -29,7 +29,7 @@ Instead of centering everything in a tall void, anchor content to the bottom-lef
         Connecting residents on Madison's Far East Side since 2006.
       </p>
       <div className="mt-8 flex flex-wrap gap-4">
-        <a className="rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-lg transition hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-xl">
+        <a className="rounded-lg bg-primary-fill px-6 py-3 font-semibold text-primary-foreground shadow-lg transition hover:-translate-y-0.5 hover:bg-primary-fill-hover hover:shadow-xl">
           Upcoming Events
         </a>
         <a className="rounded-lg border-2 border-on-image/70 px-6 py-3 font-semibold text-on-image transition hover:bg-on-image/10">
@@ -71,7 +71,7 @@ Place hero text on a frosted glass card that sits on top of the image. Text is a
         Connecting residents on Madison's Far East Side since 2006.
       </p>
       <div className="mt-8 flex flex-wrap gap-4">
-        <a className="rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground transition hover:bg-primary/90">
+        <a className="rounded-lg bg-primary-fill px-6 py-3 font-semibold text-primary-foreground transition hover:bg-primary-fill-hover">
           Upcoming Events
         </a>
         <a className="rounded-lg border border-on-image/50 px-6 py-3 font-semibold text-on-image transition hover:bg-on-image/10">
@@ -111,7 +111,7 @@ For heroes without a full-bleed background image. Text occupies 50-60% of the wi
         Reston Heights since 2006.
       </p>
       <div className="mt-8 flex flex-wrap gap-4">
-        <a className="rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground transition hover:bg-primary/90">
+        <a className="rounded-lg bg-primary-fill px-6 py-3 font-semibold text-primary-foreground transition hover:bg-primary-fill-hover">
           Upcoming Events
         </a>
         <a className="rounded-lg border border-primary px-6 py-3 font-semibold text-primary transition hover:bg-primary/10">

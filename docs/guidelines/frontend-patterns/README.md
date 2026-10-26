@@ -69,7 +69,7 @@ name, the snippet, and why it works.
 
 5. **Are cards missing visual differentiation?** Check if all cards look identical. Add icons, category colors, or image treatments to differentiate them.
 
-6. **Is the hover state missing or too subtle?** Every interactive element needs a visible hover state. Use `hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200` for cards, `hover:bg-primary/90` for buttons.
+6. **Is the hover state missing or too subtle?** Every interactive element needs a visible hover state. Use `hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200` for cards, `hover:bg-primary-fill-hover` for buttons.
 
 7. **Does the section have a clear eyebrow → heading → body → CTA hierarchy?** If not, add an eyebrow label (`text-xs font-bold uppercase tracking-widest text-primary`) and ensure the heading is significantly larger than the body text.
 
