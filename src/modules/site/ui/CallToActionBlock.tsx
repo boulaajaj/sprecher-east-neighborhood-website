@@ -15,9 +15,10 @@ export const CallToActionBlock: React.FC<CTABlockProps> = ({ links, richText }) 
       <div className="container">
         <div className="flex flex-col items-center gap-8 text-center md:flex-row md:gap-12 md:text-left">
           <div className="max-w-[48rem] flex-1">
+            {/* White text on the band, links too: the theme's link colour is for page backgrounds */}
             {richText && (
               <RichText
-                className="mb-0 text-primary-foreground [&_h2]:text-3xl [&_h2]:font-bold [&_h2]:text-primary-foreground [&_h3]:text-2xl [&_h3]:font-bold [&_h3]:text-primary-foreground [&_p]:text-lg [&_p]:text-primary-foreground/90 [&_strong]:text-primary-foreground"
+                className="mb-0 text-primary-foreground [&_a]:text-primary-foreground [&_h2]:text-3xl [&_h2]:font-bold [&_h2]:text-primary-foreground [&_h3]:text-2xl [&_h3]:font-bold [&_h3]:text-primary-foreground [&_p]:text-lg [&_p]:text-primary-foreground/90 [&_strong]:text-primary-foreground"
                 data={richText}
                 enableGutter={false}
               />
