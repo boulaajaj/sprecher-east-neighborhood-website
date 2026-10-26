@@ -86,7 +86,10 @@ Accept an item for an editor's review only when all of these hold:
    affects them. Name who benefits with the CMS's audience values: `everyone`,
    `families`, `youth`, `seniors`, `volunteers`, `association-leaders`.
 4. **It's not noise.** Reject routine citywide meetings with nothing about the area, repeated
-   announcements, general news and sports, and advertising.
+   announcements, general news and sports, and advertising. The site doesn't copy a calendar:
+   reject a venue's routine recurring programs (weekly storytimes, clubs, groups, open studios),
+   which its own calendar already lists. Accept only its best: a one-off, a talk, performance or
+   festival, or something about the neighborhood; the draft links the venue's calendar.
 5. **It's neutral.** No partisan promotion, endorsements or campaign events. Civic process
    (hearings, comment periods, how to vote) is fine and links to the official source.
 

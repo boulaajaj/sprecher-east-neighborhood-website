@@ -97,8 +97,9 @@ export async function processRun({
     }
     scouted.push({ source, ...result })
   }
-  const candidates = mergeAcrossSources(scouted.map((s) => s.candidates)).filter(
-    (c) => c.change !== 'unchanged',
+  // Taken in turns, one source at a time, so a small budget still samples every source
+  const candidates = takeTurns(
+    mergeAcrossSources(scouted.map((s) => s.candidates)).filter((c) => c.change !== 'unchanged'),
   )
 
   // 2. Model stages and submit, one item at a time
@@ -203,6 +204,21 @@ export async function processRun({
 function stopAfter(failuresInARow, deadline) {
   if (Date.now() > deadline - 60_000) return 'stopped-budget'
   return failuresInARow >= MAX_FAILURES_IN_A_ROW ? 'partial' : null
+}
+
+/** The candidates in turns by source (first of each, then second of each...), each in its order. */
+export function takeTurns(candidates) {
+  const bySource = new Map()
+  for (const c of candidates) {
+    if (!bySource.has(c.sourceId)) bySource.set(c.sourceId, [])
+    bySource.get(c.sourceId).push(c)
+  }
+  const queues = [...bySource.values()]
+  const turns = []
+  for (let i = 0; turns.length < candidates.length; i++) {
+    for (const queue of queues) if (i < queue.length) turns.push(queue[i])
+  }
+  return turns
 }
 
 function addUsage(cost, ...usages) {
