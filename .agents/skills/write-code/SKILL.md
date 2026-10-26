@@ -89,6 +89,20 @@ test Payload, Next.js or styling. How: [`references/tests.md`](references/tests.
 - Use the shared primitives (`Button`, `Field`, `Form`, `Link`, `Media`), not raw `<button>`,
   `<input>` or `<img>`.
 
+## Expert guidance for React and Next.js
+
+The owner asked for established engineering practice over guesswork (2026-10-26, #424). For React
+and Next.js code, also follow Vercel's official skills, vendored in this repo:
+
+- [`vercel-react-best-practices`](../vercel-react-best-practices/SKILL.md): data fetching, bundle
+  size, server components and re-renders. Apply the CRITICAL and HIGH rules to every change.
+- [`vercel-composition-patterns`](../vercel-composition-patterns/SKILL.md): component APIs.
+  Use it for every shared component: explicit variants and compound parts, not boolean props.
+- Next.js itself: the bundled docs in `node_modules/next/dist/docs/` for the version we run.
+
+This repo's rules come first where they differ, and a rule that needs a new package goes through
+the [package rules](../../../docs/guidelines/security.md#before-adding-any-new-package).
+
 ## 6. Before you hand it over
 
 ```bash

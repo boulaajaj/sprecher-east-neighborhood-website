@@ -62,6 +62,10 @@ gh api "repos/{owner}/{repo}/stacks?pull_request=<number>" -H 'X-GitHub-Api-Vers
   module importing another, no runtime Payload import outside `data/`, `cms/`, `platform/` and
   `payload.config.ts`, existing code and libraries reused instead of copied, tests for new rules,
   and files under 250 lines.
+- **React and Next.js practice:** React and Next.js code follows the CRITICAL and HIGH rules of
+  [`vercel-react-best-practices`](../vercel-react-best-practices/SKILL.md), and shared components
+  follow [`vercel-composition-patterns`](../vercel-composition-patterns/SKILL.md). This repo's own
+  rules come first where they differ (#424).
 - **Tool-neutral guidance:** a new rule, procedure or fact lands in `AGENTS.md`, `docs/` or
   `.agents/skills/`, never only in the Claude Code adapter (`CLAUDE.md`, `.claude/`), where
   Codex wouldn't see it.
