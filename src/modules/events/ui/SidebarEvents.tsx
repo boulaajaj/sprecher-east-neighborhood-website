@@ -2,6 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { formatDateBadge } from '@/platform/lib/formatDateTime'
+import { Text } from '@/platform/ui/Text'
 
 import { formatEventCategories } from '../domain/categories'
 import type { EventSummary } from '../domain/types'
@@ -14,9 +15,9 @@ export const SidebarEvents: React.FC<{
 
   return (
     <div>
-      <h3 className="mb-4 text-sm font-semibold tracking-wider text-muted-foreground uppercase">
+      <Text variant="label" as="h3" className="mb-4">
         {title}
-      </h3>
+      </Text>
       <ul className="space-y-4">
         {events.map((event) => {
           const { month, day } = formatDateBadge(event.date)

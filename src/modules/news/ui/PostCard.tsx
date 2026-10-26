@@ -4,6 +4,7 @@ import { Media } from '@/platform/ui/Media'
 import { Badge } from '@/platform/ui/Badge'
 import { Card, CardBody, CardMedia, CardMeta, CardTitle } from '@/platform/ui/Card'
 import { DateTime } from '@/platform/ui/DateTime'
+import { Text } from '@/platform/ui/Text'
 
 import type { PostSummary } from '../domain/types'
 
@@ -62,9 +63,9 @@ export const PostCard: React.FC<{
           </CardTitle>
         )}
         {description && (
-          <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+          <Text variant="small" clamp={2} className="mt-2">
             {sanitizedDescription}
-          </p>
+          </Text>
         )}
       </CardBody>
     </Card>

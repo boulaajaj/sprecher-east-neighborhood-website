@@ -7,6 +7,7 @@ import { mergeOpenGraph } from '@/platform/seo/mergeOpenGraph'
 import { siteTimeZoneLabel } from '@/platform/lib/timezone'
 import { EmptyState } from '@/platform/ui/EmptyState'
 import { PageHeader } from '@/platform/ui/PageHeader'
+import { Text } from '@/platform/ui/Text'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
@@ -28,9 +29,9 @@ export default async function EventsPage() {
 
       {/* Upcoming events */}
       <section aria-labelledby="upcoming-heading" className="container mb-16">
-        <h2 id="upcoming-heading" className="mb-8 text-2xl font-bold text-foreground">
+        <Text variant="section" id="upcoming-heading" className="mb-8">
           Upcoming Events
-        </h2>
+        </Text>
         {upcoming.totalDocs > 0 ? (
           <EventsFeed scope="upcoming" initial={upcoming} />
         ) : (
@@ -50,9 +51,9 @@ export default async function EventsPage() {
       {past.totalDocs > 0 && (
         <section aria-labelledby="past-heading" className="border-t border-border bg-surface py-16">
           <div className="container">
-            <h2 id="past-heading" className="mb-8 text-2xl font-bold text-foreground">
+            <Text variant="section" id="past-heading" className="mb-8">
               Past Events
-            </h2>
+            </Text>
             <EventsFeed scope="past" initial={past} />
           </div>
         </section>

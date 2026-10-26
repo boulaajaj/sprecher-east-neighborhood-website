@@ -7,6 +7,7 @@ import { FaqList, faqJsonLd, findFaqEntries } from '@/modules/directory/server'
 import { mergeOpenGraph } from '@/platform/seo/mergeOpenGraph'
 import { EmptyState } from '@/platform/ui/EmptyState'
 import { PageHeader } from '@/platform/ui/PageHeader'
+import { Text } from '@/platform/ui/Text'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
@@ -27,7 +28,9 @@ export default async function FAQPage() {
       <div className="container max-w-3xl space-y-12">
         {sections.map(({ category, label, items }) => (
           <section key={category}>
-            <h2 className="mb-6 text-xl font-semibold">{label}</h2>
+            <Text variant="subsection" className="mb-6">
+              {label}
+            </Text>
             <FaqList items={items} />
           </section>
         ))}
