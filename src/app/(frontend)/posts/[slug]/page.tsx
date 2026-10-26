@@ -21,6 +21,7 @@ import {
   SidebarPosts,
 } from '@/modules/news/server'
 import { generateMeta } from '@/platform/seo/generateMeta'
+import { DetailLayout } from '@/platform/ui/DetailLayout'
 
 // A scheduled publish or unpublish runs outside a request, where Next can't refresh the cache, so
 // the page also re-renders every 10 minutes (#141, decision 0011)
@@ -81,28 +82,28 @@ export default async function Post({ params: paramsPromise }: Args) {
             ]}
           />
         </div>
-        <div className="container lg:grid lg:grid-cols-[1fr_18rem] lg:gap-8">
-          <div>
-            <RichText
-              className="max-w-[48rem]"
-              data={post.content}
-              blocks={richTextBlocks}
-              enableGutter={false}
-            />
-          </div>
-
-          <aside className="mt-12 space-y-6 lg:sticky lg:top-24 lg:mt-0 lg:self-start">
-            <SidebarPosts posts={post.relatedPosts} title="Related Posts" />
-            <SidebarPosts posts={recentPosts} title="You May Also Like" />
-            <SidebarEvents events={upcomingEvents} title="Upcoming Events" />
-            <SidebarCTA
-              heading="Get Involved"
-              description="Join your neighbors in building a stronger Sprecher East community."
-              buttonLabel="Learn How"
-              buttonHref="/get-involved"
-            />
-          </aside>
-        </div>
+        <DetailLayout
+          aside={
+            <>
+              <SidebarPosts posts={post.relatedPosts} title="Related Posts" />
+              <SidebarPosts posts={recentPosts} title="You May Also Like" />
+              <SidebarEvents events={upcomingEvents} title="Upcoming Events" />
+              <SidebarCTA
+                heading="Get Involved"
+                description="Join your neighbors in building a stronger Sprecher East community."
+                buttonLabel="Learn How"
+                buttonHref="/get-involved"
+              />
+            </>
+          }
+        >
+          <RichText
+            className="max-w-[48rem]"
+            data={post.content}
+            blocks={richTextBlocks}
+            enableGutter={false}
+          />
+        </DetailLayout>
       </div>
     </article>
   )
