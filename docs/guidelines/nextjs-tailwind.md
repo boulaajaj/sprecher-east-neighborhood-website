@@ -56,6 +56,7 @@ Fetch data through the owning module's use cases (from its `server.ts`), whose `
 
 - Use semantic token classes: `bg-primary`, `text-foreground`, `border-border`, `bg-surface`
 - Token names are listed in `src/platform/theme/tokens.ts`; their values are in `src/themes/default/theme.css`
+- On photos use `text-on-image` and `scrim` overlays (`from-scrim/60`); on brand bands `text-primary-foreground`; for dark chrome (admin bar, code) `bg-inverse` and `text-inverse-foreground`. Lint fails on a raw palette class (`text-white`, `bg-blue-500`) or a hex/`rgba()` colour in a class (`eslint.theme.config.mjs`, #146)
 - Dark mode uses `[data-theme='dark']` selector — tokens auto-switch, no manual dark: prefixes needed for token colors
 - Container: use the `container` class (max-width with auto margins)
 - Font: Poppins loaded via `next/font/google` in layout, applied as `--font-poppins` CSS variable

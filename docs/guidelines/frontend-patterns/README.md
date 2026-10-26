@@ -69,7 +69,7 @@ name, the snippet, and why it works.
 
 5. **Are cards missing visual differentiation?** Check if all cards look identical. Add icons, category colors, or image treatments to differentiate them.
 
-6. **Is the hover state missing or too subtle?** Every interactive element needs a visible hover state. Use `hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200` for cards, `hover:bg-primary/90` for buttons.
+6. **Is the hover state missing or too subtle?** Every interactive element needs a visible hover state. Use `hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200` for cards, `hover:bg-primary-fill-hover` for buttons.
 
 7. **Does the section have a clear eyebrow → heading → body → CTA hierarchy?** If not, add an eyebrow label (`text-xs font-bold uppercase tracking-widest text-primary`) and ensure the heading is significantly larger than the body text.
 
@@ -97,6 +97,6 @@ These are specific implementation mistakes the designer should catch and prescri
 | Uniform cards       | All cards identical with no visual differentiation   | Add icons, images, or color accents per card                            |
 | Consecutive same-bg | Two sections with same background color              | Alternate `bg-background`/`bg-surface`, or insert a colored divider     |
 | Giant min-height    | `min-h-[80vh]` with 3 lines of content               | Reduce to `min-h-[60vh]` or use `py-24` instead                         |
-| Missing scrim       | White text on bright image with no gradient          | Add `bg-gradient-to-t from-black/60` below text area                    |
+| Missing scrim       | `text-on-image` on a bright image with no gradient   | Add `bg-gradient-to-t from-scrim/60` below text area                    |
 | Template buttons    | Generic "Learn More" or "Get Started"                | Use specific action words: "See Upcoming Events", "Join the Discussion" |
 | Orphan section      | A section with heading + one sentence + nothing else | Merge with adjacent section or add supporting content                   |

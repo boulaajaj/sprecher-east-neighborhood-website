@@ -18,7 +18,10 @@ export const THEME_TOKENS = {
   'card-foreground': { modes: 'both', meaning: 'Text on a card' },
   popover: { modes: 'both', meaning: 'Menus, popovers and dialogs' },
   'popover-foreground': { modes: 'both', meaning: 'Text on a popover' },
-  primary: { modes: 'both', meaning: 'Brand colour for accents, borders and icons' },
+  primary: {
+    modes: 'both',
+    meaning: 'Brand colour: accents, borders, icons, eyebrow and link text',
+  },
   'primary-foreground': { modes: 'both', meaning: 'Text on a primary fill' },
   'primary-fill': { modes: 'both', meaning: 'Primary button fill, passes AA with its text' },
   'primary-fill-hover': { modes: 'both', meaning: 'Primary button fill on hover' },
@@ -42,6 +45,10 @@ export const THEME_TOKENS = {
   success: { modes: 'both', meaning: 'Success state' },
   warning: { modes: 'both', meaning: 'Warning state' },
   error: { modes: 'both', meaning: 'Error state' },
+  'on-image': { modes: 'both', meaning: 'Text and icons on photos (heroes, image cards)' },
+  scrim: { modes: 'both', meaning: 'Overlays and shadows that keep text readable on photos' },
+  inverse: { modes: 'both', meaning: 'Dark chrome on any page: the admin bar, code blocks' },
+  'inverse-foreground': { modes: 'both', meaning: 'Text on the inverse surface' },
   'chart-1': { modes: 'both', meaning: 'Chart series 1' },
   'chart-2': { modes: 'both', meaning: 'Chart series 2' },
   'chart-3': { modes: 'both', meaning: 'Chart series 3' },
@@ -77,6 +84,12 @@ export const CONTRAST_PAIRS: ReadonlyArray<readonly [text: ThemeToken, backgroun
   ['destructive-strong', 'background'],
   ['destructive-strong', 'surface'],
   ['destructive-strong', 'card'],
+  // Plain primary and destructive are text too: eyebrows, the logo, links, a paging error (#386)
+  ['primary', 'background'],
+  ['primary', 'card'],
+  ['destructive', 'background'],
+  ['on-image', 'scrim'],
+  ['inverse-foreground', 'inverse'],
 ]
 
 /** WCAG 2.x AA minimum for normal text. */
