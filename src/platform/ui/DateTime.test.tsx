@@ -21,4 +21,10 @@ describe('DateTime', () => {
     const time = screen.getByText('Thu, Jul 25, 2024')
     expect(time.getAttribute('datetime')).toBe('2024-07-25T17:00:00.000Z')
   })
+
+  it('shows nothing for a value that is not a date', () => {
+    const { container } = render(<DateTime value="not a date" />)
+
+    expect(container.innerHTML).toBe('')
+  })
 })

@@ -4,7 +4,7 @@ import { ImageCredit } from '@/platform/ui/ImageCredit'
 import { Media } from '@/platform/ui/Media'
 import { Badge, BadgeList } from '@/platform/ui/Badge'
 import { DateTime } from '@/platform/ui/DateTime'
-import { MetaList, type MetaItem } from '@/platform/ui/MetaList'
+import { MetaList, type LabelledMetaItem } from '@/platform/ui/MetaList'
 import { siteTimeZoneLabel } from '@/platform/lib/timezone'
 
 import { formatEventLocationType } from '../domain/locationTypes'
@@ -16,7 +16,7 @@ export const EventHero: React.FC<{
   const { categories, date, image, locationType, timeEnd, timeStart, title } = event
 
   const locationTypeLabel = locationType ? formatEventLocationType(locationType) : null
-  const facts: MetaItem[] = [
+  const facts: LabelledMetaItem[] = [
     { label: 'Date', value: <DateTime value={date} format="long" /> },
     ...(timeStart
       ? [

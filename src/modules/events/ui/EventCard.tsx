@@ -7,7 +7,7 @@ import { Badge, BadgeList } from '@/platform/ui/Badge'
 import { Card, CardBody, CardFooter, CardMedia, CardTitle } from '@/platform/ui/Card'
 import { formatDateBadge } from '@/platform/lib/formatDateTime'
 import { DateTime } from '@/platform/ui/DateTime'
-import { MetaList, type MetaItem } from '@/platform/ui/MetaList'
+import { MetaList, type IconMetaItem } from '@/platform/ui/MetaList'
 
 import type { EventSummary } from '../domain/types'
 
@@ -106,7 +106,9 @@ export const EventCard: React.FC<{
                 </>
               ),
             },
-            ...(locationName ? [{ icon: <MapPin />, value: locationName } satisfies MetaItem] : []),
+            ...(locationName
+              ? [{ icon: <MapPin />, value: locationName } satisfies IconMetaItem]
+              : []),
           ]}
         />
 

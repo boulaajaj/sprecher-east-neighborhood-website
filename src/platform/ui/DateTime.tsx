@@ -16,6 +16,9 @@ export type DateTimeProps = {
  * text is formatted in UTC for day-only dates and in the site's time zone otherwise.
  */
 export function DateTime({ value, format = 'short', className }: DateTimeProps) {
+  // Bad data shows nothing rather than "Invalid Date" or a thrown error
+  if (Number.isNaN(Date.parse(value))) return null
+
   return (
     <time className={className} dateTime={toDateTimeAttr(value)}>
       {format === 'long' ? formatDateTime(value) : formatDateShort(value)}

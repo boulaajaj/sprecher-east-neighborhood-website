@@ -3,13 +3,13 @@ import React from 'react'
 
 import { cn } from '@/platform/lib/cn'
 
-export type MetaItem = {
-  /** A Lucide icon, drawn decoratively in front of the value */
-  icon?: React.ReactNode
-  /** What the value is: "Date", "Time". Left out for rows the icon explains */
-  label?: string
-  value: React.ReactNode
-}
+/** A fact with a name: "Date", "Time". A list of them is a description list */
+export type LabelledMetaItem = { label: string; icon?: never; value: React.ReactNode }
+
+/** A fact a decorative icon explains (a pin before a place). A list of them is a plain list */
+export type IconMetaItem = { icon?: React.ReactNode; label?: never; value: React.ReactNode }
+
+export type MetaItem = LabelledMetaItem | IconMetaItem
 
 /*
  * Small facts about a page or an item (#432): a date, a time, a place. `inline` is a wrapping row
@@ -19,7 +19,7 @@ export type MetaItem = {
 const metaListVariants = cva('', {
   variants: {
     variant: {
-      inline: 'flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground',
+      inline: 'flex flex-wrap gap-6 text-muted-foreground',
       stacked: 'flex flex-col gap-3',
       'on-image': 'flex flex-wrap gap-x-10 gap-y-4 text-sm text-on-image',
     },
@@ -28,19 +28,20 @@ const metaListVariants = cva('', {
 })
 
 const labelClass = {
-  inline: 'font-medium text-foreground after:content-[":_"]',
+  inline: 'font-medium text-foreground after:content-[":"]',
   stacked: 'text-sm font-medium text-muted-foreground',
   'on-image': 'text-on-image/70',
 } as const
 
 export type MetaListProps = VariantProps<typeof metaListVariants> & {
-  items: MetaItem[]
+  /** All labelled or none: a list mixes no kinds, so its markup stays valid */
+  items: LabelledMetaItem[] | IconMetaItem[]
   className?: string
 }
 
 export function MetaList({ items, variant, className }: MetaListProps) {
   const look = variant ?? 'stacked'
-  const labelled = items.some((item) => item.label)
+  const labelled = items.some((item) => item.label !== undefined)
   const List = labelled ? 'dl' : 'ul'
   const Item = labelled ? 'div' : 'li'
 
