@@ -34,7 +34,8 @@ One item with `$.candidate`, `$.taxonomy` (the site's category tree), `$.verific
    `$.verification.location`. For posts, those are null.
 4. Copy `$.curation.audiences` into `$.audience`. Put the official pages in `$.officialLinks` (at
    most three, primary sources first, a registration page when the source gives one) and link
-   them in the body too.
+   them in the body too. For an event at a venue in `coverage.md`, "Known venues", one of them is
+   the venue's official page, so readers find its other programs there.
 5. Write `$.summary`: the card text residents see first, one or two plain sentences under 160
    characters, no Markdown and no links. Say what it is and why a neighbor would care, in everyday
    words (no agency names or jargon a resident wouldn't use); the date and place are shown

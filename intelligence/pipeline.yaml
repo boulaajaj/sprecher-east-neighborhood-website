@@ -11,7 +11,8 @@ budgets:
   maxUsdPerMonth: 15
   maxMinutesPerRun: 15
   maxItemsPerSource: 50
-  maxModelItemsPerRun: 40
+  # Sampling while the sources are new (#390): a few items per run, taken in turns by source
+  maxModelItemsPerRun: 6
   maxDraftsPerRun: 10
 # Verify reruns at high effort when its confidence is below this; still below, the item goes to
 # review (README.md, "The pipeline").

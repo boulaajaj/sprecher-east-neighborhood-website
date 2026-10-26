@@ -99,6 +99,26 @@ describe('when the model fails', () => {
     assert.deepEqual(Object.keys(env).sort(), ['OPENCLAW_GATEWAY_PASSWORD', 'PATH'])
   })
 
+  it('reads token counts where OpenClaw 2026.10 reports them, cached tokens as input', async () => {
+    const envelope = {
+      status: 'ok',
+      result: {
+        payloads: [{ text: '{"ok":true}' }],
+        meta: { agentMeta: { usage: { input: 3061, output: 9, cacheRead: 100 } } },
+      },
+    }
+    const ask = openclawAdapter({
+      command: [
+        process.execPath,
+        '-e',
+        `process.stdout.write(${JSON.stringify(JSON.stringify(envelope))})`,
+      ],
+    })
+    const answer = await ask({ message: 'x' })
+    assert.equal(answer.text, '{"ok":true}')
+    assert.deepEqual(answer.usage, { input: 3161, output: 9 })
+  })
+
   it('reports OpenClaw failures without its command line', async () => {
     const ask = openclawAdapter({
       command: [process.execPath, '-e', 'process.stderr.write("boom");process.exit(3)'],

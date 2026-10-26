@@ -4,6 +4,7 @@ import { describe, it } from 'node:test'
 import { cmsOperations, docsIn, dryRunCms } from '../lib/cms.mjs'
 import { fakeAdapter } from '../lib/model.mjs'
 import { runPipeline } from '../lib/pipeline.mjs'
+import { takeTurns } from '../lib/process.mjs'
 import { robotsChecker } from '../lib/fetchSource.mjs'
 import { curation, draft, feedsHttp, verification } from './fixtures.mjs'
 import { contract } from './helpers.mjs'
@@ -63,6 +64,15 @@ const run = async ({
 }
 
 describe('a run', () => {
+  it('takes candidates in turns by source, so a small budget samples each source', () => {
+    const c = (sourceId, n) => ({ sourceId, externalId: `${sourceId}:${n}` })
+    const turns = takeTurns([c('a', 1), c('a', 2), c('a', 3), c('b', 1), c('c', 1), c('c', 2)])
+    assert.deepEqual(
+      turns.map((t) => t.externalId),
+      ['a:1', 'b:1', 'c:1', 'a:2', 'c:2', 'a:3'],
+    )
+  })
+
   it('tells the model what the registry says about each item’s source, as the item schema allows', async () => {
     const items = []
     const validateItem = contract.validator('schemas/item.schema.json')
