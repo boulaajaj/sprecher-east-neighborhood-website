@@ -22,6 +22,10 @@ export function toSignUpErrorMessage(failure: SignUpFailure | 'offline'): string
 export const ACCOUNT_VERIFIED =
   'Your email is confirmed and your account is ready. Log in with the password you chose.'
 
+/** The answer to a link opened again after it verified the account (#391). */
+export const ACCOUNT_ALREADY_VERIFIED =
+  'This account is already confirmed. There’s nothing more to do: just log in.'
+
 /**
  * What a visitor reads when the link was resent after a second sign-up (#289): the account opens
  * with the password chosen here, not one from an earlier sign-up.
@@ -35,6 +39,7 @@ export const CHOOSE_PASSWORD_TO_VERIFY =
  */
 export function toVerifyAccountErrorMessage(failure: VerifyAccountFailure | 'offline'): string {
   if (failure === 'offline') return FORM_MESSAGES.offline
+  if (failure === 'already-verified') return ACCOUNT_ALREADY_VERIFIED
   if (failure === 'invalid-link') {
     return 'This link isn’t valid or was already used. If you already confirmed your account, log in.'
   }

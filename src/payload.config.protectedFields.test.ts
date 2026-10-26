@@ -50,6 +50,8 @@ const FORGED_RESENDS = {
   verificationResends: 99,
   verificationResendsSince: '2020-01-01T00:00:00.000Z',
   verificationSetsPassword: true,
+  // Or plant a used-link hash, so a link would read "already confirmed" (#391)
+  verifiedTokenHash: 'f'.repeat(64),
 }
 
 describe('a resident’s own account', () => {
@@ -93,6 +95,7 @@ describe('a resident’s own account', () => {
       verificationResends: 0,
       verificationResendsSince: null,
       verificationSetsPassword: false,
+      verifiedTokenHash: null,
     })
   })
 
@@ -109,6 +112,7 @@ describe('a resident’s own account', () => {
       verificationResends: 0,
       verificationResendsSince: null,
       verificationSetsPassword: false,
+      verifiedTokenHash: null,
     })
   })
 })

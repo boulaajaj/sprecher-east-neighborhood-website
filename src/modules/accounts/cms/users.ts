@@ -126,6 +126,16 @@ export const Users: CollectionConfig = {
       hidden: true,
       access: serverOnlyFieldAccess,
     },
+    // The hash of the link that verified this account. Payload clears its token once used, so
+    // without it a link opened again can't be told from a bad one (#391). A hash, so a database
+    // copy holds no working link; it only lets the verify page say "already confirmed".
+    {
+      name: 'verifiedTokenHash',
+      type: 'text',
+      index: true,
+      hidden: true,
+      access: serverOnlyFieldAccess,
+    },
   ],
   timestamps: true,
 }

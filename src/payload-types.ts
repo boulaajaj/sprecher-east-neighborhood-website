@@ -507,6 +507,7 @@ export interface User {
   verificationResends?: number | null
   verificationResendsSince?: string | null
   verificationSetsPassword?: boolean | null
+  verifiedTokenHash?: string | null
   updatedAt: string
   createdAt: string
   email: string
@@ -1977,6 +1978,7 @@ export interface UsersSelect<T extends boolean = true> {
   verificationResends?: T
   verificationResendsSince?: T
   verificationSetsPassword?: T
+  verifiedTokenHash?: T
   updatedAt?: T
   createdAt?: T
   email?: T

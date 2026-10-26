@@ -3,6 +3,7 @@
 import 'server-only'
 
 export { getCurrentUser } from './use-cases/getCurrentUser'
+export { getVerificationLinkStatus } from './use-cases/getVerificationLinkStatus'
 export { requireRole, requireUser } from './use-cases/requireUser'
 
 export { AccountMenu } from './ui/AccountMenu.client'
