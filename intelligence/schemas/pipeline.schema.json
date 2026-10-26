@@ -10,21 +10,33 @@
     "budgets",
     "sources",
     "coverage",
+    "area",
     "stages",
     "escalation",
     "routes"
   ],
   "additionalProperties": false,
   "properties": {
-    "version": { "type": "integer", "minimum": 1 },
-    "enabled": { "type": "boolean" },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "enabled": {
+      "type": "boolean"
+    },
     "schedule": {
       "type": "object",
       "required": ["cron", "timezone"],
       "additionalProperties": false,
       "properties": {
-        "cron": { "type": "string", "minLength": 1, "maxLength": 50 },
-        "timezone": { "const": "America/Chicago" }
+        "cron": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "timezone": {
+          "const": "America/Chicago"
+        }
       }
     },
     "budgets": {
@@ -39,16 +51,43 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "maxUsdPerRun": { "type": "number", "exclusiveMinimum": 0 },
-        "maxUsdPerMonth": { "type": "number", "exclusiveMinimum": 0 },
-        "maxMinutesPerRun": { "type": "number", "exclusiveMinimum": 0 },
-        "maxItemsPerSource": { "type": "number", "exclusiveMinimum": 0 },
-        "maxModelItemsPerRun": { "type": "number", "exclusiveMinimum": 0 },
-        "maxDraftsPerRun": { "type": "number", "exclusiveMinimum": 0 }
+        "maxUsdPerRun": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maxUsdPerMonth": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maxMinutesPerRun": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maxItemsPerSource": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maxModelItemsPerRun": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maxDraftsPerRun": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
       }
     },
-    "sources": { "const": "sources.yaml" },
-    "coverage": { "const": "coverage.md" },
+    "sources": {
+      "const": "sources.yaml"
+    },
+    "coverage": {
+      "const": "coverage.md"
+    },
+    "area": {
+      "description": "The area words file (area.yaml), relative to this folder.",
+      "type": "string",
+      "minLength": 1
+    },
     "stages": {
       "type": "array",
       "items": {
@@ -56,11 +95,24 @@
         "required": ["id", "prompt", "input", "output", "model"],
         "additionalProperties": false,
         "properties": {
-          "id": { "enum": ["scout", "verify", "curate", "draft", "submit"] },
-          "prompt": { "type": "string", "pattern": "^prompts/[a-z-]+\\.md$" },
-          "input": { "type": "string", "pattern": "^schemas/[a-z-]+\\.schema\\.json$" },
-          "output": { "type": "string", "pattern": "^schemas/[a-z-]+\\.schema\\.json$" },
-          "model": { "enum": ["none", "medium", "high"] }
+          "id": {
+            "enum": ["scout", "verify", "curate", "draft", "submit"]
+          },
+          "prompt": {
+            "type": "string",
+            "pattern": "^prompts/[a-z-]+\\.md$"
+          },
+          "input": {
+            "type": "string",
+            "pattern": "^schemas/[a-z-]+\\.schema\\.json$"
+          },
+          "output": {
+            "type": "string",
+            "pattern": "^schemas/[a-z-]+\\.schema\\.json$"
+          },
+          "model": {
+            "enum": ["none", "medium", "high"]
+          }
         }
       },
       "minItems": 5,
@@ -77,7 +129,9 @@
           "exclusiveMinimum": 0,
           "maximum": 1
         },
-        "to": { "const": "high" }
+        "to": {
+          "const": "high"
+        }
       }
     },
     "routes": {
@@ -86,12 +140,24 @@
       "additionalProperties": false,
       "required": ["accept", "needs-review", "update", "cancel", "reject", "duplicate"],
       "properties": {
-        "accept": { "enum": ["submitSuggestion", "reportItem", "none"] },
-        "needs-review": { "enum": ["submitSuggestion", "reportItem", "none"] },
-        "update": { "enum": ["submitSuggestion", "reportItem", "none"] },
-        "cancel": { "enum": ["submitSuggestion", "reportItem", "none"] },
-        "reject": { "enum": ["submitSuggestion", "reportItem", "none"] },
-        "duplicate": { "enum": ["submitSuggestion", "reportItem", "none"] }
+        "accept": {
+          "enum": ["submitSuggestion", "reportItem", "none"]
+        },
+        "needs-review": {
+          "enum": ["submitSuggestion", "reportItem", "none"]
+        },
+        "update": {
+          "enum": ["submitSuggestion", "reportItem", "none"]
+        },
+        "cancel": {
+          "enum": ["submitSuggestion", "reportItem", "none"]
+        },
+        "reject": {
+          "enum": ["submitSuggestion", "reportItem", "none"]
+        },
+        "duplicate": {
+          "enum": ["submitSuggestion", "reportItem", "none"]
+        }
       }
     }
   }

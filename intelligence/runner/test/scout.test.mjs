@@ -3,6 +3,7 @@ import { describe, it } from 'node:test'
 
 import { pilotSources } from '../lib/contract.mjs'
 import {
+  areaMatcher,
   keepItem,
   mergeAcrossSources,
   mergedCopies,
@@ -37,6 +38,7 @@ describe('scout evals', () => {
       const http = fakeHttp(c.input.responses)
       const result = polled
         ? await scoutSource(source, {
+            area: contract.area,
             state: freshState(),
             http,
             budgets,
@@ -95,11 +97,28 @@ describe('scout', () => {
 
   it('keeps Legistar items only for the council, hearings or a place in the area', () => {
     const events = { id: 'legistar-events' }
+    const namesArea = areaMatcher(contract.area)
     const item = (title, text = '') => ({ title, sourceText: text, locationText: null })
-    assert.ok(keepItem(events, item('COMMON COUNCIL')))
-    assert.ok(keepItem(events, item('PLAN COMMISSION', 'Public hearing on 4802 Sprecher Rd')))
-    assert.ok(!keepItem(events, item('TRANSPORTATION COMMISSION', 'Budget review')))
-    assert.ok(!keepItem({ id: 'legistar-matters' }, item('Citywide fee schedule')))
+    assert.ok(keepItem(events, item('COMMON COUNCIL'), namesArea))
+    assert.ok(
+      keepItem(events, item('PLAN COMMISSION', 'Public hearing on 4802 Sprecher Rd'), namesArea),
+    )
+    assert.ok(!keepItem(events, item('TRANSPORTATION COMMISSION', 'Budget review'), namesArea))
+    assert.ok(!keepItem({ id: 'legistar-matters' }, item('Citywide fee schedule'), namesArea))
+  })
+
+  it('names the area from area.yaml: places, neighbors, and I-94 only with a cross street (#390)', () => {
+    const namesArea = areaMatcher(contract.area)
+    assert.ok(namesArea('Resurfacing on Cottage Grove Rd'))
+    assert.ok(namesArea('North Star neighborhood association picnic'))
+    assert.ok(namesArea('High Crossing Blvd sidewalk hearing'))
+    // A highway alone names half the city
+    assert.ok(!namesArea('I-94 lane closures overnight'))
+    assert.ok(!namesArea('Milwaukee Street reconstruction near Fair Oaks'))
+    assert.ok(namesArea('Milwaukee Street and I-94: proposed interchange'))
+    assert.ok(namesArea('Interstate 94 interchange study, public meeting'))
+    // Whole words only
+    assert.ok(!namesArea('Pinneyville Road'))
   })
 
   it('skips an item it already handled, and marks a changed one as updated', async () => {
@@ -108,6 +127,7 @@ describe('scout', () => {
     const source = pilotSources(contract.registry)[0]
     const options = { budgets, validate, now: atNoon('2026-10-25') }
     const first = await scoutSource(source, {
+      area: contract.area,
       ...options,
       state: freshState(),
       http: fakeHttp([{ status: 200, body }]),
@@ -115,6 +135,7 @@ describe('scout', () => {
     const [candidate] = first.candidates
     const seen = { sources: {}, seen: { [candidate.externalId]: candidate.contentHash } }
     const again = await scoutSource(source, {
+      area: contract.area,
       ...options,
       state: seen,
       http: fakeHttp([{ status: 200, body }]),
@@ -125,6 +146,7 @@ describe('scout', () => {
     )
     const changed = { sources: {}, seen: { [candidate.externalId]: 'f'.repeat(64) } }
     const updated = await scoutSource(source, {
+      area: contract.area,
       ...options,
       state: changed,
       http: fakeHttp([{ status: 200, body }]),
@@ -141,6 +163,7 @@ describe('scout', () => {
       return new Response(null, { status: 304 })
     }
     const result = await scoutSource(source, {
+      area: contract.area,
       state,
       http,
       budgets,

@@ -14,6 +14,7 @@ The agents never publish. They create **suggested drafts**; an editor reads, fix
 | [`pipeline.yaml`](pipeline.yaml) | The settings a runtime reads first: kill switch, schedule, budgets, stages |
 | [`sources.yaml`](sources.yaml)   | Approved sources, each checked by hand ([summary](sources.md))             |
 | [`coverage.md`](coverage.md)     | The Sprecher East area and the relevance policy                            |
+| [`area.yaml`](area.yaml)         | The words code uses to spot the area: places, neighbors, highway rules     |
 | [`prompts/`](prompts/)           | One prompt per stage, each naming its input and output schema              |
 | [`schemas/`](schemas/)           | JSON Schemas for every file and every stage's output                       |
 | [`evals/`](evals/)               | Test cases per stage with the result a correct pipeline reaches            |
@@ -98,7 +99,8 @@ run the same folder.
 1. Check out this repository's `main` (read-only) at the start of each run, and record its commit
    as `repoCommit` in the run log, so every suggestion can be traced to the exact prompts that made it.
 2. Read `pipeline.yaml`. If `enabled` is false, log a `disabled` run and stop.
-3. Load the schemas in `schemas/`, `sources.yaml` and `coverage.md`, and read the category tree
+3. Load the schemas in `schemas/`, `sources.yaml`, `coverage.md` and `area.yaml` (given to the
+   model with `coverage.md`), and read the category tree
    with the MCP find tool (`categories`: slug, title, parent) into each item's `taxonomy`
    (`common.schema.json#/$defs/taxonomy`), so the draft stage picks only existing categories
    (#363). Add each item's `source` from `sources.yaml` (owner, reliability, scope), so verify

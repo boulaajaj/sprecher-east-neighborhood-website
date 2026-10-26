@@ -131,6 +131,7 @@ describe('the per-source cap', () => {
   it('keeps a cursor source’s oldest changes and moves its cursor only past them', async () => {
     const http = async () => new Response(many)
     const result = await scoutSource(matters, {
+      area: contract.area,
       ...options,
       state: { sources: {}, seen: {} },
       http,
@@ -149,6 +150,7 @@ describe('the per-source cap', () => {
       .replace('RRULE', 'X')
       .replace('END:VEVENT', 'RRULE:FREQ=DAILY;COUNT=6\r\nEND:VEVENT')
     const result = await scoutSource(library, {
+      area: contract.area,
       ...options,
       state: { sources: {}, seen: {} },
       http: async () => new Response(ics),

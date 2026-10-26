@@ -64,6 +64,7 @@ export async function processRun({
       robots,
       budgets,
       validate: validateCandidate,
+      area: contract.area,
       now: startedAt,
     })
     log.sourcesChecked.push(result.check)
