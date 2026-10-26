@@ -5,8 +5,10 @@ import type { HumanVerifier } from '@/platform/lib'
 import { toVerifyAccountFailure } from '../data/failures'
 import {
   findPendingVerification,
+  recordVerifiedToken,
   setPasswordFromVerification,
   verifyAccountToken,
+  wasVerifiedWithToken,
 } from '../data/signUp'
 import type { VerifyAccountValues } from '../domain/credentials'
 import type { ActionResult, VerifyAccountFailure } from '../domain/types'
@@ -19,6 +21,8 @@ import { logServerFailure } from './logServerFailure'
  * after a second sign-up needs a password first (#289): without one the answer is
  * `needs-password` and the token stays unused; with one, it replaces the account's password, then
  * the email is verified. Only the mailbox's owner holds the link, so only they set it.
+ * Once verified, the link's hash is kept, so the same link pressed again answers
+ * `already-verified` rather than a dead link (#391).
  */
 export async function verifyAccountFromLink(
   { token, newPassword }: VerifyAccountValues,
@@ -34,11 +38,22 @@ export async function verifyAccountFromLink(
   }
   try {
     const pending = await findPendingVerification(token)
+    if (!pending && (await wasVerifiedWithToken(token))) {
+      return { ok: false, failure: 'already-verified' }
+    }
     if (pending?.setsPassword) {
       if (!newPassword) return { ok: false, failure: 'needs-password' }
       await setPasswordFromVerification(pending.id, newPassword)
     }
     await verifyAccountToken({ token })
+    if (pending) {
+      try {
+        await recordVerifiedToken(pending.id, token)
+      } catch (error) {
+        // The account is verified either way; only the "already confirmed" answer is lost
+        logServerFailure('Recording a used verification link', error)
+      }
+    }
     return { ok: true }
   } catch (error) {
     const failure = toVerifyAccountFailure(error)

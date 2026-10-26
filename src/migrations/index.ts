@@ -13,6 +13,7 @@ import * as migration_20261024_164157_review_queue from './20261024_164157_revie
 import * as migration_20261024_180000_cancel_missed_scheduled_publishes from './20261024_180000_cancel_missed_scheduled_publishes'
 import * as migration_20261024_194426_agent_mcp_access from './20261024_194426_agent_mcp_access'
 import * as migration_20261025_195057_shared_categories from './20261025_195057_shared_categories'
+import * as migration_20261026_025719_verified_token_hash from './20261026_025719_verified_token_hash'
 
 export const migrations = [
   {
@@ -89,5 +90,10 @@ export const migrations = [
     up: migration_20261025_195057_shared_categories.up,
     down: migration_20261025_195057_shared_categories.down,
     name: '20261025_195057_shared_categories',
+  },
+  {
+    up: migration_20261026_025719_verified_token_hash.up,
+    down: migration_20261026_025719_verified_token_hash.down,
+    name: '20261026_025719_verified_token_hash',
   },
 ]

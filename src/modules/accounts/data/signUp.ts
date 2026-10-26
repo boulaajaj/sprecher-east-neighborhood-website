@@ -7,6 +7,7 @@ import { getPayload } from 'payload'
 
 import { ROLES } from '@/platform/lib'
 import { getServerSideURL } from '@/platform/lib/getURL'
+import { sha256Hex } from '@/platform/lib/sha256'
 
 import type { SignUpValues, VerifyAccountValues } from '../domain/credentials'
 import { USERS } from '../domain/usersCollection'
@@ -168,4 +169,38 @@ export async function verifyAccountToken({
 }: Pick<VerifyAccountValues, 'token'>): Promise<void> {
   const payload = await getPayload({ config: configPromise })
   await payload.verifyEmail({ collection: USERS, token })
+}
+
+/**
+ * Remembers which link verified the account (#391), as a hash, once Payload has cleared its
+ * token, so the same link opened again can say "already confirmed". Written with `db.updateOne`,
+ * like the resend: a server-only field, and no hook needs to run.
+ */
+export async function recordVerifiedToken(id: number, token: string): Promise<void> {
+  const payload = await getPayload({ config: configPromise })
+  await payload.db.updateOne({
+    collection: USERS,
+    id,
+    data: { verifiedTokenHash: sha256Hex(token) },
+    returning: false,
+  })
+}
+
+/**
+ * Whether this link already verified its account (#391): the hash `recordVerifiedToken` kept.
+ * Only a yes or no comes back, never the account.
+ */
+export async function wasVerifiedWithToken(token: string): Promise<boolean> {
+  const payload = await getPayload({ config: configPromise })
+  const { docs } = await payload.find({
+    collection: USERS,
+    where: { verifiedTokenHash: { equals: sha256Hex(token) } },
+    select: { verifiedTokenHash: true },
+    limit: 1,
+    depth: 0,
+    pagination: false,
+    // The link's token is the proof, as for Payload's own verify; only a yes or no comes back
+    overrideAccess: true,
+  })
+  return docs.length > 0
 }

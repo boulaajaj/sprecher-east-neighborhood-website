@@ -17,5 +17,6 @@ export type {
   ResetPasswordFailure,
   SignInFailure,
   SignUpFailure,
+  VerificationLinkStatus,
   VerifyAccountFailure,
 } from './domain/types'

@@ -55,6 +55,7 @@ export type SignUpFailure = 'rejected' | 'robot-check' | 'too-many'
  * or something broke.
  */
 export type VerifyAccountFailure =
+  | 'already-verified'
   | 'invalid-link'
   | 'needs-password'
   | 'robot-check'
@@ -62,3 +63,9 @@ export type VerifyAccountFailure =
 
 /** What a server action that changes something returns. Failures are fixed codes, never text. */
 export type ActionResult<Failure extends string> = { ok: true } | { ok: false; failure: Failure }
+
+/**
+ * Where a verification link stands when its page opens (#391), read without changing anything:
+ * `pending` still needs the Confirm button; the others show their message and no button.
+ */
+export type VerificationLinkStatus = 'pending' | 'already-verified' | 'invalid'
