@@ -45,4 +45,15 @@ describe('PageHeader', () => {
     )
     expect(screen.getByRole('textbox', { name: 'Search' })).toBeTruthy()
   })
+
+  it('draws a compact header for a form page, with no container of its own (#439)', () => {
+    const { container } = render(
+      <PageHeader variant="compact" title="Log In" description="Log in to your account." />,
+    )
+
+    const header = container.querySelector('header')
+    expect(header?.className).not.toContain('container')
+    expect(screen.getByRole('heading', { level: 1 }).className).toContain('text-3xl')
+    expect(header?.className).toContain('mb-8')
+  })
 })

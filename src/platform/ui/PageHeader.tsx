@@ -6,6 +6,8 @@ import { cn } from '@/platform/lib/cn'
 import { Link } from './Link'
 
 export type PageHeaderProps = {
+  /** `default` heads a list page; `compact` heads a page holding one form or message (`FormPage`) */
+  variant?: 'default' | 'compact'
   /** A short label above the title: the section ("News") or a `Badge` */
   eyebrow?: React.ReactNode
   /** The page's one `h1` */
@@ -22,9 +24,11 @@ export type PageHeaderProps = {
 /*
  * The top of a list page (#430, docs/ui/component-set.md): eyebrow, title, description, an optional
  * way back and an optional control. Left-aligned, the description kept to a readable width. The
- * photo headers of post and event pages (`image`) come with `MetaList`.
+ * photo headers of post and event pages (`image`) come with `MetaList`. `compact` is the small
+ * header of a form page: title and description only, inside the page's own column.
  */
 export function PageHeader({
+  variant = 'default',
   eyebrow,
   title,
   description,
@@ -32,6 +36,15 @@ export function PageHeader({
   children,
   className,
 }: PageHeaderProps) {
+  if (variant === 'compact') {
+    return (
+      <header className={cn(description ? 'mb-8' : 'mb-6', className)}>
+        <h1 className="text-3xl font-bold text-balance text-foreground">{title}</h1>
+        {description && <p className="mt-2 text-muted-foreground">{description}</p>}
+      </header>
+    )
+  }
+
   return (
     <header className={cn('container mb-12 md:mb-16', className)}>
       {eyebrow && (
