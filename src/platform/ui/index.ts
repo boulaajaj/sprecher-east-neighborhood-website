@@ -3,6 +3,7 @@
 // so a client component that needs a Button does not bundle them.
 export { Alert, type AlertProps, type AlertTone } from './Alert'
 export { Button, type ButtonProps } from './Button'
+export { EmptyState, type EmptyStateProps } from './EmptyState'
 export { Field, type FieldProps } from './Field.client'
 export type { FieldCheckboxProps } from './FieldCheckbox.client'
 export type { FieldInputProps } from './FieldInput.client'

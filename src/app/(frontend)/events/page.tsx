@@ -5,6 +5,7 @@ import React from 'react'
 import { EventsFeed, findEventPage } from '@/modules/events/server'
 import { mergeOpenGraph } from '@/platform/seo/mergeOpenGraph'
 import { siteTimeZoneLabel } from '@/platform/lib/timezone'
+import { EmptyState } from '@/platform/ui/EmptyState'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
@@ -40,12 +41,15 @@ export default async function EventsPage() {
         {upcoming.totalDocs > 0 ? (
           <EventsFeed scope="upcoming" initial={upcoming} />
         ) : (
-          <div className="rounded-2xl border border-border bg-surface p-8 md:p-12">
-            <p className="text-lg text-foreground">No upcoming events are posted right now.</p>
-            <p className="mt-2 text-muted-foreground">
-              Check back soon, or browse past events below to see what neighbors have been up to.
-            </p>
-          </div>
+          <EmptyState
+            title="No upcoming events are posted right now."
+            description={
+              // Point to past events only when the page shows some (#206)
+              past.totalDocs > 0
+                ? 'Check back soon, or browse past events below to see what neighbors have been up to.'
+                : 'Check back soon.'
+            }
+          />
         )}
       </section>
 

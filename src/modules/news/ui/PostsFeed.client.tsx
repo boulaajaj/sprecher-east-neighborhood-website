@@ -2,6 +2,7 @@
 
 import React from 'react'
 
+import { EmptyState } from '@/platform/ui/EmptyState'
 import { LoadMoreFooter, useLoadMore } from '@/platform/ui/LoadMore.client'
 import type { FeedPage } from '@/platform/lib'
 
@@ -16,9 +17,7 @@ export const PostsFeed: React.FC<{ initial: FeedPage<PostSummary> }> = ({ initia
   if (feed.totalDocs === 0) {
     return (
       <div className="container">
-        <div className="rounded-2xl border border-border bg-surface p-12 text-center">
-          <p className="text-lg text-muted-foreground">No news posts yet. Check back soon.</p>
-        </div>
+        <EmptyState title="No news posts yet." description="Check back soon." />
       </div>
     )
   }

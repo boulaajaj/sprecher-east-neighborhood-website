@@ -4,6 +4,7 @@ import React from 'react'
 
 import { parseSearchQuery } from '@/modules/news'
 import { findSearchResults, PostGrid, SearchBox } from '@/modules/news/server'
+import { EmptyState } from '@/platform/ui/EmptyState'
 
 type Args = {
   searchParams: Promise<{
@@ -30,8 +31,12 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
       {results.length > 0 ? (
         <PostGrid posts={results} />
       ) : (
-        <div className="container py-12 text-center">
-          <p className="text-muted-foreground">No results found.</p>
+        <div className="container">
+          <EmptyState
+            variant="plain"
+            title="No results found."
+            description="Try different words, or check the spelling."
+          />
         </div>
       )}
     </div>
