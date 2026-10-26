@@ -14,7 +14,6 @@ import {
 import { generateMeta } from '@/platform/seo/generateMeta'
 import { HOME_PAGE_SLUG } from '@/platform/payload/documentHref'
 import { LivePreviewListener } from '@/platform/ui/LivePreviewListener.client'
-import PageClient from './page.client'
 import { pageBlocks } from './pageBlocks'
 
 // A scheduled publish or unpublish runs outside a request, where Next can't refresh the cache, so
@@ -55,7 +54,6 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   return (
     <article className="pb-0">
-      <PageClient />
       {/* Allows redirects for valid pages too */}
       <PayloadRedirects disableNotFound url={url} />
 

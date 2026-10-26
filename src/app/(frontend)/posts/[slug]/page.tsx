@@ -21,7 +21,6 @@ import {
   SidebarPosts,
 } from '@/modules/news/server'
 import { generateMeta } from '@/platform/seo/generateMeta'
-import PageClient from './page.client'
 
 // A scheduled publish or unpublish runs outside a request, where Next can't refresh the cache, so
 // the page also re-renders every 10 minutes (#141, decision 0011)
@@ -61,7 +60,6 @@ export default async function Post({ params: paramsPromise }: Args) {
 
   return (
     <article className="pt-16 pb-16">
-      <PageClient />
       <JsonLd data={postJsonLd(post)} />
 
       {/* Allows redirects for valid pages too */}
