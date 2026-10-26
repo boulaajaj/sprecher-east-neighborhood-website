@@ -20,7 +20,7 @@ pattern is proven in production, add it here.
 **Creative freedom within constraints:**
 
 - Stay within Tailwind CSS + Next.js — no external animation libraries unless justified
-- Use design tokens from `globals.css @theme {}` for all colors
+- Use design tokens (`src/platform/theme/tokens.ts`) for all colors
 - Respect accessibility (contrast ratios, reduced motion, focus indicators)
 - Test at 6 viewports (320, 430, 768, 1024, 1280, 1920px)
 - Beyond these constraints: **experiment freely.** Combine patterns. Invent new ones. Add subtle shadows, micro-animations, unexpected but effective layout choices. If the result is clean, intuitive, and beautiful — ship it.

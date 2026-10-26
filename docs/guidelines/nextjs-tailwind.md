@@ -55,14 +55,14 @@ Fetch data through the owning module's use cases (from its `server.ts`), whose `
 **IMPORTANT**: Never use inline CSS (`style={}`) or hardcoded hex colors. All styling goes through Tailwind utility classes using design token names.
 
 - Use semantic token classes: `bg-primary`, `text-foreground`, `border-border`, `bg-surface`
-- All design tokens defined in `src/app/(frontend)/globals.css` inside `@theme {}`
+- Token names are listed in `src/platform/theme/tokens.ts`; their values are in `src/themes/default/theme.css`
 - Dark mode uses `[data-theme='dark']` selector — tokens auto-switch, no manual dark: prefixes needed for token colors
 - Container: use the `container` class (max-width with auto margins)
 - Font: Poppins loaded via `next/font/google` in layout, applied as `--font-poppins` CSS variable
 
 ## Design Tokens
 
-Defined in `globals.css @theme`:
+Values in `src/themes/default/theme.css` (a few of them):
 
 | Token                      | Light     | Dark      |
 | -------------------------- | --------- | --------- |

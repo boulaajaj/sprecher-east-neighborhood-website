@@ -21,7 +21,7 @@ Where code goes: [`docs/architecture/`](../architecture/README.md).
 - Same spacing, typography, and color usage across all pages
 - Cards, buttons, and interactive elements are styled consistently
 - No page looks visually disconnected from the rest of the site
-- Design tokens from `globals.css @theme` are used everywhere (no hardcoded colors/sizes)
+- Design tokens (`src/platform/theme/tokens.ts`) are used everywhere (no hardcoded colors/sizes)
 - Mobile layouts are clean and usable (no overflow, no tiny touch targets)
 
 ### UX Integrity
