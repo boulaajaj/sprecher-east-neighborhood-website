@@ -83,11 +83,11 @@ coverage table, `Field · email` means a field holding `Field.Input type="email"
 
 ## Feedback and overlays
 
-| Component | Variants (`cva`)                              | Props                                                                                                     | Today                                                                          | Elements                    |
-| --------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | --------------------------- |
-| `Alert`   | `tone`: `info`, `success`, `warning`, `error` | `title`, `children` (text or rich text); `role` follows the tone (`alert` for errors, `status` otherwise) | `src/platform/ui/Alert.tsx` (two tones) and the banner block's own four styles | F16, F17, F22, F25, F26, B5 |
-| `Toast`   | `tone`: `info`                                | `message`, `action` (a `Button`), `onDismiss`                                                             | markup inside `VersionCheck`                                                   | S9                          |
-| `Dialog`  | `variant`: `sheet`                            | `open`, `onOpenChange`, `title`; Radix gives focus trap, Escape, scroll lock and focus return             | the mobile menu's hand-written behaviour                                       | N10                         |
+| Component | Variants (`cva`)                              | Props                                                                                                     | Today                                                                                                        | Elements                    |
+| --------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | --------------------------- |
+| `Alert`   | `tone`: `info`, `success`, `warning`, `error` | `title`, `children` (text or rich text); `role` follows the tone (`alert` for errors, `status` otherwise) | `src/platform/ui/Alert.tsx`, used by `Form`, the account and confirmation pages, and the banner block (#226) | F16, F17, F22, F25, F26, B5 |
+| `Toast`   | `tone`: `info`                                | `message`, `action` (a `Button`), `onDismiss`                                                             | markup inside `VersionCheck`                                                                                 | S9                          |
+| `Dialog`  | `variant`: `sheet`                            | `open`, `onOpenChange`, `title`; Radix gives focus trap, Escape, scroll lock and focus return             | the mobile menu's hand-written behaviour                                                                     | N10                         |
 
 ## Navigation
 

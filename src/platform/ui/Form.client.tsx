@@ -94,10 +94,10 @@ export function Form<Input extends FieldValues, Output>({
     >
       {showSuccess && (
         <div ref={successRef} tabIndex={-1} className="outline-none">
-          <Alert variant="success">{successMessage}</Alert>
+          <Alert tone="success">{successMessage}</Alert>
         </div>
       )}
-      {showError && <Alert variant="error">{errorMessage}</Alert>}
+      {showError && <Alert tone="error">{errorMessage}</Alert>}
       {children(form)}
     </form>
   )

@@ -56,7 +56,7 @@ export function ResetPasswordForm({ token: linkToken }: { token: string | null }
   if (status === 'success') {
     return (
       <div ref={doneRef} tabIndex={-1} className="space-y-6 outline-none">
-        <Alert variant="success">Your new password is set. Log in with it now.</Alert>
+        <Alert tone="success">Your new password is set. Log in with it now.</Alert>
         <Button href={SIGN_IN_PATH} fullWidth>
           Log In
         </Button>
@@ -67,7 +67,7 @@ export function ResetPasswordForm({ token: linkToken }: { token: string | null }
   if (linkDone) {
     return (
       <div className="space-y-6">
-        <Alert variant="error">{toResetPasswordErrorMessage('invalid-link')}</Alert>
+        <Alert tone="error">{toResetPasswordErrorMessage('invalid-link')}</Alert>
         <Button href={FORGOT_PASSWORD_PATH} fullWidth>
           Get a New Link
         </Button>

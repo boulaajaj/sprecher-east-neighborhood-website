@@ -39,12 +39,36 @@ export function readThemeModes(css: string): ThemeModes {
   return { light: lightValues, dark: { ...lightValues, ...darkOwn }, darkOwn }
 }
 
-function relativeLuminance(hex: string): number {
+type Rgb = [number, number, number]
+
+function hexToRgb(hex: string): Rgb {
   const match = /^#([0-9a-f]{6})$/i.exec(hex)
   if (!match) throw new Error(`Contrast needs a 6-digit hex colour, got "${hex}"`)
-  const channels = [0, 2, 4].map((i) => parseInt(match[1].slice(i, i + 2), 16) / 255)
-  const [r, g, b] = channels.map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
+  return [0, 2, 4].map((i) => parseInt(match[1].slice(i, i + 2), 16) / 255) as Rgb
+}
+
+const toLinear = (c: number) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)
+
+function relativeLuminance(hex: string): number {
+  const [r, g, b] = hexToRgb(hex).map(toLinear)
   return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+
+/**
+ * `color` at `alpha` opacity painted over `background`, as a 6-digit hex colour. Tailwind's
+ * `bg-x/10` is `color-mix(in oklab, x 10%, transparent)`: `x` at 10% opacity, which the browser
+ * then composites over the page per sRGB channel. So the blend here is plain sRGB.
+ */
+export function mixOver(color: string, background: string, alpha: number): string {
+  const top = hexToRgb(color)
+  const mixed = hexToRgb(background).map((c, i) => c + (top[i] - c) * alpha)
+  return `#${mixed
+    .map((c) =>
+      Math.round(c * 255)
+        .toString(16)
+        .padStart(2, '0'),
+    )
+    .join('')}`
 }
 
 /** WCAG 2.x contrast ratio between two 6-digit hex colours. */

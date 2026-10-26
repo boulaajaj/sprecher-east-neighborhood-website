@@ -44,6 +44,7 @@
   --color-primary-fill-hover: var(--primary-fill-hover);
   --color-primary-strong: var(--primary-strong);
   --color-destructive-strong: var(--destructive-strong);
+  --color-warning-strong: var(--warning-strong);
   --color-on-image: var(--on-image);
   --color-scrim: var(--scrim);
   --color-inverse: var(--inverse);

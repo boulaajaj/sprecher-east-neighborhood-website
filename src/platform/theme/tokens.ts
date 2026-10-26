@@ -44,6 +44,7 @@ export const THEME_TOKENS = {
   ring: { modes: 'both', meaning: 'Focus ring' },
   success: { modes: 'both', meaning: 'Success state' },
   warning: { modes: 'both', meaning: 'Warning state' },
+  'warning-strong': { modes: 'both', meaning: 'Warning text that passes on panels' },
   error: { modes: 'both', meaning: 'Error state' },
   'on-image': { modes: 'both', meaning: 'Text and icons on photos (heroes, image cards)' },
   scrim: { modes: 'both', meaning: 'Overlays and shadows that keep text readable on photos' },
@@ -90,7 +91,28 @@ export const CONTRAST_PAIRS: ReadonlyArray<readonly [text: ThemeToken, backgroun
   ['destructive', 'background'],
   ['on-image', 'scrim'],
   ['inverse-foreground', 'inverse'],
+  ['warning-strong', 'background'],
+  ['warning-strong', 'surface'],
+  ['warning-strong', 'card'],
 ]
+
+/**
+ * Text on a tint of a colour over a background, as `Alert` draws its tones (`bg-<tint>/10`):
+ * [text, tint, background]. The test paints the tint at `TINT_ALPHA` opacity over the
+ * background, as the browser does, then checks the text against the result.
+ */
+export const TINT_ALPHA = 0.1
+const ALERT_TONES = [
+  ['foreground', 'muted-foreground'],
+  ['primary-strong', 'primary'],
+  ['warning-strong', 'warning'],
+  ['destructive-strong', 'destructive'],
+] as const satisfies readonly (readonly [ThemeToken, ThemeToken])[]
+export const TINTED_PAIRS = ALERT_TONES.flatMap(([text, tint]) =>
+  (['background', 'surface', 'card'] as const).map(
+    (background) => [text, tint, background] as const,
+  ),
+)
 
 /** WCAG 2.x AA minimum for normal text. */
 export const MIN_TEXT_CONTRAST = 4.5

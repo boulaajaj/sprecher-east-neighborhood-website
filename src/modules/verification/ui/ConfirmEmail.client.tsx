@@ -111,7 +111,7 @@ export function ConfirmEmail({
     <div className="space-y-6">
       {message && (
         <div ref={messageRef} tabIndex={-1} className="space-y-3 outline-none">
-          <Alert variant={message.variant}>{message.text}</Alert>
+          <Alert tone={message.tone}>{message.text}</Alert>
           {isLinkDone(answer) && !settled && (
             <Link href={retryHref} variant="action">
               Go to the contact form
@@ -119,7 +119,7 @@ export function ConfirmEmail({
           )}
         </div>
       )}
-      {canConfirm && waitMessage && <Alert variant="error">{waitMessage}</Alert>}
+      {canConfirm && waitMessage && <Alert tone="error">{waitMessage}</Alert>}
       {canConfirm && robotCheck.enabled && <TurnstileWidget {...robotCheck.widgetProps} />}
       {canConfirm && (
         <Button
