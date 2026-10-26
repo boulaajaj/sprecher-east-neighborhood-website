@@ -57,7 +57,7 @@ You are not just a critic — you are a creative designer. Your job is to **make
 
 ## Design System
 
-### Brand Colors (from globals.css @theme)
+### Brand Colors (from `src/themes/default/theme.css`)
 
 The tokens and their light and dark values are in
 [`nextjs-tailwind.md`](../guidelines/nextjs-tailwind.md#design-tokens) (the one table to keep current).
@@ -127,7 +127,7 @@ How to use them:
 When reviewing or implementing any visual change:
 
 - [ ] Spacing is consistent with the spacing scale (no arbitrary px values)
-- [ ] Colors are from the design token system (no hardcoded hex outside globals.css)
+- [ ] Colors are from the design token system (no hardcoded hex outside theme files)
 - [ ] Typography follows the hierarchy (h1 > h2 > h3, consistent sizes)
 - [ ] All pages align to the same max-width as the navigation bar
 - [ ] Cards have consistent styling (radius, shadow, padding, hover)

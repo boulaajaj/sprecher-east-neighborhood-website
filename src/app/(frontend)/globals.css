@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+/* The theme: token values (the active theme), then their Tailwind mapping (#146) */
+@import '../../themes/default/theme.css';
+@import '../../platform/theme/tailwind.css';
 
 @config '../../../tailwind.config.mjs';
 
@@ -98,137 +101,9 @@
   }
 }
 
-/* Sprecher East brand tokens — light theme (default) */
-:root,
-[data-theme='light'] {
+/* Layout sizes the theme doesn't change */
+:root {
   --header-height: 4.5rem; /* ~72px — reduced from legacy 10.4rem to match actual sticky header (py-4 + logo + border) */
-  --background: #f9f8f5;
-  --foreground: #1a1a1a;
-  --card: #ffffff;
-  --card-foreground: #1a1a1a;
-  --popover: #ffffff;
-  --popover-foreground: #1a1a1a;
-  --primary: #3d7a5e;
-  --primary-foreground: #ffffff;
-  --secondary: #f0ede6;
-  --secondary-foreground: #1a1a1a;
-  --muted: #f0ede6;
-  --muted-foreground: #6b6b6b;
-  --accent: #e8923a;
-  /* Dark text on the orange accent: white on #e8923a is 2.4:1 and fails WCAG AA; #1a1a1a is 7.1:1 */
-  --accent-foreground: #1a1a1a;
-  --destructive: #dc2626;
-  --destructive-foreground: #dc2626;
-  --border: #e2ddd6;
-  /* Form control borders: 3.4:1 on --surface, 3.8:1 on --background, 4.0:1 on --card (WCAG 1.4.11) */
-  --input: #857e74;
-  --ring: #3d7a5e;
-  --chart-1: #3d7a5e;
-  --chart-2: #e8923a;
-  --chart-3: #4f9974;
-  --chart-4: #c97830;
-  --chart-5: #2e5e47;
-  --radius: 0.625rem;
-  --success: #3d7a5e;
-  --warning: #e8923a;
-  --error: #dc2626;
-  --surface: #f0ede6;
-  --primary-dark: #2e5e47;
-  --primary-light: #4f9974;
-  --accent-dark: #c97830;
-  /* Fill for primary buttons: white text on it is 5.1:1 (#121), 7.5:1 on hover. */
-  --primary-fill: #3d7a5e;
-  --primary-fill-hover: #2e5e47;
-  /* Link text that passes on surface panels too: 6.4:1 on --surface, 7.0:1 on --background */
-  --primary-strong: #2e5e47;
-  /* Error text: --destructive is 4.1:1 on --surface and 3.9:1 on its own tint; this is 5.5:1 on
-     --surface, 6.1:1 on --background and 4.8:1 or more on the error tint */
-  --destructive-strong: #b91c1c;
-}
-
-/* Sprecher East brand tokens — dark theme */
-[data-theme='dark'] {
-  --background: #0f1117;
-  --foreground: #e8e6e3;
-  --card: #1a1d27;
-  --card-foreground: #e8e6e3;
-  --popover: #1a1d27;
-  --popover-foreground: #e8e6e3;
-  --primary: #4e9b76;
-  --primary-foreground: #ffffff;
-  --secondary: #1e2130;
-  --secondary-foreground: #e8e6e3;
-  --muted: #1e2130;
-  --muted-foreground: #9ca3af;
-  --accent: #f0a04b;
-  --accent-foreground: #1a1a1a;
-  --destructive: #ef4444;
-  --destructive-foreground: #ef4444;
-  --border: #2d3040;
-  /* 3.3:1 on --surface, 3.9:1 on --background, 3.5:1 on --card */
-  --input: #6b7186;
-  --ring: #4e9b76;
-  --chart-1: #4e9b76;
-  --chart-2: #f0a04b;
-  --chart-3: #5fb88e;
-  --chart-4: #d48a38;
-  --chart-5: #3d7a5e;
-  --success: #4e9b76;
-  --warning: #f0a04b;
-  --error: #ef4444;
-  --surface: #1e2130;
-  --primary-dark: #3d7a5e;
-  --primary-light: #5fb88e;
-  --accent-dark: #d48a38;
-  /* Dark --primary (#4e9b76) gives white text only 3.35:1, so buttons keep the brand fill (#121) */
-  --primary-fill: #3d7a5e;
-  --primary-fill-hover: #2e5e47;
-  /* 6.6:1 on --surface, 7.9:1 on --background */
-  --primary-strong: #5fb88e;
-  /* 5.8:1 on --surface, 6.1:1 on --card, 6.8:1 on --background */
-  --destructive-strong: #f87171;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-error: var(--error);
-  --color-surface: var(--surface);
-  --color-primary-dark: var(--primary-dark);
-  --color-primary-light: var(--primary-light);
-  --color-accent-dark: var(--accent-dark);
-  --color-primary-fill: var(--primary-fill);
-  --color-primary-fill-hover: var(--primary-fill-hover);
-  --color-primary-strong: var(--primary-strong);
-  --color-destructive-strong: var(--destructive-strong);
 }
 
 @layer base {

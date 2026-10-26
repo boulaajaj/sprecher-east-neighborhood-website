@@ -18,7 +18,7 @@ It is an unofficial, AI-assisted initiative (ground rules in [`AGENTS.md`](../AG
 ## Current Stack
 
 - **Framework**: Next.js 16 (App Router, TypeScript; Turbopack builds), React 19.2
-- **CSS**: Tailwind CSS v4 (design tokens in `src/app/(frontend)/globals.css @theme {}`)
+- **CSS**: Tailwind CSS v4. Design tokens: the contract in `src/platform/theme/tokens.ts`, values in `src/themes/default/theme.css`, Tailwind mapping in `src/platform/theme/tailwind.css` (#146)
 - **CMS**: Payload CMS v3 Website Template at `/admin` (self-hosted, SQLite `data/payload.db`). Editors can schedule a page, post or event to publish or unpublish: Payload's jobs queue runs it inside the app every minute (`jobs.autoRun`), and pages re-render at most every 10 minutes, so visitors see it within 10 minutes (decision 0011, #141)
 - **Auth**: Payload native auth (Users collection with `auth: true`); roles `admin`, `editor`, `resident`, `agent` (#336). Pages and server actions ask `src/modules/accounts/` who is signed in (`getCurrentUser`, `requireUser`, `requireRole`); sign-in (Payload's `login` helper from `@payloadcms/next/auth`), sign-out, password changes and forgot/reset password (Payload's `forgotPassword` and `resetPassword`, with a branded email linking to `/reset-password`, #269) are its server actions. Forgot password runs only from the site's page, behind the robot check and per-connection and site-wide limits, and Payload sends the email after the answer, so the time doesn't show whether an account exists (#282); Payload's REST and GraphQL forgot password answer 403, and `/admin/forgot` redirects to `/forgot-password`. Residents sign up on `/sign-up` (linked from the header, the mobile menu and `/login` (#296), and offered on `/confirm-email` after a contact sender confirms) through Payload's `create` with `auth.verify`: the branded verification email links to `/verify-account`, and an unverified account can't sign in or get a reset email (#187). Verifying takes the Confirm button and the robot check on that page; Payload's REST verify answers 403, its GraphQL verify mutation is refused, and `/admin/users/verify/<token>` redirects to `/verify-account` (#303). Signing up again with an unverified account's email sends a new link, at most 3 times per 3 hours, counted on the account; a resent link asks the person to choose the password on `/verify-account` before the account opens, so a password from an earlier sign-up never activates (#289)
 - **Email**: `@payloadcms/email-nodemailer` over SMTP (Mailgun in production); logs to the console when `SMTP_HOST` is unset. Email addresses typed into public forms are confirmed by link (`src/modules/verification/`, #183): the link opens a page whose Confirm button also passes the robot check, so mail scanners that open the link confirm nothing (#303); a contact message's emails go out only once its sender confirms (#287). Unconfirmed messages and addresses are deleted after 48 hours, and a confirmed sender's contact data 12 months after their last message, by hourly tasks in Payload's jobs queue that run inside the app (`jobs.autoRun`, decision 0010)
@@ -92,7 +92,7 @@ src/
     payload/           Role checks, access functions, media collection, default editor, publishedAt hook, admin components
     richtext/          The `RichText` renderer, the blocks inside rich text, plain-text conversion
     seo/               Page metadata and Open Graph helpers
-    theme/             Light and dark mode: theme providers, `InitTheme`, `ThemeSelector`
+    theme/             The theme contract (`tokens.ts`), its Tailwind mapping, light and dark mode providers
     turnstile/         The robot check (Cloudflare Turnstile): widget and server verifier
     ui/                The UI kit: `Button`, `Link`, `Media`, `CMSLink`, `JsonLd`, `Breadcrumbs`, `LoadMore`…
   endpoints/seed/      Seed data and script (exception)
@@ -106,7 +106,9 @@ src/
 | File                                | Purpose                                                                                                             |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | `src/payload.config.ts`             | Payload CMS config (SQLite, collections, plugins)                                                                   |
-| `src/app/(frontend)/globals.css`    | Tailwind v4 `@theme` block — all design tokens                                                                      |
+| `src/app/(frontend)/globals.css`    | Tailwind setup and base styles; imports the theme and its Tailwind mapping                                          |
+| `src/themes/default/theme.css`      | The default theme: every token's value in light and dark mode                                                       |
+| `src/platform/theme/tokens.ts`      | The theme contract: token names, and the contrast pairs `themes.test.ts` checks                                     |
 | `src/modules/site/cms/pages.ts`     | Pages collection with layout builder blocks                                                                         |
 | `src/modules/news/cms/posts.ts`     | News posts collection                                                                                               |
 | `src/modules/events/cms/events.ts`  | Events collection (custom)                                                                                          |
@@ -116,14 +118,16 @@ src/
 | `src/modules/site/cms/`             | Block, hero and link field configs, globals                                                                         |
 | `src/modules/site/ui/`              | Blocks, heroes, header and footer components                                                                        |
 | `src/platform/payload/roles.ts`     | Role checks and access functions                                                                                    |
-| `src/platform/theme/`               | Light and dark mode providers and init script                                                                       |
+| `src/platform/theme/`               | Theme contract and its test, Tailwind mapping, light and dark mode providers and init script                        |
 | `ecosystem.config.cjs`              | PM2 config for VPS (CommonJS: package is ESM)                                                                       |
 | `eslint.boundaries.config.mjs`      | Dependency rules as lint errors (#137)                                                                              |
 | `intelligence/`                     | Intelligence agents: sources, prompts, schemas (#337), and the runner that runs them (`intelligence/runner/`, #364) |
 
 ## Design Tokens
 
-Colors, fonts and dark-mode values are tokens in `src/app/(frontend)/globals.css`; the table of
+Colors, radius and dark-mode values are tokens: named in `src/platform/theme/tokens.ts`, valued in
+`src/themes/default/theme.css`, and checked against the contract and WCAG AA by
+`src/platform/theme/themes.test.ts` (decisions 0006 and 0012). The table of
 light and dark values is in [`guidelines/nextjs-tailwind.md`](guidelines/nextjs-tailwind.md#design-tokens).
 
 ## Payload CMS Plugins
