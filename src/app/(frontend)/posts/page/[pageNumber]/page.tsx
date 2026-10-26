@@ -7,7 +7,6 @@ import React from 'react'
 import { findPostPage, listPostPageNumbers, PostsFeed } from '@/modules/news/server'
 import { parsePageNumber } from '@/platform/lib'
 import { Link } from '@/platform/ui'
-import PageClient from './page.client'
 
 export const revalidate = 600
 
@@ -31,7 +30,6 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   return (
     <div className="pt-24 pb-24">
-      <PageClient />
       <div className="container mb-12 md:mb-16">
         <p className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">
           News · Page {page}

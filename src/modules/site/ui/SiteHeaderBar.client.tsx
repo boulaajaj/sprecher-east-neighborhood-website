@@ -1,5 +1,4 @@
 'use client'
-import { useHeaderTheme } from '@/platform/theme/HeaderThemeProvider.client'
 import NextLink from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
@@ -24,11 +23,8 @@ export const SiteHeaderBar: React.FC<SiteHeaderBarProps> = ({
   accountMenu,
   mobileAccountMenu,
 }) => {
-  /* Storing the value in a useState to avoid hydration errors */
-  const [theme, setTheme] = useState<string | null>(null)
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const { headerTheme, setHeaderTheme } = useHeaderTheme()
   const pathname = usePathname()
   const toggleRef = useRef<HTMLButtonElement>(null)
 
@@ -44,16 +40,10 @@ export const SiteHeaderBar: React.FC<SiteHeaderBarProps> = ({
     [closeMobileMenu],
   )
 
+  // A new page closes the mobile menu
   useEffect(() => {
-    setHeaderTheme(null)
     setMobileOpen(false)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname])
-
-  useEffect(() => {
-    if (headerTheme !== theme) setTheme(headerTheme ?? null)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [headerTheme])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10)
@@ -99,7 +89,6 @@ export const SiteHeaderBar: React.FC<SiteHeaderBarProps> = ({
       className={`sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-md transition-[background-color,border-color,box-shadow] duration-200 ${
         scrolled ? 'shadow-md' : 'shadow-sm'
       }`}
-      {...(theme ? { 'data-theme': theme } : {})}
     >
       <div className="container flex items-center justify-between py-4">
         <NextLink href="/" className="shrink-0">

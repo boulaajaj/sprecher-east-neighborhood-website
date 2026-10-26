@@ -4,7 +4,6 @@ import React from 'react'
 
 import { parseSearchQuery } from '@/modules/news'
 import { findSearchResults, PostGrid, SearchBox } from '@/modules/news/server'
-import PageClient from './page.client'
 
 type Args = {
   searchParams: Promise<{
@@ -19,7 +18,6 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
 
   return (
     <div className="pt-24 pb-24">
-      <PageClient />
       <div className="container mb-12 md:mb-16">
         <h1 className="mb-6 text-4xl font-bold tracking-tight text-foreground md:text-5xl">
           Search

@@ -35,8 +35,6 @@ vi.mock('@/modules/site/server', () => ({
     return null
   },
 }))
-vi.mock('./page.client', () => ({ default: () => null }))
-
 import PostPage from './page'
 
 afterEach(cleanup)

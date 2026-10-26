@@ -58,7 +58,8 @@ none is fixed here.
 
    Their comments say "dark" where the code sets light. Dark mode gets a light header on
    [home](screenshots/home-1280-dark.webp); light mode gets a dark header on a
-   [post](screenshots/post-1280-light.webp).
+   [post](screenshots/post-1280-light.webp). Fixed in #201: the header always follows the
+   visitor's theme, and the forcing code is gone.
 
 5. **A post without a photo gets an empty 80vh band** with a black fade behind the title; the post
    hero has no plain look (`src/modules/news/ui/PostHero.tsx:51`).

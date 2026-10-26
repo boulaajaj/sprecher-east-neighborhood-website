@@ -7,9 +7,6 @@ import type { Header } from '@/payload-types'
 import { Button, Link } from '@/platform/ui'
 
 vi.mock('next/navigation', () => ({ usePathname: () => '/' }))
-vi.mock('@/platform/theme/HeaderThemeProvider.client', () => ({
-  useHeaderTheme: () => ({ headerTheme: null, setHeaderTheme: () => {} }),
-}))
 
 import { SiteHeaderBar } from './SiteHeaderBar.client'
 
@@ -40,6 +37,11 @@ const renderHeader = () =>
   )
 
 describe('SiteHeaderBar', () => {
+  it("follows the visitor's light or dark theme: it sets no theme of its own (#201)", () => {
+    renderHeader()
+    expect(screen.getByRole('banner').hasAttribute('data-theme')).toBe(false)
+  })
+
   it('shows the account menu it is given in the bar, and the mobile one only in the menu', async () => {
     renderHeader()
     expect(screen.getByRole('link', { name: 'Bar account' })).toBeTruthy()
