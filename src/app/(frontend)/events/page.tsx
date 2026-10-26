@@ -20,7 +20,6 @@ export default async function EventsPage() {
 
   return (
     <div className="pt-24 pb-24">
-      {/* Page header */}
       <PageHeader
         eyebrow="Community Calendar"
         title="Community Events"
