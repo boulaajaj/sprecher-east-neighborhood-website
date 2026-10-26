@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { Badge, BadgeList } from '@/platform/ui/Badge'
 import { ImageCredit } from '@/platform/ui/ImageCredit'
 import { Media } from '@/platform/ui/Media'
 import { formatDateTime } from '@/platform/lib/formatDateTime'
@@ -19,14 +20,15 @@ export const PostHero: React.FC<{
       <div className="relative -mt-[var(--header-height)] flex items-end">
         <div className="relative z-10 container pt-[var(--header-height)] pb-8 text-on-image lg:grid lg:grid-cols-[1fr_48rem_1fr]">
           <div className="col-span-1 col-start-1 md:col-span-2 md:col-start-2">
-            <div className="mb-6 text-sm uppercase">
-              {categories.map((category, index) => (
-                <React.Fragment key={category.id}>
-                  {category.title}
-                  {index < categories.length - 1 && <React.Fragment>, &nbsp;</React.Fragment>}
-                </React.Fragment>
-              ))}
-            </div>
+            {categories.length > 0 && (
+              <BadgeList className="mb-6">
+                {categories.map((category) => (
+                  <Badge key={category.id} variant="on-image">
+                    {category.title}
+                  </Badge>
+                ))}
+              </BadgeList>
+            )}
 
             <h1 className="mb-6 text-3xl md:text-5xl lg:text-6xl">{title}</h1>
 

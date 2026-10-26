@@ -8,7 +8,7 @@ import {
   MIN_TEXT_CONTRAST,
   THEME_TOKENS,
   THEME_TOKEN_NAMES,
-  TINT_ALPHA,
+  SCRIM_PAIRS,
   TINTED_PAIRS,
 } from './tokens'
 import { contrastRatio, mixOver, readThemeModes } from './themeFile'
@@ -45,14 +45,17 @@ describe('theme files', () => {
         )
       })
 
-      it.each(TINTED_PAIRS)('%s on a %s tint over %s passes WCAG AA', (text, tint, background) => {
-        const tinted = mixOver(modes[mode][tint], modes[mode][background], TINT_ALPHA)
-        const ratio = contrastRatio(modes[mode][text], tinted)
-        expect(
-          ratio,
-          `--${text} on --${tint} over --${background}: ${ratio.toFixed(2)}:1`,
-        ).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST)
-      })
+      it.each([...TINTED_PAIRS, ...SCRIM_PAIRS])(
+        '%s on a %s tint over %s (opacity %s) passes WCAG AA',
+        (text, tint, background, alpha) => {
+          const tinted = mixOver(modes[mode][tint], modes[mode][background], alpha)
+          const ratio = contrastRatio(modes[mode][text], tinted)
+          expect(
+            ratio,
+            `--${text} on --${tint} over --${background}: ${ratio.toFixed(2)}:1`,
+          ).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST)
+        },
+      )
     })
   })
 })
