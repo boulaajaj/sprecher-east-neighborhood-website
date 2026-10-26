@@ -7,7 +7,7 @@ const config = {
           css: [
             {
               // Every prose colour is a theme token, so rich text follows the site's theme
-              // (`data-theme`), not the device's dark mode, and no `prose-invert` is needed
+              // (`data-theme`), not the device's dark mode, and no inverted colours are needed
               // (#225, #401). `src/platform/theme/prose.test.ts` checks each one is a token.
               '--tw-prose-body': 'var(--foreground)',
               '--tw-prose-headings': 'var(--foreground)',

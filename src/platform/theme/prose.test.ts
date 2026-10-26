@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { createRequire } from 'node:module'
+
 import config from '../../../tailwind.config.mjs'
 import { THEME_TOKEN_NAMES } from './tokens'
 
@@ -11,35 +13,20 @@ const proseVariables = Object.entries(typography().DEFAULT.css[0]).filter(([name
   name.startsWith('--tw-prose-'),
 )
 
+// The plugin's own colour scheme lists every colour it reads, so an upgrade that adds one fails here
+const pluginStyles = createRequire(import.meta.url)('@tailwindcss/typography/src/styles.js') as {
+  gray: { css: Record<string, string> }
+}
+const PLUGIN_COLOURS = Object.keys(pluginStyles.gray.css)
+  .filter((name) => !name.startsWith('--tw-prose-invert'))
+  .sort()
+
 const TOKEN = /^var\(--([\w-]+)\)$/
 const TOKEN_TINT = /^color-mix\(in srgb, var\(--([\w-]+)\) \d+%, transparent\)$/
 
 describe('rich-text colours', () => {
   it('sets every colour the typography plugin reads', () => {
-    expect(proseVariables.map(([name]) => name).sort()).toEqual(
-      [
-        'body',
-        'headings',
-        'lead',
-        'links',
-        'bold',
-        'counters',
-        'bullets',
-        'hr',
-        'quotes',
-        'quote-borders',
-        'captions',
-        'kbd',
-        'kbd-shadows',
-        'code',
-        'pre-code',
-        'pre-bg',
-        'th-borders',
-        'td-borders',
-      ]
-        .map((name) => `--tw-prose-${name}`)
-        .sort(),
-    )
+    expect(proseVariables.map(([name]) => name).sort()).toEqual(PLUGIN_COLOURS)
   })
 
   it.each(proseVariables)('%s is a theme token', (_name, value) => {
@@ -48,6 +35,6 @@ describe('rich-text colours', () => {
   })
 
   it('needs no inverted colours, which follow the device and not the site', () => {
-    expect(proseVariables.some(([name]) => name.startsWith('--tw-prose-invert-'))).toBe(false)
+    expect(proseVariables.some(([name]) => name.startsWith('--tw-prose-invert'))).toBe(false)
   })
 })

@@ -48,7 +48,7 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
                 {/* Inner glow along top edge */}
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-on-image/40 to-transparent" />
                 <RichText
-                  className="relative mb-0 [&_p]:mt-0 [&_p]:mb-0 [&_p]:text-base [&_p]:leading-relaxed [&_p]:text-on-image/90 md:[&_p]:text-lg"
+                  className="relative mb-0 [&_a]:text-on-image [&_p]:mt-0 [&_p]:mb-0 [&_p]:text-base [&_p]:leading-relaxed [&_p]:text-on-image/90 md:[&_p]:text-lg [&_strong]:text-on-image"
                   data={body}
                   enableGutter={false}
                 />
