@@ -28,8 +28,6 @@ vi.mock('@/modules/site/server', () => ({
   },
 }))
 vi.mock('./pageBlocks', () => ({ pageBlocks: { marker: 'the block registry' } }))
-vi.mock('./page.client', () => ({ default: () => null }))
-
 import { homeStatic } from '@/endpoints/seed/home-static'
 
 import Page, { generateStaticParams } from './page'
