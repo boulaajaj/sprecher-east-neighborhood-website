@@ -12,6 +12,8 @@ export type CurrentUser = {
 /** What the header shows for the signed-in account; nothing more about it leaves the server. */
 export type AccountSummary = {
   name: string | null
+  /** An admin or editor: the header links them to the admin (#378). Not the role itself */
+  staff: boolean
 }
 
 /**

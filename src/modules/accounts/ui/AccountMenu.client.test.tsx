@@ -53,7 +53,7 @@ describe('AccountMenu', () => {
   })
 
   it('shows the signed-in account’s name in both menus, asking the server once', async () => {
-    mocks.getSignedInAccount.mockResolvedValue({ name: 'Ada' })
+    mocks.getSignedInAccount.mockResolvedValue({ name: 'Ada', staff: false })
     render(header())
 
     const links = await screen.findAllByRole('link', { name: 'Ada' })
@@ -63,8 +63,21 @@ describe('AccountMenu', () => {
     expect(screen.queryByRole('link', { name: 'Sign Up' })).toBeNull()
   })
 
+  it('links admins and editors to the admin from both menus, and nobody else (#378)', async () => {
+    mocks.getSignedInAccount.mockResolvedValue({ name: 'Ada', staff: true })
+    render(header())
+    const dashboard = await screen.findAllByRole('link', { name: 'Dashboard' })
+    expect(dashboard.map((link) => link.getAttribute('href'))).toEqual(['/admin', '/admin'])
+    cleanup()
+
+    mocks.getSignedInAccount.mockResolvedValue({ name: 'Ada', staff: false })
+    render(header())
+    await screen.findAllByRole('link', { name: 'Ada' })
+    expect(screen.queryByRole('link', { name: 'Dashboard' })).toBeNull()
+  })
+
   it('calls an account without a name “Account”', async () => {
-    mocks.getSignedInAccount.mockResolvedValue({ name: null })
+    mocks.getSignedInAccount.mockResolvedValue({ name: null, staff: false })
     render(header())
     expect(await screen.findAllByRole('link', { name: 'Account' })).toHaveLength(2)
   })
@@ -74,7 +87,7 @@ describe('AccountMenu', () => {
     const { rerender } = render(header())
     await screen.findAllByRole('link', { name: 'Log In' })
 
-    mocks.getSignedInAccount.mockResolvedValue({ name: 'Ada' })
+    mocks.getSignedInAccount.mockResolvedValue({ name: 'Ada', staff: false })
     mocks.pathname = '/account'
     rerender(header())
 
@@ -83,7 +96,7 @@ describe('AccountMenu', () => {
   })
 
   it('signs out, then opens the home page as a visitor', async () => {
-    mocks.getSignedInAccount.mockResolvedValue({ name: 'Ada' })
+    mocks.getSignedInAccount.mockResolvedValue({ name: 'Ada', staff: false })
     mocks.signOut.mockResolvedValue(undefined)
     render(header())
 

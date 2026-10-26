@@ -1,10 +1,12 @@
 import 'server-only'
 
+import { isStaffRole } from '@/platform/payload/roles'
+
 import type { AccountSummary } from '../domain/types'
 import { getCurrentUser } from './getCurrentUser'
 
-/** The header's view of the signed-in account (its name only), or null for a visitor. */
+/** The header's view of the signed-in account (its name, and whether it's staff), or null. */
 export async function getAccountSummary(): Promise<AccountSummary | null> {
   const user = await getCurrentUser()
-  return user ? { name: user.name } : null
+  return user ? { name: user.name, staff: isStaffRole(user.role) } : null
 }
