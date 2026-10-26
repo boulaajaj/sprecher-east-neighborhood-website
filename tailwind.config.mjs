@@ -6,8 +6,16 @@ const config = {
         DEFAULT: {
           css: [
             {
-              '--tw-prose-body': 'var(--text)',
-              '--tw-prose-headings': 'var(--text)',
+              // Theme tokens, which switch with the site's theme. `dark:prose-invert` follows the
+              // device setting instead, so the invert values point at the same tokens (#397)
+              '--tw-prose-body': 'var(--foreground)',
+              '--tw-prose-headings': 'var(--foreground)',
+              '--tw-prose-bullets': 'var(--muted-foreground)',
+              '--tw-prose-counters': 'var(--muted-foreground)',
+              '--tw-prose-invert-body': 'var(--foreground)',
+              '--tw-prose-invert-headings': 'var(--foreground)',
+              '--tw-prose-invert-bullets': 'var(--muted-foreground)',
+              '--tw-prose-invert-counters': 'var(--muted-foreground)',
               h1: {
                 fontWeight: 'normal',
                 marginBottom: '0.25em',
