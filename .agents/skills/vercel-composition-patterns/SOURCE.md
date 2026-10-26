@@ -16,5 +16,8 @@ nested `AGENTS.md` as instructions for this folder, so read the rule files in `r
 package we don't use yet (for example SWR or an LRU cache) goes through the
 [package rules](../../../docs/guidelines/security.md#before-adding-any-new-package) first.
 
+The code examples are upstream's, kept as they are: the "Documentation Is Code" rule doesn't
+apply to them. Don't edit vendored files; record a difference here instead.
+
 To update: copy `SKILL.md` and `rules/` from the latest upstream commit, update the commit
 above, and note what changed in the PR.
