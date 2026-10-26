@@ -80,6 +80,20 @@ describe('a post’s content', () => {
   })
 })
 
+describe('posts and events', () => {
+  // Payload's official list features, so editors can write bulleted and numbered lists (#397)
+  it.each(['posts', 'events'])('%s content offers bulleted and numbered lists', (slug) => {
+    const content = allFields(collection(slug).fields).find(
+      (field) => 'name' in field && field.name === 'content',
+    )
+    if (content?.type !== 'richText') throw new Error(`${slug} has no rich-text content`)
+
+    const features = (content.editor as LexicalRichTextAdapter).editorConfig.resolvedFeatureMap
+    expect(features.has('unorderedList')).toBe(true)
+    expect(features.has('orderedList')).toBe(true)
+  })
+})
+
 describe('the Pages collection', () => {
   it('offers the site’s blocks and then the contact form, in that order', () => {
     const layout = allFields(collection('pages').fields).find(
