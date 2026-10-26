@@ -27,7 +27,7 @@ export default async function AccountPage() {
             </div>
             <div>
               <dt className="text-sm font-medium text-muted-foreground">Email</dt>
-              <dd className="text-foreground">{user.email}</dd>
+              <dd className="wrap-anywhere text-foreground">{user.email}</dd>
             </div>
           </dl>
         </Card>
