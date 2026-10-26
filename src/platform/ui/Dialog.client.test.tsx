@@ -53,4 +53,13 @@ describe('Dialog', () => {
     expect(screen.queryByRole('dialog')).toBeNull()
     expect(document.activeElement).toBe(trigger)
   })
+
+  it('locks the page behind from scrolling while it is open', async () => {
+    render(<Example />)
+    await userEvent.click(screen.getByRole('button', { name: 'Open filters' }))
+
+    expect(document.body.hasAttribute('data-scroll-locked')).toBe(true)
+    await userEvent.keyboard('{Escape}')
+    expect(document.body.hasAttribute('data-scroll-locked')).toBe(false)
+  })
 })

@@ -20,7 +20,7 @@ export type DialogProps = {
   closeLabel?: string
   /** Shown left of the close button in the sheet's top bar: the site logo for the menu */
   start?: React.ReactNode
-  /** Element ids or classes for the panel: the mobile menu sets `lg:hidden` */
+  /** Classes for the panel: the mobile menu sets `lg:hidden` */
   className?: string
   children: React.ReactNode
 }
@@ -46,6 +46,8 @@ export function Dialog({
     <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
       {trigger && <RadixDialog.Trigger asChild>{trigger}</RadixDialog.Trigger>}
       <RadixDialog.Portal>
+        {/* Radix locks the page's scroll from the overlay, so the sheet always has one */}
+        <RadixDialog.Overlay className="fixed inset-0 z-50 bg-background" />
         <RadixDialog.Content
           aria-describedby={undefined}
           className={cn(
