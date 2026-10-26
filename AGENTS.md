@@ -144,6 +144,12 @@ through the pointers in `.claude/skills/`, and a human reads them as plain Markd
 | [`wrapped`](.agents/skills/wrapped/SKILL.md)                           | After a merge: verify it, check the deploy, close the loop, report.        |
 | [`project-tracking`](.agents/skills/project-tracking/SKILL.md)         | Picking up, filing or reporting work: epics, milestones, sprint, blockers. |
 
+Two skills come from Vercel, unchanged (MIT, source in each `SOURCE.md`, #424):
+[`vercel-react-best-practices`](.agents/skills/vercel-react-best-practices/SKILL.md) for React and
+Next.js performance, and
+[`vercel-composition-patterns`](.agents/skills/vercel-composition-patterns/SKILL.md) for component
+APIs. `write-code` and the reviews apply them; this repo's own rules come first where they differ.
+
 ## References: what is true here
 
 | Doc                                                   | What's in it                                                                                          |

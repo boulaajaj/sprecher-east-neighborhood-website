@@ -7,3 +7,6 @@ _legacy
 *.db
 package-lock.json
 src/app/(payload)
+# Vendored unchanged from Vercel (#424): keep them byte-for-byte as upstream
+.agents/skills/vercel-*/SKILL.md
+.agents/skills/vercel-*/rules

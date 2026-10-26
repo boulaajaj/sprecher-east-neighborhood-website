@@ -44,6 +44,9 @@ each; otherwise do them one after another.
    already exists.
 6. **Guidelines**: anything against [development](../../../docs/guidelines/development.md) or
    [security](../../../docs/guidelines/security.md).
+7. **Component API**: a shared component or one meant for reuse follows
+   [`vercel-composition-patterns`](../vercel-composition-patterns/SKILL.md) (explicit variants,
+   compound parts, no boolean-prop modes).
 
 ### Efficiency
 
@@ -53,6 +56,9 @@ each; otherwise do them one after another.
 4. **Existence checks before acting** (TOCTOU): do the operation and handle the error instead.
 5. **Memory**: unbounded structures, missing cleanup, listener leaks.
 6. **Overly broad operations**: reading or loading everything when a part is enough.
+7. **React and Next.js**: React and Next.js code is checked against the CRITICAL and HIGH rules of
+   [`vercel-react-best-practices`](../vercel-react-best-practices/SKILL.md) (waterfalls, bundle
+   size, server-side work, data sent to client components).
 
 ### Visual design
 
