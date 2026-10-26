@@ -29,14 +29,16 @@ those fields are what the primary source states:
   description saying cancelled, postponed or another date still gets `cancelled`, `rescheduled`
   or `conflicting-sources`, as in step 4 (the feed reports anything but a cancellation as
   scheduled).
-- **Place:** a `locationText` that names a venue in `coverage.md`, "Known venues" (a room inside
-  it included, such as "Pinney Library - Community Room A"), gives that venue's address and
-  municipality, with `$.location.verified` true. A `locationText` that names no known venue, or a
-  null one, is still a gap: a branch calendar also lists system-wide programs ("All Libraries"),
-  so never assume the venue from the feed's name.
+- **Place:** what `locationText` states is what the source states. A street address there is
+  the address (municipality and state from it), with `$.location.verified` true; "Virtual" is a
+  virtual meeting, with no address (step 1). A venue name that is in `coverage.md`, "Known
+  venues" (a room inside it included, such as "Pinney Library - Community Room A"), gives that
+  venue's address and municipality, verified. A bare venue name that isn't listed, or a null
+  `locationText`, is still a gap: a branch calendar also lists system-wide programs ("All
+  Libraries"), so never assume the venue from the feed's name.
 - **Evidence:** cite `$.candidate.sourceUrl` saying what the feed states (date, time, venue,
   status), retrieved at `$.candidate.retrievedAt`; and, for the address, the venue's official
-  page from "Known venues", retrieved on its "Checked" date.
+  page from "Known venues", with `retrievedAt` at noon America/Chicago on its "Checked" date.
 
 Other sources (`established-media`, `community`) still need a primary source for each fact.
 
