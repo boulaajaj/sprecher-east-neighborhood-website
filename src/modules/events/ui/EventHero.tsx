@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { ImageCredit } from '@/platform/ui/ImageCredit'
 import { Media } from '@/platform/ui/Media'
 import { categoryPillClassName } from '@/platform/ui/categoryPill'
 import { formatDateTime, toDateTimeAttr } from '@/platform/lib/formatDateTime'
@@ -19,48 +20,51 @@ export const EventHero: React.FC<{
   if (image) {
     // Full-bleed hero with image, dark overlay, white text
     return (
-      <div className="relative -mt-[var(--header-height)] flex items-end">
-        <div className="relative z-10 container pt-[var(--header-height)] pb-8 text-white lg:grid lg:grid-cols-[1fr_48rem_1fr]">
-          <div className="col-span-1 col-start-1 md:col-span-2 md:col-start-2">
-            {categories.length > 0 && (
-              <div className="mb-4 text-sm tracking-widest uppercase opacity-90">
-                {formatEventCategories(categories)}
-              </div>
-            )}
-
-            <h1 className="mb-6 text-3xl md:text-5xl lg:text-6xl">{title}</h1>
-
-            <div className="flex flex-wrap gap-6 text-sm">
-              <div className="flex flex-col gap-1">
-                <span className="text-white/70">Date</span>
-                <time dateTime={toDateTimeAttr(date)}>{formatDateTime(date)}</time>
-              </div>
-
-              {timeStart && (
-                <div className="flex flex-col gap-1">
-                  <span className="text-white/70">Time</span>
-                  <span>
-                    {timeStart}
-                    {timeEnd ? ` – ${timeEnd}` : ''} {siteTimeZoneLabel()}
-                  </span>
+      <>
+        <div className="relative -mt-[var(--header-height)] flex items-end">
+          <div className="relative z-10 container pt-[var(--header-height)] pb-8 text-white lg:grid lg:grid-cols-[1fr_48rem_1fr]">
+            <div className="col-span-1 col-start-1 md:col-span-2 md:col-start-2">
+              {categories.length > 0 && (
+                <div className="mb-4 text-sm tracking-widest uppercase opacity-90">
+                  {formatEventCategories(categories)}
                 </div>
               )}
 
-              {locationTypeLabel && (
+              <h1 className="mb-6 text-3xl md:text-5xl lg:text-6xl">{title}</h1>
+
+              <div className="flex flex-wrap gap-6 text-sm">
                 <div className="flex flex-col gap-1">
-                  <span className="text-white/70">Format</span>
-                  <span>{locationTypeLabel}</span>
+                  <span className="text-white/70">Date</span>
+                  <time dateTime={toDateTimeAttr(date)}>{formatDateTime(date)}</time>
                 </div>
-              )}
+
+                {timeStart && (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-white/70">Time</span>
+                    <span>
+                      {timeStart}
+                      {timeEnd ? ` – ${timeEnd}` : ''} {siteTimeZoneLabel()}
+                    </span>
+                  </div>
+                )}
+
+                {locationTypeLabel && (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-white/70">Format</span>
+                    <span>{locationTypeLabel}</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="min-h-[80vh] select-none">
-          <Media fill priority imgClassName="-z-10 object-cover" resource={image} />
-          <div className="pointer-events-none absolute bottom-0 left-0 h-1/2 w-full bg-linear-to-t from-black to-transparent" />
+          <div className="min-h-[80vh] select-none">
+            <Media fill priority imgClassName="-z-10 object-cover" resource={image} />
+            <div className="pointer-events-none absolute bottom-0 left-0 h-1/2 w-full bg-linear-to-t from-black to-transparent" />
+          </div>
         </div>
-      </div>
+        <ImageCredit image={image} className="container mt-2 text-right" />
+      </>
     )
   }
 

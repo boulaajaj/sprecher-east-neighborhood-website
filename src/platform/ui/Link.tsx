@@ -24,6 +24,8 @@ export const linkVariants = cva(
         // Footer and other quiet lists
         muted:
           'inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary-strong aria-[current=page]:text-primary-strong',
+        // A photo credit or caption: small, quiet, still underlined so it reads as a link (#405)
+        caption: 'text-muted-foreground underline underline-offset-2 hover:text-primary-strong',
         // A single follow-up next to content: "Visit website", "Back to all events"
         // 44 px tall: it stands alone, so it's a touch target (WCAG 2.5.8). primary-strong because
         // it often sits on a surface panel, where plain primary is 4.33:1

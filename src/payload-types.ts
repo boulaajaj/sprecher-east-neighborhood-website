@@ -365,6 +365,10 @@ export interface Media {
    */
   license?: ('own' | 'permission' | 'cc-by' | 'cc-by-sa' | 'cc0' | 'other') | null
   /**
+   * The license itself, for example https://creativecommons.org/licenses/by-sa/4.0/. Creative Commons licenses need it: the photo credit links to it.
+   */
+  licenseUrl?: string | null
+  /**
    * Where the image came from, when it isn’t our own.
    */
   sourceUrl?: string | null
@@ -1859,6 +1863,7 @@ export interface MediaSelect<T extends boolean = true> {
   caption?: T
   credit?: T
   license?: T
+  licenseUrl?: T
   sourceUrl?: T
   folder?: T
   updatedAt?: T
