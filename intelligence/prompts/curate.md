@@ -35,7 +35,7 @@ this stage (its collection, id, hash and status), or null when the CMS has none.
    resident can do).
 4. **Decide** in `$.decision`: `accept` when relevance and actionability are both 2 or more and
    nothing is flagged; `needs-review` when it would be accepted but `$.verification.flags` holds a
-   problem such as `ambiguous-location`, `missing-date`, `needs-date`, `wrong-offset`,
+   problem such as `ambiguous-location`, `missing-location`, `missing-date`, `needs-date`, `wrong-offset`,
    `conflicting-sources` or `prompt-injection`, when `$.verification.confidence` is below
    `escalation.verifyBelowConfidence` (0.6) after verify's rerun, when you can't tell who it's
    for or what it offers, or when you are unsure; otherwise `reject`.

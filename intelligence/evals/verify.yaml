@@ -270,3 +270,18 @@ cases:
     why: >-
       From the same dry run: the feed gives the date but no LOCATION, and the branch calendar also
       lists system-wide programs, so the venue is never assumed from the feed's name.
+  - id: verify-official-feed-text-says-cancelled
+    stage: verify
+    tags: [official-feed, conflict]
+    input:
+      sourceId: mpl-pinney-events
+      title: 'CANCELLED: Minecraft Club'
+      sourceText: This program is cancelled this week. See you next Thursday.
+      startsAt: 2026-10-29T16:00:00-05:00
+      endsAt: 2026-10-29T17:30:00-05:00
+      locationText: Pinney Library - Studio
+    expected: { decision: reject, coverage: catchment, flags: [cancelled], route: none }
+    why: >-
+      The feed reports anything but an iCalendar CANCELLED status as scheduled, so text that says
+      cancelled still wins over the feed's fields; a cancelled item the site doesn't have is not
+      suggested (as curate-cancel-unknown-item).

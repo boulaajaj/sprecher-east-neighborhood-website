@@ -23,22 +23,28 @@ runtime read them, in code, from the source's own feed (its iCalendar or API fie
 `$.source.reliability` is `official`, the source is the organizer's or venue's own calendar, and
 those fields are what the primary source states:
 
-- **Date and status:** set `$.dateConfirmed` and `$.statusConfirmed` from them. `sourceText`
-  that doesn't repeat the date is not a gap.
+- **Date, time and status:** set `$.dateConfirmed` and `$.statusConfirmed` from them, and
+  `startsAt` (with `endsAt`, or `allDay`) settles the time: no `missing-date` or `missing-time`.
+  `sourceText` that doesn't repeat them is not a gap. Text that contradicts them is: a title or
+  description saying cancelled, postponed or another date still gets `cancelled`, `rescheduled`
+  or `conflicting-sources`, as in step 4 (the feed reports anything but a cancellation as
+  scheduled).
 - **Place:** a `locationText` that names a venue in `coverage.md`, "Known venues" (a room inside
   it included, such as "Pinney Library - Community Room A"), gives that venue's address and
   municipality, with `$.location.verified` true. A `locationText` that names no known venue, or a
   null one, is still a gap: a branch calendar also lists system-wide programs ("All Libraries"),
   so never assume the venue from the feed's name.
 - **Evidence:** cite `$.candidate.sourceUrl` saying what the feed states (date, time, venue,
-  status), and the venue's official page from "Known venues" for the address.
+  status), retrieved at `$.candidate.retrievedAt`; and, for the address, the venue's official
+  page from "Known venues", retrieved on its "Checked" date.
 
 Other sources (`established-media`, `community`) still need a primary source for each fact.
 
 ## Steps
 
 1. **Place.** From the candidate's own source, or an official public page (see "Untrusted content"),
-   find the venue name, street address and municipality. Fill `$.location.name`,
+   find the venue name, street address and municipality (an official feed's venue: see "What the
+   feed already says"). Fill `$.location.name`,
    `$.location.address` and `$.location.municipality`. Set `$.location.verified` to true only when
    a primary source states the address. A virtual meeting has no address: say so in
    `$.coverageReason`.
@@ -49,7 +55,8 @@ Other sources (`established-media`, `community`) still need a primary source for
 3. **Tier.** Set `$.coverage` to `core`, `catchment`, `citywide`, `outside` or `unknown` using
    `coverage.md`, and give the reason in one sentence in `$.coverageReason`.
 4. **Date and status.** Set `$.dateConfirmed` when a primary source shows the same date. Set
-   `$.statusConfirmed` from the source: an agenda marked Cancelled, or a notice saying
+   `$.statusConfirmed` from the source (an official feed's own fields count: see "What the feed
+   already says"): an agenda marked Cancelled, or a notice saying
    rescheduled, wins over the candidate's status. Add `cancelled`, `rescheduled` or `past` to
    `$.flags` when they apply, and `partisan` when the item promotes a candidate, party, campaign
    or one side of a ballot measure (a forum open to every candidate, or a neutral explainer, is
