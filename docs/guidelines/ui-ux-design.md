@@ -109,14 +109,15 @@ Cards are the primary content container pattern. Build them with the `Card` comp
 ([component set](../ui/component-set.md#display)), whose variants keep today's looks (the owner's
 choice, 2026-10-26, Claude Code session, quoted on #426):
 
-- **Variants**: `elevated` (`bg-card`, `shadow-sm`, no border) for content cards; `outline`
-  (`bg-background`, `border border-border`, no shadow) for form boxes; `muted` (`bg-surface`, no
-  border or shadow) for panels inside a page; `tinted` (`bg-primary/10`) for a sidebar box
-- **Border or shadow**: a card has one or the other, never both
+- **Variants**: `elevated` (`bg-card`, `border border-border`, `shadow-sm`) for content cards;
+  `outline` (`bg-background` with the border) for form boxes; `muted` (`bg-surface` with the border)
+  for panels inside a page; `tinted` (`bg-primary/10`, no border) for a sidebar box
+- **Shadow only on `elevated`**: the other variants are flat. The border stays on `elevated`
+  because shadows barely show in dark mode
 - **Border radius**: `rounded-2xl` for cards, `rounded-xl` for smaller elements, `rounded-lg` for buttons
 - **Hover state**: `hover:shadow-md transition-shadow duration-200` for interactive cards
-- **Padding**: `p-6` by default, `p-8` for spacious cards, `p-4` only for compact cards (a small
-  event card, a stat)
+- **Padding**: `p-6` by default, `p-6 md:p-8` for spacious cards, `p-4` only for compact cards (a
+  small event card, a stat), none when the card starts with a full-bleed image (`CardBody` pads)
 - **Image in card**: Full-bleed at top with `rounded-t-2xl`, or inset with `rounded-xl`
 
 ## Button Design
