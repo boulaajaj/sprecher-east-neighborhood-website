@@ -92,7 +92,7 @@ src/
     payload/           Role checks, access functions, media collection, default editor, publishedAt hook, admin components
     richtext/          The `RichText` renderer, the blocks inside rich text, plain-text conversion
     seo/               Page metadata and Open Graph helpers
-    theme/             The theme contract (`tokens.ts`), its Tailwind mapping, light and dark mode providers
+    theme/             The theme contract (`tokens.ts`), its Tailwind mapping, theme options and decorations, light and dark mode providers
     turnstile/         The robot check (Cloudflare Turnstile): widget and server verifier
     ui/                The UI kit: `Button`, `Link`, `Media`, `CMSLink`, `JsonLd`, `Breadcrumbs`, `LoadMore`…
   endpoints/seed/      Seed data and script (exception)

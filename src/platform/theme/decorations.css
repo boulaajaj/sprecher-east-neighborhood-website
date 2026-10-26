@@ -1,0 +1,39 @@
+/*
+ * The decorations a theme can turn on (`ThemeDecoration`, #409). Purely visual layers drawn with
+ * CSS (no images, no script), in theme colours, kept faint so text stays readable, and still when
+ * the person asks for reduced motion.
+ */
+
+/* Three layers of flakes on tiles of unrelated sizes, so no grid shows */
+.theme-decoration-snowfall {
+  background-image:
+    radial-gradient(circle at 23% 31%, var(--on-image) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 71% 64%, var(--on-image) 0 1px, transparent 2px),
+    radial-gradient(circle at 42% 87%, var(--on-image) 0 2px, transparent 3px);
+  background-size:
+    211px 223px,
+    157px 149px,
+    293px 307px;
+  opacity: 0.35;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .theme-decoration-snowfall {
+    animation: theme-snowfall 20s linear infinite;
+  }
+}
+
+@keyframes theme-snowfall {
+  from {
+    background-position:
+      0 0,
+      0 0,
+      0 0;
+  }
+  to {
+    background-position:
+      40px 223px,
+      -30px 298px,
+      60px 307px;
+  }
+}
