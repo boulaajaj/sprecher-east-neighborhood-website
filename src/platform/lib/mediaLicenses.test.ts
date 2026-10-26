@@ -22,10 +22,17 @@ describe('toLicenseName', () => {
 
   it('adds no version from a link to a different license', () => {
     expect(toLicenseName('cc-by', 'https://creativecommons.org/licenses/by-sa/4.0/')).toBe('CC BY')
-    expect(toLicenseName('cc0', 'https://creativecommons.org/publicdomain/mark/1.0/')).toBe('CC0')
     expect(toLicenseName('cc-by', 'https://example.com/creativecommons.org/licenses/by/4.0/')).toBe(
       'CC BY',
     )
+  })
+
+  it('tells CC0 from the Public Domain Mark, and keeps the combined name otherwise', () => {
+    expect(toLicenseName('cc0', 'https://creativecommons.org/publicdomain/mark/1.0/')).toBe(
+      'Public domain',
+    )
+    expect(toLicenseName('cc0', null)).toBe('CC0 or public domain')
+    expect(toLicenseName('cc0', 'https://example.com/pd')).toBe('CC0 or public domain')
   })
 
   it('names no license for our own photos, permission, other or none', () => {
