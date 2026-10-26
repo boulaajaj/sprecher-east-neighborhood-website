@@ -72,8 +72,11 @@ grows should split its top level "into domain oriented modules which are interna
 - `ui/`: primitives (`Button`, `Input`, `Media`, `Link`) with their variants, and
   `ConfirmedEmailContext`: the address the confirm page just confirmed, which `verification`
   provides to the slot `accounts` fills with its account offer (#187).
-- `theme/`: light and dark mode (the theme providers, `InitTheme`, `ThemeSelector`); the token
-  contract (`tokens.ts`) and the Tailwind mapping join them with #146.
+- `theme/`: light and dark mode (the theme providers, `InitTheme`, `ThemeSelector`), the token
+  contract (`tokens.ts`) and its Tailwind mapping (#146), and the theme options (#409): what a theme
+  sets beyond tokens (`options.ts`, with defaults), the registry of themes and the active one
+  (`registry.ts`), and the decoration slot the layout renders (`ThemeDecoration`,
+  `decorations.css`), as [decision 0012](decisions/0012-runtime-themes.md) sets out.
 - `richtext/`: the `RichText` renderer and the blocks that can sit inside rich text (banner, code
   and media; only a post's content offers them). Pages reuse the media block from here.
   `richTextToPlainText` turns rich text into plain text (Payload's converter) for JSON-LD.
@@ -199,19 +202,20 @@ the theme test (#146). Vitest aliases
 
 ## Where does it go?
 
-| You are adding…                                                | Put it in                                                                                                |
-| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| A business rule (the event categories, `isEventScope`)         | the module's `domain/`, with a unit test                                                                 |
-| A use case other code calls (list, submit, publish)            | the module's `use-cases/`, exported from `server.ts`; a server action in `actions.ts` calls it           |
-| A database read or write                                       | the module's `data/`, called only from `use-cases/` or `actions.ts`; in a hook, `req.payload`            |
-| A color, font, corner radius or shadow                         | a token in `platform/theme/tokens.ts`, with its value in `src/themes/default/`                           |
-| A button size, card style or other UI variant                  | the primitive in `platform/ui/` (its `cva` variants), not in the feature component                       |
-| A collection, field, Payload hook or plugin option             | the module's `cms/`, exported from `cms.ts` and registered in `payload.config.ts`                        |
-| A component used by one module                                 | the module's `ui/`                                                                                       |
-| A component or helper used by two or more modules              | `src/platform/` (move it there on the second use)                                                        |
-| A page or URL                                                  | `src/app/`, as a thin file that calls a module                                                           |
-| Code where two modules meet                                    | `src/app/` (a page, layout or the block registry) or `payload.config.ts`, never inside a module          |
-| An outside service (Cloudflare, Mailgun, a city calendar feed) | an interface in the module, an adapter beside it ([conventions](conventions.md#interfaces-and-adapters)) |
+| You are adding…                                                       | Put it in                                                                                                |
+| --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| A business rule (the event categories, `isEventScope`)                | the module's `domain/`, with a unit test                                                                 |
+| A use case other code calls (list, submit, publish)                   | the module's `use-cases/`, exported from `server.ts`; a server action in `actions.ts` calls it           |
+| A database read or write                                              | the module's `data/`, called only from `use-cases/` or `actions.ts`; in a hook, `req.payload`            |
+| A color, font, corner radius or shadow                                | a token in `platform/theme/tokens.ts`, with its value in `src/themes/default/`                           |
+| A seasonal ornament or other per-theme behaviour tokens can't express | an option in `platform/theme/options.ts` (with a default), set per theme in `platform/theme/registry.ts` |
+| A button size, card style or other UI variant                         | the primitive in `platform/ui/` (its `cva` variants), not in the feature component                       |
+| A collection, field, Payload hook or plugin option                    | the module's `cms/`, exported from `cms.ts` and registered in `payload.config.ts`                        |
+| A component used by one module                                        | the module's `ui/`                                                                                       |
+| A component or helper used by two or more modules                     | `src/platform/` (move it there on the second use)                                                        |
+| A page or URL                                                         | `src/app/`, as a thin file that calls a module                                                           |
+| Code where two modules meet                                           | `src/app/` (a page, layout or the block registry) or `payload.config.ts`, never inside a module          |
+| An outside service (Cloudflare, Mailgun, a city calendar feed)        | an interface in the module, an adapter beside it ([conventions](conventions.md#interfaces-and-adapters)) |
 
 A rule the site only ever applies as a query filter, like the events upcoming rule (`inScope` in
 `src/modules/events/data/scope.ts`), may live only in `data/`, as the function that builds the

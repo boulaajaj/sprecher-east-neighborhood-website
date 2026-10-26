@@ -5,6 +5,7 @@ import { Poppins } from 'next/font/google'
 import React from 'react'
 
 import { AdminBar } from '@/platform/ui/AdminBar.client'
+import { ThemeDecoration } from '@/platform/theme/ThemeDecoration'
 import { JsonLd } from '@/platform/ui/JsonLd'
 import { SiteFooter, SiteHeader } from '@/modules/site/server'
 import { AccountMenu, AccountProvider } from '@/modules/accounts/server'
@@ -62,6 +63,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </AccountProvider>
           <main id="main-content">{children}</main>
           <SiteFooter />
+          {/* The active theme's decorative layer, if it has one (#409) */}
+          <ThemeDecoration />
           <VersionCheck />
         </Providers>
       </body>
