@@ -33,6 +33,14 @@ export async function processRun({
   const validateCandidate = contract.validator('schemas/candidate.schema.json')
   const validateEnvelope = contract.validator('schemas/submission.schema.json')
   const context = { cms, runId, validate: validateEnvelope, calls }
+  // What the registry says about each source: verify trusts an official feed's own fields
+  // (prompts/verify.md, "What the feed already says")
+  const sourceFacts = new Map(
+    contract.registry.sources.map(({ id, owner, reliability, scope }) => [
+      id,
+      { id, owner, reliability, scope },
+    ]),
+  )
 
   // 0. Follow-up reports an earlier run couldn't send (the suggestion they point at is stored)
   const waiting = state.pendingReports ?? []
@@ -109,7 +117,7 @@ export async function processRun({
       defer()
       continue
     }
-    const item = { candidate, taxonomy }
+    const item = { candidate, source: sourceFacts.get(candidate.sourceId), taxonomy }
     try {
       item.known = await cms.known(candidate.externalId)
       modelItems++

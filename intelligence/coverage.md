@@ -49,6 +49,17 @@ Every verified item gets one `coverage` value (`schemas/common.schema.json`):
 | `outside`   | Somewhere else, including places with similar names.                                                                                                                                                                                |
 | `unknown`   | The location couldn't be confirmed from a primary source.                                                                                                                                                                           |
 
+## Known venues
+
+Venues inside the area or named as catchment above, whose address is stated on the venue's own
+official page. Nothing else is listed: no venue from memory, a map or a third-party site, and no
+venue outside the area. A venue is added only through a pull request that gives that page. A
+`locationText` that names one of these (a room inside it included) has this address.
+
+| Venue          | Address                                 | Tier        | Official page                                                 | Checked    |
+| -------------- | --------------------------------------- | ----------- | ------------------------------------------------------------- | ---------- |
+| Pinney Library | 516 Cottage Grove Rd, Madison, WI 53716 | `catchment` | https://www.madisonpubliclibrary.org/locations/pinney-library | 2026-10-25 |
+
 ## Names that are not the area
 
 A matching word is never enough. Check the municipality and the address first.
