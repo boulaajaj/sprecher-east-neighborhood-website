@@ -50,7 +50,7 @@
   /* Error text: --destructive is 4.1:1 on --surface and 3.9:1 on its own tint; this is 5.5:1 on
      --surface, 6.1:1 on --background and 4.8:1 or more on the error tint */
   --destructive-strong: #b91c1c;
-  /* Warning text: 5.5:1 or more on the warning tint, on --surface too */
+  /* Warning text: 5.4:1 or more on the warning tint, on --surface too */
   --warning-strong: #8a4a0e;
   /* Text and overlays on photos: the same in both modes, as the photo doesn't change */
   --on-image: #ffffff;

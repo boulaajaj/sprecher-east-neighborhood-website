@@ -98,8 +98,8 @@ export const CONTRAST_PAIRS: ReadonlyArray<readonly [text: ThemeToken, backgroun
 
 /**
  * Text on a tint of a colour over a background, as `Alert` draws its tones (`bg-<tint>/10`):
- * [text, tint, background]. The test mixes the tint in at `TINT_ALPHA` the way Tailwind does
- * (oklab), then checks the text against the result.
+ * [text, tint, background]. The test paints the tint at `TINT_ALPHA` opacity over the
+ * background, as the browser does, then checks the text against the result.
  */
 export const TINT_ALPHA = 0.1
 const ALERT_TONES = [

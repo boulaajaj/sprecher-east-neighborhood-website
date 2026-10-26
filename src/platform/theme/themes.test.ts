@@ -84,11 +84,11 @@ describe('readThemeModes', () => {
 })
 
 describe('mixOver', () => {
-  it('mixes in oklab, as Tailwind does', () => {
+  it('paints a colour at an opacity over a background, as the browser composites it', () => {
     expect(mixOver('#000000', '#ffffff', 0)).toBe('#ffffff')
     expect(mixOver('#000000', '#ffffff', 1)).toBe('#000000')
-    // Halfway in oklab is lighter than halfway in sRGB (#808080)
-    expect(mixOver('#000000', '#ffffff', 0.5)).toBe('#636363')
+    expect(mixOver('#000000', '#ffffff', 0.5)).toBe('#808080')
+    expect(mixOver('#dc2626', '#f0ede6', 0.1)).toBe('#eed9d3')
   })
 })
 
