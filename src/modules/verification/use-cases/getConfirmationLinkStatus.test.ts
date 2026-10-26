@@ -9,7 +9,10 @@ import { getConfirmationLinkStatus } from './getConfirmationLinkStatus'
 const TOKEN = 'a'.repeat(43)
 const iso = (ms: number) => new Date(ms).toISOString()
 
-beforeEach(() => findLinkState.mockReset())
+beforeEach(() => {
+  findLinkState.mockReset()
+  vi.spyOn(console, 'error').mockImplementation(() => {})
+})
 
 describe('getConfirmationLinkStatus (#391)', () => {
   it('says a confirmed address’s link is already confirmed', async () => {
@@ -35,4 +38,12 @@ describe('getConfirmationLinkStatus (#391)', () => {
       expect(findLinkState).not.toHaveBeenCalled()
     },
   )
+
+  it('falls back to the Confirm button when the read fails, logging only the error’s kind', async () => {
+    findLinkState.mockRejectedValue(new TypeError('db ana@example.com'))
+    expect(await getConfirmationLinkStatus(TOKEN)).toBe('pending')
+    expect(console.error).toHaveBeenCalledExactlyOnceWith(
+      'Reading a confirmation link failed (TypeError)',
+    )
+  })
 })
