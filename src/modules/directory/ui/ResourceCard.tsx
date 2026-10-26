@@ -9,7 +9,7 @@ import type { ResourceSummary } from '../domain/types'
 /** One entry in the resources directory: its name, what it is, and how to reach it. */
 export function ResourceCard({ resource }: { resource: ResourceSummary }) {
   return (
-    <Card as="article" className="flex h-full flex-col">
+    <Card as="article" className="flex flex-col">
       <CardTitle className="mb-1.5 text-base">{resource.title}</CardTitle>
       {resource.description && (
         <p className="mb-3 text-sm leading-relaxed text-muted-foreground">{resource.description}</p>

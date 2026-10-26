@@ -29,7 +29,7 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
       </div>
 
       {results.length > 0 ? (
-        <PostGrid posts={results} />
+        <PostGrid posts={results} headingLevel="h2" />
       ) : (
         <div className="container">
           <EmptyState

@@ -11,7 +11,7 @@ import { cn } from '@/platform/lib/cn'
  * a page and the `tinted` sidebar box. Every card has the same corners, and an `interactive` card,
  * one whose title is a link, has the one hover: a deeper shadow and a small lift.
  */
-const cardVariants = cva('relative min-w-0 overflow-hidden rounded-2xl', {
+const cardVariants = cva('relative min-w-0 rounded-2xl', {
   variants: {
     variant: {
       elevated: 'border border-border bg-card shadow-sm',
@@ -20,22 +20,24 @@ const cardVariants = cva('relative min-w-0 overflow-hidden rounded-2xl', {
       tinted: 'bg-primary/10',
     },
     padding: {
-      // Media cards stack an image and a `CardBody` that grows to the card's height
-      none: 'flex flex-col',
+      // Media cards stack an image and a `CardBody` that grows to the card's height; the corners
+      // clip the image. Other cards don't clip, so focus outlines inside them show in full
+      none: 'flex flex-col overflow-hidden',
       sm: 'p-4',
       md: 'p-6',
       lg: 'p-6 md:p-8',
     },
     interactive: {
-      // The ring shows when the stretched title link has keyboard focus
-      true: 'group transition-all duration-200 hover:shadow-md has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring motion-safe:hover:-translate-y-0.5',
+      // The ring goes round the whole card when its stretched title link has keyboard focus, in
+      // place of the link's own outline
+      true: 'group transition-all duration-200 hover:shadow-md has-[[data-card-link]:focus-visible]:ring-2 has-[[data-card-link]:focus-visible]:ring-ring motion-safe:hover:-translate-y-0.5 [&_[data-card-link]:focus-visible]:outline-none',
       false: '',
     },
   },
   defaultVariants: { variant: 'elevated', padding: 'md', interactive: false },
 })
 
-type CardElement = 'article' | 'div' | 'section' | 'li' | 'details'
+type CardElement = 'article' | 'div' | 'section' | 'details'
 
 export type CardProps = VariantProps<typeof cardVariants> &
   Omit<React.HTMLAttributes<HTMLElement>, 'className' | 'children'> & {
@@ -88,7 +90,8 @@ export function CardBody({
 /**
  * The card's heading. With `href`, its link stretches over the whole card, so the card is
  * clickable but the link's accessible name is just the title (not every line of the card).
- * Give the card `interactive` for the hover and the focus ring.
+ * Give the card `interactive` for the hover, and for a focus ring round the whole card in place of
+ * the link's own outline.
  */
 export function CardTitle({
   as: Heading = 'h3',
@@ -106,7 +109,8 @@ export function CardTitle({
       {href ? (
         <NextLink
           href={href}
-          className="transition-colors duration-200 group-hover:text-primary-strong after:absolute after:inset-0 after:rounded-[inherit] after:content-[''] focus-visible:outline-none"
+          data-card-link
+          className="rounded-sm transition-colors duration-200 group-hover:text-primary-strong after:absolute after:inset-0 after:rounded-[inherit] after:content-[''] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           {children}
         </NextLink>

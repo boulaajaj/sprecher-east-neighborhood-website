@@ -65,6 +65,17 @@ describe('Card', () => {
     await expectAccessible(container)
   })
 
+  it("keeps the link's own focus outline on a card that is not interactive", () => {
+    render(
+      <Card>
+        <CardTitle href="/faq">FAQ</CardTitle>
+      </Card>,
+    )
+
+    expect(screen.getByRole('link', { name: 'FAQ' }).className).toContain('focus-visible:outline-2')
+    expect(screen.getByText('FAQ').closest('div')?.className).not.toContain('outline-none')
+  })
+
   it('keeps a plain title when there is no link', () => {
     render(<CardTitle as="h2">Library</CardTitle>)
 

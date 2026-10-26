@@ -40,7 +40,9 @@ const DateBadge: React.FC<{
 export const EventCard: React.FC<{
   event: EventSummary
   compact?: boolean
-}> = ({ event, compact }) => {
+  /** `h2` where no heading sits between the page's `h1` and the list */
+  headingLevel?: 'h2' | 'h3'
+}> = ({ event, compact, headingLevel = 'h3' }) => {
   const { slug, title, date, timeStart, timeEnd, categories, description, locationName, image } =
     event
 
@@ -56,7 +58,7 @@ export const EventCard: React.FC<{
           <time className="text-xs text-muted-foreground" dateTime={toDateTimeAttr(date)}>
             {formatDateShort(date)}
           </time>
-          <CardTitle href={href} className="truncate text-base">
+          <CardTitle as={headingLevel} href={href} className="truncate text-base">
             {title}
           </CardTitle>
         </div>
@@ -87,7 +89,7 @@ export const EventCard: React.FC<{
       </CardMedia>
 
       <CardBody>
-        <CardTitle href={href} className="mb-2">
+        <CardTitle as={headingLevel} href={href} className="mb-2">
           {title}
         </CardTitle>
 

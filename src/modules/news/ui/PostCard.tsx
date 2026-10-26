@@ -10,15 +10,16 @@ import type { PostSummary } from '../domain/types'
 /** A post in a grid: share image or a branded placeholder, date, categories, title, summary. */
 export const PostCard: React.FC<{
   post: PostSummary
-  className?: string
-}> = ({ post, className }) => {
+  /** `h2` where nothing on the page heads the list (`/posts`, search) */
+  headingLevel?: 'h2' | 'h3'
+}> = ({ post, headingLevel = 'h3' }) => {
   const { href, categories, description, image, publishedAt, title } = post
 
   const hasCategories = categories.length > 0
   const sanitizedDescription = description?.replace(/\u00A0/g, ' ') // non-breaking spaces to spaces
 
   return (
-    <Card as="article" padding="none" interactive className={className}>
+    <Card as="article" padding="none" interactive>
       <CardMedia>
         {image ? (
           <Media
@@ -59,7 +60,11 @@ export const PostCard: React.FC<{
             ))}
           </CardMeta>
         )}
-        {title && <CardTitle href={href}>{title}</CardTitle>}
+        {title && (
+          <CardTitle as={headingLevel} href={href}>
+            {title}
+          </CardTitle>
+        )}
         {description && (
           <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
             {sanitizedDescription}
