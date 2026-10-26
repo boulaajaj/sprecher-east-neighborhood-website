@@ -15,6 +15,7 @@ The agents never publish. They create **suggested drafts**; an editor reads, fix
 | [`sources.yaml`](sources.yaml)   | Approved sources, each checked by hand ([summary](sources.md))             |
 | [`coverage.md`](coverage.md)     | The Sprecher East area and the relevance policy                            |
 | [`area.yaml`](area.yaml)         | The words code uses to spot the area: places, neighbors, highway rules     |
+| [`images.md`](images.md)         | How to choose a story's or event's photo: real, free, on topic, level      |
 | [`prompts/`](prompts/)           | One prompt per stage, each naming its input and output schema              |
 | [`schemas/`](schemas/)           | JSON Schemas for every file and every stage's output                       |
 | [`evals/`](evals/)               | Test cases per stage with the result a correct pipeline reaches            |
