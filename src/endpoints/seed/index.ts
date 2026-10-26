@@ -401,13 +401,6 @@ export const seed = async ({
           {
             link: {
               type: 'custom',
-              label: 'Admin',
-              url: '/admin',
-            },
-          },
-          {
-            link: {
-              type: 'custom',
               label: 'Source Code',
               newTab: true,
               url: 'https://github.com/boulaajaj/sprecher-east-neighborhood-website',
