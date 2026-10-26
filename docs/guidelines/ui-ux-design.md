@@ -105,13 +105,22 @@ The goal is **visual balance**, not visual symmetry. A left-aligned text block w
 
 ## Card Design
 
-Cards are the primary content container pattern:
+Cards are the primary content container pattern. Build them with the `Card` component
+([component set](../ui/component-set.md#display)), whose variants keep today's looks (the owner's
+choice, 2026-10-26, Claude Code session, quoted on #426):
 
-- **Background**: `bg-background` (not `bg-surface` — cards should feel elevated)
-- **Border**: `border border-border` or `shadow-sm` — never both
-- **Border radius**: `rounded-2xl` for cards, `rounded-xl` for smaller elements, `rounded-lg` for buttons
-- **Hover state**: `hover:shadow-md transition-shadow duration-200` for interactive cards
-- **Padding**: `p-6` minimum, `p-8` for spacious cards
+- **Variants**: `elevated` (`bg-card`, `border border-border`, `shadow-sm`) for content cards;
+  `outline` (`bg-background` with the border) for form boxes; `muted` (`bg-surface` with the border)
+  for panels inside a page; `tinted` (`bg-primary/10`, no border) for a sidebar box
+- **Shadow only on `elevated`**: the other variants are flat. The border stays on `elevated`
+  because shadows barely show in dark mode
+- **Border radius**: `rounded-2xl` for every card variant (today's `rounded-lg` panels and compact
+  cards move to it), `rounded-xl` for smaller elements, `rounded-lg` for buttons
+- **Hover state**: one for every interactive card: `hover:shadow-md motion-safe:hover:-translate-y-0.5
+transition-all duration-200` (the `Card`'s `interactive`). A card that isn't a link doesn't lift
+- **Padding**: the `Card`'s `padding`: `md` (`p-6`) by default, `lg` (`p-6 md:p-8`) for spacious
+  cards, `sm` (`p-4`) only for compact cards (a small event card, a stat), `none` when the card
+  starts with a full-bleed image (`CardBody` pads). Today's `p-5` cards move to `p-6`
 - **Image in card**: Full-bleed at top with `rounded-t-2xl`, or inset with `rounded-xl`
 
 ## Button Design

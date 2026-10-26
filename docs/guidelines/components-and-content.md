@@ -80,6 +80,6 @@ import { Menu, X, Search } from 'lucide-react'
 ## Code Hygiene
 
 - Remove unused parameters from types and function signatures — don't leave dead code
-- Type component props using generated types from `@/payload-types` (regenerated automatically only under `next dev`; after a schema change run `npm run generate:types` and commit the result)
+- Type component props with plain types (the module's own types, `ImageRef`, `RichTextValue`), never `@/payload-types`: a mapper in the module's `data/` converts CMS data ([decision 0013](../architecture/decisions/0013-cms-content-through-mappers.md)). Blocks and heroes not yet moved still use the generated types (regenerated automatically only under `next dev`; after a schema change run `npm run generate:types` and commit the result)
 - Type seed data returns with `RequiredDataFromCollectionSlug<'slug'>` for compile-time safety
 - Import types with `import type` to avoid bundling runtime code

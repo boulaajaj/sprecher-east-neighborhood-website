@@ -53,7 +53,10 @@ For feature/stat strips. More visually engaging than text-only cards.
 ```tsx
 <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
   {stats.map((stat) => (
-    <div key={stat.label} className="rounded-2xl border border-border bg-card p-6 text-center">
+    <div
+      key={stat.label}
+      className="rounded-2xl border border-border bg-card p-6 text-center shadow-sm"
+    >
       <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
         <stat.icon className="h-6 w-6 text-primary" />
       </div>

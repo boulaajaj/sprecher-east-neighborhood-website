@@ -70,7 +70,7 @@ coverage table, `Field · email` means a field holding `Field.Input type="email"
 
 | Component     | Variants (`cva`)                                                                                      | Props                                                                                                                                       | Today                                                                                                                                                      | Elements                  |
 | ------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| `Card`        | `variant`: `elevated`, `muted`, `tinted`, `outline`; `padding`: `sm`, `md`, `lg`                      | parts `CardMedia`, `CardBody`, `CardTitle` (`href` stretches the link over the card), `CardMeta`, `CardFooter`; `interactive` adds the lift | `src/components/ui/card.tsx` (unused; removed in #135) and fourteen hand-built card shells ([D3](evidence.md#duplication))                                 | C15, C17, C20, C21        |
+| `Card`        | `variant`: `elevated`, `muted`, `tinted`, `outline`; `padding`: `none`, `sm`, `md`, `lg`              | parts `CardMedia`, `CardBody`, `CardTitle` (`href` stretches the link over the card), `CardMeta`, `CardFooter`; `interactive` adds the lift | `src/components/ui/card.tsx` (unused; removed in #135) and fourteen hand-built card shells ([D3](evidence.md#duplication))                                 | C15, C17, C20, C21        |
 | `CardGrid`    | `columns`: `2`, `3`, `4`; `gap`: `sm`, `md`                                                           | `as` (a list by default)                                                                                                                    | five grid class sets; `ContentBlock` uses `2` and `4`                                                                                                      | C3, C4, C14               |
 | `Badge`       | `variant`: `category`, `on-image`                                                                     | `children`                                                                                                                                  | `src/platform/ui/Badge.tsx`, on cards and in heroes (#418); before, the `categoryPillClassName` string and uppercase labels in heroes                      | C12, H11                  |
 | `Media`       | `variant`: `cover`, `background`, `thumbnail`, `framed`, `video`; `aspect`: `video`, `square`, `auto` | `image` (`ImageRef`), `priority`, `sizes`, `fallback` (`brand`, `icon`, `none`), `caption` for `framed`                                     | `src/platform/ui/Media.tsx`, the media block, three different placeholders                                                                                 | M1–M7                     |
@@ -125,26 +125,14 @@ coverage table, `Field · email` means a field holding `Field.Input type="email"
 - **Build order:** `Button` and `Link` (19 and 12 elements), then `Field` and `Form`, then `Card`,
   `Media`, `PageHeader` and `EmptyState`.
 
-## Choices for the owner
+## Decided choices
 
-Two parts of the set differ from rules already written down. Each still needs the owner's decision;
-neither blocks `Button`, `Link`, `Field` or `Form`.
+Two parts of the set differed from rules already written down. Both are settled (#426):
 
-1. **Card looks against the card rules in [`ui-ux-design.md`](../guidelines/ui-ux-design.md#card-design)**
-   (`bg-background`, never `bg-surface`; a border or a shadow, never both; `p-6` at least).
-   - `elevated`: `bg-card`, `rounded-2xl`, `shadow-sm` and no border; `shadow-md` on hover when
-     interactive. Follows "border or shadow"; uses `bg-card`, as every card does today, where the
-     guideline says `bg-background`.
-   - `outline`: `bg-background` with a border and no shadow (the form box). Follows the guideline.
-   - `muted`: `bg-surface`, no border or shadow (account panels, the event location panel, boxed
-     empty states). Breaks "never `bg-surface`": these are panels inside a page, not content cards.
-     The alternative is to draw them as `outline`.
-   - `tinted`: `bg-primary/10`, no border or shadow (the sidebar box). The guideline doesn't cover it.
-   - `padding: sm` (`p-4`, for the compact event card and the stats cards) is below the `p-6` minimum.
-2. **Plain props for blocks and heroes against
-   [architecture rule 8](../architecture/README.md#dependency-rules).** Rule 8 says code that
-   renders CMS content as authored (blocks, heroes) takes the generated Payload types. This set
-   gives `PageHero`, `ContentBlock` and the other blocks plain typed props, mapped from the CMS by
-   one function each, as the owner's plan on #163 (2026-10-20) asks: "Components receive plain
-   typed data and never import Payload directly." If the owner agrees, rule 8 is updated in a
-   follow-up change.
+1. **Card looks.** The owner kept today's looks (2026-10-26, Claude Code session): the `elevated`,
+   `outline`, `muted` and `tinted` variants and the compact `padding: sm` (`p-4`). The card rules
+   in [`ui-ux-design.md`](../guidelines/ui-ux-design.md#card-design) now say so.
+2. **Plain props for blocks and heroes.** Decided from established practice, as the owner asked:
+   [decision 0013](../architecture/decisions/0013-cms-content-through-mappers.md). Blocks and
+   heroes take plain typed props, built by a `to…Props` mapper in the module's `data/`, and
+   [rule 8](../architecture/README.md#dependency-rules) says so.

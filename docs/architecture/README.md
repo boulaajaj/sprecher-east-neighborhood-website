@@ -181,8 +181,8 @@ What this buys:
    either a named `Pick<>` of the generated type or a hand-written type in `domain/` that mirrors
    those fields; prefer the hand-written one. It keeps `@/payload-types` out of the domain and is
    still checked, because the `select`-narrowed result must be assignable to it, so a field that
-   drifts fails `tsc`. Code that renders CMS content as authored (page-builder blocks, heroes,
-   `RichText`, `Media`) takes the generated types, because its shape is the CMS's.
+   drifts fails `tsc`. Blocks and heroes take plain props too: a `to…Props` mapper in `data/` builds
+   them, and `RichText` and `Media` take `RichTextValue` and `ImageRef` ([0013](decisions/0013-cms-content-through-mappers.md)).
 9. **No colors in components.** Semantic token classes only: `text-primary-foreground` on
    `bg-primary`, never `text-white`; no palette classes, hex values or inline styles. Text and
    overlays on photos will use `on-image` and `scrim` tokens (#146); until then `white` and `black`
