@@ -33,16 +33,29 @@ What established practice says:
 
 ## Decision
 
-1. **Blocks and heroes take plain typed props**, defined next to the component (`ContentBlockProps`,
-   `PageHeroProps`). Like every other component, they never import `@/payload-types`.
-2. **One mapper per block or hero**, `to…Props`, in the owning module's `data/`, turns the stored
-   block into those props. Links go through `resolveLink()`, images become `ImageRef` and rich text
-   stays `RichTextValue`. The use case that loads a page returns its layout already mapped, so the
-   page and `RenderBlocks` see plain props only.
-3. **`RichText` and `Media` keep their value types.** `RichTextValue` (Lexical's editor state) and
+1. **Blocks and heroes take plain typed props.** The props type (`ContentBlockProps`,
+   `PageHeroProps`) lives in the owning module's `domain/`, so the component in `ui/` and the
+   mapper in `data/` can both import it ([rule 1](../README.md#dependency-rules)). Like every
+   other component, the block never imports `@/payload-types`.
+2. **One mapper per block or hero**, `to…Props`, in the owning module's `data/mappers.ts` (next to
+   the existing document mappers), turns the stored block into those props. Images go through
+   `toImageRef()` (`src/platform/payload/imageRef.ts`), links through `resolveLink()`, and rich
+   text stays `RichTextValue`.
+3. **Where the mapping runs.** The use case that loads a page maps the blocks and heroes its own
+   module owns, so `getPageBySlug` returns `site`'s blocks and hero as plain props. A block another
+   module owns (the form from `contact`, the post list from `news`) can't be mapped by `site`
+   ([rule 3](../README.md#dependency-rules), [0008](0008-compose-modules-at-the-app-level.md)): the
+   page's layout carries it as stored, and the block registry in `app/` maps it through a function
+   the owning module exports from `server.ts` (a use case that calls its mapper). A block from
+   `platform/` (the media block) is mapped by a function next to it in `platform/`.
+4. **Typing while blocks move.** The page's layout type is a union with one member per block
+   type: the plain props for a block that has moved, the generated block type for one that
+   hasn't yet. `PageBlockComponents` is keyed by `blockType` over that union, so `tsc` still
+   fails when a block type has no component, and each block moves on its own.
+5. **`RichText` and `Media` keep their value types.** `RichTextValue` (Lexical's editor state) and
    `ImageRef` (`src/platform/lib/content.ts`) are the platform's names for those values. They are
    the contract; what they alias can change in one place.
-4. **Moving is gradual.** A block or hero moves to plain props when its #163 component is built or
+6. **Moving is gradual.** A block or hero moves to plain props when its #163 component is built or
    it is next changed. Until then it keeps the generated types. New blocks start with plain props.
 
 ## Consequences

@@ -18,12 +18,19 @@ Slug fields use Payload's built-in `slugField()` (`import { slugField } from 'pa
 
 ## Blocks
 
-A page-builder block belongs to a module and has two parts:
+A page-builder block belongs to a module and has four parts
+([decision 0013](../architecture/decisions/0013-cms-content-through-mappers.md)):
 
 - the Payload `Block` config (`slug`, `interfaceName`, `fields`) in the module's `cms/`, for
   example `src/modules/site/cms/callToActionBlock.ts`
-- the React component receiving the block data as props, in the module's `ui/` and exported from
-  its `server.ts`, for example `src/modules/site/ui/CallToActionBlock.tsx`
+- its plain props type in the module's `domain/` (`CallToActionBlockProps`)
+- the mapper `to…Props` in the module's `data/mappers.ts`, which turns the stored block into those
+  props; the page's use case calls it for `site`'s own blocks, and the block registry for blocks
+  other modules own
+- the React component taking those props, in the module's `ui/` and exported from its
+  `server.ts`, for example `src/modules/site/ui/CallToActionBlock.tsx`
+
+Blocks built before 0013 still take the generated block type until they move.
 
 **IMPORTANT**: Adding a new block requires THREE registration steps:
 
