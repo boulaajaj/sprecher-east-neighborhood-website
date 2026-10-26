@@ -5,6 +5,7 @@ import { JsonLd } from '@/platform/ui/JsonLd'
 import { toFaqSections } from '@/modules/directory'
 import { FaqList, faqJsonLd, findFaqEntries } from '@/modules/directory/server'
 import { mergeOpenGraph } from '@/platform/seo/mergeOpenGraph'
+import { EmptyState } from '@/platform/ui/EmptyState'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
@@ -35,9 +36,11 @@ export default async function FAQPage() {
         ))}
 
         {sections.length === 0 && (
-          <div className="text-center">
-            <p className="text-muted-foreground">FAQ items are being added. Check back soon!</p>
-          </div>
+          <EmptyState
+            variant="plain"
+            title="FAQ items are being added."
+            description="Check back soon!"
+          />
         )}
       </div>
     </div>

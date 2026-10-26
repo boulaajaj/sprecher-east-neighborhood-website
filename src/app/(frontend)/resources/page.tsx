@@ -4,6 +4,7 @@ import React from 'react'
 import { toResourceSections } from '@/modules/directory'
 import { ResourceCard, findResources } from '@/modules/directory/server'
 import { mergeOpenGraph } from '@/platform/seo/mergeOpenGraph'
+import { EmptyState } from '@/platform/ui/EmptyState'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
@@ -38,9 +39,7 @@ export default async function ResourcesPage() {
         ))}
 
         {sections.length === 0 && (
-          <div className="rounded-2xl border border-border bg-surface p-12 text-center">
-            <p className="text-muted-foreground">Resources are being added. Check back soon!</p>
-          </div>
+          <EmptyState title="Resources are being added." description="Check back soon!" />
         )}
       </div>
     </div>
