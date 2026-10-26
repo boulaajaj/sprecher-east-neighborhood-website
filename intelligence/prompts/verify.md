@@ -13,7 +13,27 @@ sources. You don't judge whether it's interesting; the next stage does.
 
 One item with `$.candidate` filled in: its title, `$.candidate.startsAt`,
 `$.candidate.locationText`, `$.candidate.sourceStatus`, `$.candidate.sourceUrl` and
-`$.candidate.sourceText`. You also have `coverage.md`, the area definition.
+`$.candidate.sourceText`; and `$.source`, what the registry says about that source (owner,
+reliability, scope). You also have `coverage.md`, the area definition.
+
+## What the feed already says
+
+`startsAt`, `endsAt`, `allDay`, `locationText` and `sourceStatus` are not from `sourceText`: the
+runtime read them, in code, from the source's own feed (its iCalendar or API fields). When
+`$.source.reliability` is `official`, the source is the organizer's or venue's own calendar, and
+those fields are what the primary source states:
+
+- **Date and status:** set `$.dateConfirmed` and `$.statusConfirmed` from them. `sourceText`
+  that doesn't repeat the date is not a gap.
+- **Place:** a `locationText` that names a venue in `coverage.md`, "Known venues" (a room inside
+  it included, such as "Pinney Library - Community Room A"), gives that venue's address and
+  municipality, with `$.location.verified` true. A `locationText` that names no known venue, or a
+  null one, is still a gap: a branch calendar also lists system-wide programs ("All Libraries"),
+  so never assume the venue from the feed's name.
+- **Evidence:** cite `$.candidate.sourceUrl` saying what the feed states (date, time, venue,
+  status), and the venue's official page from "Known venues" for the address.
+
+Other sources (`established-media`, `community`) still need a primary source for each fact.
 
 ## Steps
 
@@ -44,7 +64,8 @@ One item with `$.candidate` filled in: its title, `$.candidate.startsAt`,
    (`missing-date`, `missing-time`, `missing-location`, `ambiguous-location`, `unverified-claim`,
    `conflicting-sources`).
 7. **Confidence.** Set `$.confidence` from 0 to 1 for place, date and status together: 0.9 or
-   more only when all three are confirmed by a primary source; lower for each gap, flag or
+   more only when all three are confirmed by a primary source (an official feed's own fields
+   count, see "What the feed already says"); lower for each gap, flag or
    conflict. Below `escalation.verifyBelowConfidence` in `pipeline.yaml` (0.6), the runtime runs
    this stage once more at high effort; if it's still below, the item goes to review.
 

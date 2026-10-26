@@ -63,6 +63,24 @@ const run = async ({
 }
 
 describe('a run', () => {
+  it('tells the model what the registry says about each item’s source, as the item schema allows', async () => {
+    const items = []
+    const validateItem = contract.validator('schemas/item.schema.json')
+    const ask = fakeAdapter(({ stageId, item }) => {
+      if (stageId === 'verify') items.push(structuredClone(item))
+      return stageId === 'verify' ? verification() : curation({ decision: 'reject' })
+    })
+    await run({ ask })
+    const library = items.find((i) => i.candidate.sourceId === 'mpl-pinney-events')
+    assert.deepEqual(library.source, {
+      id: 'mpl-pinney-events',
+      owner: 'Madison Public Library',
+      reliability: 'official',
+      scope: contract.registry.sources.find((s) => s.id === 'mpl-pinney-events').scope,
+    })
+    for (const item of items) assert.deepEqual(validateItem(item), [])
+  })
+
   it('suggests the accepted items, logs a valid run, and records what it handled', async () => {
     const calls = []
     const { log, cms, state } = await run({ ask: model(calls) })
