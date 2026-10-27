@@ -1,24 +1,31 @@
+import { cva } from 'class-variance-authority'
 import { ArrowLeft } from 'lucide-react'
 import React from 'react'
 
 import { cn } from '@/platform/lib/cn'
+import type { ImageRef } from '@/platform/lib/content'
 
+import { ImageCredit } from './ImageCredit'
 import { Link } from './Link'
+import { Media } from './Media'
+import { MetaList, type LabelledMetaItem } from './MetaList'
 import { Text } from './Text'
 
 type HeaderBase = {
   /** The page's one `h1` */
   title: React.ReactNode
-  /** One or two sentences on what the page holds */
-  description?: React.ReactNode
   className?: string
 }
 
-/** Heads a list page */
+/** Heads a list page, or a post or event page without a photo */
 type DefaultHeaderProps = HeaderBase & {
   variant?: 'default'
   /** A short label above the title: the section ("News") or a `Badge` */
   eyebrow?: React.ReactNode
+  /** One or two sentences on what the page holds */
+  description?: React.ReactNode
+  /** Facts about the page's item, label and value: "Date", "Time" */
+  facts?: LabelledMetaItem[]
   /** A way back, for a page inside a list: "Back to all events" */
   backLink?: { href: string; label: string }
   /** A control that belongs to the header, such as the search box */
@@ -28,46 +35,77 @@ type DefaultHeaderProps = HeaderBase & {
 /** Heads a page holding one form or message, inside a narrow `Section`: title and description only */
 type CompactHeaderProps = HeaderBase & {
   variant: 'compact'
+  description?: React.ReactNode
   eyebrow?: never
+  facts?: never
   backLink?: never
   children?: never
 }
 
-export type PageHeaderProps = DefaultHeaderProps | CompactHeaderProps
+/** Heads a post or event page with a photo: the title and facts on the photo */
+type ImageHeaderProps = HeaderBase & {
+  variant: 'image'
+  /** The photo behind the title; it loads first, and its credit shows under it */
+  image: ImageRef
+  /** A short label above the title, or `Badge · on-image` items */
+  eyebrow?: React.ReactNode
+  facts?: LabelledMetaItem[]
+  description?: never
+  backLink?: never
+  children?: never
+}
+
+export type PageHeaderProps = DefaultHeaderProps | CompactHeaderProps | ImageHeaderProps
+
+// The h1 of each variant. Every one is bold (the photo title was weight 400, docs/ui/evidence.md)
+const titleVariants = cva('font-bold text-balance', {
+  variants: {
+    variant: {
+      default: 'text-4xl tracking-tight text-foreground md:text-5xl',
+      compact: 'text-3xl text-foreground',
+      image: 'text-3xl text-on-image md:text-5xl lg:text-6xl',
+    },
+  },
+})
+
+// A text eyebrow is the coloured overline; on a photo it takes the photo's text color
+const eyebrowVariants = cva('', {
+  variants: {
+    variant: { default: 'mb-3', image: 'mb-4 text-on-image' },
+  },
+})
 
 /*
- * The top of a list page (#430, docs/ui/component-set.md): eyebrow, title, description, an optional
- * way back and an optional control. Left-aligned, the description kept to a readable width. The
- * photo headers of post and event pages (`image`) come with `MetaList`. `compact` is the small
- * header of a form page: title and description only, inside the page's own column.
+ * The top of a page (#430, docs/ui/component-set.md). `default` heads a list page, and a post or
+ * event without a photo: eyebrow, title, description, facts, an optional way back and control,
+ * left-aligned. `compact` is the small header of a form page, inside the page's own column.
+ * `image` puts the title and facts on a photo behind a `scrim` fade, as posts and events with a
+ * photo show it (#461).
  */
 export function PageHeader(props: PageHeaderProps) {
   if (props.variant === 'compact') {
     const { title, description, className } = props
     return (
       <header className={cn(description ? 'mb-8' : 'mb-6', className)}>
-        <h1 className="text-3xl font-bold text-balance text-foreground">{title}</h1>
+        <h1 className={titleVariants({ variant: 'compact' })}>{title}</h1>
         {description && <p className="mt-2 text-muted-foreground">{description}</p>}
       </header>
     )
   }
 
-  const { eyebrow, title, description, backLink, children, className } = props
+  if (props.variant === 'image') return <ImageHeader {...props} />
+
+  const { eyebrow, title, description, facts, backLink, children, className } = props
   return (
     <header className={cn('container mb-12 md:mb-16', className)}>
-      {eyebrow && (
-        <Text variant="overline" as="div" className="mb-3">
-          {eyebrow}
-        </Text>
-      )}
-      <h1 className="text-4xl font-bold tracking-tight text-balance text-foreground md:text-5xl">
-        {title}
-      </h1>
+      <Eyebrow variant="default">{eyebrow}</Eyebrow>
+      <h1 className={titleVariants({ variant: 'default' })}>{title}</h1>
       {description && (
         <Text variant="lead" className="mt-4 max-w-2xl">
           {description}
         </Text>
       )}
+      {facts && facts.length > 0 && <MetaList variant="inline" items={facts} className="mt-6" />}
       {backLink && (
         <Link
           href={backLink.href}
@@ -80,5 +118,47 @@ export function PageHeader(props: PageHeaderProps) {
       )}
       {children && <div className="mt-6 max-w-[50rem]">{children}</div>}
     </header>
+  )
+}
+
+function ImageHeader({ image, eyebrow, title, facts, className }: ImageHeaderProps) {
+  return (
+    <header className={className}>
+      <div className="relative -mt-[var(--header-height)] flex items-end">
+        <div className="relative z-10 container pt-[var(--header-height)] pb-8 text-on-image lg:grid lg:grid-cols-[1fr_48rem_1fr]">
+          <div className="lg:col-span-2 lg:col-start-2">
+            <Eyebrow variant="image">{eyebrow}</Eyebrow>
+            <h1 className={titleVariants({ variant: 'image' })}>{title}</h1>
+            {facts && facts.length > 0 && (
+              <MetaList variant="on-image" items={facts} className="mt-6" />
+            )}
+          </div>
+        </div>
+        <div className="min-h-[80vh] select-none">
+          <Media fill priority imgClassName="-z-10 object-cover" resource={image} />
+          <div className="pointer-events-none absolute bottom-0 left-0 h-1/2 w-full bg-linear-to-t from-scrim to-transparent" />
+        </div>
+      </div>
+      <ImageCredit image={image} className="container mt-2 text-right" />
+    </header>
+  )
+}
+
+/** Text is the overline; anything else (a row of badges) keeps its own look */
+function Eyebrow({
+  variant,
+  children,
+}: {
+  variant: 'default' | 'image'
+  children: React.ReactNode
+}) {
+  if (!children) return null
+  const className = eyebrowVariants({ variant })
+  if (typeof children !== 'string') return <div className={className}>{children}</div>
+
+  return (
+    <Text variant="overline" as="div" className={className}>
+      {children}
+    </Text>
   )
 }

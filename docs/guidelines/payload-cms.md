@@ -53,7 +53,7 @@ Hero components live in `src/modules/site/ui/`. Four types: `highImpact`, `mediu
 **Two kinds of hero components:**
 
 - **CMS heroes** (`PageHero` in `src/modules/site/ui/PageHero.tsx`, variants `high`, `medium`, `low`) — chosen with the `src/modules/site/cms/hero.ts` type selector; the page draws `PageHero` with the mapped props. Used by Pages via the layout builder.
-- **Standalone heroes** (`PostHero` in `src/modules/news/ui/`, `EventHero` in `src/modules/events/ui/`) — used directly by their detail pages, NOT registered in the CMS hero config. These are hardcoded per-collection detail pages and don't need CMS selection.
+- **Standalone heroes** (the post and event pages' `PageHeader · image`, from `src/platform/ui/`, with props from `postHeaderProps` in `src/modules/news/ui/` and `eventHeaderProps` in `src/modules/events/ui/`) — used directly by their detail pages, NOT registered in the CMS hero config. These are hardcoded per-collection detail pages and don't need CMS selection.
 
 ## Hooks
 

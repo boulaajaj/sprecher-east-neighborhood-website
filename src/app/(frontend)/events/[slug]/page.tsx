@@ -12,7 +12,7 @@ import { RichText } from '@/platform/richtext/RichText'
 import { SidebarCTA } from '@/platform/ui/SidebarCTA'
 import {
   EventCardPreview,
-  EventHero,
+  eventHeaderProps,
   EventLocation,
   SidebarEvents,
   eventJsonLd,
@@ -23,6 +23,8 @@ import {
 import { Button } from '@/platform/ui'
 import { generateMeta } from '@/platform/seo/generateMeta'
 import { DetailLayout } from '@/platform/ui/DetailLayout'
+import { PageHeader } from '@/platform/ui/PageHeader'
+import { cn } from '@/platform/lib/cn'
 import { Text } from '@/platform/ui/Text'
 
 // A scheduled publish or unpublish runs outside a request, where Next can't refresh the cache, so
@@ -56,17 +58,18 @@ export default async function EventPage({ params: paramsPromise }: Args) {
   const hasHeroImage = event.image !== null
 
   return (
-    <article className="pb-24">
+    // Without a photo the header is plain, so it keeps clear of the site header
+    <article className={cn('pb-24', !hasHeroImage && 'pt-32')}>
       <JsonLd data={eventJsonLd(event)} />
       <PayloadRedirects disableNotFound url={url} />
 
       {draft && <LivePreviewListener />}
 
-      <EventHero event={event} />
+      <PageHeader {...eventHeaderProps(event)} />
 
       {draft && <EventCardPreview event={event} />}
 
-      <div className={hasHeroImage ? 'pt-8' : 'pt-4'}>
+      <div className={cn(hasHeroImage && 'pt-8')}>
         <div className="container">
           <Breadcrumbs
             items={[
