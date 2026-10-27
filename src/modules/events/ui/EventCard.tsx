@@ -27,7 +27,7 @@ const DateBadge: React.FC<{
         className,
       )}
     >
-      <span className="text-xs leading-none font-bold text-primary uppercase">{month}</span>
+      <span className="text-xs leading-none font-bold text-primary-strong uppercase">{month}</span>
       <span
         className={cn(
           'leading-tight font-bold text-foreground',

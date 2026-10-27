@@ -15,7 +15,8 @@ export const SidebarCTA: React.FC<{
       <Text variant="subsection" as="h3" className="mb-2">
         {heading}
       </Text>
-      <Text variant="small" className="mb-4">
+      {/* Muted text on the tinted card is 4.41:1 in light theme, under AA's 4.5:1 (#216) */}
+      <Text variant="small" className="mb-4 text-foreground">
         {description}
       </Text>
       <Button href={buttonHref} size="sm">
