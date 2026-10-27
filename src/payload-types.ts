@@ -245,7 +245,14 @@ export interface Page {
       | null
     media?: (number | null) | Media
   }
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[]
+  layout: (
+    | CallToActionBlock
+    | ContentBlock
+    | MediaBlock
+    | ArchiveBlock
+    | FormBlock
+    | EventsThisWeekBlock
+  )[]
   meta?: {
     title?: string | null
     /**
@@ -866,6 +873,33 @@ export interface Form {
     | null
   updatedAt: string
   createdAt: string
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EventsThisWeekBlock".
+ */
+export interface EventsThisWeekBlock {
+  heading: string
+  /**
+   * How many days the strip shows, starting today. 7 shows today and the next six days.
+   */
+  days: number
+  /**
+   * Each row lists its events, soonest first. A row with no events in those days is hidden; when every row is empty, the strip says so and links to all events.
+   */
+  rows: {
+    title: string
+    source: 'all' | 'official' | 'category'
+    /**
+     * The row lists this category’s events and links to its events page.
+     */
+    category?: (number | null) | Category
+    limit: number
+    id?: string | null
+  }[]
+  id?: string | null
+  blockName?: string | null
+  blockType: 'eventsThisWeek'
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1638,6 +1672,7 @@ export interface PagesSelect<T extends boolean = true> {
         mediaBlock?: T | MediaBlockSelect<T>
         archive?: T | ArchiveBlockSelect<T>
         formBlock?: T | FormBlockSelect<T>
+        eventsThisWeek?: T | EventsThisWeekBlockSelect<T>
       }
   meta?:
     | T
@@ -1734,6 +1769,25 @@ export interface FormBlockSelect<T extends boolean = true> {
   form?: T
   enableIntro?: T
   introContent?: T
+  id?: T
+  blockName?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EventsThisWeekBlock_select".
+ */
+export interface EventsThisWeekBlockSelect<T extends boolean = true> {
+  heading?: T
+  days?: T
+  rows?:
+    | T
+    | {
+        title?: T
+        source?: T
+        category?: T
+        limit?: T
+        id?: T
+      }
   id?: T
   blockName?: T
 }

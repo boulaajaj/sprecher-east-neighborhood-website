@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { FormBlock } from '@/modules/contact/server'
+import { EventsThisWeek, findEventsThisWeek } from '@/modules/events/server'
 import { findArchivePosts, PostGrid } from '@/modules/news/server'
 import {
   ArchiveBlock,
@@ -20,6 +21,14 @@ const ArchiveWithPosts: PageBlockComponents['archive'] = async ({ id, intro, pos
   )
 }
 
+/** The "this week" strip (#122): events loads each row's events and maps the block (0013). */
+const EventsThisWeekWithEvents: PageBlockComponents['eventsThisWeek'] = async ({
+  id,
+  heading,
+  days,
+  rows,
+}) => <EventsThisWeek {...await findEventsThisWeek({ id, heading, days, rows })} />
+
 /**
  * The block registry: which module's component draws each page-builder block type. Modules meet
  * here, not in each other (docs/architecture decision 0008).
@@ -28,6 +37,7 @@ export const pageBlocks: PageBlockComponents = {
   archive: ArchiveWithPosts,
   content: ContentBlock,
   cta: CallToActionBlock,
+  eventsThisWeek: EventsThisWeekWithEvents,
   // @ts-expect-error The contact form types its form with the form-builder plugin's `Form`, which
   // the generated `Form` doesn't match; the page query populates it, as before #135
   formBlock: FormBlock,

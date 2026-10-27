@@ -4,6 +4,7 @@ import type {
   ArchiveBlock,
   CallToActionBlock,
   ContentBlock,
+  EventsThisWeekBlock,
   FormBlock,
   MediaBlock,
   Page,
@@ -37,6 +38,7 @@ export type PageLayoutBlock =
   | (ArchiveBlockProps & { blockType: 'archive'; postQuery: ArchivePostQuery })
   | FormBlock
   | MediaBlock
+  | EventsThisWeekBlock
 
 /**
  * The layout a content block's columns call for, from their sizes. A stored column with no size
@@ -124,6 +126,7 @@ export function toPageLayout(layout: Page['layout']): PageLayoutBlock[] {
       }
       case 'formBlock':
       case 'mediaBlock':
+      case 'eventsThisWeek':
         return [block]
       default:
         // Old data may hold a block type that no longer exists: it draws nothing, as before

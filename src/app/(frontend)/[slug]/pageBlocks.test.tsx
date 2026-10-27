@@ -11,12 +11,18 @@ const modules = vi.hoisted(() => ({
   ArchiveBlock: () => null,
   CallToActionBlock: () => null,
   ContentBlock: () => null,
+  findEventsThisWeek: vi.fn(),
+  EventsThisWeek: () => null,
 }))
 vi.mock('@/modules/news/server', () => ({
   findArchivePosts: modules.findArchivePosts,
   PostGrid: modules.PostGrid,
 }))
 vi.mock('@/modules/contact/server', () => ({ FormBlock: modules.FormBlock }))
+vi.mock('@/modules/events/server', () => ({
+  findEventsThisWeek: modules.findEventsThisWeek,
+  EventsThisWeek: modules.EventsThisWeek,
+}))
 vi.mock('@/modules/site/server', () => ({
   ArchiveBlock: modules.ArchiveBlock,
   CallToActionBlock: modules.CallToActionBlock,
@@ -55,5 +61,32 @@ describe('pageBlocks', () => {
     expect(isValidElement(element.props.children)).toBe(true)
     expect(element.props.children.type).toBe(modules.PostGrid)
     expect(element.props.children.props).toEqual({ posts })
+  })
+
+  it('draws the "this week" strip with the props events loads for it (#122)', async () => {
+    const props = { heading: 'This week', rows: [], allEventsHref: '/events' }
+    modules.findEventsThisWeek.mockResolvedValue(props)
+    const rows = [{ title: 'Coming up', source: 'all' as const, limit: 3 }]
+    const block: ComponentProps<PageBlockComponents['eventsThisWeek']> = {
+      blockType: 'eventsThisWeek',
+      id: 'w1',
+      heading: 'This week',
+      days: 7,
+      rows,
+      disableInnerContainer: true,
+    }
+
+    const element = (await (pageBlocks.eventsThisWeek as (b: typeof block) => unknown)(
+      block,
+    )) as ReactElement
+
+    expect(modules.findEventsThisWeek).toHaveBeenCalledWith({
+      id: 'w1',
+      heading: 'This week',
+      days: 7,
+      rows,
+    })
+    expect(element.type).toBe(modules.EventsThisWeek)
+    expect(element.props).toEqual(props)
   })
 })
