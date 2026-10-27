@@ -8,13 +8,17 @@ import { Text } from '@/platform/ui/Text'
 
 import type { PostSummary } from '../domain/types'
 
-/** A post in a grid: share image or a branded placeholder, date, categories, title, summary. */
+/**
+ * A post in a grid: share image or a branded placeholder, date, categories, title, summary, and
+ * where the news came from. The source is plain text, so the card keeps one tap target, its
+ * stretched title link; the post page links the source (#483).
+ */
 export const PostCard: React.FC<{
   post: PostSummary
   /** `h2` where nothing on the page heads the list (`/posts`, search) */
   headingLevel?: 'h2' | 'h3'
 }> = ({ post, headingLevel = 'h3' }) => {
-  const { href, categories, description, image, publishedAt, title } = post
+  const { href, categories, description, image, publishedAt, source, title } = post
 
   const hasCategories = categories.length > 0
   const sanitizedDescription = description?.replace(/\u00A0/g, ' ') // non-breaking spaces to spaces
@@ -65,6 +69,11 @@ export const PostCard: React.FC<{
         {description && (
           <Text variant="small" clamp={2} className="mt-2">
             {sanitizedDescription}
+          </Text>
+        )}
+        {source && (
+          <Text variant="small" clamp={2} className="mt-3 text-xs">
+            Source: {source.name}
           </Text>
         )}
       </CardBody>
