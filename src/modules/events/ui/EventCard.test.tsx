@@ -18,12 +18,19 @@ const event: EventSummary = {
   timeStart: '6:00 PM',
   timeEnd: null,
   cancelled: false,
+  officialBody: null,
   categories: [{ id: 1, title: 'Social' }],
   description: 'Bring a dish.',
   locationName: 'Park shelter',
   image: null,
 }
 const cancelled = { ...event, cancelled: true }
+const council: EventSummary = {
+  ...event,
+  slug: 'council',
+  title: 'Common Council',
+  officialBody: 'city',
+}
 
 describe('EventCard, for a cancelled event (#122)', () => {
   it.each([
@@ -71,6 +78,68 @@ describe('SidebarEvents, with a cancelled event (#122)', () => {
     // The label comes first and reads as one name with the title, as on the cards
     expect(screen.getByRole('link', { name: /Cancelled: Fall potluck/ })).toBeDefined()
     expect(screen.getByRole('link', { name: /Cleanup/ }).textContent).not.toContain('Cancelled')
+    await expectAccessible(container)
+  })
+})
+
+describe('EventCard, for an official meeting (#122)', () => {
+  it.each([
+    ['the full card', false],
+    ['the compact card', true],
+  ])('labels %s "Official meeting" in words, inside the title’s link', async (_, compact) => {
+    const { container } = render(<EventCard event={council} compact={compact} />)
+
+    const link = screen.getByRole('link', { name: 'Official meeting: Common Council' })
+    expect(link.getAttribute('href')).toBe('/events/council')
+    const label = screen.getByText('Official meeting')
+    expect(label.className).toContain('text-primary-strong')
+    expect(label.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true')
+    await expectAccessible(container)
+  })
+
+  it.each([false, true])(
+    'shows a cancelled official meeting as both, cancelled first (compact: %s)',
+    async (compact) => {
+      const { container } = render(
+        <EventCard event={{ ...council, cancelled: true }} compact={compact} />,
+      )
+
+      expect(
+        screen.getByRole('link', { name: 'Cancelled, Official meeting: Common Council' }),
+      ).toBeDefined()
+      const [first, second] = Array.from(container.querySelectorAll('h3 span > span'))
+      expect(first?.textContent).toBe('Cancelled')
+      expect(second?.textContent).toBe(',')
+      await expectAccessible(container)
+    },
+  )
+
+  it('shows no official label on a neighbourhood event', () => {
+    render(<EventCard event={event} />)
+
+    expect(screen.queryByText('Official meeting')).toBeNull()
+  })
+})
+
+describe('SidebarEvents, with an official meeting (#122)', () => {
+  it('labels it in words, with a cancelled one reading both', async () => {
+    const { container } = render(
+      <SidebarEvents
+        events={[
+          council,
+          { ...council, id: 9, slug: 'board', title: 'County Board', cancelled: true },
+          event,
+        ]}
+      />,
+    )
+
+    expect(screen.getByRole('link', { name: /Official meeting: Common Council/ })).toBeDefined()
+    expect(
+      screen.getByRole('link', { name: /Cancelled, Official meeting: County Board/ }),
+    ).toBeDefined()
+    expect(screen.getByRole('link', { name: /Fall potluck/ }).textContent).not.toContain(
+      'Official meeting',
+    )
     await expectAccessible(container)
   })
 })

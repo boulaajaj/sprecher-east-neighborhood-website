@@ -70,23 +70,24 @@ Also present, added by Payload or its plugins rather than defined here: `payload
 
 ### events
 
-| Field                                        | Type                | Required  | Notes                                                                                              |
-| -------------------------------------------- | ------------------- | --------- | -------------------------------------------------------------------------------------------------- |
-| `title`                                      | text                | Yes       |                                                                                                    |
-| `date`                                       | date (day only)     | Yes       | Day-only picker (`pickerAppearance: 'dayOnly'`)                                                    |
-| `timeStart`, `timeEnd`                       | text                | No        | Free text, e.g. "6:00 PM"                                                                          |
-| `featured`                                   | checkbox            | No        | Default false                                                                                      |
-| `locationType`                               | select              | No        | `in-person`, `virtual`, `hybrid`; default `in-person`                                              |
-| `locationName`, `locationAddress`, `mapsUrl` | text                | No        | Hidden in admin when `locationType` is `virtual`                                                   |
-| `registrationUrl`                            | text                | No        |                                                                                                    |
-| `heroImage`                                  | upload → media      | No        |                                                                                                    |
-| `description`                                | textarea            | No        | Short text for event cards                                                                         |
-| `content`                                    | richText            | No        | Lexical: headings h2-h4, toolbars, horizontal rule                                                 |
-| `meta`                                       | group               | No        | meta (SEO plugin)                                                                                  |
-| `publishedAt`                                | date (day and time) | No        | Sidebar. Set by hook `populatePublishedAt`                                                         |
-| `categories`                                 | → categories (many) | No        | Sidebar. The same tree as posts, subcategories included (#362)                                     |
-| `cancelled`, review queue                    | checkbox, sidebar   | No        | `cancelled` default false; the same review-queue fields as posts ([review queue](review-queue.md)) |
-| `generateSlug`, `slug`                       | checkbox, text      | slug: Yes | `slugField()`                                                                                      |
+| Field                                        | Type                | Required  | Notes                                                                                                        |
+| -------------------------------------------- | ------------------- | --------- | ------------------------------------------------------------------------------------------------------------ |
+| `title`                                      | text                | Yes       |                                                                                                              |
+| `date`                                       | date (day only)     | Yes       | Day-only picker (`pickerAppearance: 'dayOnly'`)                                                              |
+| `timeStart`, `timeEnd`                       | text                | No        | Free text, e.g. "6:00 PM"                                                                                    |
+| `featured`                                   | checkbox            | No        | Default false                                                                                                |
+| `locationType`                               | select              | No        | `in-person`, `virtual`, `hybrid`; default `in-person`                                                        |
+| `locationName`, `locationAddress`, `mapsUrl` | text                | No        | Hidden in admin when `locationType` is `virtual`                                                             |
+| `registrationUrl`                            | text                | No        |                                                                                                              |
+| `heroImage`                                  | upload → media      | No        |                                                                                                              |
+| `description`                                | textarea            | No        | Short text for event cards                                                                                   |
+| `content`                                    | richText            | No        | Lexical: headings h2-h4, toolbars, horizontal rule                                                           |
+| `meta`                                       | group               | No        | meta (SEO plugin)                                                                                            |
+| `publishedAt`                                | date (day and time) | No        | Sidebar. Set by hook `populatePublishedAt`                                                                   |
+| `categories`                                 | → categories (many) | No        | Sidebar. The same tree as posts, subcategories included (#362)                                               |
+| `officialBody`, `agendaUrl`                  | select, text        | No        | Official meeting (#122): `city` or `county`; the agenda link shows once a body is set and must be `https://` |
+| `cancelled`, review queue                    | checkbox, sidebar   | No        | `cancelled` default false; the same review-queue fields as posts ([review queue](review-queue.md))           |
+| `generateSlug`, `slug`                       | checkbox, text      | slug: Yes | `slugField()`                                                                                                |
 
 ### categories
 

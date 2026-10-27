@@ -17,6 +17,7 @@ import {
   SidebarEvents,
   eventJsonLd,
   findUpcomingEvents,
+  OfficialAgenda,
   getEventBySlug,
   listEventSlugs,
 } from '@/modules/events/server'
@@ -98,6 +99,8 @@ export default async function EventPage({ params: paramsPromise }: Args) {
               <p className="font-semibold">This event is cancelled.</p>
             </Alert>
           )}
+
+          <OfficialAgenda event={event} />
 
           <EventLocation event={event} />
 

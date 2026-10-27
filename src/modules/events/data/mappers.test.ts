@@ -38,6 +38,7 @@ describe('toEventSummary', () => {
       timeStart: '6:00 PM',
       timeEnd: '8:00 PM',
       cancelled: false,
+      officialBody: null,
       categories: [{ id: 3, title: 'Social' }],
       description: 'Bring a dish.',
       locationName: 'Park shelter',
@@ -56,6 +57,7 @@ describe('toEventSummary', () => {
       timeStart: null,
       timeEnd: null,
       cancelled: false,
+      officialBody: null,
       categories: [],
       description: null,
       locationName: null,
@@ -73,6 +75,12 @@ describe('toEventSummary', () => {
     expect(SUMMARY_FIELDS).toHaveProperty('cancelled', true)
   })
 
+  it('carries an official meeting’s body to the card, and selects it (#122)', () => {
+    expect(toEventSummary({ ...doc, officialBody: 'city' }).officialBody).toBe('city')
+    expect(toEventSummary({ ...doc, officialBody: 'county' }).officialBody).toBe('county')
+    expect(SUMMARY_FIELDS).toHaveProperty('officialBody', true)
+  })
+
   it('drops an image that was not loaded, which is only an id', () => {
     expect(toEventSummary({ ...doc, heroImage: 4 }).image).toBeNull()
   })
@@ -87,6 +95,35 @@ describe('toEventDetail', () => {
       registrationUrl: 'https://example.com/register',
       content: null,
       meta: { title: 'Potluck', description: 'A potluck', image },
+    })
+  })
+
+  describe('an official meeting (#122)', () => {
+    const council = {
+      ...doc,
+      officialBody: 'city' as const,
+      agendaUrl: 'https://madison.legistar.com/Calendar.aspx',
+    }
+
+    it('keeps its body and its agenda link', () => {
+      expect(toEventDetail(council)).toMatchObject({
+        officialBody: 'city',
+        agendaUrl: 'https://madison.legistar.com/Calendar.aspx',
+      })
+    })
+
+    it('has neither when they are unset', () => {
+      expect(toEventDetail(doc)).toMatchObject({ officialBody: null, agendaUrl: null })
+      expect(toEventDetail({ ...council, agendaUrl: '' }).agendaUrl).toBeNull()
+    })
+
+    it('drops an agenda link left behind on an event that is no longer official', () => {
+      expect(toEventDetail({ ...council, officialBody: null }).agendaUrl).toBeNull()
+    })
+
+    it('never passes on a link that is not https', () => {
+      expect(toEventDetail({ ...council, agendaUrl: 'javascript:alert(1)' }).agendaUrl).toBeNull()
+      expect(toEventDetail({ ...council, agendaUrl: 'http://example.com' }).agendaUrl).toBeNull()
     })
   })
 

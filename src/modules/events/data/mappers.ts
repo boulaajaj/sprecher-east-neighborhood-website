@@ -5,6 +5,7 @@ import { toImageRef } from '@/platform/payload/imageRef'
 
 import type { EventCategoryRef } from '../domain/categories'
 import { toMapsHref } from '../domain/maps'
+import { isAgendaUrl, isOfficialBody } from '../domain/officialMeetings'
 import type { EventDetail, EventSummary } from '../domain/types'
 
 /** The fields `toEventSummary` reads; queries for summaries select exactly these. */
@@ -15,6 +16,7 @@ export const SUMMARY_FIELDS = {
   timeStart: true,
   timeEnd: true,
   cancelled: true,
+  officialBody: true,
   categories: true,
   description: true,
   locationName: true,
@@ -42,6 +44,7 @@ export function toEventSummary(doc: SummaryDoc): EventSummary {
     timeStart: doc.timeStart ?? null,
     timeEnd: doc.timeEnd ?? null,
     cancelled: doc.cancelled === true,
+    officialBody: isOfficialBody(doc.officialBody) ? doc.officialBody : null,
     categories: toCategories(doc.categories),
     description: doc.description ?? null,
     locationName: doc.locationName ?? null,
@@ -52,12 +55,16 @@ export function toEventSummary(doc: SummaryDoc): EventSummary {
 /** An event document as its own page shows it. */
 export function toEventDetail(doc: Event): EventDetail {
   const locationAddress = doc.locationAddress ?? null
+  const summary = toEventSummary(doc)
   return {
-    ...toEventSummary(doc),
+    ...summary,
     locationType: doc.locationType ?? null,
     locationAddress,
     mapsHref: toMapsHref(doc.mapsUrl ?? null, locationAddress),
     registrationUrl: doc.registrationUrl ?? null,
+    // Only an official meeting has an agenda; a link left behind when the body was cleared, or
+    // one stored before the field was checked, is dropped rather than shown
+    agendaUrl: summary.officialBody && isAgendaUrl(doc.agendaUrl) ? doc.agendaUrl : null,
     content: doc.content ?? null,
     meta: {
       title: doc.meta?.title ?? null,

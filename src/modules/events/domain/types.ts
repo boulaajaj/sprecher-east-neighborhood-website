@@ -2,6 +2,7 @@ import type { ImageRef, RichTextValue } from '@/platform/lib'
 
 import type { EventCategoryRef } from './categories'
 import type { EventLocationType } from './locationTypes'
+import type { OfficialBody } from './officialMeetings'
 
 /** What an event card or list item shows. */
 export type EventSummary = {
@@ -15,6 +16,8 @@ export type EventSummary = {
   timeEnd: string | null
   /** Called off: still listed, and marked as cancelled wherever it shows (#122) */
   cancelled: boolean
+  /** Set for a public body's own meeting, marked "Official meeting" wherever it shows (#122) */
+  officialBody: OfficialBody | null
   /** The loaded categories, in the order the editor set them */
   categories: EventCategoryRef[]
   description: string | null
@@ -29,6 +32,8 @@ export type EventDetail = EventSummary & {
   /** "Open in Google Maps" link (`toMapsHref`) */
   mapsHref: string | null
   registrationUrl: string | null
+  /** The official meeting's agenda, an `https://` link; null when the event isn't official */
+  agendaUrl: string | null
   content: RichTextValue | null
   meta: {
     title: string | null

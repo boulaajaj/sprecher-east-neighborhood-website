@@ -882,6 +882,14 @@ export interface Event {
    */
   cancelled?: boolean | null
   /**
+   * Set for a public body’s own meeting (Common Council, a city commission, the County Board).
+   */
+  officialBody?: ('city' | 'county') | null
+  /**
+   * The body’s own agenda page, starting with https://
+   */
+  agendaUrl?: string | null
+  /**
    * Featured events appear prominently on the homepage
    */
   featured?: boolean | null
@@ -1776,6 +1784,8 @@ export interface EventsSelect<T extends boolean = true> {
   timeStart?: T
   timeEnd?: T
   cancelled?: T
+  officialBody?: T
+  agendaUrl?: T
   featured?: T
   locationType?: T
   locationName?: T
