@@ -17,7 +17,10 @@ function onSite(href, base) {
   if (!href) return null
   try {
     const url = new URL(href, base)
-    return url.protocol === 'https:' && url.hostname === new URL(base).hostname ? url.href : null
+    const site = (host) => host.replace(/^www\./, '')
+    return url.protocol === 'https:' && site(url.hostname) === site(new URL(base).hostname)
+      ? url.href
+      : null
   } catch {
     return null
   }
@@ -35,7 +38,8 @@ function statusOf(...texts) {
  * City of Madison article lists: the District 16 alder's blog and City news. Each post is an
  * `.article-summary` with its title link, a `time[datetime]` for when it was posted, and a
  * summary. A post is news: it has no start of its own, and verify reads any meeting it announces
- * from the text. Posts older than NEWS_DAYS are left out.
+ * from the text. Posts older than NEWS_DAYS are left out, and so is a post without a posted date:
+ * the list always shows one, so a post without it isn't one the parser understands.
  */
 export function parseCityArticles(body, { base, from }) {
   const $ = load(body)
@@ -66,7 +70,7 @@ export function parseCityArticles(body, { base, from }) {
 /**
  * The City's public information meetings: each event has its title link, a start and an end as
  * `time[datetime]` (local time with the offset), its venue ("Virtual event" or a named address),
- * and sometimes a tag ("Full", or a cancellation). Meetings before today are left out.
+ * and sometimes a tag ("Full", or a cancellation). Meetings that ended before today are left out.
  */
 export function parseCityEvents(body, { base, from }) {
   const $ = load(body)
@@ -96,7 +100,10 @@ export function parseCityEvents(body, { base, from }) {
         modified: null,
       }
     })
-    .filter((item) => item.ownId && !(from && item.startsAt && item.startsAt.slice(0, 10) < from))
+    .filter((item) => {
+      const last = item.endsAt ?? item.startsAt
+      return item.ownId && !(from && last && last.slice(0, 10) < from)
+    })
 }
 
 const MONTHS = [
@@ -159,15 +166,18 @@ export function clockIn(text) {
   return single ? parseClock(`${single[1]} ${single[2]}m`) : null
 }
 
-/** The time the page gives anywhere for a day, as in "on November 10, 2026, at 5:30 p.m.". */
+/**
+ * The time the page gives elsewhere for a day, as in "on November 10, 2026, at 5:30 p.m.", used
+ * only when exactly one sentence on the page says it: two times for one day could be two events.
+ */
 function clockOnPage(pageText, { year, month, day }) {
   const name = MONTHS[month - 1]
   const said = new RegExp(
     String.raw`\b${name}\s+${day},\s*${year},?\s+at\s+${CLOCK}\s*${MERIDIEM}`,
-    'i',
+    'gi',
   )
-  const match = said.exec(pageText)
-  return match ? parseClock(`${match[1]} ${match[2]}m`) : null
+  const matches = [...pageText.matchAll(said)]
+  return matches.length === 1 ? parseClock(`${matches[0][1]} ${matches[0][2]}m`) : null
 }
 
 /**
@@ -180,6 +190,9 @@ function clockOnPage(pageText, { year, month, day }) {
 export function parseWisdotMeetings(body, { base, from }) {
   const $ = load(body)
   const pageText = collapse($('body').text())
+  const boxDays = $('.subhead-small-pim')
+    .toArray()
+    .map((el) => collapse($(el).text()).toLowerCase())
   return $('.subhead-small-pim')
     .toArray()
     .map((el) => {
@@ -197,14 +210,19 @@ export function parseWisdotMeetings(body, { base, from }) {
       if (!title && !text) return null
       const date = dateOf(dateText)
       if (date && from && lastDayOf(date) < from) return null
-      const clock = date?.day ? (clockIn(text) ?? clockOnPage(pageText, date)) : null
+      // The page's own sentence counts only when no other box has the same day
+      const onlyBox = boxDays.filter((d) => d === dateText.toLowerCase()).length === 1
+      const clock = date?.day
+        ? (clockIn(text) ?? (onlyBox ? clockOnPage(pageText, date) : null))
+        : null
       const startsAt = clock ? zonedIso({ ...date, ...clock }) : null
       const dateNote = startsAt
         ? null
         : `Date given as "${dateText}"; the page's listing gives no time`
       return {
         // A dated meeting's id is its day, so a retitled meeting stays the same item; the title is
-        // added below only when two meetings share a day, or the date has no day
+        // added below only when two meetings share a day, or the date has no day. Accepted: when
+        // a second meeting joins a day, the first one's id changes and it comes back once as new
         ownId: date?.day ? lastDayOf(date) : slugOf(`${dateText} ${title}`),
         kind: 'meeting',
         title: title || 'Public meeting',

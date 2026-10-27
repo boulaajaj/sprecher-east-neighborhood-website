@@ -37,10 +37,13 @@ export function keepItem(source, item, namesArea) {
   if (source.id === 'legistar-matters') return namesArea(text)
   // City news is citywide: only releases that name the area use the run's model budget (#390)
   if (source.id === 'city-news') return namesArea(text)
-  // WisDOT's page also lists meetings on other roads (US 12 in Juneau County): only the corridor's
-  // own meetings, or those naming the area, go on (#390)
-  if (source.id === 'wisdot-i39-90-94')
-    return /\bI-?(?:39|90|94)\b|corridor/i.test(text) || namesArea(text)
+  // WisDOT's page also lists meetings on other roads (US 12 in Juneau County): a meeting that
+  // names another road and neither the corridor nor the area stays out; the rest go on (#390)
+  if (source.id === 'wisdot-i39-90-94') {
+    const otherRoad = /\b(?:US|USH|WIS|STH|CTH|County|Highway)\s+[A-Z0-9]{1,3}\b/.test(text)
+    const corridor = /\bI-?(?:39|90|94)\b|\binterstate\b|\bcorridor\b/i.test(text)
+    return !otherRoad || corridor || namesArea(text)
+  }
   return true
 }
 

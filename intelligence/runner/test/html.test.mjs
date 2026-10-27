@@ -60,6 +60,26 @@ describe('City article lists: the District 16 blog and City news', () => {
     )
   })
 
+  it('keeps a post exactly 14 days old and drops one from 15 days ago', () => {
+    const post = (date) =>
+      `<div class="article-summary"><h2 class="article-title"><a href="/news/${date}/p">Post</a></h2><time datetime="${date}T09:00:00-05:00"></time></div>`
+    const dates = parseCityArticles(post('2026-10-13') + post('2026-10-12'), {
+      base: 'https://www.cityofmadison.com/news',
+      from: '2026-10-27',
+    }).map((p) => p.modified.slice(0, 10))
+
+    assert.deepEqual(dates, ['2026-10-13'])
+  })
+
+  it('treats the site with or without www as its own', () => {
+    const [post] = parseCityArticles(
+      '<div class="article-summary"><h2 class="article-title"><a href="https://cityofmadison.com/news/a">A</a></h2></div>',
+      { base: 'https://www.cityofmadison.com/news' },
+    )
+
+    assert.equal(post.url, 'https://cityofmadison.com/news/a')
+  })
+
   it('reads City news with the same parser, and keeps only releases that name the area', () => {
     const news = parse('city-news', 'city-news.html')
 
@@ -114,7 +134,7 @@ describe('City public information meetings', () => {
     )
   })
 
-  it('leaves out meetings before today', () => {
+  it('leaves out meetings that ended before today', () => {
     const meetings = parse('city-public-info-meetings', 'public-info-meetings.html', '2026-10-28')
 
     assert.deepEqual(
@@ -199,6 +219,56 @@ describe('WisDOT I-39/90/94 meetings', () => {
     }).map((m) => m.ownId)
 
     assert.deepEqual(ids, ['2026-11-10-open-house', '2026-11-10-hearing'])
+  })
+
+  it('keeps the project’s own meetings however they name the road; drops other roads’', () => {
+    const meeting = (title, text) => ({ title, sourceText: text, locationText: null })
+    const keep = (item) => kept('wisdot-i39-90-94', [item]).length === 1
+
+    assert.ok(
+      keep(meeting('Noise wall vote', 'Interstate 39/90/94 neighbors vote on noise walls.')),
+    )
+    assert.ok(keep(meeting('Noise barrier meeting', 'Vote on noise barriers near your home.')))
+    assert.ok(keep(meeting('Public meeting', 'Updates on the I-39/90/94 project and US 51.')))
+    assert.ok(!keep(meeting('Public meeting', 'Rehabilitation of US 12 in Juneau County.')))
+    assert.ok(!keep(meeting('Public hearing', 'Resurfacing County HH near Lyndon Station.')))
+  })
+
+  it('borrows the page’s time for a day only when one box and one sentence name that day', () => {
+    const box = (day, title) =>
+      `<div><h1 class="subhead-small-pim">november ${day}, 2026</h1><h1>${title}</h1><p>Details soon.</p></div>`
+    const said = (day, time) => `<p>Join us on November ${day}, 2026, at ${time}.</p>`
+    const base = { base: 'https://x.gov/' }
+
+    const [one] = parseWisdotMeetings(box(10, 'Virtual meeting') + said(10, '5:30 p.m.'), base)
+    assert.equal(one.startsAt, '2026-11-10T17:30:00-06:00')
+
+    const twoSentences = said(10, '9 a.m.') + said(10, '5:30 p.m.')
+    const [unsure] = parseWisdotMeetings(box(10, 'Virtual meeting') + twoSentences, base)
+    assert.equal(unsure.startsAt, null)
+
+    const twoBoxes = box(10, 'Open house') + box(10, 'Hearing') + said(10, '5:30 p.m.')
+    assert.deepEqual(
+      parseWisdotMeetings(twoBoxes, base).map((m) => m.startsAt),
+      [null, null],
+    )
+  })
+
+  it('keeps a meeting dated today and a month-only one until that month ends', () => {
+    const box = (date) =>
+      `<div><h1 class="subhead-small-pim">${date}</h1><h1>Meeting</h1><p>On the corridor.</p></div>`
+    const titles = (from, dates) =>
+      parseWisdotMeetings(dates.map(box).join(''), { base: 'https://x.gov/', from }).map(
+        (m) => m.ownId,
+      )
+
+    assert.deepEqual(titles('2026-11-10', ['november 10, 2026', 'november 9, 2026']), [
+      '2026-11-10',
+    ])
+    assert.equal(titles('2026-11-30', ['november 2026']).length, 1)
+    assert.equal(titles('2026-12-01', ['november 2026']).length, 0)
+    assert.equal(titles('2026-12-31', ['december 2026']).length, 1)
+    assert.equal(titles('2027-01-01', ['december 2026']).length, 0)
   })
 
   it('answers no items for a page without meeting boxes', () => {
