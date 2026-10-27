@@ -1,13 +1,16 @@
 'use server'
 
-import { parsePageNumber } from '@/platform/lib'
+import { parseCursor } from '@/platform/lib'
 
 import { isEventScope } from './domain/scope'
-import { findEventPage } from './use-cases/findEventPage'
+import { findEventsAfter } from './use-cases/findEventsAfter'
 
-/** Next page of published upcoming or past events for the /events listing ("Load more"). */
-export async function loadEventsPage(scope: unknown, page: unknown) {
-  const pageNumber = parsePageNumber(page)
-  if (!isEventScope(scope) || pageNumber === null) throw new Error('Invalid request')
-  return findEventPage(scope, pageNumber)
+/**
+ * The next published upcoming or past events for the /events listing ("Load more"): those after
+ * `cursor`, the opaque string the previous page returned (#125).
+ */
+export async function loadMoreEvents(scope: unknown, cursor: unknown) {
+  const after = parseCursor(cursor)
+  if (!isEventScope(scope) || after === null) throw new Error('Invalid request')
+  return findEventsAfter(scope, after)
 }

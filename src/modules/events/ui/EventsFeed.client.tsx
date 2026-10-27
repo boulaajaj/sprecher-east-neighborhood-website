@@ -5,7 +5,7 @@ import React, { useCallback } from 'react'
 import { LoadMoreFooter, useLoadMore } from '@/platform/ui/LoadMore.client'
 import type { FeedPage } from '@/platform/lib'
 
-import { loadEventsPage } from '../actions'
+import { loadMoreEvents } from '../actions'
 import type { EventSummary } from '../domain/types'
 import type { EventScope } from '../domain/scope'
 import { EventCard } from './EventCard'
@@ -18,7 +18,7 @@ export const EventsFeed: React.FC<{
   /** The cards' heading level: `h2` where no heading sits between the page's `h1` and the list */
   headingLevel?: 'h2' | 'h3'
 }> = ({ scope, initial, headingLevel }) => {
-  const load = useCallback((page: number) => loadEventsPage(scope, page), [scope])
+  const load = useCallback((cursor: string) => loadMoreEvents(scope, cursor), [scope])
   const feed = useLoadMore(initial, load)
   const compact = scope === 'past'
 
@@ -40,7 +40,7 @@ export const EventsFeed: React.FC<{
         status={feed.status}
         autoLoad={feed.autoLoad}
         onLoadMore={feed.loadMore}
-        fallbackHref={`/events/list/${scope}/${feed.page + 1}`}
+        fallbackHref={`/events/list/${scope}/${feed.nextPage}`}
       />
     </>
   )
