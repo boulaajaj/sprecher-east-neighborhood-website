@@ -17,6 +17,9 @@
         "ops/*.mjs",
         // Run by hand or by CI
         "scripts/*.{ts,mjs}",
+        // Started by playwright.config.ts (webServer) and run by `payload run` from it
+        "e2e/serve.mjs",
+        "e2e/seed.ts",
         // Imported by eslint.config.mjs
         "eslint.*.config.mjs",
       ],
@@ -27,7 +30,13 @@
         // Installed globally on the server (ops/), not in this package
         "pm2",
       ],
-      "project": ["src/**/*.{ts,tsx}", "ops/**/*.mjs", "scripts/**/*.{ts,mjs}"],
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "ops/**/*.mjs",
+        "scripts/**/*.{ts,mjs}",
+        // The end-to-end tests (#311): Playwright finds the specs from playwright.config.ts
+        "e2e/**/*.{ts,mjs}",
+      ],
       "ignore": [
         // Built but not shown yet (docs/ui/evidence.md); kept for the theme work
         "src/platform/theme/ThemeSelector.client.tsx",
