@@ -31,10 +31,15 @@ export const SidebarEvents: React.FC<{
                   <span className="text-lg leading-tight font-bold">{day}</span>
                 </div>
                 <div className="min-w-0">
+                  {event.cancelled && (
+                    <>
+                      <CancelledBadge className="mb-1" />
+                      <span className="sr-only">:</span>{' '}
+                    </>
+                  )}
                   <span className="block text-sm leading-snug font-medium text-foreground group-hover:text-primary">
                     {event.title}
                   </span>
-                  {event.cancelled && <CancelledBadge className="my-1 mr-2" />}
                   {event.categories.length > 0 && (
                     <span className="text-xs text-muted-foreground">
                       {formatEventCategories(event.categories)}

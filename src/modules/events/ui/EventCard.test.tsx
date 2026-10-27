@@ -68,8 +68,8 @@ describe('SidebarEvents, with a cancelled event (#122)', () => {
     )
 
     expect(screen.getAllByRole('listitem')).toHaveLength(2)
-    const link = screen.getByRole('link', { name: /Fall potluck/ })
-    expect(link.textContent).toContain('Cancelled')
+    // The label comes first and reads as one name with the title, as on the cards
+    expect(screen.getByRole('link', { name: /Cancelled: Fall potluck/ })).toBeDefined()
     expect(screen.getByRole('link', { name: /Cleanup/ }).textContent).not.toContain('Cancelled')
     await expectAccessible(container)
   })

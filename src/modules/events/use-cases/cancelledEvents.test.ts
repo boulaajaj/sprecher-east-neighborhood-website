@@ -4,16 +4,18 @@ import { bootPayload, NO_REVALIDATE } from '@/platform/payload/testing/inMemoryP
 
 import type * as Queries from '../data/queries'
 import type { findEventPage as FindEventPage } from './findEventPage'
+import type { findEventsAfter as FindEventsAfter } from './findEventsAfter'
 import type { findUpcomingEvents as FindUpcomingEvents } from './findUpcomingEvents'
 
 // Loaded after Payload boots: the config reads its environment when it is imported
 let queries: typeof Queries
 let findEventPage: typeof FindEventPage
+let findEventsAfter: typeof FindEventsAfter
 let findUpcomingEvents: typeof FindUpcomingEvents
 
 /**
  * A cancelled event is never silently removed (#122): it stays in the upcoming and past
- * listings, their counts and the sidebar, and its page still opens, each marked as cancelled.
+ * listings, their counts, "Load more" and the sidebar, and its page still opens, each marked as cancelled.
  * Payload runs on an in-memory SQLite database: no file, no network.
  */
 
@@ -29,6 +31,7 @@ beforeAll(async () => {
   const { payload } = await bootPayload()
   queries = await import('../data/queries')
   ;({ findEventPage } = await import('./findEventPage'))
+  ;({ findEventsAfter } = await import('./findEventsAfter'))
   ;({ findUpcomingEvents } = await import('./findUpcomingEvents'))
   // Far from today either way, so the test doesn't depend on the clock
   for (const data of [
@@ -62,6 +65,18 @@ describe('cancelled events (#122)', () => {
 
     expect(cancelledBySlug(page.docs)).toEqual({ 'old-fair': false, 'old-fair-called-off': true })
     expect(page.totalDocs).toBe(2)
+  })
+
+  it('come back from "Load more", marked as cancelled', async () => {
+    // Past runs newest first: the cancelled fair comes after the one that went ahead
+    const [first] = (await findEventPage('past', 1)).docs
+    expect(first?.slug).toBe('old-fair')
+    if (!first) return
+
+    const more = await findEventsAfter('past', { key: first.date, id: first.id })
+
+    expect(cancelledBySlug(more.docs)).toEqual({ 'old-fair-called-off': true })
+    expect(more.totalDocs).toBe(2)
   })
 
   it('stay in the upcoming sidebar', async () => {
