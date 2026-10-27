@@ -63,7 +63,7 @@ These feeds are checked by the B-Research agent during Monday source review:
 | 3   | Channel 3000 (WISC-TV)   | `https://www.channel3000.com/rss`             | Breaking news, public safety, weather              | As needed |
 | 4   | Spectrum News WI         | `https://spectrumnews1.com/wi/madison/rss`    | Local events, government announcements             | 3x/week   |
 | 5   | Dane County Gov          | `https://www.danecounty.gov/press`            | County infrastructure, health, regional            | Bi-weekly |
-| 6   | City of Madison Planning | `https://www.cityofmadison.com/dpced`         | Neighborhood plans, permits, District 17           | Bi-weekly |
+| 6   | City of Madison Planning | `https://www.cityofmadison.com/dpced`         | Neighborhood plans, permits, District 16           | Bi-weekly |
 | 7   | Madison365               | `https://madison365.com`                      | Community events, cultural happenings              | Weekly    |
 
 ## Social Media Monitoring Schedule
@@ -74,18 +74,18 @@ These feeds are checked by the B-Research agent during Monday source review:
 | Sprecher East NA page      | Facebook  | `facebook.com/SprecherEast`                                            | Daily           |
 | City of Madison            | Twitter/X | `@cityofmadison`                                                       | Daily           |
 | Madison.com                | Twitter/X | `@madison_dot_com`                                                     | Daily           |
-| District 17 Alder          | Facebook  | Search current District 17 alderperson's official page                 | 3x/week         |
+| District 16 Alder          | Web       | `https://www.cityofmadison.com/council/council-members/find-my-alder`  | 3x/week         |
 | Madison Police             | Twitter/X | `@madisonpolice`                                                       | 3x/week         |
 | East Towne Business Groups | Facebook  | Search East Towne Business Association or similar                      | 1x/week         |
 
 ## Government Channel Monitoring
 
-| Source                        | URL                                           | Focus                                         | Frequency                    |
-| ----------------------------- | --------------------------------------------- | --------------------------------------------- | ---------------------------- |
-| City Council Agenda & Minutes | `https://www.cityofmadison.com/clerk`         | Upcoming votes, neighborhood proposals        | Every Tuesday + post-meeting |
-| City Neighborhood Directory   | `https://www.cityofmadison.com/neighborhoods` | Liaison updates, city initiatives             | Bi-weekly                    |
-| Dane County Board             | `https://www.danecounty.gov` (Board agendas)  | Regional infrastructure, county initiatives   | Bi-weekly                    |
-| Madison Schools               | `https://www.madison.k12.wi.us`               | Kennedy Elementary, O'Keefe Middle, East High | Weekly                       |
+| Source                        | URL                                           | Focus                                                                                                     | Frequency                    |
+| ----------------------------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| City Council Agenda & Minutes | `https://www.cityofmadison.com/clerk`         | Upcoming votes, neighborhood proposals                                                                    | Every Tuesday + post-meeting |
+| City Neighborhood Directory   | `https://www.cityofmadison.com/neighborhoods` | Liaison updates, city initiatives                                                                         | Bi-weekly                    |
+| Dane County Board             | `https://www.danecounty.gov` (Board agendas)  | Regional infrastructure, county initiatives                                                               | Bi-weekly                    |
+| Madison Schools               | `https://www.madison.k12.wi.us`               | Schools by address: MMSD Find Your School (`https://webapp1.madison.k12.wi.us/webapp1/find_your_school/`) | Weekly                       |
 
 ## Success Metrics (PostHog — when configured)
 
