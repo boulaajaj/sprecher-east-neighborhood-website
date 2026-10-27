@@ -57,8 +57,10 @@ function ColumnContent({ body, link }: Pick<ContentColumn, 'body' | 'link'>) {
 }
 
 function CardGroup({ title, cards }: ContentCardGroup) {
-  // Two halves sit two to a row; any other mix sits in thirds
-  const columns = cards.length > 0 && cards.every(({ size }) => size === 'half') ? 2 : 3
+  // Halves sit two to a row, beside any full cards (which take their own row); any other mix
+  // sits in thirds
+  const columns =
+    cards.length > 0 && cards.every(({ size }) => size === 'half' || size === 'full') ? 2 : 3
   return (
     <>
       {title && (

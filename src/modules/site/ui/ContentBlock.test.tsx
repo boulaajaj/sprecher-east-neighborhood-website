@@ -103,6 +103,22 @@ describe('ContentBlock', () => {
     expect(within(full).getByRole('listitem').className).toContain('col-span-full')
   })
 
+  it('keeps halves two to a row when a full card shares their group', () => {
+    render(
+      <ContentBlock
+        layout="cards"
+        groups={[
+          { cards: [column('Intro', 'full'), column('One', 'half'), column('Two', 'half')] },
+        ]}
+      />,
+    )
+
+    const list = screen.getByRole('list')
+    expect(list.className).toContain('sm:grid-cols-2')
+    expect(list.className).not.toContain('lg:grid-cols-3')
+    expect(within(list).getAllByRole('listitem')[0].className).toContain('col-span-full')
+  })
+
   it('draws four stats as compact cards in a row of four', async () => {
     const { container } = render(
       <main>
