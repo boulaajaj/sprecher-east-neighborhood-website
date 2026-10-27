@@ -69,17 +69,17 @@ waits for after the pilot.
 
 ## Corrections the agents must respect
 
-**Alder district: 16, not 17.** The content-marketing guideline still says District 17 in two
-rows. The City says District 16 (Alder Sean O'Brien) covers "from South Stoughton Road to the
+**Alder district: 16, not 17.** The content-marketing guideline said District 17 in two rows
+until #339 corrected it. The City says District 16 (Alder Sean O'Brien) covers "from South Stoughton Road to the
 city's edge, and from Reston Heights to Owl Creek", while District 17 (Alder Sabrina V. Madison)
 is the northeast corner with Sandburg, East Towne Mall and Reindahl Park
 ([City of Madison, 2025-08-19](https://www.cityofmadison.com/news/2025-08-19/from-council-to-community-meet-your-eastside-and-northside-alders);
 [alder district maps, Feb 2026](https://www.cityofmadison.com/council/council-members/alder-district-maps);
 [District 16](https://www.cityofmadison.com/council/district16)). The rest of the repo already
-says District 16. Fixing the guideline is #339.
+says District 16.
 
-**Schools differ between documents.** The guideline lists Kennedy Elementary, O'Keefe Middle and
-East High; the seed resources list Elvehjem Elementary. MMSD assigns schools by address and
+**Schools differed between documents.** The guideline listed Kennedy Elementary, O'Keefe Middle
+and East High until #339 replaced the list with the MMSD lookup. MMSD assigns schools by address and
 offers a lookup, [Find Your School](https://webapp1.madison.k12.wi.us/webapp1/find_your_school/)
 ([attendance areas](https://www.madison.k12.wi.us/about/why-mmsd/attendance-area-highlights));
 it spells the middle school "O'Keeffe". No primary source in the repo shows one set of schools for

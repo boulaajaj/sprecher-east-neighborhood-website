@@ -20,7 +20,8 @@ import { post2 } from './post-2'
 import { post3 } from './post-3'
 import { faqItems } from './data/faq'
 import { resourceItems } from './data/resources'
-import { eventCategories, eventItems } from './data/events'
+import { seedCategories } from './data/categories'
+import { eventItems } from './data/events'
 
 const collections: CollectionSlug[] = [
   'categories',
@@ -232,7 +233,7 @@ export const seed = async ({
   payload.logger.info(`— Seeding events...`)
 
   const categoryIds = new Map<string, number>()
-  for (const [slug, title] of Object.entries(eventCategories)) {
+  for (const [slug, title] of Object.entries(seedCategories)) {
     const category = await payload.create({
       collection: 'categories',
       depth: 0,
