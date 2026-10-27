@@ -22,6 +22,7 @@ import { faqItems } from './data/faq'
 import { resourceItems } from './data/resources'
 import { seedCategories } from './data/categories'
 import { eventItems } from './data/events'
+import { FORUM_DEFAULT_URL } from '@/modules/site'
 
 const collections: CollectionSlug[] = [
   'categories',
@@ -397,6 +398,7 @@ export const seed = async ({
     payload.updateGlobal({
       slug: 'footer',
       data: {
+        forumUrl: FORUM_DEFAULT_URL,
         navItems: [
           {
             link: {

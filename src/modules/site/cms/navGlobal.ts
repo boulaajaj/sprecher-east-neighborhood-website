@@ -1,12 +1,29 @@
-import type { GlobalConfig } from 'payload'
+import type { Field, GlobalConfig } from 'payload'
 
 import { isAdminOrEditor } from '@/platform/payload/roles'
 import { link } from '@/platform/payload/link'
 
+import { FORUM_DEFAULT_URL, validateForumUrl } from '../domain/forum'
 import { revalidateGlobal } from './revalidateGlobal'
 
-/** The header's or the footer's global: up to six links, each a page or a custom URL. */
-const navGlobal = (slug: 'header' | 'footer'): GlobalConfig => ({
+/** The neighborhood forum's address (#485): the footer and each post page link to it. */
+const forumUrlField: Field = {
+  name: 'forumUrl',
+  type: 'text',
+  label: 'Forum address',
+  defaultValue: FORUM_DEFAULT_URL,
+  validate: validateForumUrl,
+  admin: {
+    description:
+      'The neighborhood forum’s https address. The footer and every post link to it; leave it empty to hide those links.',
+  },
+}
+
+/**
+ * The header's or the footer's global: up to six links, each a page or a custom URL. The footer
+ * also keeps the forum's address.
+ */
+const navGlobal = (slug: 'header' | 'footer', extraFields: Field[] = []): GlobalConfig => ({
   slug,
   access: {
     read: () => true,
@@ -30,6 +47,7 @@ const navGlobal = (slug: 'header' | 'footer'): GlobalConfig => ({
         },
       },
     },
+    ...extraFields,
   ],
   hooks: {
     afterChange: [revalidateGlobal(slug)],
@@ -37,4 +55,4 @@ const navGlobal = (slug: 'header' | 'footer'): GlobalConfig => ({
 })
 
 export const Header = navGlobal('header')
-export const Footer = navGlobal('footer')
+export const Footer = navGlobal('footer', [forumUrlField])

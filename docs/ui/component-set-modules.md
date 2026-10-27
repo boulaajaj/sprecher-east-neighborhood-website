@@ -62,7 +62,7 @@ from the epic's list is `FaqList` until a second screen needs one.
 
 ## Coverage
 
-Every element in the inventory maps to exactly one component and variant: 143 elements,
+Every element in the inventory maps to exactly one component and variant: 144 elements,
 95 component-variant pairs, 40 components (24 shared, 16 area). `{style}` and
 `{appearance}` mean the CMS field picks the variant. The table below is generated from the
 element tables by script, so no element is missing and none maps twice.
@@ -76,7 +76,7 @@ element tables by script, so no element is missing and none maps twice.
 | Button · primary            | C16, C18, F14, F15, F21, F24, S7, S10, L1, N8, H2 |    11 |
 | Button · secondary          | B7                                                |     1 |
 | Button · {appearance}       | B12                                               |     1 |
-| Link · action               | N14, N17, N18, N19                                |     4 |
+| Link · action               | N14, N17, N18, N19, C32                           |     5 |
 | Link · inline               | N20                                               |     1 |
 | Link · muted                | N11                                               |     1 |
 | Link · nav                  | N1, N2, N3, N4, N5, N6                            |     6 |

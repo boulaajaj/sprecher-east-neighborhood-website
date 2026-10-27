@@ -7,6 +7,7 @@ import { Link } from '@/platform/ui'
 import { MetaList } from '@/platform/ui/MetaList'
 import { Text } from '@/platform/ui/Text'
 
+import { toForumUrl } from '../domain/forum'
 import { getFooterNav } from '../use-cases/getFooterNav'
 import { Logo } from './Logo'
 
@@ -14,6 +15,8 @@ export async function SiteFooter() {
   const footerData = await getFooterNav()
 
   const navItems = footerData?.navItems || []
+  // One click to the forum from every page, home included (#485)
+  const forumUrl = toForumUrl(footerData?.forumUrl)
   const currentYear = new Date().getFullYear()
 
   return (
@@ -51,6 +54,11 @@ export async function SiteFooter() {
                   </Link>
                 )
               })}
+              {forumUrl && (
+                <Link href={forumUrl} external variant="muted" className="self-start">
+                  Neighborhood forum
+                </Link>
+              )}
             </nav>
           </div>
 

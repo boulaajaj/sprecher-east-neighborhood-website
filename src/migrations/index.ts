@@ -18,6 +18,7 @@ import * as migration_20261026_054957_media_license_url from './20261026_054957_
 import * as migration_20261027_064445_official_meetings from './20261027_064445_official_meetings'
 import * as migration_20261027_072713_this_week_strip from './20261027_072713_this_week_strip'
 import * as migration_20261027_150134_top_issues from './20261027_150134_top_issues'
+import * as migration_20261027_181550_forum_url from './20261027_181550_forum_url'
 
 export const migrations = [
   {
@@ -119,5 +120,10 @@ export const migrations = [
     up: migration_20261027_150134_top_issues.up,
     down: migration_20261027_150134_top_issues.down,
     name: '20261027_150134_top_issues',
+  },
+  {
+    up: migration_20261027_181550_forum_url.up,
+    down: migration_20261027_181550_forum_url.down,
+    name: '20261027_181550_forum_url',
   },
 ]
