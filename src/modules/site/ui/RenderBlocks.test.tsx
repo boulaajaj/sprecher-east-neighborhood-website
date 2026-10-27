@@ -2,8 +2,7 @@
 import { cleanup, render } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 
-import type { Page } from '@/payload-types'
-
+import type { PageLayoutBlock } from '../use-cases/getPageBySlug'
 import { type PageBlockComponents, RenderBlocks } from './RenderBlocks'
 
 afterEach(cleanup)
@@ -28,13 +27,14 @@ const components: PageBlockComponents = {
   mediaBlock: stub('mediaBlock'),
 }
 
+// The layout as the page's use case returns it: site's blocks as plain props, the others as stored
 const blocks = [
-  { blockType: 'cta', id: 'a' },
-  { blockType: 'content', id: 'b' },
+  { blockType: 'cta', id: 'a', links: [] },
+  { blockType: 'content', id: 'b', layout: 'single', columns: [] },
   { blockType: 'mediaBlock', id: 'c', media: 1 },
-  { blockType: 'archive', id: 'd' },
+  { blockType: 'archive', id: 'd', postQuery: {} },
   { blockType: 'formBlock', id: 'e', form: 1, enableIntro: false },
-] as Page['layout']
+] as PageLayoutBlock[]
 
 const drawn = (container: HTMLElement) =>
   [...container.querySelectorAll('section')].map((section) => section.dataset)
@@ -69,7 +69,7 @@ describe('RenderBlocks', () => {
   })
 
   it('skips a block of a type it doesn’t know', () => {
-    const unknown = [{ blockType: 'gallery', id: 'x' }] as unknown as Page['layout']
+    const unknown = [{ blockType: 'gallery', id: 'x' }] as unknown as PageLayoutBlock[]
     const { container } = render(<RenderBlocks blocks={unknown} components={components} />)
 
     expect(container.innerHTML).toBe('')
