@@ -2609,6 +2609,10 @@ export interface Footer {
         id?: string | null
       }[]
     | null
+  /**
+   * The neighborhood forum’s https address. The footer and every post link to it; leave it empty to hide those links.
+   */
+  forumUrl?: string | null
   updatedAt?: string | null
   createdAt?: string | null
 }
@@ -2672,6 +2676,7 @@ export interface FooterSelect<T extends boolean = true> {
             }
         id?: T
       }
+  forumUrl?: T
   updatedAt?: T
   createdAt?: T
   globalType?: T

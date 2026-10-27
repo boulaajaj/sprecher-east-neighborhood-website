@@ -6,7 +6,7 @@ import React from 'react'
 import { Breadcrumbs } from '@/platform/ui/Breadcrumbs'
 import { JsonLd } from '@/platform/ui/JsonLd'
 import { LivePreviewListener } from '@/platform/ui/LivePreviewListener.client'
-import { PayloadRedirects } from '@/modules/site/server'
+import { ForumPrompt, getForumUrl, PayloadRedirects } from '@/modules/site/server'
 import { RichText } from '@/platform/richtext/RichText'
 import { richTextBlocks } from '@/platform/richtext/richTextBlocks'
 import { SidebarCTA } from '@/platform/ui/SidebarCTA'
@@ -55,10 +55,11 @@ export default async function Post({ params: paramsPromise }: Args) {
 
   if (!post) return <PayloadRedirects url={url} />
 
-  // News and events meet here, not in either module (docs/architecture decision 0008)
-  const [recentPosts, upcomingEvents] = await Promise.all([
+  // News, events and the site's forum link meet here, not in either module (decision 0008)
+  const [recentPosts, upcomingEvents, forumUrl] = await Promise.all([
     findRecentPosts(post),
     findUpcomingEvents(),
+    getForumUrl(),
   ])
 
   return (
@@ -106,6 +107,7 @@ export default async function Post({ params: paramsPromise }: Args) {
             blocks={richTextBlocks}
             enableGutter={false}
           />
+          <ForumPrompt href={forumUrl} />
         </DetailLayout>
       </div>
     </article>

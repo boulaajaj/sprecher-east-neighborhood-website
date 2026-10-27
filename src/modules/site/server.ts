@@ -3,7 +3,9 @@ import 'server-only'
 
 export { getPageBySlug, toSiteHero } from './use-cases/getPageBySlug'
 export { listPageSlugs } from './use-cases/listPageSlugs'
+export { getForumUrl } from './use-cases/getForumUrl'
 
+export { ForumPrompt } from './ui/ForumPrompt'
 export { ArchiveBlock } from './ui/ArchiveBlock'
 export { CallToActionBlock } from './ui/CallToActionBlock'
 export { ContentBlock } from './ui/ContentBlock'

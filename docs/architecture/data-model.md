@@ -203,7 +203,7 @@ in), so in effect 12 months after the person's last message. The hourly task
 
 `header` and `footer` have the same shape and the same access, from one factory in `src/modules/site/cms/navGlobal.ts`: `read: () => true`; `update: isAdminOrEditor` (#140).
 
-Field `navItems`: array, max 6 rows, optional. Each row is one `link` group: `type` (radio `reference` | `custom`, default `reference`), `newTab` (checkbox), `reference` → pages | posts (required when type is `reference`), `url` (text, required when type is `custom`), `label` (text, required). There is no `appearance` field.
+The footer also has `forumUrl` (text, default `https://discourse.sprechereast.org`, https only or empty; #485). Field `navItems`: array, max 6 rows, optional. Each row is one `link` group: `type` (radio `reference` | `custom`, default `reference`), `newTab` (checkbox), `reference` → pages | posts (required when type is `reference`), `url` (text, required when type is `custom`), `label` (text, required). There is no `appearance` field.
 
 ## Relations
 

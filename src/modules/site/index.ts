@@ -3,3 +3,4 @@
 // Pages collection, the globals and the layout blocks are in cms.ts.
 export { PAGES_SITEMAP_CACHE_TAG } from './domain/cacheTags'
 export type { PageSitemapEntry } from './domain/types'
+export { FORUM_DEFAULT_URL } from './domain/forum'
