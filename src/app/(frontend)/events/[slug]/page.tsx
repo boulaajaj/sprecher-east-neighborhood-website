@@ -20,7 +20,7 @@ import {
   getEventBySlug,
   listEventSlugs,
 } from '@/modules/events/server'
-import { Button } from '@/platform/ui'
+import { Alert, Button } from '@/platform/ui'
 import { generateMeta } from '@/platform/seo/generateMeta'
 import { DetailLayout } from '@/platform/ui/DetailLayout'
 import { PageHeader } from '@/platform/ui/PageHeader'
@@ -92,9 +92,17 @@ export default async function EventPage({ params: paramsPromise }: Args) {
             </>
           }
         >
+          {event.cancelled && (
+            // Part of the page, read in its place, so not announced (#122)
+            <Alert tone="error" live={false} className="mb-8">
+              <p className="font-semibold">This event is cancelled.</p>
+            </Alert>
+          )}
+
           <EventLocation event={event} />
 
-          {event.registrationUrl && (
+          {/* A cancelled event takes no registrations */}
+          {event.registrationUrl && !event.cancelled && (
             <div className="mb-8">
               <Button
                 href={event.registrationUrl}

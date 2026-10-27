@@ -6,6 +6,7 @@ import { Text } from '@/platform/ui/Text'
 
 import { formatEventCategories } from '../domain/categories'
 import type { EventSummary } from '../domain/types'
+import { CancelledBadge } from './CancelledBadge'
 
 export const SidebarEvents: React.FC<{
   events: EventSummary[]
@@ -33,6 +34,7 @@ export const SidebarEvents: React.FC<{
                   <span className="block text-sm leading-snug font-medium text-foreground group-hover:text-primary">
                     {event.title}
                   </span>
+                  {event.cancelled && <CancelledBadge className="my-1 mr-2" />}
                   {event.categories.length > 0 && (
                     <span className="text-xs text-muted-foreground">
                       {formatEventCategories(event.categories)}

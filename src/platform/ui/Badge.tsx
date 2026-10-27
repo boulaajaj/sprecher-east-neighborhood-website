@@ -8,15 +8,21 @@ import { cn } from '@/platform/lib/cn'
  * and plain pages: primary-strong on the primary tint, which the theme contract checks at 4.5:1
  * on the page, a surface and a card (the plain primary text it had was 3.9 to 4.5:1). `on-image`
  * sits on a photo, on a scrim of its own (60%), so it passes even over white (`SCRIM_PAIRS`).
+ * `status` marks a state the reader must not miss, such as a cancelled event (#122):
+ * destructive-strong on the destructive tint, which the contract checks like `Alert`'s error tone
+ * (`TINTED_PAIRS`). Its words say the state, and an icon may go before them, so colour is never
+ * the only signal.
  */
 const badgeVariants = cva(
-  'inline-flex max-w-full items-center rounded-full px-3 py-1 text-xs font-medium [overflow-wrap:anywhere]',
+  'inline-flex max-w-full items-center gap-1 rounded-full px-3 py-1 text-xs font-medium [overflow-wrap:anywhere] [&_svg]:size-3.5 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
         category: 'bg-primary/10 text-primary-strong',
         'on-image':
           'border border-on-image/30 bg-scrim/60 tracking-wide text-on-image uppercase backdrop-blur-sm',
+        status:
+          'border border-destructive/30 bg-destructive/10 font-semibold text-destructive-strong',
       },
     },
     defaultVariants: { variant: 'category' },

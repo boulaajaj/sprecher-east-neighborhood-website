@@ -12,6 +12,7 @@ const event: EventDetail = {
   date: '2026-11-02T00:00:00.000Z',
   timeStart: null,
   timeEnd: null,
+  cancelled: false,
   categories: [{ id: 1, title: 'Social' }],
   description: 'Bring a dish.',
   locationName: 'Park shelter',
@@ -46,6 +47,12 @@ describe('eventJsonLd', () => {
       location: { '@type': 'Place', name: 'Park shelter', address: '4605 Sprecher Rd' },
       eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
     })
+  })
+
+  it('tells search engines a cancelled event is cancelled, not scheduled (#122)', () => {
+    expect(eventJsonLd({ ...event, cancelled: true }).eventStatus).toBe(
+      'https://schema.org/EventCancelled',
+    )
   })
 
   it('names the attendance mode for virtual and hybrid events', () => {
