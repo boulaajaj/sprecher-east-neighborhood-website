@@ -1,13 +1,20 @@
 import type { Page } from '@playwright/test'
 
 import { expireResetLink } from './support/db'
-import { linkTo, nthEmailTo } from './support/mailbox'
+import { emailsTo, linkTo, nthEmailTo } from './support/mailbox'
 import { expect, expectAccessible, newEmail, newPassword, test } from './support/test'
 
 // The account flows (#311), as a resident goes through them on a phone and on a desktop: sign
 // up, confirm by email, sign in, forget the password and reset it. Each flow also tries the
 // mistakes residents make (a wrong password, a link opened twice, a mistyped field) and checks
 // that they can recover.
+//
+// The site-wide limits count for the whole run (both projects): 20 sign-ups and 30 reset requests
+// an hour (`requestLimits.ts`). These specs use 9 sign-ups and 5 reset requests per project, so 18
+// and 10 a run. A new test that signs up or asks for a reset adds to that: keep under the limits.
+//
+// Not covered here: an expired sign-up link (Payload's verification tokens don't expire), the robot
+// check (it's off, so the tests need no network), and changing a password on /account.
 
 type Resident = { name: string; email: string; password: string }
 
@@ -93,15 +100,49 @@ test.describe('sign up, confirm and sign in', () => {
     const verify = linkTo(await nthEmailTo(resident.email), '/verify-account')
 
     await page.goto(verify)
-    await expect(page.getByText(/already/i)).toBeVisible()
+    // The exact text: the invalid-link message also says "already"
+    await expect(page.getByText('This account is already confirmed')).toBeVisible()
     await expect(page.getByRole('button', { name: 'Confirm My Account' })).toHaveCount(0)
+  })
+
+  test('signing up again sends a new link, which asks for the password and opens the account with it', async ({
+    page,
+  }) => {
+    // #289: a resident who lost the first email signs up again. The new link asks for the
+    // password, so neither earlier one opens the account
+    const first = { name: 'Gil Resident', email: newEmail('gil'), password: newPassword() }
+    await signUp(page, first)
+    await expect(page.getByRole('status')).toContainText(/check your email/i)
+    await signUp(page, { ...first, password: newPassword() })
+    await expect(page.getByRole('status')).toContainText(/check your email/i)
+
+    await page.goto(linkTo(await nthEmailTo(first.email, 2), '/verify-account'))
+    await page.getByRole('button', { name: 'Confirm My Account' }).click()
+    await expect(page.getByText('Choose a password to finish')).toBeVisible()
+    await expectAccessible(page)
+    const chosen = newPassword()
+    const form = page.getByRole('form', { name: 'Choose your password' })
+    await form.getByRole('textbox', { name: 'Password (required)', exact: true }).fill(chosen)
+    await form
+      .getByRole('textbox', { name: 'Confirm password (required)', exact: true })
+      .fill(chosen)
+    await form.getByRole('button', { name: 'Set Password and Confirm' }).click()
+    await expect(page.getByRole('status')).toContainText('Your email is confirmed')
+
+    await logIn(page, first.email, first.password)
+    await expect(page.getByRole('main').getByRole('alert')).toContainText(
+      'Invalid email or password',
+    )
+    await logIn(page, first.email, chosen)
+    await expect(page).toHaveURL(/\/account/)
   })
 
   test('a broken confirmation link explains itself and offers a way on', async ({ page }) => {
     await page.goto('/verify-account?token=not-a-real-token')
 
     await expect(page.getByRole('button', { name: 'Confirm My Account' })).toHaveCount(0)
-    await expect(page.getByRole('main')).toContainText(/link/i)
+    await expect(page.getByRole('main')).toContainText('This link isn’t valid or was already used')
+    await expect(page.getByRole('main').getByRole('link', { name: 'Log In' })).toBeVisible()
     await expectAccessible(page)
   })
 
@@ -119,6 +160,7 @@ test.describe('sign up, confirm and sign in', () => {
       .getByRole('textbox', { name: 'Confirm password (required)', exact: true })
       .fill(`${password}x`)
     await form.getByRole('button', { name: 'Create Account' }).click()
+    await expect(form.getByText('Enter one email address')).toBeVisible()
     await expect(form.getByText('The passwords don’t match')).toBeVisible()
     await expectAccessible(page)
 
@@ -182,27 +224,34 @@ test.describe('sign in', () => {
 })
 
 test.describe('forgot password and reset', () => {
-  test('a resident resets a forgotten password from the emailed link', async ({ page }) => {
+  test('a resident resets a forgotten password from the emailed link; an unknown email gets the same answer and no email', async ({
+    page,
+  }) => {
     const resident = await newResident(page)
 
+    // An address no account uses first: the page answers the same, and no email goes out
+    const nobody = newEmail('nobody')
     await page.goto('/forgot-password')
     await expectAccessible(page)
     const form = page.getByRole('form', { name: 'Reset password' })
+    await form.getByLabel('Email').fill(nobody)
+    await form.getByRole('button', { name: 'Send Reset Link' }).click()
+    await expect(page.getByRole('status')).toContainText('If an account uses that email')
+
+    await page.goto('/forgot-password')
     await form.getByLabel('Email').fill(resident.email)
     await form.getByRole('button', { name: 'Send Reset Link' }).click()
     await expect(page.getByRole('status')).toContainText('If an account uses that email')
 
     // The second email to this resident: the first was the sign-up confirmation
     const reset = linkTo(await nthEmailTo(resident.email, 2), '/reset-password')
+    // The unknown address was asked for first, so by the time the resident's email is here, its
+    // own would have been too
+    expect(emailsTo(nobody)).toHaveLength(0)
     await page.goto(reset)
     await expectAccessible(page)
     const newOne = newPassword()
-    const choose = page.getByRole('form', { name: 'Choose a new password' })
-    await choose.getByRole('textbox', { name: 'New password (required)', exact: true }).fill(newOne)
-    await choose
-      .getByRole('textbox', { name: 'Confirm new password (required)', exact: true })
-      .fill(newOne)
-    await choose.getByRole('button', { name: 'Set New Password' }).click()
+    await chooseNewPassword(page, newOne)
     await expect(page.getByText('Your new password is set')).toBeVisible()
 
     // The old password no longer works; the new one does
@@ -216,14 +265,19 @@ test.describe('forgot password and reset', () => {
     // The same link can't be used twice, and the page offers a new one
     await page.context().clearCookies()
     await page.goto(reset)
-    const again = page.getByRole('form', { name: 'Choose a new password' })
     const another = newPassword()
-    await again.getByRole('textbox', { name: 'New password (required)', exact: true }).fill(another)
-    await again
-      .getByRole('textbox', { name: 'Confirm new password (required)', exact: true })
-      .fill(another)
-    await again.getByRole('button', { name: 'Set New Password' }).click()
-    await expect(page.getByRole('link', { name: /new link|reset link|forgot/i })).toBeVisible()
+    await chooseNewPassword(page, another)
+    await expect(page.getByRole('main').getByRole('alert')).toContainText(
+      'expired or was already used',
+    )
+    await expect(page.getByRole('link', { name: 'Get a New Link' })).toBeVisible()
+    // The refused link changed nothing: the password from the first reset still works
+    await logIn(page, resident.email, another)
+    await expect(page.getByRole('main').getByRole('alert')).toContainText(
+      'Invalid email or password',
+    )
+    await logIn(page, resident.email, newOne)
+    await expect(page).toHaveURL(/\/account/)
   })
 
   test('an expired reset link says so and offers a new one, which works', async ({ page }) => {
@@ -234,7 +288,13 @@ test.describe('forgot password and reset', () => {
 
     await page.goto(old)
     await chooseNewPassword(page, newPassword())
-    await expect(page.getByRole('main').getByRole('alert')).toBeVisible()
+    await expect(page.getByRole('main').getByRole('alert')).toContainText(
+      'expired or was already used',
+    )
+    await expect(page.getByRole('link', { name: 'Get a New Link' })).toHaveAttribute(
+      'href',
+      '/forgot-password',
+    )
     await expectAccessible(page)
 
     // Payload sends one reset email per account every 15 seconds at most: wait that out
@@ -246,19 +306,5 @@ test.describe('forgot password and reset', () => {
     await expect(page.getByText('Your new password is set')).toBeVisible()
     await logIn(page, resident.email, newOne)
     await expect(page).toHaveURL(/\/account/)
-  })
-
-  test('an unknown email gets the same answer and no email', async ({ page }) => {
-    const nobody = newEmail('nobody')
-
-    await page.goto('/forgot-password')
-    const form = page.getByRole('form', { name: 'Reset password' })
-    await form.getByLabel('Email').fill(nobody)
-    await form.getByRole('button', { name: 'Send Reset Link' }).click()
-    await expect(page.getByRole('status')).toContainText('If an account uses that email')
-
-    await page.waitForTimeout(2_000)
-    const { emailsTo } = await import('./support/mailbox')
-    expect(emailsTo(nobody)).toHaveLength(0)
   })
 })

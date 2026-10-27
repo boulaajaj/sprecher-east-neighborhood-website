@@ -18,7 +18,8 @@ const dataDir = path.join(root, E2E.dataDir)
 rmSync(dataDir, { recursive: true, force: true })
 mkdirSync(path.join(dataDir, 'mail'), { recursive: true })
 
-// Every value is set, so nothing comes from a developer's .env.local (Next keeps what's set)
+// Every value the site reads to reach a service or shape its answers is set here, so none comes
+// from a developer's .env.local (Next keeps a value that's already set, even an empty one)
 // E2E_DEV=1 runs `next dev` instead of a production build: for writing tests on a machine that
 // can't build (next/font fetches Poppins from Google Fonts at build time). CI always builds.
 const dev = Boolean(process.env.E2E_DEV)
@@ -39,6 +40,8 @@ const env = {
   CONTACT_EMAIL_FROM: '',
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: '',
   TURNSTILE_SECRET_KEY: '',
+  TURNSTILE_ALLOWED_HOSTNAMES: '',
+  SITE_TIMEZONE: 'America/Chicago',
   NEXT_TELEMETRY_DISABLED: '1',
 }
 
@@ -52,7 +55,11 @@ const smtp = new SMTPServer({
     simpleParser(stream)
       .then((mail) => {
         received++
-        const file = path.join(dataDir, 'mail', `${Date.now()}-${received}.json`)
+        const file = path.join(
+          dataDir,
+          'mail',
+          `${Date.now()}-${String(received).padStart(6, '0')}.json`,
+        )
         writeFileSync(
           file,
           JSON.stringify({

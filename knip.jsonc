@@ -17,8 +17,7 @@
         "ops/*.mjs",
         // Run by hand or by CI
         "scripts/*.{ts,mjs}",
-        // Started by playwright.config.ts (webServer) and run by `payload run` from it
-        "e2e/serve.mjs",
+        // Run by `payload run` from e2e/serve.mjs (which knip finds through playwright.config.ts)
         "e2e/seed.ts",
         // Imported by eslint.config.mjs
         "eslint.*.config.mjs",

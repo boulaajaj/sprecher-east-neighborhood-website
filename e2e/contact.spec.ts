@@ -8,14 +8,19 @@ import { expect, expectAccessible, newEmail, test } from './support/test'
 // The contact flow (#311): a resident writes, confirms their email by the link, and only then
 // does the message reach the neighborhood team (#287). Mistakes and old links are tried too.
 
-async function sendMessage(page: Page, email: string) {
-  await page.goto('/contact')
+/** Fills in the contact form on the page as it stands, and sends it. */
+async function fillAndSend(page: Page, email: string) {
   await page.getByLabel('Full Name').fill('Dee Resident')
   await page.getByLabel('Email').fill(email)
   await page.getByLabel('Subject').click()
   await page.getByRole('option', { name: 'General Question' }).click()
   await page.getByLabel('Message').fill('Is the Door Creek path open again after the storm?')
   await page.getByRole('button', { name: 'Send Message' }).click()
+}
+
+async function sendMessage(page: Page, email: string) {
+  await page.goto('/contact')
+  await fillAndSend(page, email)
 }
 
 test.describe('contact the neighborhood team', () => {
@@ -77,14 +82,16 @@ test.describe('contact the neighborhood team', () => {
     await page.goto('/contact')
     await page.getByRole('button', { name: 'Send Message' }).click()
     await expect(page.getByLabel('Email')).toHaveAttribute('aria-invalid', 'true')
+    await expect(page.getByText('This field is required').first()).toBeVisible()
 
     await page.getByLabel('Email').fill('dee.example.com')
     await page.getByRole('button', { name: 'Send Message' }).click()
-    await expect(page.getByLabel('Email')).toHaveAttribute('aria-invalid', 'true')
+    await expect(page.getByText('Enter an email address, like name@example.com')).toBeVisible()
     await expectAccessible(page)
 
+    // Fixed on the same page, without reloading: the form that showed the errors sends
     const email = newEmail('fixed')
-    await sendMessage(page, email)
+    await fillAndSend(page, email)
     await expect(page.getByText(/check your email/i)).toBeVisible()
     expect((await nthEmailTo(email)).subject).toMatch(/confirm/i)
   })

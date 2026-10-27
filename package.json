@@ -74,6 +74,12 @@
     },
     "mcp-handler": {
       "@modelcontextprotocol/sdk": "^1.32.2"
+    },
+    "mailparser": {
+      "nodemailer": "10.1.7"
+    },
+    "smtp-server": {
+      "nodemailer": "10.1.7"
     }
   },
   "devDependencies": {
