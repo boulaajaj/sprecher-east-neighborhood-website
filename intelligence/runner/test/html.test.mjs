@@ -2,16 +2,26 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { describe, it } from 'node:test'
 
-import { parseCityArticles, parseCityEvents, parseWisdotMeetings } from '../lib/html.mjs'
+import {
+  clockIn,
+  NEWS_DAYS,
+  parseCityArticles,
+  parseCityEvents,
+  parseWisdotMeetings,
+} from '../lib/html.mjs'
 import { parserFor } from '../lib/parsers.mjs'
-import { keepItem, areaMatcher, scoutSource } from '../lib/scout.mjs'
+import { areaMatcher, keepItem, scoutSource } from '../lib/scout.mjs'
 import { atNoon, budgets, contract, fakeHttp } from './helpers.mjs'
 
 // The HTML parsers (#390), on trimmed copies of each page's real markup (test/pages/README.md).
 
 const page = (name) => readFileSync(new URL(`./pages/${name}`, import.meta.url), 'utf8')
 const source = (id) => contract.registry.sources.find((s) => s.id === id)
-const parse = (id, name) => parserFor(source(id))(page(name), { base: source(id).canonicalUrl })
+/** Parses a page; without `from`, nothing is left out for being past. */
+const parse = (id, name, from) =>
+  parserFor(source(id))(page(name), { base: source(id).canonicalUrl, from })
+const kept = (id, items) =>
+  items.filter((item) => keepItem(source(id), item, areaMatcher(contract.area)))
 
 describe('City article lists: the District 16 blog and City news', () => {
   it('reads each post as news with its own address, title, summary and posted time', () => {
@@ -33,20 +43,29 @@ describe('City article lists: the District 16 blog and City news', () => {
     })
   })
 
-  it('strips scripts from the summary, as every source does', () => {
+  it('strips scripts from the summary, and leaves out a link to another site', () => {
     const posts = parse('district16-blog', 'district16-blog.html')
 
     assert.equal(posts.length, 2)
     assert.doesNotMatch(posts[1].sourceText, /script|alert/)
+    assert.ok(posts.every((p) => p.url.startsWith('https://www.cityofmadison.com/')))
+  })
+
+  it(`keeps only posts from the last ${NEWS_DAYS} days, so old posts never cost a model call`, () => {
+    const posts = parse('district16-blog', 'district16-blog.html', '2026-10-27')
+
+    assert.deepEqual(
+      posts.map((p) => p.title),
+      ['Upcoming Public Information Meetings'],
+    )
   })
 
   it('reads City news with the same parser, and keeps only releases that name the area', () => {
     const news = parse('city-news', 'city-news.html')
-    const namesArea = areaMatcher(contract.area)
 
     assert.equal(news.length, 2)
     assert.deepEqual(
-      news.filter((item) => keepItem(source('city-news'), item, namesArea)).map((i) => i.title),
+      kept('city-news', news).map((i) => i.title),
       ['Cottage Grove Road Resurfacing Begins'],
     )
   })
@@ -94,16 +113,26 @@ describe('City public information meetings', () => {
       '/independent-police-monitor/events/2026-10-29/pcob-hiring-listening-session@2026-10-29T18:00:00-05:00',
     )
   })
+
+  it('leaves out meetings before today', () => {
+    const meetings = parse('city-public-info-meetings', 'public-info-meetings.html', '2026-10-28')
+
+    assert.deepEqual(
+      meetings.map((m) => m.startsAt.slice(0, 10)),
+      ['2026-10-29', '2026-11-12'],
+    )
+  })
 })
 
 describe('WisDOT I-39/90/94 meetings', () => {
-  it('keeps a day with no published time as a date in the text, not a made-up start', () => {
+  it('takes a meeting’s time from where the page states it for that day', () => {
     const [corridor] = parse('wisdot-i39-90-94', 'wisdot-news-and-meetings.html')
 
     assert.equal(corridor.title, 'Corridor-wide Virtual Public Meeting')
-    assert.equal(corridor.startsAt, null)
-    assert.equal(corridor.allDay, null)
-    assert.match(corridor.sourceText, /^Date given as "november 10, 2026", time not published\./)
+    // November 10 is after the clocks change: Central Standard Time
+    assert.equal(corridor.startsAt, '2026-11-10T17:30:00-06:00')
+    assert.equal(corridor.allDay, false)
+    assert.doesNotMatch(corridor.sourceText, /gives no time/)
     assert.equal(corridor.locationText, 'Virtual meeting')
     assert.equal(corridor.url, source('wisdot-i39-90-94').canonicalUrl)
   })
@@ -127,7 +156,24 @@ describe('WisDOT I-39/90/94 meetings', () => {
       ],
     )
     assert.equal(meetings[2].startsAt, null)
-    assert.match(meetings[2].sourceText, /"august 2026"/)
+    assert.match(
+      meetings[2].sourceText,
+      /^Date given as "august 2026"; the page's listing gives no time/,
+    )
+  })
+
+  it('leaves out past meetings, and keeps only the corridor’s own meetings for a model', () => {
+    const upcoming = parse('wisdot-i39-90-94', 'wisdot-news-and-meetings.html', '2026-10-27')
+
+    // August has passed; the October 29 meeting is on US 12 in Juneau County
+    assert.deepEqual(
+      upcoming.map((m) => m.title),
+      ['Corridor-wide Virtual Public Meeting', 'Upcoming Public Meeting'],
+    )
+    assert.deepEqual(
+      kept('wisdot-i39-90-94', upcoming).map((m) => m.title),
+      ['Corridor-wide Virtual Public Meeting'],
+    )
   })
 
   it('answers no items for a page without meeting boxes', () => {
@@ -136,8 +182,26 @@ describe('WisDOT I-39/90/94 meetings', () => {
   })
 })
 
+describe('clockIn', () => {
+  for (const [text, expected] of [
+    ['at 5:30 p.m.', { hour: 17, minute: 30 }],
+    ['6 PM', { hour: 18, minute: 0 }],
+    ['from 5 to 7 p.m.', { hour: 17, minute: 0 }],
+    ['5:30-7 p.m.', { hour: 17, minute: 30 }],
+    ['11 to 1 p.m.', { hour: 11, minute: 0 }],
+    ['noon to 2 p.m.', { hour: 12, minute: 0 }],
+    ['12 to 1 p.m.', { hour: 12, minute: 0 }],
+    ['9 a.m. to 3 p.m.', { hour: 9, minute: 0 }],
+    ['I-94 at 5', null],
+  ]) {
+    it(`reads "${text}" as ${expected ? `${expected.hour}:${expected.minute}` : 'no time'}`, () => {
+      assert.deepEqual(clockIn(text), expected)
+    })
+  }
+})
+
 describe('scouting an HTML source end to end', () => {
-  it('turns the WisDOT page into schema-valid candidates', async () => {
+  it('turns the WisDOT page into schema-valid candidates: only the corridor’s next meeting', async () => {
     const http = fakeHttp([
       { status: 200, contentType: 'text/html', body: page('wisdot-news-and-meetings.html') },
     ])
@@ -152,8 +216,10 @@ describe('scouting an HTML source end to end', () => {
 
     assert.equal(result.check.status, 'ok')
     assert.deepEqual(result.invalid, [])
-    assert.equal(result.candidates.length, 3)
-    assert.ok(result.candidates.every((c) => c.sourceId === 'wisdot-i39-90-94'))
+    assert.deepEqual(
+      result.candidates.map((c) => [c.title, c.startsAt]),
+      [['Corridor-wide Virtual Public Meeting', '2026-11-10T17:30:00-06:00']],
+    )
     assert.deepEqual(http.requested, [source('wisdot-i39-90-94').canonicalUrl])
   })
 })

@@ -82,10 +82,10 @@ describe('scout', () => {
       'mpl-pinney-events',
       'legistar-matters',
       'madison365-news',
+      'wisdot-i39-90-94',
+      'city-public-info-meetings',
       'district16-blog',
       'city-news',
-      'city-public-info-meetings',
-      'wisdot-i39-90-94',
     ])
   })
 

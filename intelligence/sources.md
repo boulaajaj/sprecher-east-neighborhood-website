@@ -29,10 +29,10 @@ Only `valid` sources are ever fetched automatically.
 | Madison365                      | RSS      | valid      | 4     |
 | Spectrum News 1 Madison         | RSS      | valid      | later |
 | Madison Parks events            | HTML     | pending    | no    |
-| District 16 alder blog          | HTML     | valid      | 5     |
-| City of Madison news            | HTML     | valid      | 6     |
-| City public information mtgs    | HTML     | valid      | 7     |
-| WisDOT I-39/90/94 meetings      | HTML     | valid      | 8     |
+| District 16 alder blog          | HTML     | valid      | 7     |
+| City of Madison news            | HTML     | valid      | 8     |
+| City public information mtgs    | HTML     | valid      | 6     |
+| WisDOT I-39/90/94 meetings      | HTML     | valid      | 5     |
 | Dane County press releases      | HTML     | restricted | no    |
 | madison.com                     | RSS      | restricted | no    |
 | The Capital Times               | RSS      | invalid    | no    |
