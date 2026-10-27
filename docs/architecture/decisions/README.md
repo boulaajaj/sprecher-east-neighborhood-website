@@ -20,6 +20,7 @@ that supersedes the old one; don't edit history.
 | [0012](0012-runtime-themes.md)                    | Themes switch at runtime, on two axes: mode and theme          | 2026-10-25 | Accepted                             |
 | [0013](0013-cms-content-through-mappers.md)       | Blocks and heroes take plain props, mapped from the CMS        | 2026-10-26 | Accepted                             |
 | [0014](0014-cursor-paging-for-load-more.md)       | "Load more" asks for what comes after the last item            | 2026-10-27 | Accepted                             |
+| [0015](0015-event-filters-as-pages.md)            | Each event category filter is a cached page of its own         | 2026-10-27 | Accepted                             |
 
 Template for a new record: **Context** (the problem and the forces), **Decision**, **Consequences**
 (what gets easier, what gets harder), **Links** (issues, PRs, sources).

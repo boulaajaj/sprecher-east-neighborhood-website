@@ -6,15 +6,19 @@ import { expireCacheTag } from '@/platform/payload/expireCacheTag'
 import { EVENTS_SITEMAP_CACHE_TAG } from '../domain/cacheTags'
 
 /**
- * Refreshes every cached page that shows the event at `slug`: its own page, /events, and the
- * no-JavaScript list pages (/events/list/<scope>/<n>), which are cached per URL and refreshed all
- * together so page 2+ never disagrees with page 1 after an edit. A route pattern must name the
- * route group: Next tags cached pages with their app path, (frontend) included.
+ * Refreshes every cached page that shows the event at `slug`: its own page, /events, each
+ * category's page (/events/category/<slug>, #122), and the no-JavaScript list pages
+ * (/events/list/<scope>/<n> and a category's), which are cached per URL and refreshed all together
+ * so page 2+ never disagrees with page 1 after an edit. Every category's page is refreshed, not
+ * just the event's: the filter row on each lists every category and its count. A route pattern
+ * must name the route groups: Next tags cached pages with their app path, (frontend) included.
  */
 function revalidateEventPages(slug: string) {
   revalidatePath(`/events/${slug}`)
   revalidatePath('/events')
+  revalidatePath('/(frontend)/events/(index)/category/[category]', 'page')
   revalidatePath('/(frontend)/events/list/[scope]/[page]', 'page')
+  revalidatePath('/(frontend)/events/category/[category]/list/[scope]/[page]', 'page')
   expireCacheTag('events')
   expireCacheTag(EVENTS_SITEMAP_CACHE_TAG)
 }
