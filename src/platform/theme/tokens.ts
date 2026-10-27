@@ -104,6 +104,8 @@ export const CONTRAST_PAIRS: ReadonlyArray<readonly [text: ThemeToken, backgroun
 export const TINT_ALPHA = 0.1
 const ALERT_TONES = [
   ['foreground', 'muted-foreground'],
+  // `Card · tinted` (`bg-primary/10`): the sidebar box's text (#216)
+  ['foreground', 'primary'],
   ['primary-strong', 'primary'],
   ['warning-strong', 'warning'],
   ['destructive-strong', 'destructive'],

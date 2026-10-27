@@ -25,7 +25,7 @@ export const SidebarEvents: React.FC<{
           return (
             <li key={event.slug}>
               <Link href={`/events/${event.slug}`} className="group flex gap-3">
-                <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-md bg-primary/10 text-primary">
+                <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-md bg-primary/10 text-primary-strong">
                   <span className="text-xs leading-none font-medium uppercase">{month}</span>
                   <span className="text-lg leading-tight font-bold">{day}</span>
                 </div>
