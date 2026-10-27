@@ -3,7 +3,7 @@ import type { Field, GlobalConfig } from 'payload'
 import { isAdminOrEditor } from '@/platform/payload/roles'
 import { link } from '@/platform/payload/link'
 
-import { FORUM_DEFAULT_URL, validateForumUrl } from '../domain/forum'
+import { FORUM_DEFAULT_URL, trimForumUrl, validateForumUrl } from '../domain/forum'
 import { revalidateGlobal } from './revalidateGlobal'
 
 /** The neighborhood forum's address (#485): the footer and each post page link to it. */
@@ -13,6 +13,9 @@ const forumUrlField: Field = {
   label: 'Forum address',
   defaultValue: FORUM_DEFAULT_URL,
   validate: validateForumUrl,
+  hooks: {
+    beforeValidate: [({ value }) => trimForumUrl(value)],
+  },
   admin: {
     description:
       'The neighborhood forum’s https address. The footer and every post link to it; leave it empty to hide those links.',

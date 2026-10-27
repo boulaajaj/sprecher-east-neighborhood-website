@@ -18,7 +18,8 @@ export function ForumPrompt({ href, className }: ForumPromptProps) {
   return (
     <aside
       aria-label="Discuss on the forum"
-      className={cn('mt-10 max-w-[48rem] border-t border-border pt-6', className)}
+      // Centred like the post text above it (`RichText` is `mx-auto max-w-[48rem]`)
+      className={cn('mx-auto mt-10 w-full max-w-[48rem] border-t border-border pt-6', className)}
     >
       <Text variant="small">Questions or thoughts about this?</Text>
       <Link
