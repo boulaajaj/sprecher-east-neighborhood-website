@@ -7,12 +7,20 @@ type HomeArgs = {
   metaImage: Media
   /** The category the "this week" strip's Family row lists (#122) */
   familyCategoryId: number
+  /** The posts "top issues" links to (#484) */
+  corridorPostId: number
+  comingTogetherPostId: number
 }
+
+/** The neighborhood's forum, where a top issue can send residents to talk it over (#484) */
+const FORUM_URL = 'https://discourse.sprechereast.org'
 
 export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> = ({
   heroImage,
   metaImage,
   familyCategoryId,
+  corridorPostId,
+  comingTogetherPostId,
 }) => {
   return {
     slug: 'home',
@@ -55,6 +63,32 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
           { title: 'Coming up', source: 'all', limit: 3 },
           { title: 'Civic and official', source: 'official', limit: 3 },
           { title: 'Family', source: 'category', category: familyCategoryId, limit: 3 },
+        ],
+      },
+      {
+        blockName: 'Top Issues',
+        blockType: 'topIssues',
+        heading: 'Top issues right now',
+        items: [
+          {
+            title: 'I-39/90/94 corridor study',
+            summary:
+              'WisDOT held public hearings on the corridor study, which affects Madison\u2019s far east side.',
+            link: { type: 'reference', reference: { relationTo: 'posts', value: corridorPostId } },
+          },
+          {
+            title: 'Help shape Sprecher East',
+            summary: 'Why this site exists, and how neighbors can take part.',
+            link: {
+              type: 'reference',
+              reference: { relationTo: 'posts', value: comingTogetherPostId },
+            },
+          },
+          {
+            title: 'Talk it over on the forum',
+            summary: 'Questions and ideas from neighbors, in one place.',
+            link: { type: 'custom', url: FORUM_URL, newTab: true },
+          },
         ],
       },
       {

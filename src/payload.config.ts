@@ -23,7 +23,7 @@ import {
 } from '@/modules/contact/cms'
 import { FAQ, Resources, TeamMembers } from '@/modules/directory/cms'
 import { Events, EventsThisWeekBlock } from '@/modules/events/cms'
-import { Categories, Posts, searchOptions } from '@/modules/news/cms'
+import { Categories, Posts, searchOptions, TopIssuesBlock } from '@/modules/news/cms'
 import {
   createPagesCollection,
   Footer,
@@ -51,9 +51,10 @@ import { restrictJobStats } from '@/platform/payload/restrictJobStats'
 import { ADMIN_FORGOT_ROUTE, ADMIN_ROUTE } from '@/platform/payload/adminRoutes'
 import { JOB_RUNNERS } from '@/platform/payload/jobRunners'
 
-// Modules meet here (0008): contact's form and events' "this week" strip (#122) join site's blocks
+// Modules meet here (0008): contact's form, events' "this week" strip (#122) and news's top
+// issues (#484) join site's blocks
 const Pages = createPagesCollection({
-  layoutBlocks: [...SITE_LAYOUT_BLOCKS, FormBlock, EventsThisWeekBlock],
+  layoutBlocks: [...SITE_LAYOUT_BLOCKS, FormBlock, EventsThisWeekBlock, TopIssuesBlock],
 })
 // Email confirmation by link (#183): once an address is confirmed, its contact messages are too
 const EmailConfirmations = createEmailConfirmations({ onConfirmed: [markSubmissionsConfirmed] })

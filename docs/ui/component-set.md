@@ -50,7 +50,7 @@ what it replaces, with file paths as they were when the inventory was taken.
 looks like a button, so it is one.
 
 **`Button · {appearance}` (B12).** The CMS link field stores `appearance` as `default` or
-`outline` (`src/modules/site/cms/link.ts:10`, `:14`). `default` maps to `Button · primary` and `outline` to
+`outline` (`src/platform/payload/link.ts:10`, `:14`). `default` maps to `Button · primary` and `outline` to
 `Button · secondary`. The high-impact hero and the CTA block ignore the field today and style their
 buttons by position (H2, H3, B14, B15).
 

@@ -306,6 +306,8 @@ export const seed = async ({
           heroImage: imageHomeDoc,
           metaImage: image1Doc,
           familyCategoryId: requireCategory(categoryIds, 'family'),
+          corridorPostId: post2Doc.id,
+          comingTogetherPostId: post1Doc.id,
         }),
       }),
       payload.create({

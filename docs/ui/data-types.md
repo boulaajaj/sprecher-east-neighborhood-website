@@ -45,6 +45,7 @@ own types (`EventSummary`, `PostSummary`), and rich text and images travel as `R
 | `archive`           | page layout            | `ArchiveBlock` · default                                 |
 | `formBlock`         | page layout            | `FormBlock` · default                                    |
 | `eventsThisWeek`    | page layout            | `EventsThisWeek` · default                               |
+| `topIssues`         | page layout            | `TopIssuesBlock` · default                               |
 | `banner`            | rich text              | `Alert` · `{style}`                                      |
 | `code`              | rich text              | `CodeBlock` · default                                    |
 

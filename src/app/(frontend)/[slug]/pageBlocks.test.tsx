@@ -13,10 +13,14 @@ const modules = vi.hoisted(() => ({
   ContentBlock: () => null,
   findEventsThisWeek: vi.fn(),
   EventsThisWeek: () => null,
+  toTopIssues: vi.fn(),
+  TopIssuesBlock: () => null,
 }))
 vi.mock('@/modules/news/server', () => ({
   findArchivePosts: modules.findArchivePosts,
   PostGrid: modules.PostGrid,
+  toTopIssues: modules.toTopIssues,
+  TopIssuesBlock: modules.TopIssuesBlock,
 }))
 vi.mock('@/modules/contact/server', () => ({ FormBlock: modules.FormBlock }))
 vi.mock('@/modules/events/server', () => ({
@@ -88,5 +92,38 @@ describe('pageBlocks', () => {
     })
     expect(element.type).toBe(modules.EventsThisWeek)
     expect(element.props).toEqual(props)
+  })
+
+  const topIssues: ComponentProps<PageBlockComponents['topIssues']> = {
+    blockType: 'topIssues',
+    id: 't1',
+    heading: 'Top issues right now',
+    reviewedAt: null,
+    items: [{ title: 'Events', link: { type: 'custom', url: '/events' } }],
+    disableInnerContainer: true,
+  }
+  const drawTopIssues = () =>
+    (pageBlocks.topIssues as (b: typeof topIssues) => unknown)(topIssues) as ReactElement | null
+
+  it('draws top issues with the props news maps from the stored block (#484)', () => {
+    const props = { heading: 'Top issues right now', reviewedAt: null, items: [] }
+    modules.toTopIssues.mockReturnValue(props)
+
+    const element = drawTopIssues()
+
+    expect(modules.toTopIssues).toHaveBeenCalledWith({
+      id: 't1',
+      heading: 'Top issues right now',
+      reviewedAt: null,
+      items: topIssues.items,
+    })
+    expect(element?.type).toBe(modules.TopIssuesBlock)
+    expect(element?.props).toEqual(props)
+  })
+
+  it('draws nothing for top issues when news leaves no issue to show', () => {
+    modules.toTopIssues.mockReturnValue(null)
+
+    expect(drawTopIssues()).toBeNull()
   })
 })

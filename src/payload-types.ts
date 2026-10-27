@@ -252,6 +252,7 @@ export interface Page {
     | ArchiveBlock
     | FormBlock
     | EventsThisWeekBlock
+    | TopIssuesBlock
   )[]
   meta?: {
     title?: string | null
@@ -900,6 +901,48 @@ export interface EventsThisWeekBlock {
   id?: string | null
   blockName?: string | null
   blockType: 'eventsThisWeek'
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TopIssuesBlock".
+ */
+export interface TopIssuesBlock {
+  heading: string
+  /**
+   * The day you last checked the list. Residents see "Updated" with this date; leave it empty to show none.
+   */
+  reviewedAt?: string | null
+  /**
+   * Up to five, most important first. Drag to reorder. An issue whose post or page isn’t published is hidden.
+   */
+  items: {
+    /**
+     * A few words. It is the link residents tap.
+     */
+    title: string
+    /**
+     * One sentence, shown below the title.
+     */
+    summary?: string | null
+    link?: {
+      type?: ('reference' | 'custom') | null
+      newTab?: boolean | null
+      reference?:
+        | ({
+            relationTo: 'pages'
+            value: number | Page
+          } | null)
+        | ({
+            relationTo: 'posts'
+            value: number | Post
+          } | null)
+      url?: string | null
+    }
+    id?: string | null
+  }[]
+  id?: string | null
+  blockName?: string | null
+  blockType: 'topIssues'
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1673,6 +1716,7 @@ export interface PagesSelect<T extends boolean = true> {
         archive?: T | ArchiveBlockSelect<T>
         formBlock?: T | FormBlockSelect<T>
         eventsThisWeek?: T | EventsThisWeekBlockSelect<T>
+        topIssues?: T | TopIssuesBlockSelect<T>
       }
   meta?:
     | T
@@ -1786,6 +1830,31 @@ export interface EventsThisWeekBlockSelect<T extends boolean = true> {
         source?: T
         category?: T
         limit?: T
+        id?: T
+      }
+  id?: T
+  blockName?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TopIssuesBlock_select".
+ */
+export interface TopIssuesBlockSelect<T extends boolean = true> {
+  heading?: T
+  reviewedAt?: T
+  items?:
+    | T
+    | {
+        title?: T
+        summary?: T
+        link?:
+          | T
+          | {
+              type?: T
+              newTab?: T
+              reference?: T
+              url?: T
+            }
         id?: T
       }
   id?: T

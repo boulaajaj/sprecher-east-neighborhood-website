@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { ArchiveBlock, ContentBlock, MediaBlock, Page } from '@/payload-types'
+import type { ArchiveBlock, ContentBlock, MediaBlock, Page, TopIssuesBlock } from '@/payload-types'
 
 import {
   toArchiveBlockProps,
@@ -185,6 +185,13 @@ describe('toPageLayout', () => {
     limit: 6,
   }
   const media: MediaBlock = { blockType: 'mediaBlock', id: 'm1', media: 1 }
+  // news maps it in the block registry (#484), so site passes it on untouched
+  const topIssues: TopIssuesBlock = {
+    blockType: 'topIssues',
+    id: 't1',
+    heading: 'Top issues',
+    items: [{ title: 'Events', link: { type: 'custom', url: '/events' } }],
+  }
 
   it('maps site’s blocks to props and keeps the others as stored', () => {
     const layout = toPageLayout([
@@ -192,6 +199,7 @@ describe('toPageLayout', () => {
       { blockType: 'cta', links: [] },
       archive,
       media,
+      topIssues,
     ])
 
     expect(layout).toEqual([
@@ -204,6 +212,7 @@ describe('toPageLayout', () => {
         postQuery: { populateBy: 'collection', categories: [3], limit: 6, selectedDocs: undefined },
       },
       media,
+      topIssues,
     ])
   })
 

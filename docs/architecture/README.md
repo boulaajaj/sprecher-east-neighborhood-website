@@ -50,7 +50,7 @@ grows should split its top level "into domain oriented modules which are interna
 | Module         | Owns                                                                                   | Payload collections and globals                                     | Routes                                                                                     |
 | -------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
 | `events`       | Event listings, the "upcoming" rule, event types, the "this week" block, calendar      | `events`                                                            | `/events`, `/events/category/[category]`, `/events/[slug]`, sitemap entries, a CMS block   |
-| `news`         | Posts, categories, authors, search, related and recent posts                           | `posts`, `categories`, `search`                                     | `/posts`, `/posts/[slug]`, `/search`, sitemap entries                                      |
+| `news`         | Posts, categories, authors, search, related and recent posts, the "top issues" block   | `posts`, `categories`, `search`                                     | `/posts`, `/posts/[slug]`, `/search`, sitemap entries, a CMS block                         |
 | `contact`      | Public form safeguards, the robot check, form-email rules                              | `forms`, `form-submissions` (plugin)                                | the form block on CMS pages                                                                |
 | `accounts`     | Who is signed in, sign-up and verification, sign-in and password flows, the role field | `users`                                                             | `/login`, `/account`, `/forgot-password`, `/reset-password`, `/sign-up`, `/verify-account` |
 | `directory`    | FAQ, local resources, team members                                                     | `faq`, `resources`, `team-members`                                  | `/faq`, `/resources`                                                                       |
@@ -64,7 +64,7 @@ grows should split its top level "into domain oriented modules which are interna
 - `lib/`: pure helpers for dates, text, URLs and shared content types; no framework, so the domain
   may use them.
 - `payload/`: role checks and access functions (every module uses them), the `media` uploads
-  collection, the default rich-text editor (`defaultLexical`), the `populatePublishedAt` hook and
+  collection, the CMS link field (`link()`, used by site's and news's blocks) and `resolveLink()`, the default rich-text editor (`defaultLexical`), the `populatePublishedAt` hook and
   the admin dashboard components. Plugin setup is composed in `payload.config.ts`, because each
   module brings its own options. Also the retention queue and schedule (`retentionJobs.ts`) that
   the contact and verification modules' retention tasks share (#274), and the job runners the app

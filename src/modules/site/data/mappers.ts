@@ -8,6 +8,7 @@ import type {
   FormBlock,
   MediaBlock,
   Page,
+  TopIssuesBlock,
 } from '@/payload-types'
 import { toImageRef } from '@/platform/payload/imageRef'
 import { resolveLink } from '@/platform/payload/resolveLink'
@@ -39,6 +40,7 @@ export type PageLayoutBlock =
   | FormBlock
   | MediaBlock
   | EventsThisWeekBlock
+  | TopIssuesBlock
 
 /**
  * The layout a content block's columns call for, from their sizes. A stored column with no size
@@ -127,6 +129,7 @@ export function toPageLayout(layout: Page['layout']): PageLayoutBlock[] {
       case 'formBlock':
       case 'mediaBlock':
       case 'eventsThisWeek':
+      case 'topIssues':
         return [block]
       default:
         // Old data may hold a block type that no longer exists: it draws nothing, as before
