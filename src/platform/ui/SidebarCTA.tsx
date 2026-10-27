@@ -2,6 +2,7 @@ import { Button } from './Button'
 import React from 'react'
 
 import { Card } from './Card'
+import { Text } from './Text'
 
 export const SidebarCTA: React.FC<{
   heading: string
@@ -11,8 +12,12 @@ export const SidebarCTA: React.FC<{
 }> = ({ heading, description, buttonLabel, buttonHref }) => {
   return (
     <Card variant="tinted">
-      <h3 className="mb-2 text-base font-semibold text-foreground">{heading}</h3>
-      <p className="mb-4 text-sm text-muted-foreground">{description}</p>
+      <Text variant="subsection" as="h3" className="mb-2">
+        {heading}
+      </Text>
+      <Text variant="small" className="mb-4">
+        {description}
+      </Text>
       <Button href={buttonHref} size="sm">
         {buttonLabel}
       </Button>

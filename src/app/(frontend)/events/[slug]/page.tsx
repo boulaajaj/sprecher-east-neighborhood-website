@@ -23,6 +23,7 @@ import {
 import { Button } from '@/platform/ui'
 import { generateMeta } from '@/platform/seo/generateMeta'
 import { DetailLayout } from '@/platform/ui/DetailLayout'
+import { Text } from '@/platform/ui/Text'
 
 // A scheduled publish or unpublish runs outside a request, where Next can't refresh the cache, so
 // the page also re-renders every 10 minutes (#141, decision 0011)
@@ -103,7 +104,9 @@ export default async function EventPage({ params: paramsPromise }: Args) {
           )}
 
           {event.description && !hasHeroImage && (
-            <p className="mb-8 text-lg text-muted-foreground">{event.description}</p>
+            <Text variant="lead" className="mb-8">
+              {event.description}
+            </Text>
           )}
 
           {event.content && (

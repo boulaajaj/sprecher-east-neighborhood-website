@@ -25,9 +25,9 @@ export async function SiteFooter() {
             <NextLink href="/" className="inline-block">
               <Logo className="text-2xl" />
             </NextLink>
-            <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
+            <Text variant="small" className="max-w-xs">
               Connecting neighbors on Madison&apos;s Far East Side.
-            </p>
+            </Text>
           </div>
 
           {/* Quick links column */}
@@ -78,11 +78,11 @@ export async function SiteFooter() {
 
         {/* Disclaimer + copyright */}
         <div className="mt-12 border-t border-border pt-8">
-          <p className="mb-2 text-xs leading-relaxed text-muted-foreground">
+          <Text variant="small" className="mb-2">
             Sprecher East is an unofficial grassroots neighborhood initiative. This website was
             built with AI assistance.
-          </p>
-          <p className="text-xs text-muted-foreground/70">&copy; {currentYear} Sprecher East</p>
+          </Text>
+          <Text variant="small">&copy; {currentYear} Sprecher East</Text>
         </div>
       </div>
     </footer>
