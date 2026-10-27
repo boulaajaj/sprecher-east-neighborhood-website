@@ -25,7 +25,7 @@ jobs:
       turnstile_site_key: ${{ steps.facts.outputs.turnstile_site_key }}
       turnstile_paired: ${{ steps.facts.outputs.turnstile_paired }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # to compare with the commit that is live
           persist-credentials: false
@@ -89,11 +89,11 @@ jobs:
     timeout-minutes: 30
     # No secrets in this job: it runs npm's install scripts.
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false # npm install scripts run in this job
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ needs.preflight.outputs.node }}
           cache: npm
@@ -109,7 +109,7 @@ jobs:
           OUT: ${{ runner.temp }}/release.tar.gz
         run: bash ops/build-release.sh
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release
           path: ${{ runner.temp }}/release.tar.gz
@@ -125,12 +125,12 @@ jobs:
       group: deploy-production
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: release
           path: ${{ runner.temp }}
