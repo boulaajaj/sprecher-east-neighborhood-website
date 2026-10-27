@@ -18,6 +18,7 @@ import { verifyEndpointFromSiteOnly } from './verifyFromSiteOnly'
 import { noPasswordSignInForAgents } from './noPasswordSignInForAgents'
 import { noResetEmailWhileUnverified } from './noResetEmailWhileUnverified'
 import { requireCurrentPassword } from './requireCurrentPassword'
+import { residentOnlyFromProviders } from './residentOnlyFromProviders'
 
 /** The reset email for a token Payload just made: its link opens the site's reset page. */
 const resetEmailFor = (token = '') =>
@@ -69,8 +70,9 @@ export const Users: CollectionConfig = {
     },
   },
   hooks: {
-    // Your own password changes only on /account, after your current one is checked (#233)
-    beforeChange: [requireCurrentPassword],
+    // Your own password changes only on /account, after your current one is checked (#233). An
+    // account a Google or Facebook sign-in creates is always a resident (#188)
+    beforeChange: [requireCurrentPassword, residentOnlyFromProviders],
     // An agent's MCP API key is its only credential (#336)
     beforeLogin: [noPasswordSignInForAgents],
     // Forgot password only from the site's page (#282), then no reset email to an account whose
@@ -129,6 +131,25 @@ export const Users: CollectionConfig = {
     // The hash of the link that verified this account. Payload clears its token once used, so
     // without it a link opened again can't be told from a bad one (#391). A hash, so a database
     // copy holds no working link; it only lets the verify page say "already confirmed".
+    // The Google and Facebook accounts this account signs in with: the provider's subject, its
+    // stable id for the person, never the email (#188, decision 0016). Unique, so one provider
+    // account opens one account. Only the server sets them, from a checked sign-in.
+    {
+      name: 'googleSub',
+      type: 'text',
+      unique: true,
+      index: true,
+      hidden: true,
+      access: serverOnlyFieldAccess,
+    },
+    {
+      name: 'facebookSub',
+      type: 'text',
+      unique: true,
+      index: true,
+      hidden: true,
+      access: serverOnlyFieldAccess,
+    },
     {
       name: 'verifiedTokenHash',
       type: 'text',

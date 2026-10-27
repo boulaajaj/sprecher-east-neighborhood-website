@@ -8,6 +8,8 @@ export {
   VERIFY_ACCOUNT_PATH,
 } from './domain/paths'
 export { parseLinkToken } from './domain/linkToken'
+export { parseSocialProvider, SOCIAL_RESULT_PARAM } from './domain/socialSignIn'
+export type { SocialProvider } from './domain/socialSignIn'
 export type {
   AccountSummary,
   ActionResult,
