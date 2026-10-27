@@ -7,7 +7,8 @@ type BlockOf<T extends LayoutBlock['blockType']> = Extract<LayoutBlock, { blockT
 /**
  * The component that draws each page-builder block type, given the block as the page's layout
  * holds it: site's own blocks as plain props, the others as stored (0013). Blocks come from several
- * modules (the form from contact, the post list from news), so the block registry in `src/app/`
+ * modules (the form from contact, the post list from news, the "this week" strip
+ * from events), so the block registry in `src/app/`
  * supplies the map and `RenderBlocks` imports none of them (0008).
  */
 export type PageBlockComponents = {
@@ -27,6 +28,8 @@ function renderBlock(block: LayoutBlock, components: PageBlockComponents): React
       return <components.formBlock {...block} disableInnerContainer />
     case 'mediaBlock':
       return <components.mediaBlock {...block} disableInnerContainer />
+    case 'eventsThisWeek':
+      return <components.eventsThisWeek {...block} disableInnerContainer />
     default:
       // A block type added to Pages without a case here fails tsc; an unknown type in old data
       // still draws nothing at runtime

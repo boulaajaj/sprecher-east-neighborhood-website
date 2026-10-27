@@ -6,6 +6,7 @@ export const eventCategories = {
   workshop: 'Workshop',
   sports: 'Sports & Recreation',
   community: 'Community',
+  family: 'Family',
   other: 'Other',
 } as const
 

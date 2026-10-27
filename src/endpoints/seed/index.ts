@@ -289,12 +289,23 @@ export const seed = async ({
 
   payload.logger.info(`— Seeding pages...`)
 
+  // The home page's "this week" strip lists the Family category (#122)
+  const requireCategory = (ids: Map<string, number>, slug: string) => {
+    const id = ids.get(slug)
+    if (id === undefined) throw new Error(`The seed has no "${slug}" category`)
+    return id
+  }
+
   const [_homePage, contactPage, aboutPageDoc, getInvolvedDoc, _associationDoc] = await Promise.all(
     [
       payload.create({
         collection: 'pages',
         depth: 0,
-        data: home({ heroImage: imageHomeDoc, metaImage: image1Doc }),
+        data: home({
+          heroImage: imageHomeDoc,
+          metaImage: image1Doc,
+          familyCategoryId: requireCategory(categoryIds, 'family'),
+        }),
       }),
       payload.create({
         collection: 'pages',

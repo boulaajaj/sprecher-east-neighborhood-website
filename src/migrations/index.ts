@@ -16,6 +16,7 @@ import * as migration_20261025_195057_shared_categories from './20261025_195057_
 import * as migration_20261026_025719_verified_token_hash from './20261026_025719_verified_token_hash'
 import * as migration_20261026_054957_media_license_url from './20261026_054957_media_license_url'
 import * as migration_20261027_064445_official_meetings from './20261027_064445_official_meetings'
+import * as migration_20261027_072713_this_week_strip from './20261027_072713_this_week_strip'
 
 export const migrations = [
   {
@@ -107,5 +108,10 @@ export const migrations = [
     up: migration_20261027_064445_official_meetings.up,
     down: migration_20261027_064445_official_meetings.down,
     name: '20261027_064445_official_meetings',
+  },
+  {
+    up: migration_20261027_072713_this_week_strip.up,
+    down: migration_20261027_072713_this_week_strip.down,
+    name: '20261027_072713_this_week_strip',
   },
 ]

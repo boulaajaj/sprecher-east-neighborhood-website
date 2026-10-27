@@ -12,6 +12,8 @@ import { EVENTS_SITEMAP_CACHE_TAG } from '../domain/cacheTags'
  * so page 2+ never disagrees with page 1 after an edit. Every category's page is refreshed, not
  * just the event's: the filter row on each lists every category and its count. A route pattern
  * must name the route groups: Next tags cached pages with their app path, (frontend) included.
+ * The home page and every CMS page are refreshed too, since any of them may hold the "this week"
+ * strip (#122): its rows are Local API reads inside the page's render, cached with the page.
  */
 function revalidateEventPages(slug: string) {
   revalidatePath(`/events/${slug}`)
@@ -19,6 +21,8 @@ function revalidateEventPages(slug: string) {
   revalidatePath('/(frontend)/events/(index)/category/[category]', 'page')
   revalidatePath('/(frontend)/events/list/[scope]/[page]', 'page')
   revalidatePath('/(frontend)/events/category/[category]/list/[scope]/[page]', 'page')
+  revalidatePath('/')
+  revalidatePath('/(frontend)/[slug]', 'page')
   expireCacheTag('events')
   expireCacheTag(EVENTS_SITEMAP_CACHE_TAG)
 }

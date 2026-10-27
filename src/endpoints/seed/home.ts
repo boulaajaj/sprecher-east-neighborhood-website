@@ -5,11 +5,14 @@ import { heading, paragraph, text, boldText, root, p } from './helpers/lexical'
 type HomeArgs = {
   heroImage: Media
   metaImage: Media
+  /** The category the "this week" strip's Family row lists (#122) */
+  familyCategoryId: number
 }
 
 export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> = ({
   heroImage,
   metaImage,
+  familyCategoryId,
 }) => {
   return {
     slug: 'home',
@@ -43,6 +46,17 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
       ]),
     },
     layout: [
+      {
+        blockName: 'This Week',
+        blockType: 'eventsThisWeek',
+        heading: 'This week in Sprecher East',
+        days: 7,
+        rows: [
+          { title: 'Coming up', source: 'all', limit: 3 },
+          { title: 'Civic and official', source: 'official', limit: 3 },
+          { title: 'Family', source: 'category', category: familyCategoryId, limit: 3 },
+        ],
+      },
       {
         blockName: 'About the Neighborhood',
         blockType: 'content',
