@@ -7,8 +7,8 @@ import { cn } from '@/platform/lib/cn'
  * The site's text styles in one place (#441): headings inside a page and the paragraph sizes around
  * them. A page's `h1` comes from `PageHeader` or a hero. `section` heads a part of the page,
  * `subsection` a group inside it; `overline` is the coloured eyebrow above a heading, `label` the
- * quiet uppercase name of a sidebar list or a footer column; `lead`, `muted` and `small` are body
- * text in decreasing weight.
+ * quiet uppercase name of a sidebar list or a footer column; `lead` and `small` are body text,
+ * large and small.
  */
 const textVariants = cva('', {
   variants: {
@@ -18,7 +18,6 @@ const textVariants = cva('', {
       overline: 'text-xs font-bold tracking-widest text-primary uppercase',
       label: 'text-xs font-bold tracking-widest text-muted-foreground uppercase',
       lead: 'text-lg text-muted-foreground',
-      muted: 'text-muted-foreground',
       small: 'text-sm leading-relaxed text-muted-foreground',
     },
     clamp: { 1: 'line-clamp-1', 2: 'line-clamp-2', 3: 'line-clamp-3' },
@@ -31,8 +30,8 @@ const HEADINGS: ReadonlySet<Variant> = new Set(['section', 'subsection'])
 
 export type TextProps = VariantProps<typeof textVariants> & {
   variant: Variant
-  /** The element: headings default to `h2`, everything else to `p` */
-  as?: 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span'
+  /** The element: headings default to `h2`, everything else to `p` (`div` when it holds a block, such as a `Badge`) */
+  as?: 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span' | 'div'
   id?: string
   className?: string
   children: React.ReactNode

@@ -6,6 +6,7 @@ import { Card } from '@/platform/ui/Card'
 import { MetaList } from '@/platform/ui/MetaList'
 import { PageHeader } from '@/platform/ui/PageHeader'
 import { Section } from '@/platform/ui/Section'
+import { Text } from '@/platform/ui/Text'
 
 export const metadata: Metadata = {
   title: 'Account',
@@ -21,7 +22,9 @@ export default async function AccountPage() {
       <PageHeader variant="compact" title="Account" />
 
       <Card as="section" variant="muted" className="mb-8">
-        <h2 className="mb-4 text-lg font-semibold text-foreground">Profile</h2>
+        <Text variant="subsection" className="mb-4">
+          Profile
+        </Text>
         <MetaList
           items={[
             { label: 'Name', value: user.name || 'Not set' },
@@ -31,7 +34,9 @@ export default async function AccountPage() {
       </Card>
 
       <Card as="section" variant="muted">
-        <h2 className="mb-4 text-lg font-semibold text-foreground">Change Password</h2>
+        <Text variant="subsection" className="mb-4">
+          Change Password
+        </Text>
         <ChangePasswordForm />
       </Card>
     </Section>

@@ -28,7 +28,7 @@ export default async function FAQPage() {
       <div className="container max-w-3xl space-y-12">
         {sections.map(({ category, label, items }) => (
           <section key={category}>
-            <Text variant="subsection" className="mb-6">
+            <Text variant="section" className="mb-6">
               {label}
             </Text>
             <FaqList items={items} />

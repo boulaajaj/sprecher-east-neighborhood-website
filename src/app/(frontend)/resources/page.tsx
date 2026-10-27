@@ -26,7 +26,7 @@ export default async function ResourcesPage() {
       <div className="container space-y-16">
         {sections.map(({ category, label, items }) => (
           <section key={category}>
-            <Text variant="subsection" className="mb-6 border-b border-border pb-3">
+            <Text variant="section" className="mb-6 border-b border-border pb-3">
               {label}
             </Text>
             <CardGrid gap="sm">

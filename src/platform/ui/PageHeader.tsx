@@ -4,6 +4,7 @@ import React from 'react'
 import { cn } from '@/platform/lib/cn'
 
 import { Link } from './Link'
+import { Text } from './Text'
 
 type HeaderBase = {
   /** The page's one `h1` */
@@ -55,14 +56,18 @@ export function PageHeader(props: PageHeaderProps) {
   return (
     <header className={cn('container mb-12 md:mb-16', className)}>
       {eyebrow && (
-        <div className="mb-3 text-xs font-bold tracking-widest text-primary uppercase">
+        <Text variant="overline" as="div" className="mb-3">
           {eyebrow}
-        </div>
+        </Text>
       )}
       <h1 className="text-4xl font-bold tracking-tight text-balance text-foreground md:text-5xl">
         {title}
       </h1>
-      {description && <p className="mt-4 max-w-2xl text-lg text-muted-foreground">{description}</p>}
+      {description && (
+        <Text variant="lead" className="mt-4 max-w-2xl">
+          {description}
+        </Text>
+      )}
       {backLink && (
         <Link
           href={backLink.href}
