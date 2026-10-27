@@ -26,6 +26,10 @@ const day = (offset: number) => new Date(Date.parse(TODAY) + offset * DAY_MS).to
 const UPCOMING_DAYS = [0, 1, 2, 3, 4, 5, 6, 7, 8, ...Array(6).fill(10), 11, 12, 13, 14, 15, 16, 17]
 const PAST_DAYS = [-1, -2, -3, -4, -5, -6, ...Array(6).fill(-8), -9, -10, -11, -12, -13, -14, -15]
   .concat([-16, -17, -18])
+// Each list also holds an event one day outside the other (day 0 is upcoming, day -1 is past)
+
+// Drafts that stay drafts, where the loads after page 1 run: on a shared day and on its own
+const DRAFT_DAYS = [10, 13, -8, -13]
 
 beforeAll(async () => {
   ;({ payload } = await bootPayload())
@@ -57,6 +61,7 @@ beforeEach(async () => {
     const shuffled = days[(index * 7) % days.length] ?? offset
     await createEvent(`Event ${index}`, day(shuffled))
   }
+  for (const offset of DRAFT_DAYS) await createEvent(`Draft on day ${offset}`, day(offset), false)
 }, 60_000)
 
 /** What the listing holds now, in its order: the whole truth the reader should end up with. */
@@ -122,6 +127,15 @@ describe.each<EventScope>(['upcoming', 'past'])('the %s events listing', (scope)
     expectEveryItemOnce(await read(scope), await listingNow(scope))
   })
 
+  it('loads only its own published events after a cursor from outside the list', async () => {
+    // A forged cursor dated a month into the other list: the scope still holds
+    const outside = { key: scope === 'upcoming' ? day(-30) : day(30), id: 1 }
+    const { docs } = await queries.findEventsAfter(scope, outside, TODAY)
+    const listing = await listingNow(scope)
+
+    expect(docs.map((doc) => doc.id)).toEqual(listing.slice(0, docs.length))
+  })
+
   it.each<[string, (onScreen: number[]) => Promise<number>]>([
     [
       'unpublishing an event on screen',
@@ -172,5 +186,5 @@ it('skips nothing when upcoming events become past at midnight between loads', a
   const seen = await read('upcoming', undefined, tomorrow)
   // Today's events are already on screen and leave the list; the rest all come, once each
   expectEveryItemOnce(seen, await listingNow('upcoming', tomorrow))
-  expect(seen.slice(12)).toEqual((await listingNow('upcoming', tomorrow)).slice(11))
+  expect(seen.ids.slice(12)).toEqual((await listingNow('upcoming', tomorrow)).slice(11))
 })

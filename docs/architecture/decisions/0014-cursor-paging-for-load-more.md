@@ -46,8 +46,9 @@ fix: ask for the items strictly after the last one shown, in an order where no t
   the open list; a reload shows it. That's the expected trade-off of keyset paging.
 - The numbered no-JavaScript pages still page by offset, and can skip an item the same way if
   content changes between two page visits. They are separate page views, so this is accepted.
-- Each "Load more" runs two queries (the page and the count); both are indexed lookups on small
-  tables.
+- Each "Load more" runs two queries (the page and the count). Neither `events.date` nor
+  `posts.publishedAt` has a database index yet, so both scan their table. The tables are small,
+  so that is cheap today; an index on the sort date is the fix if they grow.
 
 ## Links
 

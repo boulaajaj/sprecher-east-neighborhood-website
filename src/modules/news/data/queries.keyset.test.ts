@@ -22,6 +22,9 @@ const hoursAgo = (hours: number) => new Date(NOW - hours * 3_600_000).toISOStrin
 // of page 1
 const HOURS_AGO = [1, 2, 3, 4, 5, 6, 7, 8, 9, ...Array(6).fill(10), 11, 12, 13, 14, 15, 16, 17]
 
+// Drafts that stay drafts, where the loads after page 1 run: at a shared time and on their own
+const DRAFT_HOURS_AGO = [10, 13]
+
 beforeAll(async () => {
   ;({ payload } = await bootPayload())
   queries = await import('./queries')
@@ -59,6 +62,7 @@ beforeEach(async () => {
   for (const index of HOURS_AGO.keys()) {
     await createPost(hoursAgo(HOURS_AGO[(index * 5) % HOURS_AGO.length] ?? 0))
   }
+  for (const hours of DRAFT_HOURS_AGO) await createPost(hoursAgo(hours), false)
 }, 60_000)
 
 /** What the listing holds now, in its order: the whole truth the reader should end up with. */
@@ -120,7 +124,7 @@ describe('the news listing', () => {
 
     const seen = await read()
     expectEveryItemOnce(seen, await listingNow())
-    expect(seen.at(-1)).toBe(post.id)
+    expect(seen.ids.at(-1)).toBe(post.id)
   })
 
   it('shows posts without a date across a page boundary exactly once', async () => {
