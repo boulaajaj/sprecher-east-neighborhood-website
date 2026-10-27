@@ -197,8 +197,7 @@ in), so in effect 12 months after the person's last message. The hourly task
 
 - `forms`: `title` (required), `fields` (blocks: `checkbox`, `country`, `email`, `message`, `number`, `select`, `state`, `text`, `textarea`; payment disabled), `submitButtonLabel`, `confirmationType` (`message` | `redirect`, default `message`), `confirmationMessage` (richText, required for message), `redirect.url`, `emails` (array: `emailTo`, `cc`, `bcc`, `replyTo`, `emailFrom`, `subject` required, `message` richText).
 - `form-submissions`: `form` → forms (required), `submissionData` (array of `field` text, `value` textarea, both required). Added by `src/modules/contact/cms/senderEmail.ts` (#183): `senderEmail` (text, indexed, from the form's first email field; text so Payload's stricter email check can never refuse a message) and `emailConfirmed` (checkbox, default false); both set by the server only. `heldEmails` (json, hidden, no read or write access): an unconfirmed sender's emails, as the form builder made them after the safety rules, kept until the sender confirms and then sent (#287). `recordSenderEmail` clears anything a visitor sends in it. Added by `src/modules/contact/cms/retentionHold.ts` (#274): `retentionHold` (checkbox, default false) and `retentionHoldReason` (textarea, required while the hold is on), admin-only and never set on create. Retention (#274): the hourly task `deleteExpiredContactMessages` deletes an unconfirmed message 48 hours after it was sent (not confirmed, and it has a sender address or its form asks for one: this includes rows stored before #183), and any other 12 months after its sender's last message (one from a form with no email field, 12 months after it was sent); never one on hold. The delete is one statement that re-checks the hold and the confirmation.
-- `redirects`: `from` (text, required, unique, indexed), `to` (group: `type` reference | custom, `reference` → pages | posts, `url`). Plugin covers `pages` and `posts`.
-- `search`: `title`, `priority`, `doc` → posts | events (required), `slug`, `meta` (`title`, `description`, `image` → media), `categories` (array of `relationTo`, `categoryID`, `title`). Synced from `posts` and `events` only, drafts excluded.
+- `redirects`: `from` (text, required, unique, indexed), `to` (group: `type` reference | custom, `reference` → pages | posts, `url`). Plugin covers `pages` and `posts`. `search`: `title`, `priority`, `doc` → posts | events (required), `slug`, `meta` (`title`, `description`, `image` → media), `categories` (array of `relationTo`, `categoryID`, `title`). Synced from `posts` and `events` only, drafts excluded.
 
 ## Globals
 
@@ -212,12 +211,8 @@ Field `navItems`: array, max 6 rows, optional. Each row is one `link` group: `ty
 - `pages.layout`: `cta.links[].link.reference` → pages | posts; `content.columns[].link.reference` → pages | posts; `mediaBlock.media` → media (one); `archive.categories` → categories (many); `archive.selectedDocs` → posts (many); `formBlock.form` → forms (one).
 - `posts.heroImage` → media (one); `posts.relatedPosts` → posts (many); `posts.categories` → categories (many); `posts.authors` → users (many).
 - `posts.content` (Lexical): `mediaBlock` blocks → media; link nodes → pages | posts. Every rich-text field built on the site's default editor can hold the same link nodes: `faq.answer`, `events.content`, `pages.hero.richText`, the `cta`, `content`, `archive` and `formBlock` rich text, `media.caption`, `forms.confirmationMessage`, `forms.emails[].message` and the `banner` block's text.
-- `events.heroImage` → media (one); `team-members.photo` → media (one).
-- `pages.meta.image`, `posts.meta.image`, `events.meta.image` → media (one), from each collection's SEO tab (`meta_image_id`, and `version_meta_image_id` in the version tables).
-- `categories.parent` → categories (one); `categories.breadcrumbs[].doc` → categories; `media.folder` → payload-folders (one).
-- `header.navItems[].link.reference`, `footer.navItems[].link.reference` → pages | posts (one).
-- `redirects.to.reference` → pages | posts (one); `form-submissions.form` → forms (one, required); `search.doc` → posts | events (one, required); `search.meta.image` → media (one).
-- `users`, `resources`: no outgoing relations; `faq` only through rich-text links.
+- `events.heroImage` → media (one); `team-members.photo` → media (one). `pages.meta.image`, `posts.meta.image`, `events.meta.image` → media (one), from each collection's SEO tab (`meta_image_id`, and `version_meta_image_id` in the version tables). `categories.parent` → categories (one); `categories.breadcrumbs[].doc` → categories; `media.folder` → payload-folders (one).
+- `header.navItems[].link.reference`, `footer.navItems[].link.reference` → pages | posts (one). `redirects.to.reference` → pages | posts (one); `form-submissions.form` → forms (one, required); `search.doc` → posts | events (one, required); `search.meta.image` → media (one). `users`, `resources`: no outgoing relations; `faq` only through rich-text links.
 
 ## Hooks that change data or caches
 
@@ -249,8 +244,6 @@ All revalidation hooks skip when `context.disableRevalidate` is set (seed script
 
 ## Field-level access
 
-- `users.role`: create and update `isAdminFieldAccess` (admin only); read `() => true`.
-- `forms.emails`: read `isAdminOrEditorFieldAccess` (overrides the plugin default so recipients and templates stay private even though `forms` is publicly readable).
+- `users.role`: create and update `isAdminFieldAccess` (admin only); read `() => true`. `forms.emails`: read `isAdminOrEditorFieldAccess` (overrides the plugin default so recipients and templates stay private even though `forms` is publicly readable).
 - `posts.populatedAuthors`: update `() => false`. `team-members.email`: read `isAdminOrEditorFieldAccess`, so the public read of `team-members` leaves it out (#140).
-- `form-submissions.senderEmail`, `form-submissions.emailConfirmed`: read `isAdminFieldAccess`, so the answer to a visitor's own submission doesn't say whether the address they typed is confirmed (#183). `form-submissions.retentionHold`, `form-submissions.retentionHoldReason`: create `() => false`; read and update `isAdminFieldAccess` (#274).
-- `payload-mcp-api-keys.user`: create and update `isAdminFieldAccess`, and only `agent` accounts (`filterOptions`); Payload's own key fields allow admin-panel users (#336). No other field sets its own access.
+- `form-submissions.senderEmail`, `form-submissions.emailConfirmed`: read `isAdminFieldAccess`, so the answer to a visitor's own submission doesn't say whether the address they typed is confirmed (#183). `form-submissions.retentionHold`, `form-submissions.retentionHoldReason`: create `() => false`; read and update `isAdminFieldAccess` (#274). `payload-mcp-api-keys.user`: create and update `isAdminFieldAccess`, and only `agent` accounts (`filterOptions`); Payload's own key fields allow admin-panel users (#336). No other field sets its own access.

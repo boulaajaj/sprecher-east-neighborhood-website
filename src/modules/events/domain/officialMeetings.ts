@@ -20,15 +20,23 @@ export function isOfficialBody(value: unknown): value is OfficialBody {
   return OFFICIAL_BODIES.some((body) => body.value === value)
 }
 
+/** Longest agenda link accepted: a generous bound for a real agenda page's address. */
+export const MAX_AGENDA_URL_LENGTH = 2048
+
 /**
  * True for an absolute `https://` link, the only kind an agenda link may be: no `http:`, no
- * `javascript:` or other scheme, no relative path.
+ * `javascript:` or other scheme, no relative path. It is stored as typed, so it must already be
+ * clean: no spaces, tabs or line breaks anywhere (`new URL` would quietly drop them), no user name
+ * or password in it, and at most `MAX_AGENDA_URL_LENGTH` characters.
  */
 export function isAgendaUrl(value: unknown): value is string {
-  if (typeof value !== 'string') return false
+  if (typeof value !== 'string' || value.length > MAX_AGENDA_URL_LENGTH) return false
+  if (/\s/.test(value) || !/^https:\/\//i.test(value)) return false
   try {
     const url = new URL(value)
-    return url.protocol === 'https:' && url.hostname !== ''
+    return (
+      url.protocol === 'https:' && url.hostname !== '' && url.username === '' && url.password === ''
+    )
   } catch {
     return false
   }

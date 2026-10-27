@@ -25,6 +25,7 @@ describe('OFFICIAL_BODIES (#122)', () => {
 describe('validateAgendaUrl (#122)', () => {
   it('accepts a full https link, and a blank one (the link is optional)', () => {
     expect(validateAgendaUrl('https://madison.legistar.com/Calendar.aspx')).toBe(true)
+    expect(validateAgendaUrl('HTTPS://Madison.Legistar.com/Calendar.aspx')).toBe(true)
     expect(validateAgendaUrl(null)).toBe(true)
     expect(validateAgendaUrl(undefined)).toBe(true)
     expect(validateAgendaUrl('')).toBe(true)
@@ -37,6 +38,15 @@ describe('validateAgendaUrl (#122)', () => {
     'madison.legistar.com',
     'https://',
     'ftp://example.com/agenda.pdf',
+    // `new URL` would quietly strip or accept these, but the link is stored as typed
+    ' https://madison.legistar.com/Calendar.aspx',
+    'https://madison.legistar.com/Calendar.aspx ',
+    '\thttps://madison.legistar.com/Calendar.aspx',
+    'https://madison.leg\nistar.com/Calendar.aspx',
+    'https:madison.legistar.com',
+    'https:\\\\madison.legistar.com',
+    'https://user:secret@madison.legistar.com/Calendar.aspx',
+    `https://madison.legistar.com/${'a'.repeat(2048)}`,
   ])('refuses %s with a message the editor can act on', (value) => {
     expect(validateAgendaUrl(value)).toBe('Enter the full agenda link, starting with https://')
     expect(isAgendaUrl(value)).toBe(false)

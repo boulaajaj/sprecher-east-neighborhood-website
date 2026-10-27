@@ -1,6 +1,10 @@
 import type { Field } from 'payload'
 
-import { OFFICIAL_BODIES, validateAgendaUrl } from '../domain/officialMeetings'
+import {
+  MAX_AGENDA_URL_LENGTH,
+  OFFICIAL_BODIES,
+  validateAgendaUrl,
+} from '../domain/officialMeetings'
 
 /**
  * An official meeting's body and agenda link, in the event's details (#122). Both are optional;
@@ -24,6 +28,7 @@ export const officialMeetingFields: Field = {
       name: 'agendaUrl',
       type: 'text',
       label: 'Official agenda link',
+      maxLength: MAX_AGENDA_URL_LENGTH,
       validate: validateAgendaUrl,
       admin: {
         width: '66%',
