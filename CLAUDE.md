@@ -41,5 +41,16 @@ Read the other guidelines (frontend patterns, content marketing, Asana) when a t
   haven't finished after 15 minutes, tell the user.
 - **Subagents:** `.claude/agents/` registers each [role guide](docs/roles/README.md) as a subagent
   Claude Code can delegate to. Those files only hold Claude Code settings; edit the guide.
+- **Hooks** (#446, in `.claude/settings.json`, scripts and tests in `.claude/hooks/`): after each
+  Edit or Write, the file is formatted with Prettier and checked with ESLint in the checkout or
+  worktree that holds it, and an error comes back to fix at once. Before each Bash command, the
+  commands `AGENTS.md` forbids (`--admin`, `bypass_rules: true`, a push to `main`) are refused, and
+  so is a commit whose `src/payload-types.ts` change is only `next dev` reformatting it. CI stays
+  the real gate. Hooks run in local and cloud sessions alike.
+- **Security plugin:** `.claude/settings.json` turns on Anthropic's `security-guidance` plugin,
+  which reviews Claude's changes for security mistakes as it works. Local sessions install it once
+  with `claude plugin install security-guidance@claude-plugins-official --scope project` (it needs
+  Python 3.8+). Cloud sessions don't load plugins a repository turns on, so there CodeQL and the
+  reviews cover it.
 - **Browser and dev server:** `.claude/settings.json` allows the Playwright MCP tools used for
   screenshots, and `.claude/launch.json` starts `npm run dev`.

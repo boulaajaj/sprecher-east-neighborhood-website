@@ -21,7 +21,7 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['src/**/*.test.{ts,tsx}'],
+    include: ['src/**/*.test.{ts,tsx}', '.claude/hooks/**/*.test.mjs'],
     environment: 'node',
     // Every test starts clean: spies, stubbed env vars and stubbed globals are undone after each.
     restoreMocks: true,
