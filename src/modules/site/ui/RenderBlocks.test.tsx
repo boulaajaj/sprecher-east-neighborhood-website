@@ -26,6 +26,7 @@ const components: PageBlockComponents = {
   formBlock: stub('formBlock'),
   mediaBlock: stub('mediaBlock'),
   eventsThisWeek: stub('eventsThisWeek'),
+  topIssues: stub('topIssues'),
 }
 
 // The layout as the page's use case returns it: site's blocks as plain props, the others as stored
@@ -36,6 +37,7 @@ const blocks = [
   { blockType: 'archive', id: 'd', postQuery: {} },
   { blockType: 'formBlock', id: 'e', form: 1, enableIntro: false },
   { blockType: 'eventsThisWeek', id: 'f', heading: 'This week', days: 7, rows: [] },
+  { blockType: 'topIssues', id: 'g', heading: 'Top issues', items: [] },
 ] as PageLayoutBlock[]
 
 const drawn = (container: HTMLElement) =>
@@ -52,6 +54,7 @@ describe('RenderBlocks', () => {
       ['archive', 'd'],
       ['formBlock', 'e'],
       ['eventsThisWeek', 'f'],
+      ['topIssues', 'g'],
     ])
   })
 

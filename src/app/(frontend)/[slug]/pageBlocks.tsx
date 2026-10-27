@@ -2,7 +2,7 @@ import React from 'react'
 
 import { FormBlock } from '@/modules/contact/server'
 import { EventsThisWeek, findEventsThisWeek } from '@/modules/events/server'
-import { findArchivePosts, PostGrid } from '@/modules/news/server'
+import { findArchivePosts, PostGrid, toTopIssues, TopIssuesBlock } from '@/modules/news/server'
 import {
   ArchiveBlock,
   CallToActionBlock,
@@ -29,6 +29,17 @@ const EventsThisWeekWithEvents: PageBlockComponents['eventsThisWeek'] = async ({
   rows,
 }) => <EventsThisWeek {...await findEventsThisWeek({ id, heading, days, rows })} />
 
+/** "Top issues" (#484): news maps the stored block; with no issue left it draws nothing (0013). */
+const TopIssuesFromBlock: PageBlockComponents['topIssues'] = ({
+  id,
+  heading,
+  reviewedAt,
+  items,
+}) => {
+  const props = toTopIssues({ id, heading, reviewedAt, items })
+  return props && <TopIssuesBlock {...props} />
+}
+
 /**
  * The block registry: which module's component draws each page-builder block type. Modules meet
  * here, not in each other (docs/architecture decision 0008).
@@ -42,4 +53,5 @@ export const pageBlocks: PageBlockComponents = {
   // the generated `Form` doesn't match; the page query populates it, as before #135
   formBlock: FormBlock,
   mediaBlock: MediaBlock,
+  topIssues: TopIssuesFromBlock,
 }

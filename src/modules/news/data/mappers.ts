@@ -1,9 +1,17 @@
 import 'server-only'
 
-import type { ArchiveBlock, Post, Search } from '@/payload-types'
+import type { ArchiveBlock, Post, Search, TopIssuesBlock } from '@/payload-types'
 import { documentHref } from '@/platform/payload/documentHref'
 import { toImageRef } from '@/platform/payload/imageRef'
+import { resolveLink } from '@/platform/payload/resolveLink'
 
+import {
+  isSafeHref,
+  TOP_ISSUES_DEFAULT_HEADING,
+  TOP_ISSUES_LIMITS,
+  type TopIssue,
+  type TopIssuesBlockProps,
+} from '../domain/topIssues'
 import type { PostCategory, PostDetail, PostSummary } from '../domain/types'
 
 /** The fields `toPostSummary` reads; queries for summaries select exactly these. */
@@ -110,5 +118,45 @@ export function toSearchResult(
     ),
     description: doc.meta?.description ?? null,
     image: toImageRef(doc.meta?.image),
+  }
+}
+
+type StoredIssue = TopIssuesBlock['items'][number]
+
+/**
+ * One stored issue as it draws, or `null` when it has no title or nowhere safe to go: a post or
+ * page the reader may not see (Payload leaves its id unpopulated) or that was deleted, or a custom
+ * URL that is neither http(s) nor a path on this site.
+ */
+function toTopIssue({ title, summary, link }: StoredIssue): TopIssue | null {
+  const text = title?.trim()
+  const resolved = resolveLink(link)
+  if (!text || !resolved || !isSafeHref(resolved.href)) return null
+  return {
+    title: text,
+    summary: summary?.trim() || null,
+    link: { href: resolved.href, external: resolved.external },
+  }
+}
+
+/**
+ * "Top issues" as it draws (#484), from the stored block: the issues that can be shown, in the
+ * editor's order, at most five. With none left the block draws nothing, so this gives `null`.
+ */
+export function toTopIssuesBlockProps({
+  id,
+  heading,
+  reviewedAt,
+  items,
+}: Pick<TopIssuesBlock, 'id' | 'heading' | 'reviewedAt' | 'items'>): TopIssuesBlockProps | null {
+  const shown = (items ?? [])
+    .flatMap((item) => toTopIssue(item) ?? [])
+    .slice(0, TOP_ISSUES_LIMITS.items.max)
+  if (shown.length === 0) return null
+  return {
+    ...(id && { id }),
+    heading: heading?.trim() || TOP_ISSUES_DEFAULT_HEADING,
+    reviewedAt: reviewedAt ?? null,
+    items: shown,
   }
 }

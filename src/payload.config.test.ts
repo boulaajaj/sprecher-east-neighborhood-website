@@ -95,7 +95,7 @@ describe('posts and events', () => {
 })
 
 describe('the Pages collection', () => {
-  it('offers the site’s blocks, then the contact form and the events strip, in that order', () => {
+  it('offers the site’s blocks, then the contact form, the events strip and top issues, in that order', () => {
     const layout = allFields(collection('pages').fields).find(
       (field) => 'name' in field && field.name === 'layout',
     )
@@ -108,6 +108,7 @@ describe('the Pages collection', () => {
       'archive',
       'formBlock',
       'eventsThisWeek',
+      'topIssues',
     ])
   })
 })

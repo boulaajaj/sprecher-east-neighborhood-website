@@ -3,7 +3,7 @@ import type { ResolvedLink } from '@/platform/lib'
 import { documentHref } from './documentHref'
 
 /**
- * The CMS link field (`src/modules/site/cms/link.ts`) as plain data for `Button` and `Link`: the one place
+ * The CMS link field (`./link.ts`) as plain data for `Button` and `Link`: the one place
  * that turns a reference or a custom URL into an `href`. Typed structurally, so any collection's
  * populated document works and an unpopulated ID resolves to nothing.
  */

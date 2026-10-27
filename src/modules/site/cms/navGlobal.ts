@@ -1,7 +1,7 @@
 import type { GlobalConfig } from 'payload'
 
 import { isAdminOrEditor } from '@/platform/payload/roles'
-import { link } from './link'
+import { link } from '@/platform/payload/link'
 
 import { revalidateGlobal } from './revalidateGlobal'
 

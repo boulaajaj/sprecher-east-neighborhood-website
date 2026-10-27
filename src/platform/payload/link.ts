@@ -14,6 +14,11 @@ export const appearanceOptions: Record<LinkAppearances, { label: string; value: 
   },
 }
 
+/**
+ * The CMS link field: a page or post, or a custom URL, with an optional label and look. Shared by
+ * every module's blocks and globals (site's buttons and nav, news's top issues, #484);
+ * `resolveLink()` turns what it stores into an `href`.
+ */
 type LinkType = (options?: {
   appearances?: LinkAppearances[] | false
   disableLabel?: boolean
@@ -66,12 +71,14 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
     ],
   }
 
-  const linkTypes: Field[] = [
+  // The document or the URL, whichever the type picks; beside the label, half the width each
+  const linkTypes = (width?: string): Field[] => [
     {
       name: 'reference',
       type: 'relationship',
       admin: {
         condition: (_, siblingData) => siblingData?.type === 'reference',
+        ...(width && { width }),
       },
       label: 'Document to link to',
       relationTo: ['pages', 'posts'],
@@ -82,6 +89,7 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
       type: 'text',
       admin: {
         condition: (_, siblingData) => siblingData?.type === 'custom',
+        ...(width && { width }),
       },
       label: 'Custom URL',
       required: true,
@@ -89,18 +97,10 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
   ]
 
   if (!disableLabel) {
-    linkTypes.map((linkType) => ({
-      ...linkType,
-      admin: {
-        ...linkType.admin,
-        width: '50%',
-      },
-    }))
-
     linkResult.fields.push({
       type: 'row',
       fields: [
-        ...linkTypes,
+        ...linkTypes('50%'),
         {
           name: 'label',
           type: 'text',
@@ -113,7 +113,7 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
       ],
     })
   } else {
-    linkResult.fields = [...linkResult.fields, ...linkTypes]
+    linkResult.fields = [...linkResult.fields, ...linkTypes()]
   }
 
   if (appearances !== false) {

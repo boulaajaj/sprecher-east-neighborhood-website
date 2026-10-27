@@ -22,6 +22,7 @@ page or layout in `src/app/` composes them ([0008](../architecture/decisions/000
 | `site`      | `CallToActionBlock` | one look                                        | `CallToActionBlockProps`: `body`, `links` (`ResolvedLink[]`)                                                                            | `Section · brand`, `RichText` (dark scope), `Button · inverse`                                                                                             | `src/modules/site/ui/CallToActionBlock.tsx` (#457; props from `toCallToActionBlockProps`)                                                     | B13        |
 | `site`      | `ArchiveBlock`      | one look                                        | `ArchiveBlockProps`: `id`, `intro`; the posts as children                                                                               | `Section · surface`, the `news` `PostGrid` passed in by `app/`                                                                                             | `src/modules/site/ui/ArchiveBlock.tsx` (#457; posts from `findArchivePosts` in `news` with the block's `postQuery`, passed in by `app/`)      | B16        |
 | `news`      | `PostCard`          | `variant`: `default`, `compact`                 | `post` (`PostSummary`: title, href, date, categories, summary, image)                                                                   | `Card · elevated`, `Media`, `Badge`, `DateTime`                                                                                                            | `PostCard` and `SidebarPosts` in `src/modules/news/ui/`                                                                                       | C1, C2, C8 |
+| `news`      | `TopIssuesBlock`    | one look                                        | `TopIssuesBlockProps`: `heading`, `reviewedAt`, `items` (`{ title, summary, link: { href, external } }[]`, at least one)                | `Section · sm`, `Text · overline`, `Text · section`, `Text · small`, `DateTime`, `Link · inline` (44 px tall)                                              | `src/modules/news/ui/TopIssuesBlock.tsx` (#484; props from `toTopIssues`, which maps with `toTopIssuesBlockProps`, called by `app/`)          | B19        |
 | `events`    | `EventCard`         | `variant`: `featured`, `compact`, `inline`      | `event` (`EventSummary`, with `cancelled` and `officialBody`)                                                                           | `Card · elevated`, `Media`, `DateBadge`, `MetaList`, `Badge`, `Badge · status` (`CancelledBadge`, #122), `Badge · official` (`OfficialMeetingBadge`, #122) | `EventCard` and `SidebarEvents` in `src/modules/events/ui/`                                                                                   | C5–C7      |
 | `events`    | `DateBadge`         | `variant`: `floating`, `plain`, `tinted`        | `date`                                                                                                                                  | —                                                                                                                                                          | `DateBadge` in `EventCard` and a second copy in `SidebarEvents`                                                                               | C9–C11     |
 | `events`    | `EventsThisWeek`    | one look                                        | `EventsThisWeekProps`: `heading`, `rows` (`{ title, events, seeAll }[]`, only rows with events), `allEventsHref`                        | `Section · sm`, `Text · overline`, `Text · section`, `Text · subsection`, `CardGrid`, `EventCard · compact`, `Link · action`, `EmptyState`                 | `src/modules/events/ui/EventsThisWeek.tsx` (#122; props from `findEventsThisWeek`, which maps with `toEventsThisWeekProps`, called by `app/`) | B18        |
@@ -61,8 +62,8 @@ from the epic's list is `FaqList` until a second screen needs one.
 
 ## Coverage
 
-Every element in the inventory maps to exactly one component and variant: 140 elements,
-91 component-variant pairs, 37 components (23 shared, 14 area). `{style}` and
+Every element in the inventory maps to exactly one component and variant: 143 elements,
+95 component-variant pairs, 40 components (24 shared, 16 area). `{style}` and
 `{appearance}` mean the CMS field picks the variant. The table below is generated from the
 element tables by script, so no element is missing and none maps twice.
 
@@ -159,5 +160,6 @@ element tables by script, so no element is missing and none maps twice.
 | ResourceCard · default      | C13                                               |     1 |
 | FaqList · default           | N16                                               |     1 |
 | EventsThisWeek · default    | B18                                               |     1 |
+| TopIssuesBlock · default    | B19                                               |     1 |
 | FormBlock · default         | B17                                               |     1 |
 | TurnstileWidget · default   | F18                                               |     1 |

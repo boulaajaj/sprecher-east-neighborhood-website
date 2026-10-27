@@ -86,11 +86,11 @@ src/
     directory/         FAQ, local resources, team members
     events/            Events and the upcoming rule
     news/              Posts, categories, search
-    site/              CMS pages, page-builder blocks, heroes, header, footer, redirects, link fields
+    site/              CMS pages, page-builder blocks, heroes, header, footer, redirects, link groups
   platform/            Shared by every module; imports no module
     email/             SMTP settings for password-reset and form emails
     lib/               Pure helpers: paging, roles, dates and the site timezone, URLs, `cn`
-    payload/           Role checks, access functions, media collection, default editor, publishedAt hook, admin components
+    payload/           Role checks, access functions, media collection, link field, default editor, publishedAt hook, admin components
     richtext/          The `RichText` renderer, the blocks inside rich text, plain-text conversion
     seo/               Page metadata and Open Graph helpers
     theme/             The theme contract (`tokens.ts`), its Tailwind mapping, theme options and decorations, light and dark mode providers
@@ -116,7 +116,7 @@ src/
 | `src/modules/accounts/cms/users.ts` | Users collection with Payload native auth                                                                           |
 | `src/modules/verification/cms/`     | Email confirmations collection and confirmation service                                                             |
 | `src/platform/payload/media.ts`     | Media uploads with size variants                                                                                    |
-| `src/modules/site/cms/`             | Block, hero and link field configs, globals                                                                         |
+| `src/modules/site/cms/`             | Block, hero and link-group field configs, globals (the link field itself is `src/platform/payload/link.ts`)         |
 | `src/modules/site/ui/`              | Blocks, heroes, header and footer components                                                                        |
 | `src/platform/payload/roles.ts`     | Role checks and access functions                                                                                    |
 | `src/platform/theme/`               | Theme contract and its test, Tailwind mapping, light and dark mode providers and init script                        |
