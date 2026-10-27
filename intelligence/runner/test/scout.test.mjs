@@ -17,7 +17,8 @@ import { atNoon, budgets, contract, evalCases, fakeHttp, grade } from './helpers
 
 const NOT_BUILT = {
   'fetch-fallback': 'the Playwright fallback is not built yet (#364)',
-  duplicate: 'needs an HTML parser for the other source, not built yet (#364)',
+  duplicate:
+    'a blog post is news with no start of its own: matching it to a meeting is verify’s job (#390)',
 }
 
 const { cases, asOf } = evalCases('scout')
@@ -81,6 +82,10 @@ describe('scout', () => {
       'mpl-pinney-events',
       'legistar-matters',
       'madison365-news',
+      'district16-blog',
+      'city-news',
+      'city-public-info-meetings',
+      'wisdot-i39-90-94',
     ])
   })
 

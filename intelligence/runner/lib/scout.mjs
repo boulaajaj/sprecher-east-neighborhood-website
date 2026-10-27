@@ -35,6 +35,8 @@ export function keepItem(source, item, namesArea) {
     return /common council/i.test(item.title) || /public hearing/i.test(text) || namesArea(text)
   }
   if (source.id === 'legistar-matters') return namesArea(text)
+  // City news is citywide: only releases that name the area use the run's model budget (#390)
+  if (source.id === 'city-news') return namesArea(text)
   return true
 }
 
@@ -96,7 +98,8 @@ export async function scoutSource(
   const host = new URL(source.canonicalUrl).hostname.replace(/^www\./, '')
   let items
   try {
-    items = parse(answer.body, { from: today, host }).filter((item) =>
+    // `base` resolves an HTML page's relative links (#390)
+    items = parse(answer.body, { from: today, host, base: source.canonicalUrl }).filter((item) =>
       keepItem(source, item, namesArea),
     )
   } catch (error) {

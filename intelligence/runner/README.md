@@ -40,6 +40,7 @@ only when the run failed; the run log is in Admin → Agents → Agent Runs.
 | `lib/contract.mjs`    | Loads `pipeline.yaml`, `sources.yaml`, `coverage.md`, the prompts and the JSON Schemas   |
 | `lib/fetchSource.mjs` | Direct fetch: ETag and Last-Modified, 3 redirects, one retry, gates, robots.txt          |
 | `lib/parsers.mjs`     | Legistar events and matters (JSON), RSS and Atom; `lib/ics.mjs`: iCalendar via ical.js   |
+| `lib/html.mjs`        | The HTML pages with no feed (#390): City article lists, City meetings, WisDOT meetings   |
 | `lib/scout.mjs`       | Candidates with `externalId`, `contentHash` and `change`; the Legistar area filter       |
 | `lib/model.mjs`       | The model adapter: OpenClaw (`openclaw agent --agent … --json`), or a fake for tests     |
 | `lib/stages.mjs`      | One stage: prompt + coverage + item, schema check, one retry; verify's escalation        |
@@ -49,8 +50,9 @@ only when the run failed; the run log is in Admin → Agents → Agent Runs.
 
 ## Not built yet
 
-- **The Playwright fallback** (#352) and **HTML sources**: no pilot source needs them. A source
-  without a parser is logged as `skipped`, and its evals are skipped in the tests.
+- **The Playwright fallback** (#352): no pilot source needs it. The four HTML sources (#390) are
+  read directly, each by its own parser in `lib/html.mjs`; a source without a parser is logged as
+  `skipped`, and its evals are skipped in the tests.
 - **Cost in dollars**: runs use the owner's flat subscription, so `cost.usd` is 0; token counts
   are logged only if OpenClaw reports them, which its docs don't promise.
 - **A code guard on low verify confidence** after the rerun: curate's prompt sends such items to

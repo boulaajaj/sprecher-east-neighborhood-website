@@ -1,7 +1,7 @@
 # Source registry for the intelligence agents (#271, #352). Summary: sources.md. Only `valid` is
 # polled; `pilotRank` marks the daily pilot; `fetchStrategy` is `direct` unless stated.
 version: 1
-checkedOn: '2026-10-24'
+checkedOn: '2026-10-27'
 sources:
   - id: legistar-events
     name: City of Madison meetings (Legistar API)
@@ -148,21 +148,20 @@ sources:
     scope: The area's alder's weekly meeting highlights and local public meetings
     audiences: [everyone, association-leaders, volunteers]
     reliability: official
-    access: Public web page. No feed link found; email list only.
-    cadence: none
-    lastChecked: '2026-10-24'
-    result: pending
-    pilotRank: null
+    access: Public web page, no feed (#352); parser `parseCityArticles` (#390).
+    cadence: daily
+    lastChecked: '2026-10-27'
+    result: valid
+    pilotRank: 5
     fetchStrategy: direct-then-playwright
     robots:
-      { checked: '2026-10-24', result: allowed, url: https://www.cityofmadison.com/robots.txt }
-    treatment: >-
-      Page parsing approved on #352. A direct GET on 2026-10-24 served the post list in the HTML,
-      newest 2026-10-06. Stays pending until the collector records a parse of a current post.
-    example:
-      title: Data Centers - Public Information Meeting Oct. 27th
-      date: '2026-10-06'
-      url: https://www.cityofmadison.com/council/district16/blog/2026-10-06/data-centers-public-information-meeting-oct-27th
+      &cityRobots {
+        checked: '2026-10-27',
+        result: allowed,
+        url: https://www.cityofmadison.com/robots.txt,
+      }
+    treatment: Every post is kept (the area's own alder); verify reads meetings from the text.
+    example: null
   - id: city-news
     name: City of Madison news releases
     owner: City of Madison
@@ -172,12 +171,52 @@ sources:
     scope: Citywide announcements, road work, services
     audiences: [everyone]
     reliability: official
-    access: Public web page. No feed link found on the news or planning pages; email list only.
-    cadence: none
-    lastChecked: '2026-10-24'
-    result: pending
-    pilotRank: null
-    treatment: Not collected until a feed is found. The old https://www.cityofmadison.com/dpced URL is a page.
+    access: Public web page, no feed; parser `parseCityArticles` (#390).
+    cadence: daily
+    lastChecked: '2026-10-27'
+    result: valid
+    pilotRank: 6
+    robots: *cityRobots
+    treatment: Citywide, so only releases that name the area (area.yaml) go on to a model.
+    example: null
+  - id: city-public-info-meetings
+    name: City of Madison public information meetings
+    owner: City of Madison
+    canonicalUrl: https://www.cityofmadison.com/events/public-information-meetings
+    feedUrl: null
+    format: html
+    scope: Public information meetings from every City agency, Engineering projects included
+    audiences: [everyone, association-leaders]
+    reliability: official
+    access: Public web page, no feed; parser `parseCityEvents` (#390).
+    cadence: daily
+    lastChecked: '2026-10-27'
+    result: valid
+    pilotRank: 7
+    robots: *cityRobots
+    treatment: All kept, with the page's own times and venue; verify and curate decide relevance.
+    example: null
+  - id: wisdot-i39-90-94
+    name: WisDOT I-39/90/94 project news and meetings
+    owner: Wisconsin Department of Transportation
+    canonicalUrl: https://www.i399094project.wisconsindot.gov/news-and-meetings
+    feedUrl: null
+    format: html
+    scope: Meetings for the I-39/90/94 corridor study, along the area's east side
+    audiences: [everyone, association-leaders]
+    reliability: official
+    access: Public web page, no feed; parser `parseWisdotMeetings` (#390).
+    cadence: daily
+    lastChecked: '2026-10-27'
+    result: valid
+    pilotRank: 8
+    robots:
+      {
+        checked: '2026-10-27',
+        result: allowed,
+        url: https://www.i399094project.wisconsindot.gov/robots.txt,
+      }
+    treatment: A time only when the text gives one; meetings elsewhere on the corridor go to verify.
     example: null
   - id: dane-county-press
     name: Dane County press releases
