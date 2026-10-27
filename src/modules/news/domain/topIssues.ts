@@ -32,11 +32,24 @@ export type TopIssuesBlockProps = {
   items: TopIssue[]
 }
 
+/** A base no real address shares: a path that stays on it is a path on this site. */
+const SITE_BASE = 'https://site.invalid'
+
 /**
  * True for an address a top issue may link to: a full http(s) URL, or a path on this site. Other
- * schemes (`javascript:`, `data:`) and protocol-relative `//host` addresses are refused.
+ * schemes (`javascript:`, `data:`) and protocol-relative `//host` addresses are refused. The
+ * address is checked as the browser reads it: it may hold no whitespace or control characters
+ * (browsers drop tabs and line breaks, so `/\t/evil.com` would leave the site), and a path must
+ * resolve on this site.
  */
 export function isSafeHref(href: string): boolean {
-  if (href.startsWith('/')) return !href.startsWith('//') && !href.startsWith('/\\')
-  return isHttpUrl(href)
+  if (/[\s\u0000-\u001f\u007f]/.test(href)) return false
+  if (href.startsWith('/')) {
+    try {
+      return new URL(href, SITE_BASE).origin === SITE_BASE
+    } catch {
+      return false
+    }
+  }
+  return /^https?:\/\//i.test(href) && isHttpUrl(href)
 }

@@ -73,6 +73,13 @@ describe('toTopIssuesBlockProps (#484)', () => {
     'mailto:someone@example.com',
     '//evil.example.com',
     '/\\evil.example.com',
+    // Browsers drop tabs and line breaks, so these would leave the site
+    '/\t/evil.example.com',
+    '/\n/evil.example.com',
+    '/\r\\evil.example.com',
+    // Resolve against the page instead of naming a host
+    'https:evil.example.com',
+    'https:/evil.example.com',
     'not a url',
   ])('drops an issue whose custom URL is %j', (url) => {
     const props = toTopIssuesBlockProps(
