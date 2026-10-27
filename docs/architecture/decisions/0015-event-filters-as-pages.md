@@ -24,10 +24,12 @@ see the filter). Cache Components, which would keep a static shell, aren't turne
   matcher). Next's `redirects` would keep the query string on the new URL, so the proxy does it.
 - **The filters are the categories with published events**, read from the CMS with their counts
   (`findEventFilterMenu`), sorted by title. A slug from a URL or a "Load more" request must have a
-  slug's shape (`isCategorySlug`: `[a-z0-9_-]`, at most 64 characters), checked first, and then be
-  one of those categories. Only the category's id reaches a query.
+  slug's shape (`isCategorySlug`: `[a-z0-9_-]`, at most 64 characters), checked first. A page's slug
+  must then be one of those categories. Only the category's id reaches a query.
 - **"Load more" keeps the filter:** `loadMoreEvents(scope, cursor, category)` takes the slug, or
-  `null` for every event, and refuses anything else.
+  `null` for every event, and refuses anything else. It looks the slug up with one indexed read
+  (`findEventCategoryId`), not the whole filter row, since the action is public and each click is a
+  request of its own.
 - **The filter row sits in a layout** that /events and the category pages share
   (`events/(index)/layout.tsx`). Moving between filters keeps it mounted, so the pressed link keeps
   keyboard focus and its status line, a polite live region, announces the new count.

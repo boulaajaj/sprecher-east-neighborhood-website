@@ -24,6 +24,24 @@ function tally(byScope: Record<EventScope, (number | { id: number })[][]>) {
 }
 
 /**
+ * The id of the category with `slug`, or `null` when there is none: one indexed read, for the
+ * "Load more" action, which must not rebuild the whole filter row on every click (#122).
+ */
+export async function findCategoryIdBySlug(slug: string): Promise<number | null> {
+  const payload = await getPayload({ config: configPromise })
+  const { docs } = await payload.find({
+    collection: 'categories',
+    depth: 0,
+    limit: 1,
+    pagination: false,
+    overrideAccess: false,
+    where: { slug: { equals: slug } },
+    select: { slug: true },
+  })
+  return docs[0]?.id ?? null
+}
+
+/**
  * The filter row of /events (#122): the categories at least one published event has, upcoming or
  * past, sorted by title, with their counts, and the counts of the whole listing. The scopes use the
  * listing's own filter (`inListing`), so the counts match the lists. Events share the category tree

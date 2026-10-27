@@ -60,7 +60,13 @@ export function proxy(request: NextRequest): NextResponse {
     target.searchParams.set('token', pathname.slice(ADMIN_VERIFY_PREFIX.length))
     return NextResponse.redirect(target)
   }
-  if (pathname === '/events') return redirectCategoryQuery(request)
+  // The matcher sends /events here only with a `category` query; checked again so that widening
+  // the matcher can never turn the plain page into a 404
+  if (pathname === '/events') {
+    return request.nextUrl.searchParams.has('category')
+      ? redirectCategoryQuery(request)
+      : NextResponse.next()
+  }
   if (isValidPagingPath(pathname)) return NextResponse.next()
   return new NextResponse('Not found', { status: 404 })
 }

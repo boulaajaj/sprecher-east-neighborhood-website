@@ -99,6 +99,14 @@ describe('proxy', () => {
     },
   )
 
+  it.each(['/events', '/events?utm_source=newsletter'])(
+    'passes %s on to the page when it reaches the proxy',
+    (path) => {
+      const response = proxy(new NextRequest(`https://sprechereast.example${path}`))
+      expect(response.headers.get('x-middleware-next')).toBe('1')
+    },
+  )
+
   it('answers 404 for a malformed category page without rendering it', () => {
     const response = proxy(new NextRequest('https://sprechereast.example/events/category/Civic'))
     expect(response.status).toBe(404)

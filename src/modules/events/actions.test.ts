@@ -5,16 +5,12 @@ const findEventsAfter = vi.hoisted(() =>
 )
 vi.mock('./use-cases/findEventsAfter', () => ({ findEventsAfter }))
 
-const CIVIC = vi.hoisted(() => ({
-  id: 3,
-  slug: 'civic',
-  title: 'Civic',
-  counts: { upcoming: 1, past: 0 },
-}))
-const findEventFilterMenu = vi.hoisted(() =>
-  vi.fn(async () => ({ all: { upcoming: 1, past: 0 }, categories: [CIVIC] })),
+// One category, Civic (id 3); the action looks a slug up directly, never through the whole menu
+const findCategoryIdBySlug = vi.hoisted(() =>
+  vi.fn(async (slug: string) => (slug === 'civic' ? 3 : null)),
 )
-vi.mock('./data/categories', () => ({ findEventFilterMenu }))
+const findEventFilterMenu = vi.hoisted(() => vi.fn())
+vi.mock('./data/categories', () => ({ findCategoryIdBySlug, findEventFilterMenu }))
 
 import { loadMoreEvents } from './actions'
 
@@ -23,6 +19,7 @@ const AFTER = { key: '2026-10-19T00:00:00.000Z', id: 42 }
 
 beforeEach(() => {
   findEventsAfter.mockClear()
+  findCategoryIdBySlug.mockClear()
   findEventFilterMenu.mockClear()
 })
 
@@ -35,12 +32,15 @@ describe('loadMoreEvents', () => {
   it('loads every event when the filter is null', async () => {
     await loadMoreEvents('upcoming', CURSOR, null)
     expect(findEventsAfter).toHaveBeenCalledWith('upcoming', AFTER)
-    expect(findEventFilterMenu).not.toHaveBeenCalled()
+    expect(findCategoryIdBySlug).not.toHaveBeenCalled()
   })
 
-  it('keeps the filter: passes the category found for its slug (#122)', async () => {
+  it('keeps the filter: passes the id of the category found for its slug (#122)', async () => {
     await loadMoreEvents('upcoming', CURSOR, 'civic')
-    expect(findEventsAfter).toHaveBeenCalledWith('upcoming', AFTER, CIVIC)
+    expect(findEventsAfter).toHaveBeenCalledWith('upcoming', AFTER, 3)
+    // One lookup of the slug, not the whole filter row, on every click
+    expect(findCategoryIdBySlug).toHaveBeenCalledOnce()
+    expect(findEventFilterMenu).not.toHaveBeenCalled()
   })
 
   it.each([
@@ -56,7 +56,7 @@ describe('loadMoreEvents', () => {
   })
 
   it.each<[string, unknown]>([
-    ['a slug no category with events has', 'family'],
+    ['a slug no category has', 'family'],
     ['a category id', 3],
     ['a Payload query', { in: [3] }],
     ['an undefined filter sent explicitly as a string', 'undefined'],
@@ -69,6 +69,6 @@ describe('loadMoreEvents', () => {
     await expect(loadMoreEvents('upcoming', CURSOR, 'Civic; drop')).rejects.toThrow(
       'Invalid request',
     )
-    expect(findEventFilterMenu).not.toHaveBeenCalled()
+    expect(findCategoryIdBySlug).not.toHaveBeenCalled()
   })
 })

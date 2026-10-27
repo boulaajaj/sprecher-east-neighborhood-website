@@ -150,6 +150,20 @@ describe('the filter row', () => {
   })
 })
 
+describe('the "Load more" lookup of a filter', () => {
+  it('finds a category by its exact slug, and nothing for any other', async () => {
+    expect(await categories.findCategoryIdBySlug('civic')).toBe(ids.civic)
+    expect(await categories.findCategoryIdBySlug('unused')).toBe(ids.unused)
+    expect(await categories.findCategoryIdBySlug('civ')).toBeNull()
+    expect(await categories.findCategoryIdBySlug('no-such-category')).toBeNull()
+  })
+
+  it('lists nothing for a category without published events', async () => {
+    const { docs } = await queries.findEventPage('upcoming', 1, TODAY, ids.family)
+    expect(docs).toEqual([])
+  })
+})
+
 describe.each<EventScope>(['upcoming', 'past'])('the %s listing of one category', (scope) => {
   it('holds only its published events, with the right count, across "Load more"', async () => {
     const first = await queries.findEventPage(scope, 1, TODAY, ids.civic)

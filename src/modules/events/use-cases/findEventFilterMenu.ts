@@ -29,3 +29,14 @@ export async function findEventCategory(slug: unknown): Promise<EventCategoryFil
   if (!isCategorySlug(slug)) return null
   return findFilter((await findEventFilterMenu()).categories, slug)
 }
+
+/**
+ * The id of the category with `slug`, from a client request ("Load more"), or `null` when the slug
+ * is malformed or no category has it. One indexed read, so a public action can't make each click
+ * rebuild the whole filter row; a category without published events simply lists nothing.
+ */
+export async function findEventCategoryId(slug: unknown): Promise<number | null> {
+  // A malformed slug is refused before any query
+  if (!isCategorySlug(slug)) return null
+  return categories.findCategoryIdBySlug(slug)
+}

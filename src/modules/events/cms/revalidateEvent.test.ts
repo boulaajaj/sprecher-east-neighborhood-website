@@ -1,0 +1,33 @@
+import { existsSync } from 'node:fs'
+import path from 'node:path'
+
+import { describe, expect, it, vi } from 'vitest'
+
+const revalidatePath = vi.hoisted(() => vi.fn())
+vi.mock('next/cache', () => ({ revalidatePath }))
+vi.mock('@/platform/payload/expireCacheTag', () => ({ expireCacheTag: vi.fn() }))
+
+import { revalidateDelete } from './revalidateEvent'
+
+/**
+ * A route pattern passed to `revalidatePath(…, 'page')` names a folder under `src/app`. If the
+ * route moves or a group is renamed, Next refreshes nothing and says nothing, so each pattern must
+ * still point at a real page (#122).
+ */
+describe('revalidateEvent', () => {
+  it('refreshes only route patterns that exist under src/app', () => {
+    const context = {}
+    revalidateDelete({ doc: { slug: 'potluck' }, req: { context } } as unknown as Parameters<
+      typeof revalidateDelete
+    >[0])
+
+    const patterns = revalidatePath.mock.calls
+      .filter(([, type]) => type === 'page')
+      .map(([pattern]) => pattern as string)
+    expect(patterns.length).toBeGreaterThan(0)
+    for (const pattern of patterns) {
+      const file = path.join(process.cwd(), 'src/app', pattern.slice(1), 'page.tsx')
+      expect(existsSync(file), `${pattern} has no page.tsx`).toBe(true)
+    }
+  })
+})
