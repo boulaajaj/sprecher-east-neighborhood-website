@@ -128,9 +128,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      # Node 22: on Node 20 knip exits 13 at random (#455)
       - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
