@@ -7,7 +7,7 @@ Technical patterns for Next.js App Router pages and Tailwind styling in this cod
 The `src/app/(frontend)/[slug]/page.tsx` pattern:
 
 1. `generateStaticParams()` — lists all pages (`listPageSlugs()` from `@/modules/site/server`), returns `{ slug }` array
-2. `Page` component — resolves slug (default `'home'`), fetches page via cached query (`getPageBySlug()`), renders `<RenderHero>` + `<RenderBlocks>`
+2. `Page` component — resolves slug (default `'home'`), fetches page via cached query (`getPageBySlug()`), renders `<PageHero>` (when the page has a hero) + `<RenderBlocks>`
 3. `generateMetadata()` — calls `generateMeta({ doc })` from `src/platform/seo/generateMeta.ts`
 
 All page queries use `cache()` from React to deduplicate fetches between Page and generateMetadata.

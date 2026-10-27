@@ -7,9 +7,10 @@ import { homeStatic } from '@/endpoints/seed/home-static'
 import {
   getPageBySlug,
   listPageSlugs,
+  PageHero,
   PayloadRedirects,
   RenderBlocks,
-  RenderHero,
+  toSiteHero,
 } from '@/modules/site/server'
 import { generateMeta } from '@/platform/seo/generateMeta'
 import { HOME_PAGE_SLUG } from '@/platform/payload/documentHref'
@@ -46,7 +47,9 @@ export default async function Page({ params: paramsPromise }: Args) {
   // Remove the fallback once your website is seeded. The starter home page has no blocks.
   const page =
     (await getPageBySlug(decodedSlug)) ??
-    (slug === HOME_PAGE_SLUG ? { ...homeStatic, layout: [] } : null)
+    (slug === HOME_PAGE_SLUG
+      ? { ...homeStatic, hero: toSiteHero(homeStatic.hero), layout: [] }
+      : null)
 
   if (!page) {
     return <PayloadRedirects url={url} />
@@ -61,7 +64,7 @@ export default async function Page({ params: paramsPromise }: Args) {
 
       {draft && <LivePreviewListener />}
 
-      <RenderHero {...hero} />
+      {hero && <PageHero {...hero} />}
       <RenderBlocks blocks={layout} components={pageBlocks} />
     </article>
   )

@@ -14,15 +14,15 @@ The full list of shared components, with their variants and props, is
 [`docs/ui/component-set.md`](../ui/component-set.md), and the code is in `src/platform/ui/`. This
 table names only the ones used most.
 
-| Component | Path                                 | Usage                                                                                    |
-| --------- | ------------------------------------ | ---------------------------------------------------------------------------------------- |
-| CMSLink   | `src/platform/ui/CMSLink.tsx`        | Internal/external links with reference support                                           |
-| Media     | `src/platform/ui/Media.tsx`          | Image/video rendering with Payload media docs                                            |
-| RichText  | `src/platform/richtext/RichText.tsx` | Renders Lexical rich text content                                                        |
-| PostGrid  | `src/modules/news/ui/PostGrid.tsx`   | Grid display of posts with cards                                                         |
-| Card      | `src/platform/ui/Card.tsx`           | The one card: `elevated`, `outline`, `muted`, `tinted`; parts; `CardGrid` lays cards out |
-| Button    | `src/platform/ui/Button.tsx`         | The one button, `cva` variants (`primary`, `secondary`, `accent`, `ghost`, `inverse`, …) |
-| JsonLd    | `src/platform/ui/JsonLd.tsx`         | Safe JSON-LD structured data (escapes XSS). Always use this.                             |
+| Component  | Path                                 | Usage                                                                                    |
+| ---------- | ------------------------------------ | ---------------------------------------------------------------------------------------- |
+| LinkButton | `src/platform/ui/CMSLink.tsx`        | A resolved CMS link (`ResolvedLink`) as a `Button` in the look the editor chose          |
+| Media      | `src/platform/ui/Media.tsx`          | Image/video rendering with Payload media docs                                            |
+| RichText   | `src/platform/richtext/RichText.tsx` | Renders Lexical rich text content                                                        |
+| PostGrid   | `src/modules/news/ui/PostGrid.tsx`   | Grid display of posts with cards                                                         |
+| Card       | `src/platform/ui/Card.tsx`           | The one card: `elevated`, `outline`, `muted`, `tinted`; parts; `CardGrid` lays cards out |
+| Button     | `src/platform/ui/Button.tsx`         | The one button, `cva` variants (`primary`, `secondary`, `accent`, `ghost`, `inverse`, …) |
+| JsonLd     | `src/platform/ui/JsonLd.tsx`         | Safe JSON-LD structured data (escapes XSS). Always use this.                             |
 
 ## Nav Links
 

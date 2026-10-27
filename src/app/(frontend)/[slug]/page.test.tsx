@@ -18,10 +18,11 @@ vi.mock('@/modules/site/server', () => ({
     site.redirects(props)
     return null
   },
-  RenderHero: (props: unknown) => {
+  PageHero: (props: unknown) => {
     site.hero(props)
     return null
   },
+  toSiteHero: (hero: { type: string }) => ({ mapped: hero.type }),
   RenderBlocks: (props: unknown) => {
     site.blocks(props)
     return null
@@ -39,7 +40,7 @@ const params = (slug?: string) => ({ params: Promise.resolve(slug ? { slug } : {
 
 describe('/[slug]', () => {
   it('draws the page’s hero, then its blocks with the block registry', async () => {
-    const hero = { type: 'lowImpact' }
+    const hero = { variant: 'low', body: { root: {} } }
     const layout = [{ blockType: 'content', id: 'b1' }]
     site.getPageBySlug.mockResolvedValue({ slug: 'about', hero, layout })
 
@@ -60,6 +61,8 @@ describe('/[slug]', () => {
     render(await Page(params()))
 
     expect(site.getPageBySlug).toHaveBeenCalledWith('home')
+    // Its stored hero goes through site's mapper, as a stored page's does
+    expect(site.hero).toHaveBeenCalledWith({ mapped: homeStatic.hero.type })
     expect(site.blocks).toHaveBeenCalledWith(expect.objectContaining({ blocks: homeStatic.layout }))
   })
 
@@ -70,6 +73,14 @@ describe('/[slug]', () => {
 
     expect(site.redirects).toHaveBeenCalledExactlyOnceWith({ url: '/gone' })
     expect(site.blocks).not.toHaveBeenCalled()
+  })
+
+  it('draws no hero when the page has none', async () => {
+    site.getPageBySlug.mockResolvedValue({ slug: 'about', hero: null, layout: [] })
+
+    render(await Page(params('about')))
+
+    expect(site.hero).not.toHaveBeenCalled()
   })
 })
 
