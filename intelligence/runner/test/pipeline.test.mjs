@@ -128,8 +128,9 @@ describe('a run', () => {
     assert.equal(log.counts.deferred, 1)
     assert.equal(log.status, 'partial')
     // The deferred item's source keeps its old ETag, so it is fetched again
+    // (the four HTML pages here have no items, so all four save theirs too, #390)
     const kept = Object.keys(state.sources)
-    assert.equal(kept.length, 3)
+    assert.equal(kept.length, 7)
   })
 
   it('logs a disabled run and fetches nothing when the kill switch is off', async () => {

@@ -39,7 +39,19 @@ describe('when the CMS fails', () => {
     assert.equal(log.status, 'partial')
     assert.equal(log.counts.seen, 0)
     assert.equal(Object.keys(state.seen).length, 0)
-    assert.equal(Object.keys(state.sources).length, 0)
+    // No source with items saves its fetch state; the HTML pages here have none to keep (#390)
+    const withItems = [
+      'legistar-events',
+      'mpl-pinney-events',
+      'legistar-matters',
+      'madison365-news',
+    ]
+    assert.deepEqual(
+      Object.keys(state.sources).filter((id) => withItems.includes(id)),
+      [],
+    )
+    // ...while the four HTML pages, with nothing pending, do
+    assert.equal(Object.keys(state.sources).length, 4)
     assert.ok(cms.writes.some((w) => w.tool === 'updateAgentRuns'))
   })
 

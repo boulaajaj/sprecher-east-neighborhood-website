@@ -177,8 +177,6 @@ cases:
       title: Listening session with Alder O'Brien
       startsAt: 2026-11-12T18:00:00-06:00
       locationText: Pinney Library
-    given:
-      sources: [{ id: district16-blog, result: valid, pilotRank: 5, cadence: daily }]
     expected: { decision: accept, coverage: catchment, route: submitSuggestion }
     graders:
       - check: model

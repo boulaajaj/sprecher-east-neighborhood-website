@@ -29,8 +29,10 @@ Only `valid` sources are ever fetched automatically.
 | Madison365                      | RSS      | valid      | 4     |
 | Spectrum News 1 Madison         | RSS      | valid      | later |
 | Madison Parks events            | HTML     | pending    | no    |
-| District 16 alder blog          | HTML     | pending    | no    |
-| City of Madison news            | HTML     | pending    | no    |
+| District 16 alder blog          | HTML     | valid      | 7     |
+| City of Madison news            | HTML     | valid      | 8     |
+| City public information mtgs    | HTML     | valid      | 6     |
+| WisDOT I-39/90/94 meetings      | HTML     | valid      | 5     |
 | Dane County press releases      | HTML     | restricted | no    |
 | madison.com                     | RSS      | restricted | no    |
 | The Capital Times               | RSS      | invalid    | no    |
@@ -113,8 +115,13 @@ robots rules disallow automated reading (Dane County's subscription page).
   `direct-then-playwright`: public City pages, read logged out once a day, on paths robots.txt
   allows (checked 2026-10-24). A direct GET that day served both lists in the HTML, with item
   links (Parks: Bat Fest, 2026-10-24; blog: newest post 2026-10-06), so no browser was needed.
-  They move to `valid` once the collector (#272) records a parse of a real current item. City
-  news stays `pending` until a feed is found.
+  Parks stays `pending`.
+- **HTML parsers (#390, 2026-10-27):** the District 16 blog, City news, the City's public
+  information meetings and WisDOT's I-39/90/94 meetings page have no feed, so each has a parser
+  for its own list markup (`runner/lib/html.mjs`, with trimmed copies of each page in
+  `runner/test/pages/`). All four are `valid` and polled once a day; robots.txt allows each path
+  (checked 2026-10-27). City news is citywide, so only releases that name the area go on to a
+  model.
 - **Notes from the 2026-10-24 checks** (kept here, out of `sources.yaml`'s line budget): none of
   the first 8 Parks events (October 24 to 29) was at Door Creek Park or Elvehjem Sanctuary;
   Pinney's Book Discussion feed held 8 events, 5 of them from 2026-10-15 to 2026-12-15; Spectrum's
