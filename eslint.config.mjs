@@ -4,6 +4,7 @@ import unusedImports from 'eslint-plugin-unused-imports'
 import eslintConfigPrettier from 'eslint-config-prettier'
 import { boundariesConfig } from './eslint.boundaries.config.mjs'
 import { themeTokensConfig } from './eslint.theme.config.mjs'
+import { uiKitConfig } from './eslint.ui-kit.config.mjs'
 
 export default [
   // ─── 1. Global ignores ───────────────────────────────────────────────────────
@@ -87,6 +88,9 @@ export default [
   // ─── 6. Theme tokens only, no raw colours in classes (#146) ──────────────────
   themeTokensConfig,
 
-  // ─── 7. Prettier must be last ────────────────────────────────────────────────
+  // ─── 7. The UI kit's controls, no raw form elements outside it (#465) ────────
+  uiKitConfig,
+
+  // ─── 8. Prettier must be last ────────────────────────────────────────────────
   eslintConfigPrettier,
 ]

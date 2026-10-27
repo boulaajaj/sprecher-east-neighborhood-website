@@ -123,6 +123,7 @@ src/
 | `ecosystem.config.cjs`              | PM2 config for VPS (CommonJS: package is ESM)                                                                       |
 | `eslint.boundaries.config.mjs`      | Dependency rules as lint errors (#137)                                                                              |
 | `eslint.theme.config.mjs`           | Lint errors for raw colours in classes: components use theme tokens only (#146)                                     |
+| `eslint.ui-kit.config.mjs`          | Lint errors for raw `button`, `input`, `select` and `textarea` outside `src/platform/ui/` (#465)                    |
 | `intelligence/`                     | Intelligence agents: sources, prompts, schemas (#337), and the runner that runs them (`intelligence/runner/`, #364) |
 
 ## Design Tokens
