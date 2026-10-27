@@ -77,6 +77,9 @@ gh api "repos/{owner}/{repo}/stacks?pull_request=<number>" -H 'X-GitHub-Api-Vers
   rollback plan are all spelled out in the PR.
 - **UI changes:** check visually at mobile and desktop widths, in both themes. Check
   accessibility (labels, contrast, focus).
+- **`shared-component` label:** the change reaches every page that uses the changed code. Find
+  those pages (grep the component or helper's imports) and check each one, not only the pages the
+  PR names. Say in the review which pages you checked.
 
 ## 4. Post the review on the PR
 
