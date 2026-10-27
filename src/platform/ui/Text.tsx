@@ -14,7 +14,7 @@ const textVariants = cva('', {
   variants: {
     variant: {
       section: 'text-2xl font-bold text-balance text-foreground',
-      subsection: 'text-xl font-semibold text-balance text-foreground',
+      subsection: 'text-lg font-semibold text-balance text-foreground',
       overline: 'text-xs font-bold tracking-widest text-primary uppercase',
       label: 'text-xs font-bold tracking-widest text-muted-foreground uppercase',
       lead: 'text-lg text-muted-foreground',

@@ -3,6 +3,7 @@ import React from 'react'
 
 import { Link } from '@/platform/ui'
 import { Card } from '@/platform/ui/Card'
+import { Text } from '@/platform/ui/Text'
 
 import type { EventDetail } from '../domain/types'
 
@@ -14,7 +15,9 @@ export const EventLocation: React.FC<{
 
   return (
     <Card as="section" variant="muted" padding="sm" className="mb-8">
-      <h2 className="mb-2 text-base font-semibold">Location</h2>
+      <Text variant="subsection" className="mb-2">
+        Location
+      </Text>
       {locationName && <p>{locationName}</p>}
       {locationAddress && <p className="text-sm text-muted-foreground">{locationAddress}</p>}
       {mapsHref && (
