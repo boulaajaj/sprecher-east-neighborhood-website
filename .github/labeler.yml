@@ -56,3 +56,22 @@ process:
             '.github/workflows/issue-labels.yml',
             '.github/workflows/issue-fix-summary.yml',
           ]
+
+# A "watch out" marker (#447): the change reaches every page that uses this code
+shared-component:
+  - changed-files:
+      - any-glob-to-any-file:
+          [
+            'src/platform/ui/**',
+            'src/platform/richtext/**',
+            'src/platform/theme/**',
+            'src/themes/**',
+            'src/platform/lib/**',
+            'src/platform/turnstile/**',
+            'src/app/(frontend)/globals.css',
+            'src/app/(frontend)/layout.tsx',
+            'src/modules/site/ui/SiteHeader*',
+            'src/modules/site/ui/HeaderNav*',
+            'src/modules/site/ui/SiteFooter*',
+            'src/modules/site/ui/Logo*',
+          ]
