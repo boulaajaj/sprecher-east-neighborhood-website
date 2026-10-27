@@ -106,7 +106,7 @@ the [package rules](../../../docs/guidelines/security.md#before-adding-any-new-p
 ## 6. Before you hand it over
 
 ```bash
-npx tsc --noEmit && npm run lint && npm test
+npx tsc --noEmit && npm run lint && npm test && npm run knip
 ```
 
 Fix new lint warnings in the files you touched, then run [`self-review`](../self-review/SKILL.md)
