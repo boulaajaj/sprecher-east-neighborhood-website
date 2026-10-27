@@ -230,6 +230,7 @@ describe('WisDOT I-39/90/94 meetings', () => {
     )
     assert.ok(keep(meeting('Noise barrier meeting', 'Vote on noise barriers near your home.')))
     assert.ok(keep(meeting('Public meeting', 'Updates on the I-39/90/94 project and US 51.')))
+    assert.ok(keep(meeting('WIS 30 interchange', 'Design options for the WIS 30 interchange.')))
     assert.ok(!keep(meeting('Public meeting', 'Rehabilitation of US 12 in Juneau County.')))
     assert.ok(!keep(meeting('Public hearing', 'Resurfacing County HH near Lyndon Station.')))
   })
@@ -247,7 +248,11 @@ describe('WisDOT I-39/90/94 meetings', () => {
     const [unsure] = parseWisdotMeetings(box(10, 'Virtual meeting') + twoSentences, base)
     assert.equal(unsure.startsAt, null)
 
-    const twoBoxes = box(10, 'Open house') + box(10, 'Hearing') + said(10, '5:30 p.m.')
+    // The same day written two ways is still two boxes on one day
+    const twoBoxes =
+      box(10, 'Open house') +
+      box(10, 'Hearing').replace('november 10, 2026', 'November 10,2026') +
+      said(10, '5:30 p.m.')
     assert.deepEqual(
       parseWisdotMeetings(twoBoxes, base).map((m) => m.startsAt),
       [null, null],

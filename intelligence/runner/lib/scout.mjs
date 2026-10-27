@@ -41,7 +41,7 @@ export function keepItem(source, item, namesArea) {
   // names another road and neither the corridor nor the area stays out; the rest go on (#390)
   if (source.id === 'wisdot-i39-90-94') {
     const otherRoad = /\b(?:US|USH|WIS|STH|CTH|County|Highway)\s+[A-Z0-9]{1,3}\b/.test(text)
-    const corridor = /\bI-?(?:39|90|94)\b|\binterstate\b|\bcorridor\b/i.test(text)
+    const corridor = /\bI-?(?:39|90|94)\b|\binterstate\b|\bcorridor\b|\binterchange\b/i.test(text)
     return !otherRoad || corridor || namesArea(text)
   }
   return true

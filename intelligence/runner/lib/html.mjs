@@ -190,9 +190,15 @@ function clockOnPage(pageText, { year, month, day }) {
 export function parseWisdotMeetings(body, { base, from }) {
   const $ = load(body)
   const pageText = collapse($('body').text())
+  // Each box's day as `YYYY-MM-DD` (or its text when it has no day), so two boxes that write the
+  // same day differently still count as one day
+  const dayKey = (text) => {
+    const date = dateOf(text)
+    return date?.day ? lastDayOf(date) : collapse(text).toLowerCase()
+  }
   const boxDays = $('.subhead-small-pim')
     .toArray()
-    .map((el) => collapse($(el).text()).toLowerCase())
+    .map((el) => dayKey($(el).text()))
   return $('.subhead-small-pim')
     .toArray()
     .map((el) => {
@@ -211,7 +217,7 @@ export function parseWisdotMeetings(body, { base, from }) {
       const date = dateOf(dateText)
       if (date && from && lastDayOf(date) < from) return null
       // The page's own sentence counts only when no other box has the same day
-      const onlyBox = boxDays.filter((d) => d === dateText.toLowerCase()).length === 1
+      const onlyBox = boxDays.filter((d) => d === dayKey(dateText)).length === 1
       const clock = date?.day
         ? (clockIn(text) ?? (onlyBox ? clockOnPage(pageText, date) : null))
         : null
