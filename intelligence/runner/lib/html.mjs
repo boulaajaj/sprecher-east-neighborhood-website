@@ -202,12 +202,10 @@ export function parseWisdotMeetings(body, { base, from }) {
       const dateNote = startsAt
         ? null
         : `Date given as "${dateText}"; the page's listing gives no time`
-      const slug = `${dateText} ${title}`
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '')
       return {
-        ownId: slug.slice(0, 120),
+        // A dated meeting's id is its day, so a retitled meeting stays the same item; the title is
+        // added below only when two meetings share a day, or the date has no day
+        ownId: date?.day ? lastDayOf(date) : slugOf(`${dateText} ${title}`),
         kind: 'meeting',
         title: title || 'Public meeting',
         sourceText: toSourceText([dateNote, text].filter(Boolean).join('. ')),
@@ -221,4 +219,16 @@ export function parseWisdotMeetings(body, { base, from }) {
       }
     })
     .filter((item) => item?.ownId)
+    .map((item, _, all) =>
+      all.filter((other) => other.ownId === item.ownId).length > 1
+        ? { ...item, ownId: `${item.ownId}-${slugOf(item.title)}` }
+        : item,
+    )
 }
+
+const slugOf = (text) =>
+  text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 120)

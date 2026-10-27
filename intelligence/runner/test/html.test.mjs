@@ -176,6 +176,31 @@ describe('WisDOT I-39/90/94 meetings', () => {
     )
   })
 
+  it('keys a dated meeting on its day, so a new title is the same item (an update)', () => {
+    const before = parse('wisdot-i39-90-94', 'wisdot-news-and-meetings.html')
+    const retitled = parseWisdotMeetings(
+      page('wisdot-news-and-meetings.html').replace(
+        'Corridor-wide Virtual Public Meeting',
+        'Corridor-wide Virtual Public Information Meeting',
+      ),
+      { base: source('wisdot-i39-90-94').canonicalUrl },
+    )
+
+    assert.equal(before[0].ownId, '2026-11-10')
+    assert.equal(retitled[0].ownId, before[0].ownId)
+    assert.equal(before[2].ownId, 'august-2026-noise-barrier-public-meeting')
+  })
+
+  it('tells two meetings on the same day apart by their titles', () => {
+    const box = (title) =>
+      `<div><h1 class="subhead-small-pim">november 10, 2026</h1><h1>${title}</h1><p>At 6 p.m.</p></div>`
+    const ids = parseWisdotMeetings(box('Open house') + box('Hearing'), {
+      base: 'https://x.gov/',
+    }).map((m) => m.ownId)
+
+    assert.deepEqual(ids, ['2026-11-10-open-house', '2026-11-10-hearing'])
+  })
+
   it('answers no items for a page without meeting boxes', () => {
     assert.deepEqual(parseWisdotMeetings('<h1>News</h1>', { base: 'https://x.gov/' }), [])
     assert.deepEqual(parseCityEvents('<h1>Events</h1>', { base: 'https://x.gov/' }), [])
