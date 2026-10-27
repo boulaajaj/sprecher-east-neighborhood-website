@@ -176,9 +176,9 @@ because a rolled-back change means plain HTTP to the IP may still reach sign-in 
 the gap the owner asked to close (#235). A green run would hide it until someone happened to read
 a warning. Each later deploy retries it, so the red goes away as soon as the fix is in.
 
-**Rollout.** The max-age is the one value in `caddy/hsts.caddy`: 300 (5 minutes) now, then
-86400 (1 day), then 31536000 (1 year), each after a day without problems, each a one-line pull
-request. **To undo HSTS,** set `max-age=0` in that file and keep it for at least the longest
+**Rollout.** The max-age is the one value in `caddy/hsts.caddy`: 300 (5 minutes) first, then
+86400 (1 day, now), then 31536000 (1 year), each after a day without problems, each a one-line
+pull request. **To undo HSTS,** set `max-age=0` in that file and keep it for at least the longest
 max-age that was live, so browsers forget the rule. Removing the import alone leaves browsers
 following it until it expires. **To undo the IP redirect,** revert the pull request that added
 it, then on the server delete the `redir https://<domain>{uri} 308` lines and run
