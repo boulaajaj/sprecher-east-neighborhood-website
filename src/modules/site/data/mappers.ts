@@ -8,6 +8,7 @@ import type {
   MediaBlock,
   Page,
 } from '@/payload-types'
+import { toImageRef } from '@/platform/payload/imageRef'
 import { resolveLink } from '@/platform/payload/resolveLink'
 
 import type {
@@ -18,6 +19,7 @@ import type {
   ContentColumn,
   ContentLayout,
 } from '../domain/blocks'
+import type { PageHeroProps } from '../domain/hero'
 
 type StoredColumn = NonNullable<ContentBlock['columns']>[number]
 type StoredSize = StoredColumn['size']
@@ -129,4 +131,27 @@ export function toPageLayout(layout: Page['layout']): PageLayoutBlock[] {
         return []
     }
   })
+}
+
+const HERO_VARIANTS = { highImpact: 'high', mediumImpact: 'medium', lowImpact: 'low' } as const
+
+/**
+ * A page's hero as plain props, or `null` when it draws nothing: type `none`, or a hero with no
+ * text, image or links. The low hero draws its text only, so it needs text.
+ */
+export function toPageHeroProps({
+  type,
+  richText,
+  media,
+  links,
+}: Page['hero']): PageHeroProps | null {
+  if (type === 'none') return null
+  const body = richText ?? undefined
+  const variant = HERO_VARIANTS[type]
+  if (variant === 'low') return body ? { variant, body } : null
+
+  const image = toImageRef(media) ?? undefined
+  const resolved = (links ?? []).flatMap(({ link }) => resolveLink(link) ?? [])
+  if (!body && !image && resolved.length === 0) return null
+  return { variant, ...(body && { body }), ...(image && { image }), links: resolved }
 }

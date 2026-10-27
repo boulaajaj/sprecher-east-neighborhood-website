@@ -48,11 +48,11 @@ text (`src/platform/richtext/`): `banner`, `code`, `mediaBlock`.
 
 Hero components live in `src/modules/site/ui/`. Four types: `highImpact`, `mediumImpact`, `lowImpact`, `none`.
 
-`src/modules/site/ui/RenderHero.tsx` maps the `type` field to the correct component. Hero config fields are defined in `src/modules/site/cms/hero.ts` as a reusable field group.
+`toPageHeroProps` in `src/modules/site/data/mappers.ts` maps the `type` field and the hero's fields to `PageHeroProps` (`src/modules/site/domain/hero.ts`, [decision 0013](../architecture/decisions/0013-cms-content-through-mappers.md)), and `getPageBySlug` returns the hero mapped. Hero config fields are defined in `src/modules/site/cms/hero.ts` as a reusable field group.
 
 **Two kinds of hero components:**
 
-- **CMS heroes** (`HighImpactHero`, `MediumImpactHero`, `LowImpactHero`) — registered in the `src/modules/site/cms/hero.ts` type selector and wired through `RenderHero.tsx`. Used by Pages via the layout builder.
+- **CMS heroes** (`PageHero` in `src/modules/site/ui/PageHero.tsx`, variants `high`, `medium`, `low`) — chosen with the `src/modules/site/cms/hero.ts` type selector; the page draws `PageHero` with the mapped props. Used by Pages via the layout builder.
 - **Standalone heroes** (`PostHero` in `src/modules/news/ui/`, `EventHero` in `src/modules/events/ui/`) — used directly by their detail pages, NOT registered in the CMS hero config. These are hardcoded per-collection detail pages and don't need CMS selection.
 
 ## Hooks

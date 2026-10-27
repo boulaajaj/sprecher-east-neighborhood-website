@@ -95,7 +95,7 @@ src/
     seo/               Page metadata and Open Graph helpers
     theme/             The theme contract (`tokens.ts`), its Tailwind mapping, theme options and decorations, light and dark mode providers
     turnstile/         The robot check (Cloudflare Turnstile): widget and server verifier
-    ui/                The UI kit: `Button`, `Link`, `Media`, `CMSLink`, `JsonLd`, `Breadcrumbs`, `LoadMore`…
+    ui/                The UI kit: `Button`, `Link`, `Media`, `LinkButton`, `JsonLd`, `Breadcrumbs`, `LoadMore`…
   endpoints/seed/      Seed data and script (exception)
   migrations/          Database migrations (generated)
   payload.config.ts    CMS composition: collections, globals, plugins
