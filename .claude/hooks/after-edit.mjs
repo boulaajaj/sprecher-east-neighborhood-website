@@ -1,36 +1,28 @@
 #!/usr/bin/env node
 // PostToolUse hook on Edit, Write and MultiEdit (#446): formats the file Claude just changed and
-// lints it, the same commands lint-staged runs at commit time. A lint error goes back to Claude
-// (exit 2) so it fixes it now, not at the commit. It never undoes the edit.
-import { spawnSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+// lints it, the same commands lint-staged runs at commit time, in the checkout (or worktree) that
+// holds the file. A lint error goes back to Claude (exit 2) so it fixes it now, not at the commit.
+// It never undoes the edit, and it does nothing before `npm install`.
 import path from 'node:path'
 
+import { readInput, repoRoot, runTool } from './io.mjs'
 import { shouldFormat, shouldLint } from './rules.mjs'
 
-const input = JSON.parse(readFileSync(0, 'utf8') || '{}')
-const root = process.env.CLAUDE_PROJECT_DIR || process.cwd()
+const input = readInput()
 const file = input?.tool_input?.file_path
-if (!file) process.exit(0)
+if (typeof file !== 'string' || !file) process.exit(0)
 
-const relative = path.relative(root, path.resolve(root, file))
-// Only files inside this repo, outside node_modules
-if (relative.startsWith('..') || path.isAbsolute(relative) || relative.includes('node_modules')) {
-  process.exit(0)
-}
+const absolute = path.resolve(input.cwd || process.cwd(), file)
+const root = repoRoot(path.dirname(absolute))
+if (!root) process.exit(0)
+const relative = path.relative(root, absolute)
+if (relative.startsWith('..') || relative.split(path.sep).includes('node_modules')) process.exit(0)
 
-const run = (args) =>
-  spawnSync('npx', ['--no-install', ...args], {
-    cwd: root,
-    encoding: 'utf8',
-    shell: process.platform === 'win32',
-  })
-
-if (shouldFormat(relative)) run(['prettier', '--write', '--ignore-unknown', relative])
+if (shouldFormat(relative)) runTool(root, 'prettier', ['--write', '--ignore-unknown', relative])
 
 if (shouldLint(relative)) {
-  const lint = run(['eslint', '--fix', '--no-warn-ignored', relative])
-  if (lint.status !== 0) {
+  const lint = runTool(root, 'eslint', ['--fix', '--no-warn-ignored', relative])
+  if (lint && lint.status !== 0) {
     process.stderr.write(
       `ESLint found problems in ${relative}; fix them now:\n${lint.stdout}${lint.stderr}`,
     )
