@@ -67,4 +67,11 @@ shared-component:
             'src/platform/theme/**',
             'src/themes/**',
             'src/platform/lib/**',
+            'src/platform/turnstile/**',
+            'src/app/(frontend)/globals.css',
+            'src/app/(frontend)/layout.tsx',
+            'src/modules/site/ui/SiteHeader*',
+            'src/modules/site/ui/HeaderNav*',
+            'src/modules/site/ui/SiteFooter*',
+            'src/modules/site/ui/Logo*',
           ]

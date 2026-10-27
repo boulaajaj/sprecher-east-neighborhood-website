@@ -47,9 +47,10 @@ The allowed labels are in [`.github/label-policy.json`](../../.github/label-poli
     `needs owner` issue is listed in the checklist of the owner-actions epic (#169); its parent
     stays the epic it belongs to. The issues that depend on it are marked **blocked by** it, so
     nobody starts them too early.
-  - `shared-component`: a "watch out" flag on a PR that changes shared code many pages use
-    (`src/platform/ui/`, `richtext/`, `theme/`, `lib/`, `src/themes/`). The labeler sets it from the
-    changed paths (#447); its reviewer checks every page that uses the changed code.
+  - `shared-component`: a "watch out" flag on a PR that changes shared code many pages use:
+    `src/platform/` (`ui/`, `richtext/`, `theme/`, `lib/`, `turnstile/`), `src/themes/`, the
+    frontend layout and `globals.css`, and the site header, nav, footer and logo. The labeler sets
+    it from the changed paths (#447); its reviewer checks every page that uses the changed code.
 
 ### Waits for owner
 
