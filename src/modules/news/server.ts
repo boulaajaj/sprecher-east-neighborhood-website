@@ -11,7 +11,7 @@ export { listPostSlugs } from './use-cases/listPostSlugs'
 
 export { PostGrid } from './ui/PostGrid'
 export { PostCardPreview } from './ui/PostCardPreview'
-export { PostHero } from './ui/PostHero'
+export { postHeaderProps } from './ui/postHeader'
 export { postJsonLd } from './ui/postJsonLd'
 export { PostsFeed } from './ui/PostsFeed.client'
 export { SearchBox } from './ui/SearchBox.client'

@@ -16,12 +16,14 @@ import {
   getPostBySlug,
   listPostSlugs,
   PostCardPreview,
-  PostHero,
+  postHeaderProps,
   postJsonLd,
   SidebarPosts,
 } from '@/modules/news/server'
 import { generateMeta } from '@/platform/seo/generateMeta'
 import { DetailLayout } from '@/platform/ui/DetailLayout'
+import { PageHeader } from '@/platform/ui/PageHeader'
+import { cn } from '@/platform/lib/cn'
 
 // A scheduled publish or unpublish runs outside a request, where Next can't refresh the cache, so
 // the page also re-renders every 10 minutes (#141, decision 0011)
@@ -60,7 +62,8 @@ export default async function Post({ params: paramsPromise }: Args) {
   ])
 
   return (
-    <article className="pt-16 pb-16">
+    // Without a photo the header is plain, so it keeps clear of the site header (#461)
+    <article className={cn('pb-16', post.heroImage ? 'pt-16' : 'pt-32')}>
       <JsonLd data={postJsonLd(post)} />
 
       {/* Allows redirects for valid pages too */}
@@ -68,11 +71,11 @@ export default async function Post({ params: paramsPromise }: Args) {
 
       {draft && <LivePreviewListener />}
 
-      <PostHero post={post} />
+      <PageHeader {...postHeaderProps(post)} />
 
       {draft && <PostCardPreview post={post} />}
 
-      <div className="pt-8">
+      <div className={cn(post.heroImage && 'pt-8')}>
         <div className="container">
           <Breadcrumbs
             items={[

@@ -15,7 +15,7 @@ vi.mock('@/modules/news/server', () => ({
   findRecentPosts: async () => [],
   getPostBySlug: mocks.getPostBySlug,
   listPostSlugs: async () => [],
-  PostHero: () => null,
+  postHeaderProps: () => ({ title: 'Park cleanup' }),
   postJsonLd: () => ({}),
   SidebarPosts: () => null,
 }))

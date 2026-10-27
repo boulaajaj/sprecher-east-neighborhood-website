@@ -2,10 +2,30 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 
+import type { ImageRef } from '@/platform/lib/content'
+
+import { Badge } from './Badge'
 import { PageHeader } from './PageHeader'
 import { expectAccessible } from './testing/expectAccessible'
 
 afterEach(cleanup)
+
+const photo = {
+  id: 1,
+  alt: 'Volunteers planting trees in the park',
+  url: '/api/media/file/park.webp',
+  width: 1600,
+  height: 900,
+  mimeType: 'image/webp',
+  credit: 'Jane Doe',
+  updatedAt: '2026-10-01T12:00:00.000Z',
+  createdAt: '2026-10-01T12:00:00.000Z',
+} as ImageRef
+
+const facts = [
+  { label: 'Date', value: 'Tue, Mar 3, 2026' },
+  { label: 'Format', value: 'In person' },
+]
 
 describe('PageHeader', () => {
   it("draws the page's one h1 with its eyebrow and description, with no accessibility violations", async () => {
@@ -66,5 +86,64 @@ describe('PageHeader', () => {
   it('takes no eyebrow, way back or control in the compact variant', () => {
     // @ts-expect-error A compact header is title and description only
     render(<PageHeader variant="compact" title="Log In" eyebrow="Account" />)
+  })
+
+  it('puts the title and facts on the photo, which loads first, with its credit (#461)', async () => {
+    const { container } = render(
+      <main>
+        <PageHeader
+          variant="image"
+          image={photo}
+          eyebrow={<Badge variant="on-image">Parks</Badge>}
+          title="Park cleanup"
+          facts={facts}
+        />
+      </main>,
+    )
+
+    const title = screen.getByRole('heading', { level: 1 })
+    expect(title.className).toContain('text-on-image')
+    expect(title.className).toContain('font-bold')
+    const image = screen.getByRole('img', { name: photo.alt ?? '' })
+    // `priority`: next/image preloads it and never lazy-loads it
+    expect(image.getAttribute('loading')).not.toBe('lazy')
+    expect(container.querySelector('[class*="from-scrim"]')).not.toBeNull()
+    expect(screen.getByText('Date').closest('dl')?.className).toContain('text-on-image')
+    expect(screen.getByText('Parks').className).toContain('bg-scrim/60')
+    expect(screen.getByText(/Jane Doe/)).toBeTruthy()
+    await expectAccessible(container)
+  })
+
+  it('draws a photo header with no facts or eyebrow', async () => {
+    const { container } = render(
+      <main>
+        <PageHeader variant="image" image={photo} title="Park cleanup" />
+      </main>,
+    )
+
+    expect(container.querySelector('dl')).toBeNull()
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Park cleanup')
+    await expectAccessible(container)
+  })
+
+  it('shows facts as a plain inline row on a header without a photo', async () => {
+    const { container } = render(
+      <main>
+        <PageHeader eyebrow={<Badge>Parks</Badge>} title="Park cleanup" facts={facts} />
+      </main>,
+    )
+
+    const list = screen.getByText('Date').closest('dl')
+    expect(list?.className).toContain('text-muted-foreground')
+    expect(screen.getByText('In person').tagName).toBe('DD')
+    // A badge eyebrow keeps its own look: no uppercase overline around it
+    expect(screen.getByText('Parks').parentElement?.className).not.toContain('uppercase')
+    expect(container.querySelector('img')).toBeNull()
+    await expectAccessible(container)
+  })
+
+  it('takes no description or control on a photo header', () => {
+    // @ts-expect-error The photo header shows title, eyebrow and facts only
+    render(<PageHeader variant="image" image={photo} title="Park cleanup" description="No" />)
   })
 })
