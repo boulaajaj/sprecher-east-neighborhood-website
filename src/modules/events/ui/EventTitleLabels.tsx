@@ -3,7 +3,7 @@ import React from 'react'
 import { cn } from '@/platform/lib/cn'
 
 import type { EventSummary } from '../domain/types'
-import { CancelledBadge } from './CancelledBadge'
+import { CancelledBadge } from '@/platform/ui/CancelledBadge'
 import { OfficialMeetingBadge } from './OfficialMeetingBadge'
 
 /**

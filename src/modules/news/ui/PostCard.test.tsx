@@ -42,3 +42,23 @@ describe('PostCard source line (#483)', () => {
     await expectAccessible(container)
   })
 })
+
+describe('PostCard Cancelled label (#471)', () => {
+  it('marks a cancelled event in search results inside its title link', async () => {
+    const event = { ...post, href: '/events/plan-commission', title: 'Plan Commission' }
+    const { container } = render(
+      <PostCard post={{ ...event, cancelled: true }} headingLevel="h2" />,
+    )
+
+    expect(screen.getByRole('link', { name: 'Cancelled: Plan Commission' })).toBeTruthy()
+    expect(screen.getAllByRole('link')).toHaveLength(1)
+    await expectAccessible(container)
+  })
+
+  it('shows no label otherwise', () => {
+    render(<PostCard post={post} />)
+
+    expect(screen.queryByText('Cancelled')).toBeNull()
+    expect(screen.getByRole('link', { name: 'Council recap' })).toBeTruthy()
+  })
+})

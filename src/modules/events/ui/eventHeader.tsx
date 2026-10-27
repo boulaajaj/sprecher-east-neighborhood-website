@@ -9,7 +9,7 @@ import type { PageHeaderProps } from '@/platform/ui/PageHeader'
 import { formatEventLocationType } from '../domain/locationTypes'
 import { formatOfficialBody } from '../domain/officialMeetings'
 import type { EventDetail } from '../domain/types'
-import { CancelledBadge } from './CancelledBadge'
+import { CancelledBadge } from '@/platform/ui/CancelledBadge'
 import { OfficialMeetingBadge } from './OfficialMeetingBadge'
 
 /**

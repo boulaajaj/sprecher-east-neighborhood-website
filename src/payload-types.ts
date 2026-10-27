@@ -1338,6 +1338,9 @@ export interface Search {
     description?: string | null
     image?: (number | null) | Media
   }
+  cancelled?: boolean | null
+  sourceName?: string | null
+  sourceUrl?: string | null
   categories?:
     | {
         relationTo?: string | null
@@ -2410,6 +2413,9 @@ export interface SearchSelect<T extends boolean = true> {
         description?: T
         image?: T
       }
+  cancelled?: T
+  sourceName?: T
+  sourceUrl?: T
   categories?:
     | T
     | {

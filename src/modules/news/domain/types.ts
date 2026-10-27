@@ -30,6 +30,8 @@ export type PostSummary = {
   image: ImageRef | null
   /** Where the news came from, or `null` for the site's own posts */
   source: PostSource | null
+  /** True only for a cancelled event in search results, which cards mark "Cancelled" (#471) */
+  cancelled?: boolean
 }
 
 /** Everything the post page shows, including its search-engine fields. */

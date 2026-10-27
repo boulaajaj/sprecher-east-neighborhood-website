@@ -111,6 +111,9 @@ export const SEARCH_RESULT_FIELDS = {
   slug: true,
   categories: true,
   meta: true,
+  cancelled: true,
+  sourceName: true,
+  sourceUrl: true,
 } as const
 
 /**
@@ -136,8 +139,8 @@ export function toSearchResult(
     ),
     description: doc.meta?.description ?? null,
     image: toImageRef(doc.meta?.image),
-    // The search plugin copies no source
-    source: null,
+    source: toPostSource(doc.sourceName, doc.sourceUrl),
+    cancelled: doc.cancelled === true,
   }
 }
 

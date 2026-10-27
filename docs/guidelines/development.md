@@ -82,7 +82,7 @@ The search order:
 
 1. **Shared utilities** (`src/platform/lib/`, `src/platform/seo/`) — URL handling, metadata, formatting, data transforms
 2. **Shared components** (`src/platform/ui/`, `src/platform/richtext/`) — UI rendering, links, media, rich text, structured data
-3. **Reusable field configs** (`src/modules/site/cms/`, and Payload's `slugField()`) — slug, link, hero field groups
+3. **Reusable field configs** (`src/platform/payload/link.ts`, `src/modules/site/cms/`, and Payload's `slugField()`) — slug, link, hero field groups
 4. **Access control helpers** (`src/platform/payload/`) — auth and permission checks
 
 If no abstraction exists for a pattern you need more than once, **create one first** as a shared utility or component, then use it everywhere. Never copy-paste logic between files.

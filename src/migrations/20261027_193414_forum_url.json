@@ -8818,6 +8818,28 @@
           "notNull": false,
           "autoincrement": false
         },
+        "cancelled": {
+          "name": "cancelled",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "source_name": {
+          "name": "source_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "updated_at": {
           "name": "updated_at",
           "type": "text",
@@ -10795,6 +10817,6 @@
   "internal": {
     "indexes": {}
   },
-  "id": "497014ab-f342-48ca-961b-0deec79f7514",
+  "id": "2f376e92-6907-4fe1-bb25-5df57f4a639e",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

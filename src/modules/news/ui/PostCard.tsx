@@ -2,6 +2,7 @@ import React from 'react'
 
 import { Media } from '@/platform/ui/Media'
 import { Badge } from '@/platform/ui/Badge'
+import { CancelledBadge } from '@/platform/ui/CancelledBadge'
 import { Card, CardBody, CardMedia, CardMeta, CardTitle } from '@/platform/ui/Card'
 import { DateTime } from '@/platform/ui/DateTime'
 import { Text } from '@/platform/ui/Text'
@@ -18,7 +19,7 @@ export const PostCard: React.FC<{
   /** `h2` where nothing on the page heads the list (`/posts`, search) */
   headingLevel?: 'h2' | 'h3'
 }> = ({ post, headingLevel = 'h3' }) => {
-  const { href, categories, description, image, publishedAt, source, title } = post
+  const { href, cancelled, categories, description, image, publishedAt, source, title } = post
 
   const hasCategories = categories.length > 0
   const sanitizedDescription = description?.replace(/\u00A0/g, ' ') // non-breaking spaces to spaces
@@ -63,6 +64,15 @@ export const PostCard: React.FC<{
         )}
         {title && (
           <CardTitle as={headingLevel} href={href}>
+            {/* Inside the title's link, so it reads "Cancelled: <title>", as event cards do (#471) */}
+            {cancelled && (
+              <>
+                <span className="mb-1.5 flex">
+                  <CancelledBadge />
+                </span>
+                <span className="sr-only">:</span>{' '}
+              </>
+            )}
             {title}
           </CardTitle>
         )}
