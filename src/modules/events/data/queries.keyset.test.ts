@@ -23,10 +23,10 @@ const day = (offset: number) => new Date(Date.parse(TODAY) + offset * DAY_MS).to
 
 // 22 upcoming events (12 a page): six share day +10, at positions 10 to 15, across the end of
 // page 1. 22 past events (9 a page): six share day -8, at positions 7 to 12, across page 1's end.
+// Each list also holds an event one day outside the other (day 0 is upcoming, day -1 is past).
 const UPCOMING_DAYS = [0, 1, 2, 3, 4, 5, 6, 7, 8, ...Array(6).fill(10), 11, 12, 13, 14, 15, 16, 17]
 const PAST_DAYS = [-1, -2, -3, -4, -5, -6, ...Array(6).fill(-8), -9, -10, -11, -12, -13, -14, -15]
   .concat([-16, -17, -18])
-// Each list also holds an event one day outside the other (day 0 is upcoming, day -1 is past)
 
 // Drafts that stay drafts, where the loads after page 1 run: on a shared day and on its own
 const DRAFT_DAYS = [10, 13, -8, -13]
@@ -133,6 +133,7 @@ describe.each<EventScope>(['upcoming', 'past'])('the %s events listing', (scope)
     const { docs } = await queries.findEventsAfter(scope, outside, TODAY)
     const listing = await listingNow(scope)
 
+    expect(docs.length).toBeGreaterThan(0)
     expect(docs.map((doc) => doc.id)).toEqual(listing.slice(0, docs.length))
   })
 
