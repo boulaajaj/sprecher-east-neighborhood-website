@@ -1,7 +1,7 @@
 import { CircleX } from 'lucide-react'
 import React from 'react'
 
-import { Badge } from '@/platform/ui/Badge'
+import { Badge } from './Badge'
 
 /**
  * The "Cancelled" label of a cancelled event (#122), wherever the event shows. The word says it,
