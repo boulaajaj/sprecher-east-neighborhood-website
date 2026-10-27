@@ -80,7 +80,7 @@ export const resourceItems: ResourceItem[] = [
   {
     title: 'Elvehjem Elementary School',
     description:
-      'Public elementary school near Sprecher East. MMSD assigns schools by address: check yours with Find Your School.',
+      'Public elementary school near Sprecher East. MMSD assigns schools by address: check yours with Find Your School on madison.k12.wi.us.',
     url: 'https://elvehjem.mmsd.org/',
     phone: '(608) 204-6800',
     category: 'childcare',

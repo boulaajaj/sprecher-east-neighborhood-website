@@ -74,7 +74,7 @@ These feeds are checked by the B-Research agent during Monday source review:
 | Sprecher East NA page      | Facebook  | `facebook.com/SprecherEast`                                            | Daily           |
 | City of Madison            | Twitter/X | `@cityofmadison`                                                       | Daily           |
 | Madison.com                | Twitter/X | `@madison_dot_com`                                                     | Daily           |
-| District 16 Alder          | Web       | `https://www.cityofmadison.com/council/council-members/find-my-alder`  | 3x/week         |
+| District 16 Alder          | Web       | `https://www.cityofmadison.com/council/district16`                     | 3x/week         |
 | Madison Police             | Twitter/X | `@madisonpolice`                                                       | 3x/week         |
 | East Towne Business Groups | Facebook  | Search East Towne Business Association or similar                      | 1x/week         |
 
