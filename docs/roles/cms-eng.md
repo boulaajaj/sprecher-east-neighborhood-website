@@ -23,7 +23,7 @@ The installed plugins are listed in [`docs/project.md`](../project.md#payload-cm
 This project is built on the official Payload CMS v3 Website Template. Key patterns:
 
 - **Layout Builder**: Pages use the `layout` blocks field for flexible content layout; posts embed blocks (Banner, Code, Media) in their rich text. Each block has its own schema and React component.
-- **Hero System**: 3 hero types (HighImpact, MediumImpact, LowImpact) or none, chosen per page. Posts and events use their own fixed heroes (`PostHero`, `EventHero`).
+- **Hero System**: 3 hero types (`PageHero` variants `high`, `medium`, `low`) or none, chosen per page. Posts and events use `PageHeader` (`image` with a photo, `default` without).
 - **Live Preview**: Real-time content preview in admin panel via `window.postMessage`. Supports mobile/tablet/desktop breakpoints.
 - **Draft Preview**: Unpublished content can be previewed via draft routes before publishing.
 - **Scheduled Publishing**: Jobs queue enables `waitUntil` for future publish dates.
