@@ -4,7 +4,8 @@ import React from 'react'
 
 import type { Header as HeaderType } from '@/payload-types'
 
-import { type ResolvedLink, resolveLink } from '@/platform/payload/resolveLink'
+import type { ResolvedLink } from '@/platform/lib'
+import { resolveLink } from '@/platform/payload/resolveLink'
 import { Link } from '@/platform/ui'
 import { SearchIcon } from 'lucide-react'
 

@@ -1,7 +1,7 @@
-import { isValidElement, type ReactElement } from 'react'
+import { type ComponentProps, isValidElement, type ReactElement } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { ArchiveBlock as ArchiveBlockFields } from '@/payload-types'
+import type { PageBlockComponents } from '@/modules/site/server'
 
 // The modules are replaced with stand-ins: this tests which module draws each block type
 const modules = vi.hoisted(() => ({
@@ -38,15 +38,20 @@ describe('pageBlocks', () => {
   it('draws the archive block around the posts news loads for it', async () => {
     const posts = [{ id: 1, slug: 'park-cleanup' }]
     modules.findArchivePosts.mockResolvedValue(posts)
-    const block: ArchiveBlockFields = { blockType: 'archive', id: 'a1', populateBy: 'collection' }
+    const postQuery = { populateBy: 'collection' as const, limit: 3 }
+    const block: ComponentProps<PageBlockComponents['archive']> = {
+      blockType: 'archive',
+      id: 'a1',
+      postQuery,
+    }
 
-    const element = (await (pageBlocks.archive as (b: ArchiveBlockFields) => unknown)(
+    const element = (await (pageBlocks.archive as (b: typeof block) => unknown)(
       block,
     )) as ReactElement<{ children: ReactElement }>
 
-    expect(modules.findArchivePosts).toHaveBeenCalledWith(block)
+    expect(modules.findArchivePosts).toHaveBeenCalledWith(postQuery)
     expect(element.type).toBe(modules.ArchiveBlock)
-    expect(element.props).toMatchObject({ id: 'a1', populateBy: 'collection' })
+    expect(element.props).toMatchObject({ id: 'a1' })
     expect(isValidElement(element.props.children)).toBe(true)
     expect(element.props.children.type).toBe(modules.PostGrid)
     expect(element.props.children.props).toEqual({ posts })

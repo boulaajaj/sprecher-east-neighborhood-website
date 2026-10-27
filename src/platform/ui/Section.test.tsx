@@ -36,4 +36,30 @@ describe('Section', () => {
     expect(band?.className).toContain('items-center')
     expect(screen.getByText('Log in').parentElement?.className).toContain('max-w-md')
   })
+
+  // The call-to-action band (#457): the brand green in both modes, read as a dark scope
+  it('scopes the brand band to the dark theme, and takes an anchor', async () => {
+    const { container } = render(
+      <Section id="block-cta" tone="brand" spacing="md">
+        <p>Join us</p>
+      </Section>,
+    )
+
+    const band = container.firstElementChild
+    expect(band?.id).toBe('block-cta')
+    expect(band?.getAttribute('data-theme')).toBe('dark')
+    expect(band?.className).toContain('from-primary-fill')
+    await expectAccessible(container)
+  })
+
+  it('leaves other bands in the page’s theme', () => {
+    const { container } = render(
+      <Section tone="surface" spacing="sm">
+        <p>Cards</p>
+      </Section>,
+    )
+
+    expect(container.firstElementChild?.hasAttribute('data-theme')).toBe(false)
+    expect(container.firstElementChild?.className).toContain('py-8')
+  })
 })

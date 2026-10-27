@@ -1,3 +1,5 @@
+import type { ResolvedLink } from '@/platform/lib'
+
 import { documentHref } from './documentHref'
 
 /**
@@ -15,15 +17,6 @@ export type CmsLink = {
     relationTo: string
     value: number | string | { slug?: string | null }
   } | null
-}
-
-export type ResolvedLink = {
-  href: string
-  label: string
-  /** Opens in a new tab */
-  external: boolean
-  /** The look the editor chose; the UI maps it to a `Button` variant */
-  appearance: 'default' | 'outline'
 }
 
 export function resolveLink(link: CmsLink | null | undefined): ResolvedLink | null {

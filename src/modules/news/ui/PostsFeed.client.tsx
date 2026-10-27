@@ -23,21 +23,19 @@ export const PostsFeed: React.FC<{ initial: FeedPage<PostSummary> }> = ({ initia
   }
 
   return (
-    <>
+    <div className="container">
       <PostGrid posts={feed.items} headingLevel="h2" />
-      <div className="container">
-        <LoadMoreFooter
-          noun="posts"
-          shownCount={feed.items.length}
-          firstItemNumber={feed.firstItemNumber}
-          totalDocs={feed.totalDocs}
-          hasMore={feed.hasMore}
-          status={feed.status}
-          autoLoad={feed.autoLoad}
-          onLoadMore={feed.loadMore}
-          fallbackHref={`/posts/page/${feed.page + 1}`}
-        />
-      </div>
-    </>
+      <LoadMoreFooter
+        noun="posts"
+        shownCount={feed.items.length}
+        firstItemNumber={feed.firstItemNumber}
+        totalDocs={feed.totalDocs}
+        hasMore={feed.hasMore}
+        status={feed.status}
+        autoLoad={feed.autoLoad}
+        onLoadMore={feed.loadMore}
+        fallbackHref={`/posts/page/${feed.page + 1}`}
+      />
+    </div>
   )
 }

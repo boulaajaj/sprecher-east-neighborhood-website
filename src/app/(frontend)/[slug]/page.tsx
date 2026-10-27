@@ -43,8 +43,10 @@ export default async function Page({ params: paramsPromise }: Args) {
   const decodedSlug = decodeURIComponent(slug)
   const url = '/' + decodedSlug
 
-  // Remove the fallback once your website is seeded
-  const page = (await getPageBySlug(decodedSlug)) ?? (slug === HOME_PAGE_SLUG ? homeStatic : null)
+  // Remove the fallback once your website is seeded. The starter home page has no blocks.
+  const page =
+    (await getPageBySlug(decodedSlug)) ??
+    (slug === HOME_PAGE_SLUG ? { ...homeStatic, layout: [] } : null)
 
   if (!page) {
     return <PayloadRedirects url={url} />

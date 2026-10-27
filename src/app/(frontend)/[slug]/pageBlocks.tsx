@@ -11,10 +11,10 @@ import {
 import { MediaBlock } from '@/platform/richtext/MediaBlock'
 
 /** The archive block with the posts it lists: site draws the block, news loads the posts. */
-const ArchiveWithPosts: PageBlockComponents['archive'] = async (block) => {
-  const posts = await findArchivePosts(block)
+const ArchiveWithPosts: PageBlockComponents['archive'] = async ({ id, intro, postQuery }) => {
+  const posts = await findArchivePosts(postQuery)
   return (
-    <ArchiveBlock {...block}>
+    <ArchiveBlock id={id} intro={intro}>
       <PostGrid posts={posts} />
     </ArchiveBlock>
   )

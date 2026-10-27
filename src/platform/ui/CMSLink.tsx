@@ -1,3 +1,4 @@
+import type { ResolvedLink } from '@/platform/lib'
 import { type CmsLink, resolveLink } from '@/platform/payload/resolveLink'
 import { Button } from './Button'
 import { Link } from './Link'
@@ -20,15 +21,9 @@ export const CMSLink: React.FC<CMSLinkProps> = ({ appearance, children, classNam
 
   if (appearance === 'default' || appearance === 'outline') {
     return (
-      <Button
-        href={resolved.href}
-        external={resolved.external}
-        variant={resolved.appearance === 'outline' ? 'secondary' : 'primary'}
-        className={className}
-      >
-        {resolved.label}
+      <LinkButton link={resolved} className={className}>
         {children}
-      </Button>
+      </LinkButton>
     )
   }
 
@@ -37,5 +32,28 @@ export const CMSLink: React.FC<CMSLinkProps> = ({ appearance, children, classNam
       {resolved.label}
       {children}
     </Link>
+  )
+}
+
+/** A resolved CMS link as a `Button` in the look the editor chose: `default` is primary, `outline` secondary. */
+export function LinkButton({
+  link,
+  className,
+  children,
+}: {
+  link: ResolvedLink
+  className?: string
+  children?: React.ReactNode
+}) {
+  return (
+    <Button
+      href={link.href}
+      external={link.external}
+      variant={link.appearance === 'outline' ? 'secondary' : 'primary'}
+      className={className}
+    >
+      {link.label}
+      {children}
+    </Button>
   )
 }
