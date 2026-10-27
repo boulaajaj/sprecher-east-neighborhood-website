@@ -1,7 +1,7 @@
 import 'server-only'
 
 import configPromise from '@payload-config'
-import { getPayload, type Where } from 'payload'
+import { getPayload } from 'payload'
 
 import { cursorAfterLast, type FeedMore, type FeedPage, type SortCursor } from '@/platform/lib'
 import { afterCursor, keysetSort } from '@/platform/payload/keyset'
@@ -9,29 +9,26 @@ import { PUBLISHED } from '@/platform/payload/published'
 
 import { EVENT_SCOPE_ORDER, type EventScope } from '../domain/scope'
 import type { EventDetail, EventSitemapEntry, EventSummary } from '../domain/types'
+import { inListing } from './listing'
 import { SUMMARY_FIELDS, toEventDetail, toEventSummary } from './mappers'
 import { inScope } from './scope'
 
 /** Events per page in each listing, numbered pages and "Load more" alike. */
 const PAGE_SIZE: Record<EventScope, number> = { upcoming: 12, past: 9 }
 
-/** Published events in the scope: what every page of a listing shows. */
-const inListing = (scope: EventScope, today: string): Where => ({
-  and: [PUBLISHED, inScope(scope, today)],
-})
-
 /**
  * One page of a listing, sorted by date with the id as tie-break (#125), so equal dates keep one
- * order across pages: page `page`, or the page after `after`.
+ * order across pages: page `page`, or the page after `after`. With `categoryId`, only the events
+ * in that category (#122).
  */
 async function findListingPage(
   scope: EventScope,
   today: string,
-  { page, after }: { page?: number; after?: SortCursor },
+  { page, after, categoryId }: { page?: number; after?: SortCursor; categoryId?: number },
 ) {
   const payload = await getPayload({ config: configPromise })
   const order = EVENT_SCOPE_ORDER[scope]
-  const where = inListing(scope, today)
+  const where = inListing(scope, today, categoryId)
 
   const result = await payload.find({
     collection: 'events',
@@ -53,15 +50,16 @@ async function findListingPage(
 
 /**
  * One numbered page of published upcoming events (soonest first) or past events (most recent
- * first), for the first page and the no-JavaScript pages. `today` is the site-timezone date as
- * midnight UTC (`startOfToday()`).
+ * first), for the first page and the no-JavaScript pages, in one category when `categoryId` is
+ * given. `today` is the site-timezone date as midnight UTC (`startOfToday()`).
  */
 export async function findEventPage(
   scope: EventScope,
   page: number,
   today: string,
+  categoryId?: number,
 ): Promise<FeedPage<EventSummary>> {
-  const result = await findListingPage(scope, today, { page })
+  const result = await findListingPage(scope, today, { page, categoryId })
 
   return {
     docs: result.docs,
@@ -81,11 +79,16 @@ export async function findEventsAfter(
   scope: EventScope,
   cursor: SortCursor,
   today: string,
+  categoryId?: number,
 ): Promise<FeedMore<EventSummary>> {
   const payload = await getPayload({ config: configPromise })
   const [result, total] = await Promise.all([
-    findListingPage(scope, today, { after: cursor }),
-    payload.count({ collection: 'events', overrideAccess: false, where: inListing(scope, today) }),
+    findListingPage(scope, today, { after: cursor, categoryId }),
+    payload.count({
+      collection: 'events',
+      overrideAccess: false,
+      where: inListing(scope, today, categoryId),
+    }),
   ])
 
   return { docs: result.docs, nextCursor: result.nextCursor, totalDocs: total.totalDocs }

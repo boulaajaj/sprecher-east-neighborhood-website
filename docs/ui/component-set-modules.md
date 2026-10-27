@@ -30,7 +30,8 @@ page or layout in `src/app/` composes them ([0008](../architecture/decisions/000
 | `platform`  | `TurnstileWidget`   | one look                                        | `onToken`, `onLoadError`, `onWidgetError`, `resetSignal`                                                                                | —                                                                                                                                                  | `src/platform/turnstile/TurnstileWidget.client.tsx`                                                                                      | F18        |
 
 Compositions with no element of their own: `PostsFeed` and `EventsFeed` (a `CardGrid` of cards plus
-`LoadMore`), the search form in `news` (`Field · search` plus the URL), `AccountMenu` in
+`LoadMore`; `EventsFeed` keeps a category filter, #122), `EventsOverview` and `EventListPage` (the
+events pages' bodies), `EventFilters` (`Button` links and a status line, #122), the search form in `news` (`Field · search` plus the URL), `AccountMenu` in
 `accounts` (`Link · nav` and `Button · ghost`; "Dashboard" for staff in the mobile menu, #378), `SignInForm` and `ChangePasswordForm` (`Form`), and
 `VersionCheck` (`Toast`). Variants with no element of their own (`Card · elevated`,
 `Card · outline`, `CardGrid` columns `2` and `4`, `Section · brand`, `Button` size `sm`) are used inside the area components.

@@ -3,6 +3,7 @@
 // collection is in cms.ts.
 export { EVENTS_SITEMAP_CACHE_TAG } from './domain/cacheTags'
 export type { EventCategoryRef } from './domain/categories'
+export { eventListTitle, isCategorySlug } from './domain/filters'
 export type { EventLocationType } from './domain/locationTypes'
 export { isEventScope, type EventScope } from './domain/scope'
 export type { EventDetail, EventSitemapEntry, EventSummary } from './domain/types'
