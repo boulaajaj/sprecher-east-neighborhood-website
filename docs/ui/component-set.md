@@ -2,6 +2,9 @@
 
 Part of the [UI inventory](inventory.md) (#170), for epic #163.
 
+To see every component and variant at once, run `npm run dev` and open `/dev/gallery`
+(`src/app/(frontend)/dev/gallery/`, development only, #466).
+
 > **Status: approved.** The owner approved this set on 2026-10-21, with the merges he asked for
 > that day (fewer components, each composed from the others, never a second button). Components
 > are built in the order below, each in its own issue under epic #163.
