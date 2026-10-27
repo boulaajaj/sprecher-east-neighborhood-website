@@ -21,7 +21,9 @@ export function eventJsonLd(event: EventDetail): Record<string, unknown> {
     url: `${siteUrl}/events/${slug}`,
     startDate: date,
     description: description || '',
-    eventStatus: 'https://schema.org/EventScheduled',
+    eventStatus: event.cancelled
+      ? 'https://schema.org/EventCancelled'
+      : 'https://schema.org/EventScheduled',
     organizer: {
       '@type': 'Organization',
       name: 'Sprecher East',

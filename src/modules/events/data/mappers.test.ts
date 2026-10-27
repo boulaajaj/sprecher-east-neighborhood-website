@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { Event, Media } from '@/payload-types'
 
-import { toEventDetail, toEventSummary } from './mappers'
+import { SUMMARY_FIELDS, toEventDetail, toEventSummary } from './mappers'
 
 const image = { id: 4, alt: 'Park shelter', url: '/api/media/file/park.jpg' } as Media
 
@@ -13,6 +13,7 @@ const doc: Event = {
   date: '2026-11-02T00:00:00.000Z',
   timeStart: '6:00 PM',
   timeEnd: '8:00 PM',
+  cancelled: false,
   categories: [{ id: 3, title: 'Social', slug: 'social', updatedAt: '', createdAt: '' }, 9],
   description: 'Bring a dish.',
   locationType: 'in-person',
@@ -36,6 +37,7 @@ describe('toEventSummary', () => {
       date: '2026-11-02T00:00:00.000Z',
       timeStart: '6:00 PM',
       timeEnd: '8:00 PM',
+      cancelled: false,
       categories: [{ id: 3, title: 'Social' }],
       description: 'Bring a dish.',
       locationName: 'Park shelter',
@@ -53,11 +55,22 @@ describe('toEventSummary', () => {
     expect(summary).toMatchObject({
       timeStart: null,
       timeEnd: null,
+      cancelled: false,
       categories: [],
       description: null,
       locationName: null,
       image: null,
     })
+  })
+
+  it('carries the cancelled flag to the card and the page (#122)', () => {
+    expect(toEventSummary({ ...doc, cancelled: true }).cancelled).toBe(true)
+    expect(toEventDetail({ ...doc, cancelled: true }).cancelled).toBe(true)
+    expect(toEventSummary({ ...doc, cancelled: null }).cancelled).toBe(false)
+  })
+
+  it('selects the flag, so listings can show it', () => {
+    expect(SUMMARY_FIELDS).toHaveProperty('cancelled', true)
   })
 
   it('drops an image that was not loaded, which is only an id', () => {

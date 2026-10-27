@@ -23,6 +23,21 @@ describe('Badge', () => {
     expect(screen.getByText('Meeting').className).toContain('bg-scrim/60')
   })
 
+  it('marks a state in destructive-strong on the destructive tint, with an optional icon (#122)', async () => {
+    const { container } = render(
+      <Badge variant="status">
+        <svg aria-hidden="true" />
+        Cancelled
+      </Badge>,
+    )
+
+    const badge = screen.getByText('Cancelled')
+    expect(badge.className).toContain('text-destructive-strong')
+    expect(badge.className).toContain('bg-destructive/10')
+    expect(badge.className).toContain('[&_svg]:size-3.5')
+    await expectAccessible(container)
+  })
+
   it('lines badges up in a row that wraps, with no accessibility violations', async () => {
     const { container } = render(
       <BadgeList>

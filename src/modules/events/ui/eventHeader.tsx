@@ -8,13 +8,15 @@ import type { PageHeaderProps } from '@/platform/ui/PageHeader'
 
 import { formatEventLocationType } from '../domain/locationTypes'
 import type { EventDetail } from '../domain/types'
+import { CancelledBadge } from './CancelledBadge'
 
 /**
  * The top of an event's page as `PageHeader` props (#461): its categories, title, date, time and
- * format, on its photo (`image`), or plain (`default`) when it has none.
+ * format, on its photo (`image`), or plain (`default`) when it has none. A cancelled event's
+ * "Cancelled" label leads the eyebrow (#122).
  */
 export function eventHeaderProps(event: EventDetail): PageHeaderProps {
-  const { categories, date, image, locationType, timeEnd, timeStart, title } = event
+  const { cancelled, categories, date, image, locationType, timeEnd, timeStart, title } = event
   const facts: LabelledMetaItem[] = [
     { label: 'Date', value: <DateTime value={date} format="long" /> },
     ...(timeStart
@@ -29,8 +31,9 @@ export function eventHeaderProps(event: EventDetail): PageHeaderProps {
   ]
   const badge = image ? 'on-image' : 'category'
   const eyebrow =
-    categories.length > 0 ? (
+    cancelled || categories.length > 0 ? (
       <BadgeList>
+        {cancelled && <CancelledBadge variant={image ? 'on-image' : 'status'} />}
         {categories.map((category) => (
           <Badge key={category.id} variant={badge}>
             {category.title}

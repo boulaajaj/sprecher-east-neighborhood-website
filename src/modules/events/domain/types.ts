@@ -13,6 +13,8 @@ export type EventSummary = {
   /** Free text in site time, for example "6:00 PM" */
   timeStart: string | null
   timeEnd: string | null
+  /** Called off: still listed, and marked as cancelled wherever it shows (#122) */
+  cancelled: boolean
   /** The loaded categories, in the order the editor set them */
   categories: EventCategoryRef[]
   description: string | null
