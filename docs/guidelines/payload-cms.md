@@ -34,15 +34,16 @@ Blocks built before 0013 still take the generated block type until they move.
 
 **IMPORTANT**: Adding a new block requires THREE registration steps:
 
-1. Add the block config to the Pages layout: `SITE_LAYOUT_BLOCKS` in `src/modules/site/cms/layoutBlocks.ts` for a `site` block, or the `layoutBlocks` that `src/payload.config.ts` passes to `createPagesCollection` for another module's block (the form block from `contact`, the "this week" strip from `events`)
+1. Add the block config to the Pages layout: `SITE_LAYOUT_BLOCKS` in `src/modules/site/cms/layoutBlocks.ts` for a `site` block, or the `layoutBlocks` that `src/payload.config.ts` passes to `createPagesCollection` for another module's block (the form block from `contact`, the "this week" strip from `events`, top issues from `news`)
 2. Add a `case` for its `blockType` to `renderBlock` in `src/modules/site/ui/RenderBlocks.tsx`
 3. Add the component to the block registry, `pageBlocks` in `src/app/(frontend)/[slug]/pageBlocks.tsx`
 
 Without step 1 editors can't add the block. Once the types are regenerated, a missing step 2 or 3
 fails `tsc`.
 
-Page-builder blocks: `archive`, `content`, `cta`, `eventsThisWeek` (from `events`), `formBlock`,
-`mediaBlock`. Blocks inside rich text (`src/platform/richtext/`): `banner`, `code`, `mediaBlock`.
+Page-builder blocks: `archive`, `content`, `cta`, `eventsThisWeek` (from `events`), `formBlock`
+(from `contact`), `mediaBlock`, `topIssues` (from `news`). Blocks inside rich text
+(`src/platform/richtext/`): `banner`, `code`, `mediaBlock`.
 
 ## Heroes
 
@@ -73,7 +74,7 @@ Collection-specific hooks (e.g., `revalidatePage`, `revalidatePost`, `revalidate
 
 Reusable field helpers:
 
-- `src/modules/site/cms/link.ts` — `link()` creates a group field with `type` (reference/custom), `label`, `url`, `reference`, `newTab`, `appearance`
+- `src/platform/payload/link.ts` — `link()` creates a group field with `type` (reference/custom), `label`, `url`, `reference`, `newTab`, `appearance`; any module's blocks may use it (`appearances: false` leaves out `appearance`, `disableLabel: true` leaves out `label`)
 - `src/modules/site/cms/linkGroup.ts` — `linkGroup()` creates an array of link fields
 - `src/platform/payload/defaultLexical.ts` — Standard Lexical editor config with toolbar features
 
