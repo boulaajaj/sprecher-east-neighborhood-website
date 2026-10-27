@@ -44,6 +44,7 @@
     "graphql": "^16.13.1",
     "lucide-react": "^0.576.0",
     "next": "^16.4.2",
+    "openid-client": "^6.8.8",
     "payload": "^3.91.0",
     "prism-react-renderer": "^2.3.1",
     "react": "^19.2.8",

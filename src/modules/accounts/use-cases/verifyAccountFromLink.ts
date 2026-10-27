@@ -13,6 +13,7 @@ import {
 import type { VerifyAccountValues } from '../domain/credentials'
 import type { ActionResult, VerifyAccountFailure } from '../domain/types'
 import { logServerFailure } from './logServerFailure'
+import { linkWaitingSocialAccount } from './socialSignIn'
 
 /**
  * Verifies an account from its link (#187), once the robot check passes (#303): the page's
@@ -22,7 +23,8 @@ import { logServerFailure } from './logServerFailure'
  * `needs-password` and the token stays unused; with one, it replaces the account's password, then
  * the email is verified. Only the mailbox's owner holds the link, so only they set it.
  * Once verified, the link's hash is kept, so the same link pressed again answers
- * `already-verified` rather than a dead link (#391).
+ * `already-verified` rather than a dead link (#391). A Facebook sign-in that sent this link links
+ * its Facebook account now, if it was made in this browser for this account (#188).
  */
 export async function verifyAccountFromLink(
   { token, newPassword }: VerifyAccountValues,
@@ -53,6 +55,7 @@ export async function verifyAccountFromLink(
         // The account is verified either way; only the "already confirmed" answer is lost
         logServerFailure('Recording a used verification link', error)
       }
+      await linkWaitingSocialAccount(pending)
     }
     return { ok: true }
   } catch (error) {

@@ -44,14 +44,17 @@ async function rest(
 const stored = (collection: 'users' | 'email-confirmations' | 'form-submissions', id: number) =>
   payload.findByID({ collection, id, depth: 0, overrideAccess: true, showHiddenFields: true })
 
-// What a resident might try on their own account: reset the resend limit, or skip choosing a
-// password on a resent link (#289)
+// What a resident might try on their own account: reset the resend limit, skip choosing a
+// password on a resent link (#289), or link a provider account (#188)
 const FORGED_RESENDS = {
   verificationResends: 99,
   verificationResendsSince: '2020-01-01T00:00:00.000Z',
   verificationSetsPassword: true,
   // Or plant a used-link hash, so a link would read "already confirmed" (#391)
   verifiedTokenHash: 'f'.repeat(64),
+  // Or link someone else's Google or Facebook account to sign in with it (#188)
+  googleSub: 'google-subject-of-someone-else',
+  facebookSub: 'facebook-subject-of-someone-else',
 }
 
 describe('a resident’s own account', () => {
@@ -96,6 +99,8 @@ describe('a resident’s own account', () => {
       verificationResendsSince: null,
       verificationSetsPassword: false,
       verifiedTokenHash: null,
+      googleSub: null,
+      facebookSub: null,
     })
   })
 
@@ -113,6 +118,8 @@ describe('a resident’s own account', () => {
       verificationResendsSince: null,
       verificationSetsPassword: false,
       verifiedTokenHash: null,
+      googleSub: null,
+      facebookSub: null,
     })
   })
 })

@@ -12,6 +12,7 @@ import { forgotPasswordFromSiteOnly } from './forgotPasswordFromSiteOnly'
 import { noResetEmailWhileUnverified } from './noResetEmailWhileUnverified'
 import { noPasswordSignInForAgents } from './noPasswordSignInForAgents'
 import { requireCurrentPassword } from './requireCurrentPassword'
+import { residentOnlyFromProviders } from './residentOnlyFromProviders'
 import { Users } from './users'
 
 describe('Users', () => {
@@ -70,7 +71,7 @@ describe('Users', () => {
 
   it('asks for the current password before anyone changes their own (#233), takes forgot password from the site only (#282), and sends no reset email to an unverified account (#187)', () => {
     expect(Users.hooks).toEqual({
-      beforeChange: [requireCurrentPassword],
+      beforeChange: [requireCurrentPassword, residentOnlyFromProviders],
       beforeLogin: [noPasswordSignInForAgents],
       beforeOperation: [forgotPasswordFromSiteOnly, noResetEmailWhileUnverified],
     })

@@ -123,7 +123,7 @@ export async function resendVerification(email: string, now: Date): Promise<Rese
  */
 export async function findPendingVerification(
   token: string,
-): Promise<{ id: number; setsPassword: boolean } | null> {
+): Promise<{ id: number; email: string; setsPassword: boolean } | null> {
   const payload = await getPayload({ config: configPromise })
   const { docs } = await payload.find({
     collection: USERS,
@@ -137,7 +137,11 @@ export async function findPendingVerification(
   })
   const account = docs[0]
   return account
-    ? { id: account.id, setsPassword: account.verificationSetsPassword === true }
+    ? {
+        id: account.id,
+        email: account.email,
+        setsPassword: account.verificationSetsPassword === true,
+      }
     : null
 }
 
