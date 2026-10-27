@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, CircleX } from 'lucide-react'
 import React from 'react'
 
 import { Badge, BadgeList } from '@/platform/ui/Badge'
@@ -40,6 +40,12 @@ export function DisplayGallery() {
           <div className="rounded-2xl bg-scrim p-6">
             <Badge variant="on-image">Events</Badge>
           </div>
+        </GalleryVariant>
+        <GalleryVariant label="status (a cancelled event, #122)">
+          <Badge variant="status">
+            <CircleX aria-hidden="true" />
+            Cancelled
+          </Badge>
         </GalleryVariant>
       </GalleryEntry>
 
