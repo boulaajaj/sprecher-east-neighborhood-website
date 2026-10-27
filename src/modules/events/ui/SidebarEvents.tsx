@@ -6,7 +6,7 @@ import { Text } from '@/platform/ui/Text'
 
 import { formatEventCategories } from '../domain/categories'
 import type { EventSummary } from '../domain/types'
-import { CancelledBadge } from './CancelledBadge'
+import { EventTitleLabels } from './EventTitleLabels'
 
 export const SidebarEvents: React.FC<{
   events: EventSummary[]
@@ -31,12 +31,7 @@ export const SidebarEvents: React.FC<{
                   <span className="text-lg leading-tight font-bold">{day}</span>
                 </div>
                 <div className="min-w-0">
-                  {event.cancelled && (
-                    <>
-                      <CancelledBadge className="mb-1" />
-                      <span className="sr-only">:</span>{' '}
-                    </>
-                  )}
+                  <EventTitleLabels event={event} className="mb-1" />
                   <span className="block text-sm leading-snug font-medium text-foreground group-hover:text-primary">
                     {event.title}
                   </span>

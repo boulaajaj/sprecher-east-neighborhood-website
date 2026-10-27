@@ -1,4 +1,4 @@
-import { ArrowRight, CircleX } from 'lucide-react'
+import { ArrowRight, CircleX, Landmark } from 'lucide-react'
 import React from 'react'
 
 import { Badge, BadgeList } from '@/platform/ui/Badge'
@@ -45,6 +45,12 @@ export function DisplayGallery() {
           <Badge variant="status">
             <CircleX aria-hidden="true" />
             Cancelled
+          </Badge>
+        </GalleryVariant>
+        <GalleryVariant label="official (an official meeting, #122)">
+          <Badge variant="official">
+            <Landmark aria-hidden="true" />
+            Official meeting
           </Badge>
         </GalleryVariant>
       </GalleryEntry>

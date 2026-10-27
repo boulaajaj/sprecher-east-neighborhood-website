@@ -38,6 +38,16 @@ describe('Badge', () => {
     await expectAccessible(container)
   })
 
+  it('marks an official meeting in the category pill’s pair, set apart by a border (#122)', async () => {
+    const { container } = render(<Badge variant="official">Official meeting</Badge>)
+
+    const badge = screen.getByText('Official meeting')
+    expect(badge.className).toContain('text-primary-strong')
+    expect(badge.className).toContain('bg-primary/10')
+    expect(badge.className).toContain('border-primary/30')
+    await expectAccessible(container)
+  })
+
   it('lines badges up in a row that wraps, with no accessibility violations', async () => {
     const { container } = render(
       <BadgeList>

@@ -11,7 +11,7 @@ import { MetaList, type IconMetaItem } from '@/platform/ui/MetaList'
 import { Text } from '@/platform/ui/Text'
 
 import type { EventSummary } from '../domain/types'
-import { CancelledBadge } from './CancelledBadge'
+import { EventTitleLabels } from './EventTitleLabels'
 
 const DateBadge: React.FC<{
   date: string
@@ -41,41 +41,14 @@ const DateBadge: React.FC<{
   )
 }
 
-/**
- * The card's title, after the "Cancelled" label on its own line when the event is called off
- * (#122). The label sits inside the title's link, so the link reads "Cancelled" with the title.
- */
-const CardTitleText: React.FC<{ title: string; cancelled: boolean }> = ({ title, cancelled }) =>
-  cancelled ? (
-    <>
-      <span className="mb-1.5 flex">
-        <CancelledBadge />
-      </span>
-      {/* Read as "Cancelled: <title>"; on screen the label's own line separates them */}
-      <span className="sr-only">:</span> {title}
-    </>
-  ) : (
-    title
-  )
-
 export const EventCard: React.FC<{
   event: EventSummary
   compact?: boolean
   /** `h2` where no heading sits between the page's `h1` and the list */
   headingLevel?: 'h2' | 'h3'
 }> = ({ event, compact, headingLevel = 'h3' }) => {
-  const {
-    slug,
-    title,
-    date,
-    timeStart,
-    timeEnd,
-    cancelled,
-    categories,
-    description,
-    locationName,
-    image,
-  } = event
+  const { slug, title, date, timeStart, timeEnd, categories, description, locationName, image } =
+    event
 
   if (!slug) return null
 
@@ -88,7 +61,8 @@ export const EventCard: React.FC<{
         <div className="min-w-0">
           <DateTime value={date} className="text-xs text-muted-foreground" />
           <CardTitle as={headingLevel} href={href} className="truncate text-base">
-            <CardTitleText title={title} cancelled={cancelled} />
+            <EventTitleLabels event={event} className="mb-1.5" />
+            {title}
           </CardTitle>
         </div>
       </Card>
@@ -119,7 +93,9 @@ export const EventCard: React.FC<{
 
       <CardBody>
         <CardTitle as={headingLevel} href={href} className="mb-2">
-          <CardTitleText title={title} cancelled={cancelled} />
+          {/* Inside the title's link, so the link reads its labels with the title (#122) */}
+          <EventTitleLabels event={event} className="mb-1.5" />
+          {title}
         </CardTitle>
 
         {/* Date (the badge above is decorative) and time — never invent a time */}

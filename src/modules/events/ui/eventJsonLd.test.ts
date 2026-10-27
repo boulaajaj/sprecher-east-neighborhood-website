@@ -13,6 +13,7 @@ const event: EventDetail = {
   timeStart: null,
   timeEnd: null,
   cancelled: false,
+  officialBody: null,
   categories: [{ id: 1, title: 'Social' }],
   description: 'Bring a dish.',
   locationName: 'Park shelter',
@@ -21,6 +22,7 @@ const event: EventDetail = {
   locationAddress: '4605 Sprecher Rd',
   mapsHref: null,
   registrationUrl: null,
+  agendaUrl: null,
   content: null,
   meta: { title: null, description: null, image: null },
 }
@@ -53,6 +55,17 @@ describe('eventJsonLd', () => {
     expect(eventJsonLd({ ...event, cancelled: true }).eventStatus).toBe(
       'https://schema.org/EventCancelled',
     )
+  })
+
+  it('names the public body as the organizer of an official meeting, with no invented URL (#122)', () => {
+    expect(eventJsonLd({ ...event, officialBody: 'city' }).organizer).toEqual({
+      '@type': 'GovernmentOrganization',
+      name: 'City of Madison',
+    })
+    expect(eventJsonLd({ ...event, officialBody: 'county' }).organizer).toEqual({
+      '@type': 'GovernmentOrganization',
+      name: 'Dane County',
+    })
   })
 
   it('names the attendance mode for virtual and hybrid events', () => {

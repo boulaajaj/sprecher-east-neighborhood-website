@@ -11,7 +11,9 @@ import { cn } from '@/platform/lib/cn'
  * `status` marks a state the reader must not miss, such as a cancelled event (#122):
  * destructive-strong on the destructive tint, which the contract checks like `Alert`'s error tone
  * (`TINTED_PAIRS`). Its words say the state, and an icon may go before them, so colour is never
- * the only signal.
+ * the only signal. `official` marks an official meeting (#122): the category pill's checked pair
+ * (primary-strong on the primary tint), set apart by its border, weight and icon rather than a
+ * new colour, so it reads as distinct but calm.
  */
 const badgeVariants = cva(
   'inline-flex max-w-full items-center gap-1 rounded-full px-3 py-1 text-xs font-medium [overflow-wrap:anywhere] [&_svg]:size-3.5 [&_svg]:shrink-0',
@@ -23,6 +25,7 @@ const badgeVariants = cva(
           'border border-on-image/30 bg-scrim/60 tracking-wide text-on-image uppercase backdrop-blur-sm',
         status:
           'border border-destructive/30 bg-destructive/10 font-semibold text-destructive-strong',
+        official: 'border border-primary/30 bg-primary/10 font-semibold text-primary-strong',
       },
     },
     defaultVariants: { variant: 'category' },

@@ -26,6 +26,7 @@ import {
 } from '@/platform/payload/reviewQueue'
 
 import { EVENT_LOCATION_TYPES } from '../domain/locationTypes'
+import { officialMeetingFields } from './officialMeetingFields'
 import { revalidateDelete, revalidateEvent } from './revalidateEvent'
 
 export const Events: CollectionConfig<'events'> = {
@@ -103,6 +104,7 @@ export const Events: CollectionConfig<'events'> = {
               defaultValue: false,
               admin: { description: 'A cancelled event stays listed and is marked as cancelled.' },
             },
+            officialMeetingFields,
             {
               name: 'featured',
               type: 'checkbox',

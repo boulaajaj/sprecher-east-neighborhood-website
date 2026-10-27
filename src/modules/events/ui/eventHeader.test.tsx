@@ -19,6 +19,7 @@ const event: EventDetail = {
   timeStart: '6:00 PM',
   timeEnd: '8:00 PM',
   cancelled: false,
+  officialBody: null,
   categories: [{ id: 1, title: 'Social' }],
   description: 'Bring a dish.',
   locationName: 'Park shelter',
@@ -27,6 +28,7 @@ const event: EventDetail = {
   locationAddress: '4605 Sprecher Rd',
   mapsHref: null,
   registrationUrl: null,
+  agendaUrl: null,
   content: null,
   meta: { title: null, description: null, image: null },
 }
@@ -90,6 +92,35 @@ describe('eventHeaderProps', () => {
       render(<PageHeader {...eventHeaderProps(event)} />)
 
       expect(screen.queryByText('Cancelled')).toBeNull()
+    })
+  })
+
+  describe('an official meeting (#122)', () => {
+    const council: EventDetail = { ...event, title: 'Common Council', officialBody: 'city' }
+
+    it('names the body in the eyebrow, after "Cancelled" and before the categories', async () => {
+      const { container } = render(
+        <PageHeader {...eventHeaderProps({ ...council, cancelled: true })} />,
+      )
+
+      const label = screen.getByText('City of Madison meeting')
+      expect(label.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true')
+      expect(label.parentElement?.textContent).toBe('CancelledCity of Madison meetingSocial')
+      await expectAccessible(container)
+    })
+
+    it('puts the label on the photo, on its own scrim', () => {
+      render(
+        <PageHeader {...eventHeaderProps({ ...council, officialBody: 'county', image: photo })} />,
+      )
+
+      expect(screen.getByText('Dane County meeting').className).toContain('bg-scrim/60')
+    })
+
+    it('shows the label even when the meeting has no categories', () => {
+      render(<PageHeader {...eventHeaderProps({ ...council, categories: [] })} />)
+
+      expect(screen.getByText('City of Madison meeting')).toBeDefined()
     })
   })
 })

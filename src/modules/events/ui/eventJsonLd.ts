@@ -1,5 +1,6 @@
 import { getServerSideURL, toAbsoluteURL } from '@/platform/lib/getURL'
 
+import { formatOfficialBody } from '../domain/officialMeetings'
 import type { EventDetail } from '../domain/types'
 
 const ATTENDANCE_MODE = {
@@ -24,11 +25,10 @@ export function eventJsonLd(event: EventDetail): Record<string, unknown> {
     eventStatus: event.cancelled
       ? 'https://schema.org/EventCancelled'
       : 'https://schema.org/EventScheduled',
-    organizer: {
-      '@type': 'Organization',
-      name: 'Sprecher East',
-      url: siteUrl,
-    },
+    // An official meeting is the public body's own; no URL, so none is guessed for it (#122)
+    organizer: event.officialBody
+      ? { '@type': 'GovernmentOrganization', name: formatOfficialBody(event.officialBody) }
+      : { '@type': 'Organization', name: 'Sprecher East', url: siteUrl },
     ...(image?.url ? { image: toAbsoluteURL(image.url) } : {}),
     ...(hasPlace
       ? {
