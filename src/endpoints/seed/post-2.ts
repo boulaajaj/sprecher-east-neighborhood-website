@@ -37,6 +37,9 @@ export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
       title: 'WisDOT Holds Public Hearings on I-39/90/94 Corridor Study',
     },
     publishedAt: '2024-07-25T12:00:00.000Z',
+    // The hearings were WisDOT's own; its site has the project's documents (#483)
+    sourceName: 'Wisconsin Department of Transportation',
+    sourceUrl: 'https://wisconsindot.gov/',
     relatedPosts: [],
     title: 'WisDOT Holds Public Hearings on I-39/90/94 Corridor Study',
   }

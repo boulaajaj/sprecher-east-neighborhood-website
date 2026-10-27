@@ -42,6 +42,9 @@ export const Posts: CollectionConfig<'posts'> = {
       image: true,
       description: true,
     },
+    // Cards show where the news came from (#483)
+    sourceName: true,
+    sourceUrl: true,
   },
   admin: {
     components: { beforeListTable: [SUGGESTIONS_FILTER] },

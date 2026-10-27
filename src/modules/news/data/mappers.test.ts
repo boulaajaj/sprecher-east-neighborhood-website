@@ -59,6 +59,7 @@ describe('toPostSummary', () => {
       ],
       description: 'Public hearings.',
       image,
+      source: null,
     })
   })
 
@@ -72,6 +73,7 @@ describe('toPostSummary', () => {
       categories: [],
       description: null,
       image: null,
+      source: null,
     })
   })
 
@@ -174,6 +176,7 @@ describe('toSearchResult', () => {
       ],
       description: 'Public hearings.',
       image,
+      source: null,
     })
   })
 
@@ -196,6 +199,7 @@ describe('toSearchResult', () => {
       categories: [],
       description: null,
       image: null,
+      source: null,
     })
   })
 })

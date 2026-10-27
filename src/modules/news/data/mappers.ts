@@ -1,10 +1,11 @@
 import 'server-only'
 
 import type { ArchiveBlock, Post, Search } from '@/payload-types'
+import { isHttpUrl } from '@/platform/lib/reviewQueue'
 import { documentHref } from '@/platform/payload/documentHref'
 import { toImageRef } from '@/platform/payload/imageRef'
 
-import type { PostCategory, PostDetail, PostSummary } from '../domain/types'
+import type { PostCategory, PostDetail, PostSource, PostSummary } from '../domain/types'
 
 /** The fields `toPostSummary` reads; queries for summaries select exactly these. */
 export const SUMMARY_FIELDS = {
@@ -13,6 +14,8 @@ export const SUMMARY_FIELDS = {
   categories: true,
   publishedAt: true,
   meta: true,
+  sourceName: true,
+  sourceUrl: true,
 } as const
 
 type SummaryDoc = Pick<Post, 'id' | keyof typeof SUMMARY_FIELDS>
@@ -29,6 +32,20 @@ function toCategories(values: Post['categories']): PostCategory[] {
   )
 }
 
+/**
+ * Where a post's news came from (#483). The link is kept only when it's an absolute http(s)
+ * address: the field checks that on save, but older or imported data is never trusted to render
+ * as a link. A link without a name is named by its host; with neither, the post has no source.
+ */
+function toPostSource(
+  name: string | null | undefined,
+  url: string | null | undefined,
+): PostSource | null {
+  const link = isHttpUrl(url) ? url : null
+  const label = name?.trim() || (link ? new URL(link).hostname : '')
+  return label ? { name: label, url: link } : null
+}
+
 /** A post document as a card or sidebar item shows it. */
 export function toPostSummary(doc: SummaryDoc): PostSummary {
   return {
@@ -40,6 +57,7 @@ export function toPostSummary(doc: SummaryDoc): PostSummary {
     categories: toCategories(doc.categories),
     description: doc.meta?.description ?? null,
     image: toImageRef(doc.meta?.image),
+    source: toPostSource(doc.sourceName, doc.sourceUrl),
   }
 }
 
@@ -110,5 +128,7 @@ export function toSearchResult(
     ),
     description: doc.meta?.description ?? null,
     image: toImageRef(doc.meta?.image),
+    // The search plugin copies no source
+    source: null,
   }
 }
