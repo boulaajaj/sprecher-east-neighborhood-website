@@ -1,3 +1,4 @@
+import { randomBytes, randomInt } from 'node:crypto'
 import { createRequire } from 'node:module'
 
 import { test as base, expect, type Page } from '@playwright/test'
@@ -6,7 +7,7 @@ const axePath = createRequire(import.meta.url).resolve('axe-core/axe.min.js')
 
 let visitors = 0
 // A different block of addresses each run, so a rerun never meets an earlier run's counts
-const run = 20 + Math.floor(Math.random() * 200)
+const run = randomInt(20, 220)
 
 /**
  * The tests' `test`: each test is a different visitor, with its own address in X-Forwarded-For
@@ -29,10 +30,10 @@ export { expect }
 
 /** A new address no account or message uses yet. */
 export const newEmail = (who: string) =>
-  `${who}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@example.com`
+  `${who}-${Date.now()}-${randomBytes(3).toString('hex')}@example.com`
 
 /** A password that passes the site's rules. */
-export const newPassword = () => `Neighbor-${Math.random().toString(36).slice(2, 10)}-2026`
+export const newPassword = () => `Neighbor-${randomBytes(6).toString('base64url')}-2026`
 
 /** Runs axe on the page as it stands, WCAG 2.2 AA, and fails with the rules it breaks. */
 export async function expectAccessible(page: Page) {
