@@ -45,4 +45,26 @@ describe('PageHeader', () => {
     )
     expect(screen.getByRole('textbox', { name: 'Search' })).toBeTruthy()
   })
+
+  it('draws a compact header for a form page, with no container of its own (#439)', () => {
+    const { container } = render(
+      <PageHeader variant="compact" title="Log In" description="Log in to your account." />,
+    )
+
+    const header = container.querySelector('header')
+    expect(header?.className).not.toContain('container')
+    expect(screen.getByRole('heading', { level: 1 }).className).toContain('text-3xl')
+    expect(header?.className).toContain('mb-8')
+  })
+
+  it('keeps less room under a compact header with no description', () => {
+    const { container } = render(<PageHeader variant="compact" title="Account Confirmed" />)
+
+    expect(container.querySelector('header')?.className).toContain('mb-6')
+  })
+
+  it('takes no eyebrow, way back or control in the compact variant', () => {
+    // @ts-expect-error A compact header is title and description only
+    render(<PageHeader variant="compact" title="Log In" eyebrow="Account" />)
+  })
 })

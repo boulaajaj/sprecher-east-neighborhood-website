@@ -3,8 +3,9 @@ import type { Metadata } from 'next'
 import { AccountOffer } from '@/modules/accounts/server'
 import { parseConfirmationToken } from '@/modules/verification'
 import { ConfirmEmail, getConfirmationLinkStatus } from '@/modules/verification/server'
-import { cn } from '@/platform/lib/cn'
 import { NOT_INDEXED } from '@/platform/seo/notIndexed'
+import { PageHeader } from '@/platform/ui/PageHeader'
+import { Section } from '@/platform/ui/Section'
 
 export const metadata: Metadata = {
   title: 'Confirm Your Email',
@@ -27,23 +28,20 @@ export default async function ConfirmEmailPage({ searchParams }: Props) {
   const alreadyConfirmed = status === 'already-confirmed'
 
   return (
-    <div className="container flex min-h-[60vh] items-center py-16">
-      <div className="mx-auto w-full max-w-md">
-        <h1
-          className={cn('text-3xl font-bold text-foreground', alreadyConfirmed ? 'mb-6' : 'mb-2')}
-        >
-          {alreadyConfirmed ? 'Email Confirmed' : 'Confirm Your Email'}
-        </h1>
-        {!alreadyConfirmed && (
-          <p className="mb-8 text-muted-foreground">
-            One click to confirm this address is yours. Then we’ll send you a welcome email.
-          </p>
-        )}
-        {/* A dead link offers the contact form, where sending again brings a new link */}
-        <ConfirmEmail token={parseConfirmationToken(token)} status={status} retryHref="/contact">
-          <AccountOffer />
-        </ConfirmEmail>
-      </div>
-    </div>
+    <Section as="div" width="narrow" spacing="center">
+      <PageHeader
+        variant="compact"
+        title={alreadyConfirmed ? 'Email Confirmed' : 'Confirm Your Email'}
+        description={
+          alreadyConfirmed
+            ? undefined
+            : 'One click to confirm this address is yours. Then we’ll send you a welcome email.'
+        }
+      />
+      {/* A dead link offers the contact form, where sending again brings a new link */}
+      <ConfirmEmail token={parseConfirmationToken(token)} status={status} retryHref="/contact">
+        <AccountOffer />
+      </ConfirmEmail>
+    </Section>
   )
 }
