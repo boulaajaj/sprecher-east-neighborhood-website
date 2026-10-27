@@ -8,6 +8,7 @@ import { Card, CardBody, CardFooter, CardMedia, CardTitle } from '@/platform/ui/
 import { formatDateBadge } from '@/platform/lib/formatDateTime'
 import { DateTime } from '@/platform/ui/DateTime'
 import { MetaList, type IconMetaItem } from '@/platform/ui/MetaList'
+import { Text } from '@/platform/ui/Text'
 
 import type { EventSummary } from '../domain/types'
 
@@ -113,9 +114,9 @@ export const EventCard: React.FC<{
         />
 
         {description && (
-          <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+          <Text variant="small" clamp={2} className="mb-3">
             {description}
-          </p>
+          </Text>
         )}
 
         {categories.length > 0 && (

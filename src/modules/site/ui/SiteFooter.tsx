@@ -5,6 +5,7 @@ import { MapPin, Mail } from 'lucide-react'
 import { resolveLink } from '@/platform/payload/resolveLink'
 import { Link } from '@/platform/ui'
 import { MetaList } from '@/platform/ui/MetaList'
+import { Text } from '@/platform/ui/Text'
 
 import { getFooterNav } from '../use-cases/getFooterNav'
 import { Logo } from './Logo'
@@ -31,9 +32,9 @@ export async function SiteFooter() {
 
           {/* Quick links column */}
           <div>
-            <h3 className="mb-5 text-xs font-bold tracking-widest text-muted-foreground uppercase">
+            <Text variant="label" as="h3" className="mb-5">
               Quick Links
-            </h3>
+            </Text>
             <nav aria-label="Footer" className="flex flex-col gap-3">
               {navItems.map(({ link }, i) => {
                 const resolved = resolveLink(link)
@@ -55,9 +56,9 @@ export async function SiteFooter() {
 
           {/* Contact column */}
           <div>
-            <h3 className="mb-5 text-xs font-bold tracking-widest text-muted-foreground uppercase">
+            <Text variant="label" as="h3" className="mb-5">
               Get in Touch
-            </h3>
+            </Text>
             <MetaList
               className="text-sm text-muted-foreground"
               items={[

@@ -15,7 +15,7 @@ page or layout in `src/app/` composes them ([0008](../architecture/decisions/000
 | Module      | Component           | Variants (`cva`)                                | Props (plain data)                                                    | Built from                                                                                                | Today                                                                                                 | Elements   |
 | ----------- | ------------------- | ----------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ---------- |
 | `site`      | `SiteHeader`        | one look                                        | `navItems` (resolved links), `account` slot, `current` path           | `Section · page`, `Link · nav`, `Button`, `Dialog · sheet`; a pulsing placeholder while the account loads | `src/modules/site/ui/SiteHeaderBar.client.tsx` (desktop and mobile markup written twice)              | L2, S8     |
-| `site`      | `SiteFooter`        | one look                                        | `navItems`; hides a column with no links                              | `Section · page`, `Text · overline`, `Link · muted`, `MetaList`                                           | `src/modules/site/ui/SiteFooter.tsx`                                                                  | L6         |
+| `site`      | `SiteFooter`        | one look                                        | `navItems`; hides a column with no links                              | `Section · page`, `Text · label`, `Link · muted`, `MetaList`                                              | `src/modules/site/ui/SiteFooter.tsx`                                                                  | L6         |
 | `site`      | `Logo`              | `size`: `md`, `lg`                              | —                                                                     | —                                                                                                         | `src/modules/site/ui/Logo.tsx`                                                                        | L3, L4     |
 | `site`      | `PageHero`          | `variant`: `high`, `medium`, `low`              | `title` and `body` (`RichTextValue`), `image`, `links`                | `Media`, `RichText`, `Button`                                                                             | `src/modules/site/ui/` (three hero components and `RenderHero`)                                       | H1, H4, H5 |
 | `site`      | `ContentBlock`      | `layout`: `single`, `columns`, `cards`, `stats` | `columns` (`{ size, body, link? }[]`)                                 | `Section`, `CardGrid`, `Card`, `RichText · compact`, `Button`                                             | `src/modules/site/ui/ContentBlock.tsx` (layout guessed from sizes)                                    | B8–B11     |
@@ -60,7 +60,7 @@ from the epic's list is `FaqList` until a second screen needs one.
 ## Coverage
 
 Every element in the inventory maps to exactly one component and variant: 138 elements,
-91 component-variant pairs, 37 components (23 shared, 14 area). `{style}` and
+90 component-variant pairs, 37 components (23 shared, 14 area). `{style}` and
 `{appearance}` mean the CMS field picks the variant. The table below is generated from the
 element tables by script, so no element is missing and none maps twice.
 
@@ -103,10 +103,9 @@ element tables by script, so no element is missing and none maps twice.
 | MetaList · on-image         | H9                                                |     1 |
 | MetaList · stacked          | C22                                               |     1 |
 | Text · lead                 | C19                                               |     1 |
-| Text · muted                | C26                                               |     1 |
-| Text · overline             | L7, H15                                           |     2 |
+| Text · label                | L7, H15                                           |     2 |
 | Text · section              | H14                                               |     1 |
-| Text · small                | L8                                                |     1 |
+| Text · small                | L8, C26                                           |     2 |
 | Text · subsection           | H16                                               |     1 |
 | PageHeader · compact        | H13                                               |     1 |
 | PageHeader · default        | H8, H12                                           |     2 |

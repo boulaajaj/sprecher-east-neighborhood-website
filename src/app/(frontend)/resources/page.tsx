@@ -7,6 +7,7 @@ import { mergeOpenGraph } from '@/platform/seo/mergeOpenGraph'
 import { CardGrid, CardGridItem } from '@/platform/ui/CardGrid'
 import { EmptyState } from '@/platform/ui/EmptyState'
 import { PageHeader } from '@/platform/ui/PageHeader'
+import { Text } from '@/platform/ui/Text'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
@@ -25,9 +26,9 @@ export default async function ResourcesPage() {
       <div className="container space-y-16">
         {sections.map(({ category, label, items }) => (
           <section key={category}>
-            <h2 className="mb-6 border-b border-border pb-3 text-xl font-semibold text-foreground">
+            <Text variant="section" className="mb-6 border-b border-border pb-3">
               {label}
-            </h2>
+            </Text>
             <CardGrid gap="sm">
               {items.map((resource) => (
                 <CardGridItem key={resource.id}>
