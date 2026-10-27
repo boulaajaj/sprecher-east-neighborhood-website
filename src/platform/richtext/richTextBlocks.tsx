@@ -6,8 +6,8 @@ import { MediaBlock } from './MediaBlock'
 import type { RichTextBlocks } from './RichText'
 
 /**
- * Renderers for the blocks in `RICH_TEXT_BLOCKS`, for `RichText`'s `blocks` prop. Only a post's
- * content can hold blocks, so the post page passes these; other rich text renders none.
+ * Renderers for the blocks in `RICH_TEXT_BLOCKS`, for `RichText`'s `blocks` prop.
+ * Post and event pages pass this map to RichText; event content only enables media blocks.
  */
 export const richTextBlocks = {
   banner: ({ node }) => <BannerBlock className="col-start-2 mb-4" {...node.fields} />,

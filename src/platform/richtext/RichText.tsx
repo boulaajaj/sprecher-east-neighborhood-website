@@ -27,7 +27,7 @@ type NodeTypes = DefaultNodeTypes | RichTextBlockNode
 
 /**
  * Renderers for the blocks a rich-text field may hold, by block type. The caller passes them in
- * (the post page passes `richTextBlocks`), so this file imports no block, and a block can render
+ * (post and event pages pass `richTextBlocks`), so this file imports no block, and a block can render
  * rich text of its own without an import cycle (#135).
  */
 export type RichTextBlocks = NonNullable<JSXConverters<NodeTypes>['blocks']>
@@ -82,8 +82,8 @@ type Props = {
   data: RichTextValue
   /**
    * Renderers for the blocks this field may hold. Pass them for any field whose editor has a
-   * blocks feature: Payload draws a block with no renderer as "unknown node". Today only a post's
-   * content has one (`payload.config.test.ts` checks every rich-text field).
+   * blocks feature: Payload draws a block with no renderer as "unknown node". Today post and
+   * event content have blocks (`payload.config.test.ts` checks every rich-text field).
    */
   blocks?: RichTextBlocks
   enableGutter?: boolean

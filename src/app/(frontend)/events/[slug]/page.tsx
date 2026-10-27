@@ -9,6 +9,7 @@ import { JsonLd } from '@/platform/ui/JsonLd'
 import { LivePreviewListener } from '@/platform/ui/LivePreviewListener.client'
 import { PayloadRedirects } from '@/modules/site/server'
 import { RichText } from '@/platform/richtext/RichText'
+import { richTextBlocks } from '@/platform/richtext/richTextBlocks'
 import { SidebarCTA } from '@/platform/ui/SidebarCTA'
 import {
   EventCardPreview,
@@ -124,7 +125,12 @@ export default async function EventPage({ params: paramsPromise }: Args) {
           )}
 
           {event.content && (
-            <RichText className="max-w-[48rem]" data={event.content} enableGutter={false} />
+            <RichText
+              blocks={richTextBlocks}
+              className="max-w-[48rem]"
+              data={event.content}
+              enableGutter={false}
+            />
           )}
         </DetailLayout>
       </div>
