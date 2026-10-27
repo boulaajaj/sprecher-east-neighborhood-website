@@ -10,8 +10,8 @@ import type { PostSummary } from '../domain/types'
 
 /**
  * A post in a grid: share image or a branded placeholder, date, categories, title, summary, and
- * where the news came from. The source is plain text: the title's link already covers the card,
- * and a link can't hold another (#483).
+ * where the news came from. The source is plain text, so the card keeps one tap target, its
+ * stretched title link; the post page links the source (#483).
  */
 export const PostCard: React.FC<{
   post: PostSummary
