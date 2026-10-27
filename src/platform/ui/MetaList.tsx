@@ -9,8 +9,6 @@ export type LabelledMetaItem = { label: string; icon?: never; value: React.React
 /** A fact a decorative icon explains (a pin before a place). A list of them is a plain list */
 export type IconMetaItem = { icon?: React.ReactNode; label?: never; value: React.ReactNode }
 
-export type MetaItem = LabelledMetaItem | IconMetaItem
-
 /*
  * Small facts about a page or an item (#432): a date, a time, a place. `inline` is a wrapping row
  * of "Label: value"; `stacked` puts one item per line; `on-image` is a row on a photo, each label

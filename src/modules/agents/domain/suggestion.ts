@@ -59,7 +59,6 @@ export const REVIEW_FLAGS = [
 ] as const
 
 export const SUGGESTION_COLLECTIONS = ['events', 'posts'] as const
-export type SuggestionCollection = (typeof SUGGESTION_COLLECTIONS)[number]
 
 /** What an agent can report about a run, for an editor to look at. */
 export const REVIEW_ITEM_KINDS = [

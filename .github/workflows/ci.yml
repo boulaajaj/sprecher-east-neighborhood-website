@@ -119,6 +119,26 @@ jobs:
           npm test
           npm audit --audit-level=high --omit=dev
 
+  # Files, exports and packages nothing uses (#445). Not a required check yet, and the deploy
+  # doesn't wait for it; it becomes required once it has stayed green on main for a while.
+  knip:
+    name: Unused code (knip)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Knip
+        run: npm run knip
+
   # Pushes to main deploy once the build above has passed; the deploy also waits for the Lint
   # checks (#245). Pull requests skip this job.
   deploy:
