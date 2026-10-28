@@ -4,6 +4,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 
 import { revalidateRedirects } from '@/modules/site/cms'
 import { RICH_TEXT_BLOCKS } from '@/platform/richtext/blockConfigs'
+import { richTextBlocks } from '@/platform/richtext/richTextBlocks'
 
 /**
  * Where modules meet in the CMS (docs/architecture decision 0008): checks the composed config,
@@ -92,6 +93,16 @@ describe('posts and events', () => {
     expect(features.has('unorderedList')).toBe(true)
     expect(features.has('orderedList')).toBe(true)
   })
+
+  it('allows inline images in event content using the shared media block', () => {
+    const content = allFields(collection('events').fields).find(
+      (field) => 'name' in field && field.name === 'content',
+    )
+    if (content?.type !== 'richText') throw new Error('Events have no rich-text content')
+
+    expect(editorBlocks(content).map((block) => block.slug)).toEqual(['mediaBlock'])
+    expect(richTextBlocks).toHaveProperty('mediaBlock')
+  })
 })
 
 describe('the Pages collection', () => {
@@ -130,8 +141,8 @@ describe('the globals', () => {
 })
 
 describe('every other rich-text field', () => {
-  // Only the post page passes block renderers to RichText; a block anywhere else would show as
-  // Payload's "unknown node" (#135)
+  // Post and event pages pass block renderers to RichText; any other field offering blocks
+  // would show Payload's "unknown node" (#135).
   it('offers no blocks', () => {
     const fields = [
       ...config.collections.flatMap((c) => richTextFields(c.fields, c.slug)),
@@ -151,6 +162,6 @@ describe('every other rich-text field', () => {
     )
 
     const withBlocks = fields.filter(({ field }) => editorBlocks(field).length > 0)
-    expect(withBlocks.map(({ path }) => path)).toEqual(['posts.content'])
+    expect(withBlocks.map(({ path }) => path)).toEqual(['posts.content', 'events.content'])
   })
 })
