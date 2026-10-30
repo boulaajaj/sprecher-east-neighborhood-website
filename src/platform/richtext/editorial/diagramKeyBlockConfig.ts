@@ -1,4 +1,9 @@
-import type { Block } from 'payload'
+import type { Block, TextFieldSingleValidation } from 'payload'
+import { text } from 'payload/shared'
+
+// `required` accepts a label of only spaces, which would leave a number with nothing beside it
+export const validateLabel: TextFieldSingleValidation = (value, args) =>
+  value && !value.trim() ? 'Add a label, or remove this marker.' : text(value, args)
 
 /**
  * A numbered legend for an annotated image (#515): put it right under a picture whose markers
@@ -30,6 +35,7 @@ export const DiagramKeyBlockConfig: Block = {
               type: 'text',
               required: true,
               maxLength: 40,
+              validate: validateLabel,
               admin: { width: '40%', description: 'Short: "North roundabout".' },
             },
             {

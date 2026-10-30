@@ -22,7 +22,7 @@ describe('DiagramKey', () => {
     const list = screen.getByRole('list', { name: 'Diagram key' })
     const items = within(list).getAllByRole('listitem')
     expect(items.map((item) => item.textContent)).toEqual([
-      '1Marker 1: North roundabout · Ramps meet the crossing road.',
+      '1Marker 1: North roundabout: \u00a0· Ramps meet the crossing road.',
       '2Marker 2: Westbound loop',
     ])
     const circle = items[0].querySelector('[aria-hidden="true"]')
