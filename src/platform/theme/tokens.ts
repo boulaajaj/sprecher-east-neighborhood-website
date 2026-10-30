@@ -94,6 +94,8 @@ export const CONTRAST_PAIRS: ReadonlyArray<readonly [text: ThemeToken, backgroun
   ['warning-strong', 'background'],
   ['warning-strong', 'surface'],
   ['warning-strong', 'card'],
+  // An outcome fork's "open" card: body text on the muted surface (#510)
+  ['foreground', 'muted'],
 ]
 
 /**
@@ -109,6 +111,8 @@ const ALERT_TONES = [
   ['primary-strong', 'primary'],
   ['warning-strong', 'warning'],
   ['destructive-strong', 'destructive'],
+  // An outcome fork's "stop" card: its body text on the destructive tint (#510)
+  ['foreground', 'destructive'],
 ] as const satisfies readonly (readonly [ThemeToken, ThemeToken])[]
 export const TINTED_PAIRS = ALERT_TONES.flatMap(([text, tint]) =>
   (['background', 'surface', 'card'] as const).map(

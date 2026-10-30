@@ -2822,6 +2822,108 @@ export interface TimelineBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StepsBlock".
+ */
+export interface StepsBlock {
+  /**
+   * In the order a reader does them. Keep headings short and alike: "Join…".
+   */
+  steps: {
+    heading: string
+    /**
+     * One or two plain sentences. Optional.
+     */
+    body?: string | null
+    /**
+     * Optional, for example "Find your alder".
+     */
+    linkLabel?: string | null
+    /**
+     * A site path (/events) or https:// address.
+     */
+    linkUrl?: string | null
+    id?: string | null
+  }[]
+  id?: string | null
+  blockName?: string | null
+  blockType: 'steps'
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "KeyFactsBlock".
+ */
+export interface KeyFactsBlock {
+  /**
+   * Two to six facts. They sit side by side on wide screens.
+   */
+  facts: {
+    /**
+     * Short: "2040s", "$10M", "Not set".
+     */
+    value: string
+    /**
+     * What it is: "earliest construction".
+     */
+    label: string
+    icon:
+      | 'info'
+      | 'date'
+      | 'time'
+      | 'money'
+      | 'taxes'
+      | 'government'
+      | 'place'
+      | 'people'
+      | 'traffic'
+      | 'walking'
+      | 'biking'
+      | 'noise'
+      | 'construction'
+    certainty: 'confirmed' | 'estimate' | 'unknown'
+    /**
+     * Optional, for example "City budget".
+     */
+    linkLabel?: string | null
+    /**
+     * A site path (/events) or https:// address.
+     */
+    linkUrl?: string | null
+    id?: string | null
+  }[]
+  id?: string | null
+  blockName?: string | null
+  blockType: 'keyFacts'
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "OutcomeForkBlock".
+ */
+export interface OutcomeForkBlock {
+  /**
+   * The open question, as a reader would ask it.
+   */
+  question: string
+  /**
+   * Two or three possible answers, each with what it would mean.
+   */
+  outcomes: {
+    /**
+     * The answer: "If they agree".
+     */
+    title: string
+    tone: 'go' | 'stop' | 'open'
+    /**
+     * What happens then, in one or two plain sentences.
+     */
+    description: string
+    id?: string | null
+  }[]
+  id?: string | null
+  blockName?: string | null
+  blockType: 'outcomeFork'
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "auth".
  */
 export interface Auth {

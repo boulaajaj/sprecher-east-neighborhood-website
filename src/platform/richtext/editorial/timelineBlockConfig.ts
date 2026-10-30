@@ -1,12 +1,8 @@
-import type { ArrayFieldValidation, Block, TextFieldSingleValidation } from 'payload'
+import type { ArrayFieldValidation, Block } from 'payload'
 import { array } from 'payload/shared'
 
-import { EDITORIAL_LINK_MAX_LENGTH, validateEditorialLink } from './editorialLink'
+import { editorialLinkFields } from './linkFields'
 import { TIMELINE_STATUS_OPTIONS } from './timelineStatus'
-
-// The address is checked together with its link text: both or neither
-const validateLinkUrl: TextFieldSingleValidation = (value, { siblingData }) =>
-  validateEditorialLink(value, (siblingData as { linkLabel?: string | null }).linkLabel)
 
 // One milestone at most is "Next up": it's the reader's "you are here"
 const validateEntries: ArrayFieldValidation = (value, args) => {
@@ -71,26 +67,7 @@ export const TimelineBlockConfig: Block = {
           maxLength: 300,
           admin: { description: 'One or two plain sentences. Optional.' },
         },
-        {
-          type: 'row',
-          fields: [
-            {
-              name: 'linkLabel',
-              type: 'text',
-              label: 'Link text',
-              maxLength: 60,
-              admin: { width: '50%', description: 'Optional, for example "Read the decision".' },
-            },
-            {
-              name: 'linkUrl',
-              type: 'text',
-              label: 'Link address',
-              maxLength: EDITORIAL_LINK_MAX_LENGTH,
-              admin: { width: '50%', description: 'A site path (/events) or https:// address.' },
-              validate: validateLinkUrl,
-            },
-          ],
-        },
+        editorialLinkFields({ labelExample: 'Read the decision' }),
       ],
     },
   ],

@@ -2,6 +2,12 @@ import React from 'react'
 
 import { BannerBlock } from './BannerBlock'
 import { CodeBlock } from './CodeBlock'
+import { KeyFacts } from './editorial/KeyFacts'
+import { toKeyFactsProps } from './editorial/keyFacts'
+import { OutcomeFork } from './editorial/OutcomeFork'
+import { toOutcomeForkProps } from './editorial/outcomeFork'
+import { Steps } from './editorial/Steps'
+import { toStepsProps } from './editorial/steps'
 import { Timeline } from './editorial/Timeline'
 import { toTimelineProps } from './editorial/timeline'
 import { MediaBlock } from './MediaBlock'
@@ -26,4 +32,9 @@ export const richTextBlocks = {
   ),
   code: ({ node }) => <CodeBlock className="col-start-2" {...node.fields} />,
   timeline: ({ node }) => <Timeline className="col-start-2" {...toTimelineProps(node.fields)} />,
+  steps: ({ node }) => <Steps className="col-start-2" {...toStepsProps(node.fields)} />,
+  keyFacts: ({ node }) => <KeyFacts className="col-start-2" {...toKeyFactsProps(node.fields)} />,
+  outcomeFork: ({ node }) => (
+    <OutcomeFork className="col-start-2" {...toOutcomeForkProps(node.fields)} />
+  ),
 } satisfies RichTextBlocks

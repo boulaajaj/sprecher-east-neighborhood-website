@@ -16,13 +16,26 @@ import { cn } from '@/platform/lib/cn'
 import type { RichTextValue } from '@/platform/lib'
 import { documentHref } from '@/platform/payload/documentHref'
 import { Link } from '@/platform/ui/Link'
-import type { BannerBlock, MediaBlock, TimelineBlock } from '@/payload-types'
+import type {
+  BannerBlock,
+  KeyFactsBlock,
+  MediaBlock,
+  OutcomeForkBlock,
+  StepsBlock,
+  TimelineBlock,
+} from '@/payload-types'
 
 import type { CodeBlockProps } from './CodeBlock'
 
 /** A node for one of the blocks an editor can put inside rich text (`RICH_TEXT_BLOCKS`) */
 export type RichTextBlockNode = SerializedBlockNode<
-  BannerBlock | CodeBlockProps | MediaBlock | TimelineBlock
+  | BannerBlock
+  | CodeBlockProps
+  | MediaBlock
+  | TimelineBlock
+  | StepsBlock
+  | KeyFactsBlock
+  | OutcomeForkBlock
 >
 
 type NodeTypes = DefaultNodeTypes | RichTextBlockNode
