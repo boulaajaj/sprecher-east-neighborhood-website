@@ -5,12 +5,18 @@ import { describe, expect, it } from 'vitest'
 import type {
   BannerBlock as BannerFields,
   MediaBlock as MediaFields,
+  KeyFactsBlock as KeyFactsFields,
+  OutcomeForkBlock as OutcomeForkFields,
+  StepsBlock as StepsFields,
   TimelineBlock as TimelineFields,
 } from '@/payload-types'
 
 import { BannerBlock } from './BannerBlock'
 import { RICH_TEXT_BLOCKS } from './blockConfigs'
 import { CodeBlock, type CodeBlockProps } from './CodeBlock'
+import { KeyFacts } from './editorial/KeyFacts'
+import { OutcomeFork } from './editorial/OutcomeFork'
+import { Steps } from './editorial/Steps'
 import { Timeline } from './editorial/Timeline'
 import { MediaBlock } from './MediaBlock'
 import { richTextBlocks } from './richTextBlocks'
@@ -82,5 +88,43 @@ describe('richTextBlocks', () => {
       'Decision',
       'Construction',
     ])
+  })
+
+  it('draws steps, key facts and an outcome fork in the middle column, from plain props', () => {
+    const steps: StepsFields = {
+      blockType: 'steps',
+      steps: [{ heading: 'Join' }, { heading: 'Vote' }],
+    }
+    const facts: KeyFactsFields = {
+      blockType: 'keyFacts',
+      facts: [
+        { value: '2040s', label: 'build', icon: 'date', certainty: 'estimate' },
+        { value: '?', label: 'cost', icon: 'money', certainty: 'unknown' },
+      ],
+    }
+    const fork: OutcomeForkFields = {
+      blockType: 'outcomeFork',
+      question: 'Deal?',
+      outcomes: [
+        { title: 'Yes', tone: 'go', description: 'Go.' },
+        { title: 'No', tone: 'stop', description: 'Stop.' },
+      ],
+    }
+
+    const stepsElement = richTextBlocks.steps(argsFor(steps))
+    expect(stepsElement.type).toBe(Steps)
+    expect(stepsElement.props).toMatchObject({ className: 'col-start-2' })
+    expect(stepsElement.props.steps).toHaveLength(2)
+
+    const factsElement = richTextBlocks.keyFacts(argsFor(facts))
+    expect(factsElement.type).toBe(KeyFacts)
+    expect(factsElement.props.facts.map((fact: { value: string }) => fact.value)).toEqual([
+      '2040s',
+      '?',
+    ])
+
+    const forkElement = richTextBlocks.outcomeFork(argsFor(fork))
+    expect(forkElement.type).toBe(OutcomeFork)
+    expect(forkElement.props).toMatchObject({ className: 'col-start-2', question: 'Deal?' })
   })
 })
