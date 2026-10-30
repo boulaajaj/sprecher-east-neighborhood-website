@@ -1,11 +1,21 @@
-import type { Block, TextFieldSingleValidation } from 'payload'
+import type { ArrayFieldValidation, Block, TextFieldSingleValidation } from 'payload'
+import { array } from 'payload/shared'
 
-import { validateEditorialLink } from './editorialLink'
+import { EDITORIAL_LINK_MAX_LENGTH, validateEditorialLink } from './editorialLink'
 import { TIMELINE_STATUS_OPTIONS } from './timelineStatus'
 
 // The address is checked together with its link text: both or neither
 const validateLinkUrl: TextFieldSingleValidation = (value, { siblingData }) =>
   validateEditorialLink(value, (siblingData as { linkLabel?: string | null }).linkLabel)
+
+// One milestone at most is "Next up": it's the reader's "you are here"
+const validateEntries: ArrayFieldValidation = (value, args) => {
+  const nextUp = Array.isArray(value)
+    ? value.filter((entry) => (entry as { status?: string }).status === 'next').length
+    : 0
+  if (nextUp > 1) return 'Mark only one milestone as "Next up".'
+  return array(value, args)
+}
 
 /**
  * The timeline an editor puts inside rich text (#507): milestones in order, each with a date
@@ -28,6 +38,7 @@ export const TimelineBlockConfig: Block = {
       minRows: 2,
       maxRows: 12,
       required: true,
+      validate: validateEntries,
       fields: [
         {
           type: 'row',
@@ -74,6 +85,7 @@ export const TimelineBlockConfig: Block = {
               name: 'linkUrl',
               type: 'text',
               label: 'Link address',
+              maxLength: EDITORIAL_LINK_MAX_LENGTH,
               admin: { width: '50%', description: 'A site path (/events) or https:// address.' },
               validate: validateLinkUrl,
             },

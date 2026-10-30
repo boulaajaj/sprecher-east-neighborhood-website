@@ -6,11 +6,21 @@ import type { ResolvedLink } from '@/platform/lib'
  * inside rich text isn't populated, so a plain address is the reliable choice here.
  */
 
-/** A site path (`/events/…`) or an http(s) address. */
-const ADDRESS = /^(\/(?!\/)\S*|https?:\/\/\S+)$/i
+/**
+ * A site path (`/events/…`) or an http(s) address. A site path can't start with a second slash
+ * or hold a backslash anywhere: browsers read `\` as `/`, so `/\host` and `//host` both leave the
+ * site while looking like a path (#513 review).
+ */
+const SITE_PATH = /^\/(?![/\\])[^\s\\]*$/
+const WEB_ADDRESS = /^https?:\/\/[^\s\\]+$/i
+
+/** The longest address an editor can save, the common URL limit. */
+export const EDITORIAL_LINK_MAX_LENGTH = 2048
 
 export function isEditorialLinkUrl(value: string): boolean {
-  return ADDRESS.test(value.trim())
+  const address = value.trim()
+  if (address.length > EDITORIAL_LINK_MAX_LENGTH) return false
+  return SITE_PATH.test(address) || WEB_ADDRESS.test(address)
 }
 
 /** Payload field validation: both parts or neither, and an address the site can link to. */

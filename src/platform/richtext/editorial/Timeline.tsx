@@ -17,12 +17,15 @@ import { TIMELINE_STATUS_LABELS, type TimelineStatus } from './timelineStatus'
  */
 export function Timeline({ entries, className }: TimelineProps & { className?: string }) {
   if (entries.length === 0) return null
+  // Only one step can be the reader's "you are here", even if an editor marked two
+  const current = entries.findIndex((entry) => entry.status === 'next')
   return (
     <ol className={cn('not-prose my-8 w-full', className)}>
       {entries.map((entry, index) => (
         <TimelineItem
           key={`${index}-${entry.title}`}
           entry={entry}
+          isCurrent={index === current}
           // The line runs down to the next milestone: solid when that one has happened
           lineToNext={index < entries.length - 1 ? lineStyle(entries[index + 1].status) : null}
         />
@@ -38,15 +41,17 @@ const lineStyle = (nextStatus: TimelineStatus): LineStyle =>
 
 function TimelineItem({
   entry,
+  isCurrent,
   lineToNext,
 }: {
   entry: TimelineEntry
+  isCurrent: boolean
   lineToNext: LineStyle | null
 }) {
   return (
     <li
       className={cn('relative pl-10', lineToNext && 'pb-8')}
-      aria-current={entry.status === 'next' ? 'step' : undefined}
+      aria-current={isCurrent ? 'step' : undefined}
     >
       {lineToNext && (
         <span

@@ -66,6 +66,22 @@ describe('Timeline', () => {
     expect(current[0].textContent).toContain('Public meeting')
   })
 
+  it('marks only the first "Next up" as the current step if an editor marked two', () => {
+    render(
+      <Timeline
+        entries={[
+          entry({ title: 'First', status: 'next' }),
+          entry({ title: 'Second', status: 'next' }),
+        ]}
+      />,
+    )
+
+    const current = screen
+      .getAllByRole('listitem')
+      .filter((item) => item.getAttribute('aria-current') === 'step')
+    expect(current.map((item) => item.textContent)).toEqual([expect.stringContaining('First')])
+  })
+
   it('shows a description and a link when the milestone has them', () => {
     render(<Timeline entries={ENTRIES} />)
 
