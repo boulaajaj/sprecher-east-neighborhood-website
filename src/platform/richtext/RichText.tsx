@@ -18,6 +18,7 @@ import { documentHref } from '@/platform/payload/documentHref'
 import { Link } from '@/platform/ui/Link'
 import type {
   BannerBlock,
+  DiagramKeyBlock,
   KeyFactsBlock,
   MediaBlock,
   OutcomeForkBlock,
@@ -36,6 +37,7 @@ export type RichTextBlockNode = SerializedBlockNode<
   | StepsBlock
   | KeyFactsBlock
   | OutcomeForkBlock
+  | DiagramKeyBlock
 >
 
 type NodeTypes = DefaultNodeTypes | RichTextBlockNode

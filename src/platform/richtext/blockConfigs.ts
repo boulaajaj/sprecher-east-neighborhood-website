@@ -1,5 +1,6 @@
 import type { Block } from 'payload'
 
+import { DiagramKeyBlockConfig } from './editorial/diagramKeyBlockConfig'
 import { KeyFactsBlockConfig } from './editorial/keyFactsBlockConfig'
 import { OutcomeForkBlockConfig } from './editorial/outcomeForkBlockConfig'
 import { StepsBlockConfig } from './editorial/stepsBlockConfig'
@@ -90,14 +91,15 @@ export const MediaBlock: Block = {
 }
 
 /**
- * Visual blocks for explainer stories (epic #506): a timeline, steps, key facts and an outcome
- * fork. Post and event content both offer them, in this order.
+ * Visual blocks for explainer stories (epic #506): a timeline, steps, key facts, an outcome
+ * fork and a diagram key for annotated images. Post and event content both offer them, in this order.
  */
 export const EDITORIAL_BLOCKS: Block[] = [
   TimelineBlockConfig,
   StepsBlockConfig,
   KeyFactsBlockConfig,
   OutcomeForkBlockConfig,
+  DiagramKeyBlockConfig,
 ]
 
 /** The blocks a post's content may hold, in the order the editor offers them. */
