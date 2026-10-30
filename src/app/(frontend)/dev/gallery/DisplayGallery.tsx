@@ -1,4 +1,4 @@
-import { ArrowRight, CircleX, Landmark } from 'lucide-react'
+import { ArrowRight, CircleDashed, CircleX, Clock, Landmark } from 'lucide-react'
 import React from 'react'
 
 import { Badge, BadgeList } from '@/platform/ui/Badge'
@@ -52,6 +52,22 @@ export function DisplayGallery() {
             <Landmark aria-hidden="true" />
             Official meeting
           </Badge>
+        </GalleryVariant>
+        <GalleryVariant label="current, caution, neutral (a timeline step, #507)">
+          <BadgeList>
+            <Badge variant="current">
+              <ArrowRight aria-hidden="true" />
+              Next up
+            </Badge>
+            <Badge variant="caution">
+              <CircleDashed aria-hidden="true" />
+              Depends
+            </Badge>
+            <Badge variant="neutral">
+              <Clock aria-hidden="true" />
+              Later
+            </Badge>
+          </BadgeList>
         </GalleryVariant>
       </GalleryEntry>
 

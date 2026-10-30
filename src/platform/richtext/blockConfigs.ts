@@ -1,5 +1,7 @@
 import type { Block } from 'payload'
 
+import { TimelineBlockConfig } from './editorial/timelineBlockConfig'
+
 import {
   FixedToolbarFeature,
   InlineToolbarFeature,
@@ -84,5 +86,14 @@ export const MediaBlock: Block = {
   ],
 }
 
+/**
+ * Visual blocks for explainer stories (epic #506): a timeline, and later steps, key facts and an
+ * outcome fork. Post and event content both offer them, in this order.
+ */
+export const EDITORIAL_BLOCKS: Block[] = [TimelineBlockConfig]
+
 /** The blocks a post's content may hold, in the order the editor offers them. */
-export const RICH_TEXT_BLOCKS: Block[] = [Banner, Code, MediaBlock]
+export const RICH_TEXT_BLOCKS: Block[] = [Banner, Code, MediaBlock, ...EDITORIAL_BLOCKS]
+
+/** The blocks an event's content may hold: images and the visual blocks, no banner or code. */
+export const EVENT_RICH_TEXT_BLOCKS: Block[] = [MediaBlock, ...EDITORIAL_BLOCKS]

@@ -48,6 +48,22 @@ describe('Badge', () => {
     await expectAccessible(container)
   })
 
+  it.each([
+    ['current', 'text-primary-foreground', 'bg-primary-fill', 'Next up'],
+    ['caution', 'text-warning-strong', 'bg-warning/10', 'Depends'],
+    ['neutral', 'text-muted-foreground', 'bg-muted', 'Later'],
+  ] as const)(
+    'marks a timeline step as %s in a contract-checked pair (#507)',
+    async (variant, text, background, label) => {
+      const { container } = render(<Badge variant={variant}>{label}</Badge>)
+
+      const badge = screen.getByText(label)
+      expect(badge.className).toContain(text)
+      expect(badge.className).toContain(background)
+      await expectAccessible(container)
+    },
+  )
+
   it('lines badges up in a row that wraps, with no accessibility violations', async () => {
     const { container } = render(
       <BadgeList>

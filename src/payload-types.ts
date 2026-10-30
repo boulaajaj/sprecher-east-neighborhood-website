@@ -2789,6 +2789,39 @@ export interface CodeBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TimelineBlock".
+ */
+export interface TimelineBlock {
+  /**
+   * In the order they happen, oldest first. Two to twelve milestones.
+   */
+  entries: {
+    /**
+     * As readers should see it: "Dec 5, 2024", "Spring 2027", "Not set".
+     */
+    date: string
+    status: 'done' | 'next' | 'conditional' | 'later'
+    title: string
+    /**
+     * One or two plain sentences. Optional.
+     */
+    description?: string | null
+    /**
+     * Optional, for example "Read the decision".
+     */
+    linkLabel?: string | null
+    /**
+     * A site path (/events) or https:// address.
+     */
+    linkUrl?: string | null
+    id?: string | null
+  }[]
+  id?: string | null
+  blockName?: string | null
+  blockType: 'timeline'
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "auth".
  */
 export interface Auth {

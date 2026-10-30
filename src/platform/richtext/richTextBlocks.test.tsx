@@ -2,11 +2,16 @@ import type { SerializedBlockNode } from '@payloadcms/richtext-lexical'
 import type { JSXConverterArgs } from '@payloadcms/richtext-lexical/react'
 import { describe, expect, it } from 'vitest'
 
-import type { BannerBlock as BannerFields, MediaBlock as MediaFields } from '@/payload-types'
+import type {
+  BannerBlock as BannerFields,
+  MediaBlock as MediaFields,
+  TimelineBlock as TimelineFields,
+} from '@/payload-types'
 
 import { BannerBlock } from './BannerBlock'
 import { RICH_TEXT_BLOCKS } from './blockConfigs'
 import { CodeBlock, type CodeBlockProps } from './CodeBlock'
+import { Timeline } from './editorial/Timeline'
 import { MediaBlock } from './MediaBlock'
 import { richTextBlocks } from './richTextBlocks'
 
@@ -59,5 +64,23 @@ describe('richTextBlocks', () => {
       disableInnerContainer: true,
       media: 4,
     })
+  })
+
+  it('draws a timeline in the middle column, from plain props', () => {
+    const fields: TimelineFields = {
+      blockType: 'timeline',
+      entries: [
+        { date: '2024', status: 'done', title: 'Decision' },
+        { date: '2040s', status: 'later', title: 'Construction' },
+      ],
+    }
+    const element = richTextBlocks.timeline(argsFor(fields))
+
+    expect(element.type).toBe(Timeline)
+    expect(element.props.className).toBe('col-start-2')
+    expect(element.props.entries.map((entry: { title: string }) => entry.title)).toEqual([
+      'Decision',
+      'Construction',
+    ])
   })
 })
