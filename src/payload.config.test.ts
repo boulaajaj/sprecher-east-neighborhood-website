@@ -3,7 +3,11 @@ import type { Block, Field, RichTextField, SanitizedConfig } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { revalidateRedirects } from '@/modules/site/cms'
-import { RICH_TEXT_BLOCKS } from '@/platform/richtext/blockConfigs'
+import {
+  EDITORIAL_BLOCKS,
+  EVENT_RICH_TEXT_BLOCKS,
+  RICH_TEXT_BLOCKS,
+} from '@/platform/richtext/blockConfigs'
 import { richTextBlocks } from '@/platform/richtext/richTextBlocks'
 
 /**
@@ -94,14 +98,21 @@ describe('posts and events', () => {
     expect(features.has('orderedList')).toBe(true)
   })
 
-  it('allows inline images in event content using the shared media block', () => {
+  it('offers inline images and the editorial blocks in event content, each with a renderer', () => {
     const content = allFields(collection('events').fields).find(
       (field) => 'name' in field && field.name === 'content',
     )
     if (content?.type !== 'richText') throw new Error('Events have no rich-text content')
 
-    expect(editorBlocks(content).map((block) => block.slug)).toEqual(['mediaBlock'])
-    expect(richTextBlocks).toHaveProperty('mediaBlock')
+    const slugs = editorBlocks(content).map((block) => block.slug)
+    expect(slugs).toEqual(EVENT_RICH_TEXT_BLOCKS.map((block) => block.slug))
+    expect(slugs).toEqual(['mediaBlock', ...EDITORIAL_BLOCKS.map((block) => block.slug)])
+    for (const slug of slugs) expect(richTextBlocks).toHaveProperty(slug)
+  })
+
+  it('offers the editorial blocks in post content too', () => {
+    const slugs = RICH_TEXT_BLOCKS.map((block) => block.slug)
+    for (const block of EDITORIAL_BLOCKS) expect(slugs).toContain(block.slug)
   })
 })
 

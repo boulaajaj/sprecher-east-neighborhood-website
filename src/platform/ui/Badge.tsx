@@ -13,7 +13,11 @@ import { cn } from '@/platform/lib/cn'
  * (`TINTED_PAIRS`). Its words say the state, and an icon may go before them, so colour is never
  * the only signal. `official` marks an official meeting (#122): the category pill's checked pair
  * (primary-strong on the primary tint), set apart by its border, weight and icon rather than a
- * new colour, so it reads as distinct but calm.
+ * new colour, so it reads as distinct but calm. Three tones mark how certain a step is, for the
+ * editorial timeline (#507), each with its own words: `current` (primary-foreground on the primary
+ * fill, the button pair) for what's next; `caution` (warning-strong on the warning tint, `Alert`'s
+ * warning pair) for what depends on something else; `neutral` (muted-foreground on muted) for what
+ * is expected later. Every pair is one the theme contract checks.
  */
 const badgeVariants = cva(
   'inline-flex max-w-full items-center gap-1 rounded-full px-3 py-1 text-xs font-medium [overflow-wrap:anywhere] [&_svg]:size-3.5 [&_svg]:shrink-0',
@@ -26,6 +30,9 @@ const badgeVariants = cva(
         status:
           'border border-destructive/30 bg-destructive/10 font-semibold text-destructive-strong',
         official: 'border border-primary/30 bg-primary/10 font-semibold text-primary-strong',
+        current: 'bg-primary-fill font-semibold text-primary-foreground',
+        caution: 'border border-warning/40 bg-warning/10 font-semibold text-warning-strong',
+        neutral: 'border border-border bg-muted text-muted-foreground',
       },
     },
     defaultVariants: { variant: 'category' },

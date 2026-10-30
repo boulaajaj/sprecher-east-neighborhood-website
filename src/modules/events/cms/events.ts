@@ -18,7 +18,7 @@ import {
 } from '@payloadcms/plugin-seo/fields'
 
 import { suggestibleContentAccess } from '@/platform/payload/draftContentAccess'
-import { MediaBlock } from '@/platform/richtext/blockConfigs'
+import { EVENT_RICH_TEXT_BLOCKS } from '@/platform/richtext/blockConfigs'
 import { generatePreviewPath } from '@/platform/payload/generatePreviewPath'
 import { populatePublishedAt } from '@/platform/payload/populatePublishedAt'
 import {
@@ -171,7 +171,7 @@ export const Events: CollectionConfig<'events'> = {
                   return [
                     ...rootFeatures,
                     HeadingFeature({ enabledHeadingSizes: ['h2', 'h3', 'h4'] }),
-                    BlocksFeature({ blocks: [MediaBlock] }),
+                    BlocksFeature({ blocks: EVENT_RICH_TEXT_BLOCKS }),
                     FixedToolbarFeature(),
                     InlineToolbarFeature(),
                     HorizontalRuleFeature(),
