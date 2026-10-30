@@ -2,6 +2,8 @@ import React from 'react'
 
 import { BannerBlock } from './BannerBlock'
 import { CodeBlock } from './CodeBlock'
+import { DiagramKey } from './editorial/DiagramKey'
+import { toDiagramKeyProps } from './editorial/diagramKey'
 import { KeyFacts } from './editorial/KeyFacts'
 import { toKeyFactsProps } from './editorial/keyFacts'
 import { OutcomeFork } from './editorial/OutcomeFork'
@@ -34,6 +36,9 @@ export const richTextBlocks = {
   timeline: ({ node }) => <Timeline className="col-start-2" {...toTimelineProps(node.fields)} />,
   steps: ({ node }) => <Steps className="col-start-2" {...toStepsProps(node.fields)} />,
   keyFacts: ({ node }) => <KeyFacts className="col-start-2" {...toKeyFactsProps(node.fields)} />,
+  diagramKey: ({ node }) => (
+    <DiagramKey className="col-start-2" {...toDiagramKeyProps(node.fields)} />
+  ),
   outcomeFork: ({ node }) => (
     <OutcomeFork className="col-start-2" {...toOutcomeForkProps(node.fields)} />
   ),

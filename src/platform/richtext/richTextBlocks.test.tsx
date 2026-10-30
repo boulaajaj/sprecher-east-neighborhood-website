@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import type {
   BannerBlock as BannerFields,
   MediaBlock as MediaFields,
+  DiagramKeyBlock as DiagramKeyFields,
   KeyFactsBlock as KeyFactsFields,
   OutcomeForkBlock as OutcomeForkFields,
   StepsBlock as StepsFields,
@@ -14,6 +15,7 @@ import type {
 import { BannerBlock } from './BannerBlock'
 import { RICH_TEXT_BLOCKS } from './blockConfigs'
 import { CodeBlock, type CodeBlockProps } from './CodeBlock'
+import { DiagramKey } from './editorial/DiagramKey'
 import { KeyFacts } from './editorial/KeyFacts'
 import { OutcomeFork } from './editorial/OutcomeFork'
 import { Steps } from './editorial/Steps'
@@ -126,5 +128,17 @@ describe('richTextBlocks', () => {
     const forkElement = richTextBlocks.outcomeFork(argsFor(fork))
     expect(forkElement.type).toBe(OutcomeFork)
     expect(forkElement.props).toMatchObject({ className: 'col-start-2', question: 'Deal?' })
+  })
+
+  it('draws a diagram key in the middle column, from plain props', () => {
+    const fields: DiagramKeyFields = {
+      blockType: 'diagramKey',
+      items: [{ label: 'North roundabout' }, { label: 'Westbound loop', text: 'Onto I-94 west.' }],
+    }
+    const element = richTextBlocks.diagramKey(argsFor(fields))
+
+    expect(element.type).toBe(DiagramKey)
+    expect(element.props.className).toBe('col-start-2')
+    expect(element.props.items).toHaveLength(2)
   })
 })

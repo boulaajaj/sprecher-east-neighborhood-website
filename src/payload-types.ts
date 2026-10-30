@@ -2924,6 +2924,29 @@ export interface OutcomeForkBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DiagramKeyBlock".
+ */
+export interface DiagramKeyBlock {
+  /**
+   * One per numbered marker on the image above, in number order. Don’t type the numbers.
+   */
+  items: {
+    /**
+     * Short: "North roundabout".
+     */
+    label: string
+    /**
+     * One line: what it is or does. Optional.
+     */
+    text?: string | null
+    id?: string | null
+  }[]
+  id?: string | null
+  blockName?: string | null
+  blockType: 'diagramKey'
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "auth".
  */
 export interface Auth {
