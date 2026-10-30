@@ -47,12 +47,13 @@ describe('KeyFacts', () => {
     await expectAccessible(container)
   })
 
-  it('puts three facts in three columns on wide screens, two or four in two', () => {
+  it('puts exactly three facts three across from sm, two or four in two columns', () => {
     const { container, rerender } = render(<KeyFacts facts={FACTS} />)
-    expect(container.querySelector('ul')?.className).toContain('lg:grid-cols-3')
+    expect(container.querySelector('ul')?.className).toContain('sm:grid-cols-3')
+    expect(container.querySelector('ul')?.getAttribute('role')).toBe('list')
 
     rerender(<KeyFacts facts={FACTS.slice(0, 2)} />)
-    expect(container.querySelector('ul')?.className).not.toContain('lg:grid-cols-3')
+    expect(container.querySelector('ul')?.className).not.toMatch(/grid-cols-3/)
   })
 
   it('renders nothing without facts', () => {

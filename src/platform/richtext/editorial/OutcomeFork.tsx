@@ -4,12 +4,13 @@ import React from 'react'
 import { cn } from '@/platform/lib/cn'
 
 import type { Outcome, OutcomeForkProps } from './outcomeFork'
-import type { OutcomeTone } from './outcomeTone'
+import { OUTCOME_TONE_LABELS, type OutcomeTone } from './outcomeTone'
 
 /**
  * One question branching to two or three outcomes (#510). On wide screens the outcomes sit side
  * by side under the question, joined by a stem and a bar; on phones they stack, hung from a line
- * down the left. The connectors are decoration: the question is a heading and the outcomes a list.
+ * down the left. The connectors are decoration: the question is a heading and the outcomes a list,
+ * each title read with its tone in words ("Goes ahead: If they agree"), since the icon is hidden.
  */
 export function OutcomeFork({
   question,
@@ -28,7 +29,11 @@ export function OutcomeFork({
         aria-hidden="true"
         className="mx-auto hidden h-6 w-0.5 bg-muted-foreground/50 sm:block"
       />
-      <ul className={cn('relative grid grid-cols-1 gap-4 pt-4 pl-6', 'sm:pt-0 sm:pl-0', columns)}>
+      {/* `role="list"`: Safari drops list semantics from a list without bullets */}
+      <ul
+        role="list"
+        className={cn('relative grid grid-cols-1 gap-4 pt-4 pl-10', 'sm:pt-0 sm:pl-0', columns)}
+      >
         {outcomes.map((outcome, index) => (
           <OutcomeItem
             key={`${index}-${outcome.title}`}
@@ -64,8 +69,10 @@ function OutcomeItem({
   const { card, title, Icon } = CARD[outcome.tone]
   return (
     <li className="relative sm:pt-6">
-      {/* Phones: the line down the left, through the gap above this card and down to its branch
-          (the last card's line stops there), then a short branch across to the card */}
+      {/* Phones: the line down the left, hung from the question box's flat bottom edge (16 px in,
+          clear of its rounded corner) and through the gap above this card. The last card's line
+          stops at its branch: 16 px gap + 24 px down to the branch + 2 px of branch (h-10.5).
+          Then a short branch across to the card */}
       <span
         aria-hidden="true"
         className={cn(
@@ -93,7 +100,10 @@ function OutcomeItem({
       <div className={cn('h-full rounded-2xl border p-6', card)}>
         <p className={cn('flex items-center gap-2 text-base font-semibold', title)}>
           <Icon aria-hidden="true" className="size-5 shrink-0" />
-          {outcome.title}
+          <span>
+            <span className="sr-only">{OUTCOME_TONE_LABELS[outcome.tone]}: </span>
+            {outcome.title}
+          </span>
         </p>
         {outcome.description && (
           <p className="mt-2 text-base leading-relaxed text-foreground">{outcome.description}</p>

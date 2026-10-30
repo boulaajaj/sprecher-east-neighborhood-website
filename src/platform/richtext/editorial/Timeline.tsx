@@ -20,7 +20,8 @@ export function Timeline({ entries, className }: TimelineProps & { className?: s
   // Only one step can be the reader's "you are here", even if an editor marked two
   const current = entries.findIndex((entry) => entry.status === 'next')
   return (
-    <ol className={cn('not-prose my-8 w-full', className)}>
+    // `role="list"`: Safari drops list semantics from a list without bullets
+    <ol role="list" className={cn('not-prose my-8 w-full', className)}>
       {entries.map((entry, index) => (
         <TimelineItem
           key={`${index}-${entry.title}`}

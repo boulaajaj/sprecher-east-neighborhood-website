@@ -7,13 +7,14 @@ import type { Step, StepsProps } from './steps'
 
 /**
  * Numbered steps joined by a line (#508), following the USWDS process list: an ordered list, each
- * step a heading and a short body. The numbers are real list numbers for screen readers (`ol`);
- * the circles repeat them visually and the line is decoration.
+ * step a heading and a short body. Screen readers hear "Step 2: …" from a hidden prefix in the
+ * heading; the circles show the number visually and, with the line, are decoration. `role="list"`
+ * because Safari drops list semantics from a list without bullets.
  */
 export function Steps({ steps, className }: StepsProps & { className?: string }) {
   if (steps.length === 0) return null
   return (
-    <ol className={cn('not-prose my-8 w-full', className)}>
+    <ol role="list" className={cn('not-prose my-8 w-full', className)}>
       {steps.map((step, index) => (
         <StepItem
           key={`${index}-${step.heading}`}
@@ -42,6 +43,7 @@ function StepItem({ step, number, last }: { step: Step; number: number; last: bo
         {number}
       </span>
       <h3 className="pt-1.5 text-lg leading-snug font-semibold text-pretty text-foreground">
+        <span className="sr-only">Step {number}: </span>
         {step.heading}
       </h3>
       {step.body && (

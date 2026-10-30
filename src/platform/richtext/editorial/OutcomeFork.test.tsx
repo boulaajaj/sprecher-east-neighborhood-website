@@ -24,9 +24,9 @@ describe('OutcomeFork', () => {
     expect(screen.getByRole('heading').textContent).toBe('Will the City and State agree on cost?')
     const items = within(screen.getByRole('list')).getAllByRole('listitem')
     expect(items.map((item) => item.textContent)).toEqual([
-      'If they agreeDesign, land, contracts.',
-      'If they don’tNo new interchange.',
-      'If it stalls',
+      'Goes ahead: If they agreeDesign, land, contracts.',
+      'Doesn’t go ahead: If they don’tNo new interchange.',
+      'Other outcome: If it stalls',
     ])
     expect(screen.getByRole('list').className).toContain('sm:grid-cols-3')
     await expectAccessible(container)

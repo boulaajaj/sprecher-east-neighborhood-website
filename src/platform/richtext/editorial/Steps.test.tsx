@@ -30,11 +30,13 @@ describe('Steps', () => {
     )
 
     const items = within(screen.getByRole('list')).getAllByRole('listitem')
+    // Screen readers hear the number with the heading; the circle is decoration
     expect(items.map((item) => within(item).getByRole('heading').textContent)).toEqual([
-      'Join the meeting',
-      'Tell your alder',
-      'Vote on noise walls',
+      'Step 1: Join the meeting',
+      'Step 2: Tell your alder',
+      'Step 3: Vote on noise walls',
     ])
+    expect(screen.getByRole('list').getAttribute('role')).toBe('list')
     expect(
       items.map((item) => item.querySelector('[aria-hidden="true"].rounded-full')?.textContent),
     ).toEqual(['1', '2', '3'])
