@@ -76,8 +76,8 @@ optional; the type label stays the required one because the `PR Policy` check re
 ## Sprints
 
 - **One week**, Monday to Sunday, starting 2026-10-26. A sprint is the board's **Sprint** field.
-- **Planning (Monday):** pick **Ready** items, highest priority first, enough for the week. Leave
-  room for bugs.
+- **Planning (Monday):** groom the backlog ([below](#grooming-and-one-task-at-a-time)), then pick
+  **Ready** items, highest priority first, enough for the week. Leave room for bugs.
 - **Review (end of the week):** the "Done last 7 days" view is the report of what shipped.
 - **Retro (end of the week):** one thing to keep, one to change. A change becomes a rule (a PR to
   the right doc) or a task, never a loose note.
@@ -92,7 +92,7 @@ built on 2026-10-21 from the spec in #90.
 | ----------- | ----------------------------------------------------------------------------------------- |
 | Backlog     | Captured, not ready yet.                                                                  |
 | Ready       | Meets the Definition of Ready (below). Can go into a sprint.                              |
-| In progress | Someone (person or agent) is working on it.                                               |
+| In progress | Work has started (set before the first commit). Only one task at a time.                  |
 | In review   | A PR that closes it is open, even as a draft. Linking the PR moves the issue here.        |
 | Done        | Merged: the issue closes and the item moves here on its own. `wrapped` checks any deploy. |
 
@@ -108,7 +108,30 @@ built on 2026-10-21 from the spec in #90.
 - **Access:** changing the board needs the owner's account with the `project` scope: the owner in
   the web UI, or an agent on his computer signed in with `gh` and that scope. Agents in cloud
   sessions can't reach a board on a personal account, so they keep issue state, labels, parents
-  and milestones right, and the board's automations do the rest.
+  and milestones right, say in a comment on the issue which card needs moving (and to which
+  column), and let the board's automations do the rest. The next session on his computer moves it.
+
+## Grooming and one task at a time
+
+The owner's rule (Amine, 2026-10-31, Claude Code session, text, quoted on #524):
+
+> _"We'll do some grooming before every major change. You groom the tasks, categorize them based
+> on effort and priority, and then move them into Ready. Once we have everything in Ready, we will
+> start to work one task at a time. Every time we work on a task, it will need to be switched to In
+> Progress so that everything is visible on the project board. If I would like to know where things
+> are, what's being done, and what's not, I can just go to the board very quickly."_
+
+- **Groom before every major change:** a new epic, a sprint, or a batch of work. Each issue gets
+  its plain summary, acceptance criteria, parent epic, labels (type, area, `priority:`) and a
+  **Size**, which is effort: S, M or L (a cloud session that can't read the board skips Size and
+  says so, as in the Definition of Ready). Anything bigger is split. When it meets the
+  [Definition of Ready](#definition-of-ready), it moves to **Ready**.
+- **Work in progress is limited to one task across the project,** whoever works on it. The next
+  starts only when the current one is In review or Done. The highest-priority Ready item goes first.
+- **In progress is set when work starts,** before the first commit, so the board shows it. In
+  review and Done stay automatic.
+- **Only a session on the owner's computer moves cards** (the Access note above). A cloud session
+  says on the issue which card to move.
 
 ## Definition of Ready
 
@@ -144,7 +167,7 @@ An issue is **Done** when:
 
 - An issue is the brief. Its acceptance criteria are the definition of done for whoever picks it
   up, person or agent.
-- Before starting, read the issue's epic, milestone and sprint. If it isn't Ready, make it Ready
-  first or pick another issue.
+- Before starting, read the issue's epic, milestone and sprint. If it isn't Ready, groom it into
+  Ready first or pick another issue. Then set it In progress.
 - New work found along the way becomes a new issue at the right level, with a parent. Don't widen
   the current PR to cover it.

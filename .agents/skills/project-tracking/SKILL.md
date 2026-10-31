@@ -32,8 +32,22 @@ issue is **Ready**:
 - no open PR already closes it (the list in §2 step 3)
 
 When the board can't be read (cloud sessions), skip the size check and say so in a comment on the
-issue. If the issue isn't Ready, make it Ready (add what's missing) or pick another one. Read the
-parent epic too: it says what the issue is part of.
+issue. If the issue isn't Ready, groom it (§1a) or pick another one. Read the parent epic too: it
+says what the issue is part of. Work on one task at a time across the project: start the next only when
+the current one is In review or Done.
+
+## 1a. Grooming
+
+Before every major change (a new epic, a sprint, a batch of work), groom the backlog
+([rules and the owner's words](../../../docs/process/project-management.md#grooming-and-one-task-at-a-time)).
+For each issue:
+
+1. Give it a plain summary, acceptance criteria, a parent epic, and the type, area and `priority:`
+   labels (§3).
+2. Set its **Size** as effort: S, M or L. If it is bigger than L, split it into sub-issues. In a
+   cloud session, which can't read the board, skip Size and say so on the issue.
+3. When it meets the Definition of Ready, move it to **Ready**. On the owner's computer, move the
+   card as in §4. In a cloud session, comment on the issue that its card goes to Ready.
 
 ## 2. "What's next?"
 
@@ -134,13 +148,14 @@ parent epic too: it says what the issue is part of.
 - Keep the issue current: comment when something important is decided or found, and when a
   plan changes.
 - New work found along the way becomes a new issue (§3). Don't widen the current PR.
-- On the owner's computer, move the board's **Status** (`In progress`, `In review`) with
-  `gh project item-edit`. It needs the item, project, field and option IDs: get them from
+- **Set In progress when work starts, before the first commit.** On the owner's computer, move the
+  board's **Status** (`In progress`; `In review` and Done are automatic) with `gh project item-edit`. It needs the item, project, field and option IDs: get them from
   `gh project item-list 2 --owner boulaajaj --format json`,
   `gh project field-list 2 --owner boulaajaj --format json` and
   `gh project view 2 --owner boulaajaj --format json -q .id`. Closing an issue or
-  merging a PR moves the item to Done on its own. In cloud sessions, leave the board to its
-  automations.
+  merging a PR moves the item to Done on its own. A cloud session can't move cards: it comments
+  on the issue which card to move and to which column ("move to In progress"), and the next
+  session on his computer moves it.
 
 ## 5. Weekly report: "what got done this week?"
 
