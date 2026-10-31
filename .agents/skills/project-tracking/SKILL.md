@@ -33,18 +33,19 @@ issue is **Ready**:
 
 When the board can't be read (cloud sessions), skip the size check and say so in a comment on the
 issue. If the issue isn't Ready, groom it (§1a) or pick another one. Read the parent epic too: it
-says what the issue is part of. Work on one task at a time: start the next only when the current
-one is In review or Done.
+says what the issue is part of. Work on one task at a time across the project: start the next only when
+the current one is In review or Done.
 
 ## 1a. Grooming
 
 Before every major change (a new epic, a sprint, a batch of work), groom the backlog
 ([rules and the owner's words](../../../docs/process/project-management.md#grooming-and-one-task-at-a-time)).
-Grooming is planning work, so run it on Opus. For each issue:
+For each issue:
 
 1. Give it a plain summary, acceptance criteria, a parent epic, and the type, area and `priority:`
    labels (§3).
-2. Set its **Size** as effort: S, M or L. If it is bigger than L, split it into sub-issues.
+2. Set its **Size** as effort: S, M or L. If it is bigger than L, split it into sub-issues. In a
+   cloud session, which can't read the board, skip Size and say so on the issue.
 3. When it meets the Definition of Ready, move it to **Ready**. On the owner's computer, move the
    card as in §4. In a cloud session, comment on the issue that its card goes to Ready.
 

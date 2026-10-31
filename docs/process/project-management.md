@@ -123,11 +123,11 @@ The owner's rule (Amine, 2026-10-31, Claude Code session, text, quoted on #524):
 
 - **Groom before every major change:** a new epic, a sprint, or a batch of work. Each issue gets
   its plain summary, acceptance criteria, parent epic, labels (type, area, `priority:`) and a
-  **Size**, which is effort: S, M or L. Anything bigger is split. When it meets the
-  [Definition of Ready](#definition-of-ready), it moves to **Ready**. Grooming is planning work, so
-  it runs on Opus ([`CLAUDE.md`](../../CLAUDE.md), #522).
-- **Work in progress is limited to one task.** The next starts only when the current one is In
-  review or Done. The highest-priority Ready item goes first.
+  **Size**, which is effort: S, M or L (a cloud session that can't read the board skips Size and
+  says so, as in the Definition of Ready). Anything bigger is split. When it meets the
+  [Definition of Ready](#definition-of-ready), it moves to **Ready**.
+- **Work in progress is limited to one task across the project,** whoever works on it. The next
+  starts only when the current one is In review or Done. The highest-priority Ready item goes first.
 - **In progress is set when work starts,** before the first commit, so the board shows it. In
   review and Done stay automatic.
 - **Only a session on the owner's computer moves cards** (the Access note above). A cloud session
