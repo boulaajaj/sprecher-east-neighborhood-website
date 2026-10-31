@@ -58,7 +58,7 @@ Where code goes: [`docs/architecture/`](../architecture/README.md).
 - Social login (OAuth) is not installed; if it's added, test that each provider redirects properly and creates the user account
 - Session cookies are set and cleared correctly
 - Protected routes redirect unauthenticated users to login
-- User roles (admin, editor, resident) have correct access levels
+- User roles (admin, editor, guest, resident, agent) have correct access levels
 - Admin panel at `/admin` is only accessible to admin users
 - Password reset flow works end-to-end
 

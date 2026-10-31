@@ -66,17 +66,17 @@ patterns are in [`payload-cms.md`](../guidelines/payload-cms.md).
 
 ## Collections
 
-| Collection  | What it holds                                                   |
-| ----------- | --------------------------------------------------------------- |
-| Pages       | CMS pages built from blocks (`/` and `/[slug]`)                 |
-| Posts       | News articles, listed at `/posts` with detail pages             |
-| Events      | Events, listed at `/events` with detail pages                   |
-| FAQ         | Questions and answers by category, shown at `/faq`              |
-| Resources   | Links and contacts by category, shown at `/resources`           |
-| TeamMembers | People and their roles; the `email` field is staff-only         |
-| Categories  | Post categories                                                 |
-| Media       | Uploads in `public/media`, with size variants and a focal point |
-| Users       | Accounts with the roles `admin`, `editor` and `resident`        |
+| Collection  | What it holds                                                              |
+| ----------- | -------------------------------------------------------------------------- |
+| Pages       | CMS pages built from blocks (`/` and `/[slug]`)                            |
+| Posts       | News articles, listed at `/posts` with detail pages                        |
+| Events      | Events, listed at `/events` with detail pages                              |
+| FAQ         | Questions and answers by category, shown at `/faq`                         |
+| Resources   | Links and contacts by category, shown at `/resources`                      |
+| TeamMembers | People and their roles; the `email` field is staff-only                    |
+| Categories  | Post categories                                                            |
+| Media       | Uploads in `public/media`, with size variants and a focal point            |
+| Users       | Accounts with the roles `admin`, `editor`, `guest`, `resident` and `agent` |
 
 The exact fields are in [`docs/architecture/data-model.md`](../architecture/data-model.md) and the
 collection configs in each module's `cms/` folder (`src/modules/<area>/cms/`; Media in
@@ -123,4 +123,4 @@ Payload v3 rich text should support:
 
 - Primary admin: provided at task time, never stored in the repo
 - Roles and what each may do: [`security.md`](../guidelines/security.md#when-handling-auth-and-sessions)
-  (`admin`, `editor`, `resident`)
+  (`admin`, `editor`, `guest`, `resident`, `agent`)
