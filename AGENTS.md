@@ -51,6 +51,9 @@ Merging code changes to `main` deploys them to production automatically
    The issue forms apply these automatically (`.github/workflows/issue-labels.yml`). The
    allowed values live in one place: `.github/label-policy.json`.
 
+   The issue is groomed into **Ready** first, and set **In progress** when you start, one task at
+   a time ([how we work](docs/process/project-management.md#grooming-and-one-task-at-a-time)).
+
 2. **Branch and pull request.** Work on a branch, never on `main`. Open a PR that:
    - links the issue with a closing keyword (`Closes #123`), or with `Part of #123` when an
      issue needs several PRs (the last one uses `Closes`)
@@ -69,12 +72,14 @@ Merging code changes to `main` deploys them to production automatically
 
    Changes to the process itself are policy changes, and the review must call them out
    explicitly. That covers `AGENTS.md`, `.agents/`, `docs/guidelines/`, `docs/roles/`,
-   `.github/`, and the Claude Code adapter (`CLAUDE.md`, `.claude/`). A policy change
-   the owner (Amine) asked for follows the normal path. Agents file issues through his account,
-   so an issue alone doesn't show he asked: the issue or PR quotes his words, with the date and
-   where he said them, and the reviewer checks the change stays within that quote. A policy
-   change an agent proposes on its own is labeled `needs owner` when it's filed, and waits for
-   him.
+   `.github/`, and the Claude Code adapter (`CLAUDE.md`, `.claude/`). In `docs/process/`, it
+   covers changes to how the team works, such as sprint length, what Ready or Done means, the
+   levels of work, or the board's columns and fields; fixing wording, links or facts there isn't
+   a policy change. A policy change the owner (Amine) asked for follows the normal path. Agents
+   file issues through his account, so an issue alone doesn't show he asked: the issue or PR
+   quotes his words, with the date and where he said them, and the reviewer checks the change
+   stays within that quote. A policy change an agent proposes on its own is labeled
+   `needs owner` when it's filed, and waits for him.
 
 4. **Everything green.** All required checks pass before merge: `Type-check & Build`,
    `Prettier`, `ESLint`, `Dependency Audit`, and `PR Policy` (which verifies steps 1–2).

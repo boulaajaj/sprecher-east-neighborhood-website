@@ -8,6 +8,10 @@ skill is the step-by-step version for agents.
 
 GitHub is the only tracker for new work. Asana is being retired (#89: export #91, cutover #93).
 
+Changing a rule here (how the team works: sprint length, Ready or Done, the levels, the board's
+columns and fields) is a policy change, so the owner agrees first ([`AGENTS.md`](../../AGENTS.md),
+step 3). Fixing wording, links or facts isn't.
+
 ## Levels of work
 
 | Level         | Answers                                            | Size            | On GitHub                                        |
@@ -72,33 +76,62 @@ optional; the type label stays the required one because the `PR Policy` check re
 ## Sprints
 
 - **One week**, Monday to Sunday, starting 2026-10-26. A sprint is the board's **Sprint** field.
-- **Planning (Monday):** pick **Ready** items, highest priority first, enough for the week. Leave
-  room for bugs.
+- **Planning (Monday):** groom the backlog ([below](#grooming-and-one-task-at-a-time)), then pick
+  **Ready** items, highest priority first, enough for the week. Leave room for bugs.
 - **Review (end of the week):** the "Done last 7 days" view is the report of what shipped.
 - **Retro (end of the week):** one thing to keep, one to change. A change becomes a rule (a PR to
   the right doc) or a task, never a loose note.
 
 ## The board
 
-GitHub Project "Sprecher East", owned by `boulaajaj`. The full setup is in #90. Until it exists,
-there's no Sprint or Size field: plan from the milestone.
+[GitHub Project #2 "Sprecher East"](https://github.com/users/boulaajaj/projects/2), owned by
+`boulaajaj` and linked to this repo. It's private, so only the owner's account can open it. It was
+built on 2026-10-21 from the spec in #90.
 
 | Status      | Means                                                                                     |
 | ----------- | ----------------------------------------------------------------------------------------- |
 | Backlog     | Captured, not ready yet.                                                                  |
 | Ready       | Meets the Definition of Ready (below). Can go into a sprint.                              |
-| In progress | Someone (person or agent) is working on it. A PR may be open as a draft.                  |
-| In review   | The PR is open and waiting for its independent review or checks.                          |
+| In progress | Work has started (set before the first commit). Only one task at a time.                  |
+| In review   | A PR that closes it is open, even as a draft. Linking the PR moves the issue here.        |
 | Done        | Merged: the issue closes and the item moves here on its own. `wrapped` checks any deploy. |
 
 - **Fields:** Status, Sprint, Size (S is under half a day, M is 1–2 days, L is up to 3 days),
   plus the built-in Labels, Milestone, Parent issue and Sub-issue progress.
-- **Views:** This sprint (board), Backlog (grouped by epic), Roadmap (by milestone), and Done last
-  7 days.
+- **Views:** This sprint (board), Backlog (everything not Done; each epic expands to its
+  sub-issues), Roadmap (grouped by milestone, dated by Sprint), and Done last 7 days (issues closed
+  as completed, `reason:completed`).
+- **Automations:** new issues and PRs from this repo join in Backlog, and a sub-issue joins with its
+  parent. Linking a PR moves an issue to In review. Merging its PR, or closing it for any reason
+  (also as not planned), moves it to Done. Moving an item to Done by hand doesn't close the issue.
+  Closed items are archived after two weeks.
 - **Access:** changing the board needs the owner's account with the `project` scope: the owner in
   the web UI, or an agent on his computer signed in with `gh` and that scope. Agents in cloud
   sessions can't reach a board on a personal account, so they keep issue state, labels, parents
-  and milestones right, and the board's automations do the rest.
+  and milestones right, say in a comment on the issue which card needs moving (and to which
+  column), and let the board's automations do the rest. The next session on his computer moves it.
+
+## Grooming and one task at a time
+
+The owner's rule (Amine, 2026-10-31, Claude Code session, text, quoted on #524):
+
+> _"We'll do some grooming before every major change. You groom the tasks, categorize them based
+> on effort and priority, and then move them into Ready. Once we have everything in Ready, we will
+> start to work one task at a time. Every time we work on a task, it will need to be switched to In
+> Progress so that everything is visible on the project board. If I would like to know where things
+> are, what's being done, and what's not, I can just go to the board very quickly."_
+
+- **Groom before every major change:** a new epic, a sprint, or a batch of work. Each issue gets
+  its plain summary, acceptance criteria, parent epic, labels (type, area, `priority:`) and a
+  **Size**, which is effort: S, M or L (a cloud session that can't read the board skips Size and
+  says so, as in the Definition of Ready). Anything bigger is split. When it meets the
+  [Definition of Ready](#definition-of-ready), it moves to **Ready**.
+- **Work in progress is limited to one task across the project,** whoever works on it. The next
+  starts only when the current one is In review or Done. The highest-priority Ready item goes first.
+- **In progress is set when work starts,** before the first commit, so the board shows it. In
+  review and Done stay automatic.
+- **Only a session on the owner's computer moves cards** (the Access note above). A cloud session
+  says on the issue which card to move.
 
 ## Definition of Ready
 
@@ -107,7 +140,7 @@ An issue is **Ready** when it has:
 - what and why, in plain language
 - acceptance criteria someone else could check
 - a parent epic, labels (type, area, priority) and a size. When the board can't be read (cloud
-  sessions, or until #90 is done), skip Size and say so on the issue
+  sessions), skip Size and say so on the issue
   ([`project-tracking`](../../.agents/skills/project-tracking/SKILL.md) §1)
 - no open blocker: nothing it's **blocked by** is still open
 - no `needs owner` label: that work waits for the owner, not for a sprint
@@ -134,7 +167,7 @@ An issue is **Done** when:
 
 - An issue is the brief. Its acceptance criteria are the definition of done for whoever picks it
   up, person or agent.
-- Before starting, read the issue's epic, milestone and sprint. If it isn't Ready, make it Ready
-  first or pick another issue.
+- Before starting, read the issue's epic, milestone and sprint. If it isn't Ready, groom it into
+  Ready first or pick another issue. Then set it In progress.
 - New work found along the way becomes a new issue at the right level, with a parent. Don't widen
   the current PR to cover it.

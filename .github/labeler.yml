@@ -50,6 +50,7 @@ process:
             '.claude/**',
             'docs/guidelines/**',
             'docs/roles/**',
+            'docs/process/**',
             '.github/ISSUE_TEMPLATE/**',
             '.github/pull_request_template.md',
             '.github/workflows/pr-policy.yml',
