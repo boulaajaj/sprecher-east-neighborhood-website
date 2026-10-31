@@ -10,6 +10,7 @@ import {
   logoutOperation,
   type Payload,
 } from 'payload'
+import { cache } from 'react'
 
 import type { User } from '@/payload-types'
 
@@ -34,11 +35,14 @@ async function getSessionPayloadUser(): Promise<SessionAccount | null> {
   return { ...user, collection: USERS }
 }
 
-/** Who is signed in for this request, or null. */
-export async function getSessionUser(): Promise<CurrentUser | null> {
+/**
+ * Who is signed in for this request, or null, checked by Payload's Local API. Cached per request,
+ * so a page, its metadata and the checks it makes ask Payload once.
+ */
+export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const user = await getSessionPayloadUser()
   return user ? toCurrentUser(user) : null
-}
+})
 
 /**
  * Signs in with Payload's own Next.js helper (`login` from `@payloadcms/next/auth`): it runs

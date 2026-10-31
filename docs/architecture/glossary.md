@@ -106,6 +106,6 @@ which module owns it).
 | Module       | One business area's folder under `src/modules/` ([architecture](README.md)).                                                                                               |
 | Entry file   | `index.ts` (types and pure rules), `server.ts` (server-only), `actions.ts` (server actions) or `cms.ts` (Payload config): the only files other code imports from a module. |
 | Domain layer | `domain/`: pure rules and types, no framework.                                                                                                                             |
-| Use case     | `use-cases/`: one thing a caller can do (list upcoming events, submit a form), returning the module's own types. Server-only.                                              |
+| Use case     | `use-cases/`: one thing a caller can do (list upcoming events, submit a form), returning the module's own types. Server-only; a plain read has none (#521).                |
 | Data layer   | `data/`: server-only queries over Payload that return the module's own types.                                                                                              |
 | Platform     | `src/platform/`: code every module shares.                                                                                                                                 |

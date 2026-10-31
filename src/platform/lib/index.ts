@@ -23,3 +23,4 @@ export {
   type HumanCheck,
   type HumanVerifier,
 } from './humanCheck'
+export type { ActionResult } from './actionResult'

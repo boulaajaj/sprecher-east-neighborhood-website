@@ -43,7 +43,7 @@ describe('getConfirmationLinkStatus (#391)', () => {
     findLinkState.mockRejectedValue(new TypeError('db ana@example.com'))
     expect(await getConfirmationLinkStatus(TOKEN)).toBe('pending')
     expect(console.error).toHaveBeenCalledExactlyOnceWith(
-      'Reading a confirmation link failed (TypeError)',
+      'Reading a confirmation link failed on the server (TypeError)',
     )
   })
 })

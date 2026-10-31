@@ -2,13 +2,11 @@
 import 'server-only'
 
 export { findArchivePosts } from './use-cases/findArchivePosts'
-export { findPostPage } from './use-cases/findPostPage'
+export { findPostPage, findSearchResults, listPostSlugs } from './data/queries'
 export { findRecentPosts } from './use-cases/findRecentPosts'
-export { findSearchResults } from './use-cases/findSearchResults'
 export { getPostBySlug } from './use-cases/getPostBySlug'
 export { listPostPageNumbers } from './use-cases/listPostPageNumbers'
-export { listPostSlugs } from './use-cases/listPostSlugs'
-export { toTopIssues } from './use-cases/toTopIssues'
+export { toTopIssuesBlockProps } from './data/mappers'
 
 export { PostGrid } from './ui/PostGrid'
 export { postHeaderProps } from './ui/postHeader'

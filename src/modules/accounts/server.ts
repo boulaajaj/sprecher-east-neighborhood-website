@@ -2,7 +2,7 @@
 // layout render.
 import 'server-only'
 
-export { getCurrentUser } from './use-cases/getCurrentUser'
+export { getCurrentUser } from './data/session'
 export { getVerificationLinkStatus } from './use-cases/getVerificationLinkStatus'
 export { requireRole, requireUser } from './use-cases/requireUser'
 

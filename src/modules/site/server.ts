@@ -2,7 +2,7 @@
 import 'server-only'
 
 export { getPageBySlug, toSiteHero } from './use-cases/getPageBySlug'
-export { listPageSlugs } from './use-cases/listPageSlugs'
+export { listPageSlugs } from './data/pages'
 export { getForumUrl } from './use-cases/getForumUrl'
 
 export { ForumPrompt } from './ui/ForumPrompt'

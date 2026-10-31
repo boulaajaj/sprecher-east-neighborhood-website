@@ -2,7 +2,7 @@
 
 import { parseCursor } from '@/platform/lib'
 
-import { findPostsAfter } from './use-cases/findPostsAfter'
+import { findPostsAfter } from './data/queries'
 
 /**
  * The next published posts for the /posts listing ("Load more"): those after `cursor`, the opaque

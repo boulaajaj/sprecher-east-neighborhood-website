@@ -3,6 +3,7 @@ import 'server-only'
 import { after } from 'next/server'
 
 import type { HumanVerifier } from '@/platform/lib'
+import { logServerFailure, runUseCase } from '@/platform/service'
 
 import { isRefusal } from '../data/failures'
 import { createResidentAccount, deleteFailedSignUp, resendVerification } from '../data/signUp'
@@ -10,7 +11,6 @@ import type { SignUpValues } from '../domain/credentials'
 import { SIGN_UP_LIMITS } from '../domain/requestLimits'
 import type { ActionResult, SignUpFailure } from '../domain/types'
 import { createRequestGuard, type PublicRequest } from './guardPublicRequest'
-import { logServerFailure } from './logServerFailure'
 
 const guard = createRequestGuard('Sign-up', SIGN_UP_LIMITS)
 
@@ -70,10 +70,10 @@ function resendLostLink(email: string): Promise<void> {
 }
 
 async function resendOnce(email: string): Promise<void> {
-  try {
-    const outcome = await resendVerification(email, new Date())
-    if (outcome === 'capped') console.warn('Sign-up verification resend capped for an account')
-  } catch (error) {
-    logServerFailure('Sign-up verification resend', error)
-  }
+  const outcome = await runUseCase(
+    'Sign-up verification resend',
+    () => resendVerification(email, new Date()),
+    null,
+  )
+  if (outcome === 'capped') console.warn('Sign-up verification resend capped for an account')
 }

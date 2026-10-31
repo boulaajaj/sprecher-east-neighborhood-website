@@ -2,7 +2,12 @@ import React from 'react'
 
 import { FormBlock } from '@/modules/contact/server'
 import { EventsThisWeek, findEventsThisWeek } from '@/modules/events/server'
-import { findArchivePosts, PostGrid, toTopIssues, TopIssuesBlock } from '@/modules/news/server'
+import {
+  findArchivePosts,
+  PostGrid,
+  toTopIssuesBlockProps,
+  TopIssuesBlock,
+} from '@/modules/news/server'
 import {
   ArchiveBlock,
   CallToActionBlock,
@@ -36,7 +41,7 @@ const TopIssuesFromBlock: PageBlockComponents['topIssues'] = ({
   reviewedAt,
   items,
 }) => {
-  const props = toTopIssues({ id, heading, reviewedAt, items })
+  const props = toTopIssuesBlockProps({ id, heading, reviewedAt, items })
   return props && <TopIssuesBlock {...props} />
 }
 

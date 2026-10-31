@@ -1,6 +1,6 @@
 import React, { type ReactNode } from 'react'
 
-import { getHeaderNav } from '../use-cases/getHeaderNav'
+import { getHeader } from '../data/globals'
 import { SiteHeaderBar } from './SiteHeaderBar.client'
 
 /**
@@ -15,7 +15,7 @@ export async function SiteHeader({
   accountMenu: ReactNode
   mobileAccountMenu: ReactNode
 }) {
-  const headerData = await getHeaderNav()
+  const headerData = await getHeader()
 
   return (
     <SiteHeaderBar

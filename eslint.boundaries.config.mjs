@@ -31,8 +31,15 @@ const LAYER_LIMITS = [
   ],
   [
     'ui/**',
-    ['{data,cms}/**', '{index,server,cms}.ts'],
-    'ui/ imports only domain/, use-cases/ and actions.ts',
+    ['cms/**', '{index,server,cms}.ts'],
+    'ui/ imports only domain/, use-cases/, actions.ts and, in server components, data/',
+  ],
+  // A plain read has no use case (#521), so a server component may read data/; browser code (the
+  // *.client files, headless use* hooks and the ui/api.ts browser clients) may not
+  [
+    'ui/**/{*.client.{ts,tsx},use*.ts,api.ts}',
+    ['data/**'],
+    'client code gets DTOs as props and never imports data/ (rule 5)',
   ],
   [
     'index.ts',
@@ -41,8 +48,8 @@ const LAYER_LIMITS = [
   ],
   [
     'server.ts',
-    ['{data,cms}/**', '{index,actions,cms}.ts'],
-    'server.ts exports domain/, use-cases/ and ui/ only',
+    ['cms/**', '{index,actions,cms}.ts'],
+    'server.ts exports domain/, use-cases/, data/ reads and ui/ only',
   ],
   [
     'cms.ts',
@@ -116,7 +123,8 @@ export const boundariesConfig = {
               to: { element: { type: 'module', fileInternalPath: to } },
               dependency: { relationship: { to: 'internal' } },
             },
-            message: `${why} (${rule(1)})`,
+            // A limit that names its own rule (the client one) doesn't get rule 1 added
+            message: why.includes('(rule ') ? why : `${why} (${rule(1)})`,
           })),
           {
             from: [

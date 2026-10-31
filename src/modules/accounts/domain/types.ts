@@ -62,7 +62,7 @@ export type VerifyAccountFailure =
   | 'server-error'
 
 /** What a server action that changes something returns. Failures are fixed codes, never text. */
-export type ActionResult<Failure extends string> = { ok: true } | { ok: false; failure: Failure }
+export type { ActionResult } from '@/platform/lib'
 
 /**
  * Where a verification link stands when its page opens (#391), read without changing anything:
