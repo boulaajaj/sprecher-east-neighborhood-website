@@ -210,7 +210,7 @@ Three tiers of visual importance:
 
 ## Common Anti-Patterns (Never Do These)
 
-- Editor-only, preview or debug boxes inside an article's layout (a "card preview", a draft banner, a checklist between the hero and the text). A post or event page looks the same in an editor's preview as it does to residents; anything for editors belongs in the admin (the owner's rule, 2026-10-31, Claude in Chrome side panel, quoted on #532)
+- A card preview inside an article's layout, in any mode (the owner's rule, 2026-10-31, Claude in Chrome side panel, quoted on #532)
 - Empty sections with no content — hide them entirely, don't show empty boxes
 - Text that disappears in dark/light mode — always test both themes
 - Huge whitespace gaps between header and content

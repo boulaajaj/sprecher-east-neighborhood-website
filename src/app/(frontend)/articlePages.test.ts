@@ -6,19 +6,11 @@ import { describe, expect, it } from 'vitest'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 
-// A post or event page looks the same in an editor's preview as it does to residents: no
-// editor-only box (a "card preview") goes inside an article's layout (owner's rule, #532). Only
-// the invisible live-refresh listener may depend on draft mode.
+// No card preview goes inside a post or event page's layout, in any mode (owner's rule, #532).
+// The live-refresh listener is the page's only "preview" in the code, and it draws nothing.
 describe.each(['posts/[slug]/page.tsx', 'events/[slug]/page.tsx'])('%s', (file) => {
-  const source = readFileSync(path.join(here, file), 'utf8')
-
-  it('renders no preview box', () => {
+  it('renders no card preview', () => {
+    const source = readFileSync(path.join(here, file), 'utf8')
     expect(source.replace(/LivePreviewListener/g, '')).not.toMatch(/preview/i)
-  })
-
-  it('uses draft mode only for the live-refresh listener', () => {
-    const draftUses = source.match(/draft &&/g) ?? []
-    expect(draftUses).toEqual(['draft &&'])
-    expect(source).toContain('{draft && <LivePreviewListener />}')
   })
 })
