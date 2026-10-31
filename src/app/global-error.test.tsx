@@ -1,17 +1,26 @@
-import { renderToStaticMarkup } from 'react-dom/server'
-import { describe, expect, it } from 'vitest'
+// @vitest-environment jsdom
+import { cleanup, render } from '@testing-library/react'
+import { afterEach, describe, expect, it } from 'vitest'
+
+import { expectAccessible } from '@/platform/ui/testing/expectAccessible'
 
 import GlobalError from './global-error'
 
+afterEach(cleanup)
+
 describe('the global error page', () => {
-  it('brings its own document and says what happened without the error’s text', () => {
-    const html = renderToStaticMarkup(
+  it('says what happened, without the error’s text, and passes axe as a whole document', async () => {
+    // It renders its own <html>, so mount it as the document's root, as Next does
+    const { container } = render(
       <GlobalError error={new Error('Failed query: params ada@example.com')} retry={() => {}} />,
+      { container: document, baseElement: document },
     )
 
-    expect(html).toContain('<html lang="en"><head></head><body>')
-    expect(html).toContain('Something went wrong on our side')
-    expect(html).toContain('Try again')
-    expect(html).not.toContain('ada@example.com')
+    expect(document.title).toBe('Something went wrong')
+    expect(document.querySelector('main')?.textContent).toContain(
+      'Something went wrong on our side',
+    )
+    expect(document.documentElement.outerHTML).not.toContain('ada@example.com')
+    await expectAccessible(container as unknown as Element)
   })
 })

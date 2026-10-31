@@ -16,18 +16,24 @@ import './(frontend)/globals.css'
 export default function GlobalError({ retry }: { error: unknown; retry: () => void }) {
   return (
     <html lang="en">
+      <head>
+        {/* No metadata export here (Next 16): the page needs its own title (WCAG 2.4.2) */}
+        <title>Something went wrong</title>
+      </head>
       <body>
-        <EmptyState
-          variant="page"
-          className="container"
-          title="500"
-          description="Something went wrong on our side. Please try again."
-          action={
-            <Button onClick={retry} iconStart={<RotateCw aria-hidden="true" />}>
-              Try again
-            </Button>
-          }
-        />
+        <main>
+          <EmptyState
+            variant="page"
+            className="container"
+            title="500"
+            description="Something went wrong on our side. Please try again."
+            action={
+              <Button onClick={retry} iconStart={<RotateCw aria-hidden="true" />}>
+                Try again
+              </Button>
+            }
+          />
+        </main>
       </body>
     </html>
   )

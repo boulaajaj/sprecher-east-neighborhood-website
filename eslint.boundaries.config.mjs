@@ -123,7 +123,8 @@ export const boundariesConfig = {
               to: { element: { type: 'module', fileInternalPath: to } },
               dependency: { relationship: { to: 'internal' } },
             },
-            message: `${why} (${rule(1)})`,
+            // A limit that names its own rule (the client one) doesn't get rule 1 added
+            message: why.includes('(rule ') ? why : `${why} (${rule(1)})`,
           })),
           {
             from: [
