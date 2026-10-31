@@ -36,6 +36,13 @@ Read the other guidelines (frontend patterns, content marketing, Asana) when a t
 - **Independent review:** run the [`pr-review`](.agents/skills/pr-review/SKILL.md) skill in a
   separate session or a subagent (for example `qa-reviewer`), never in the context that wrote
   the change.
+- **Models and effort** (#522, the owner's choice to save Opus for where it counts):
+  `.claude/settings.json` starts sessions on `opusplan` (Opus in plan mode, Sonnet once the plan is
+  approved) at `medium` effort, and every agent in `.claude/agents/` runs on Sonnet at `medium`.
+  Start the review on Opus at `high` effort (pass the model and effort when you start the
+  reviewer) only when the PR touches sign-in or accounts, access rules, migrations, the deploy or
+  server scripts, or other security code. Use the plain aliases (`opus`, `sonnet`), never a
+  version, so the newest model is always used.
 - **Waiting for checks:** poll `gh pr checks <number>` in the background (`run_in_background`),
   about once a minute and for at most 15 minutes. Don't push while waiting. If the checks still
   haven't finished after 15 minutes, tell the user.
