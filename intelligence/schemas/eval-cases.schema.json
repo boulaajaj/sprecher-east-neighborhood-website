@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/eval-cases.schema.json",
+  "title": "Evaluation cases (evals/<stage>.yaml)",
+  "description": "One file per stage. CI checks the structure only: schemas, routes, targets, offsets and grader fields. Running the cases against a model is the collector's job (#272).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "asOf", "stage", "cases"],
+  "properties": {
+    "version": { "type": "integer", "minimum": 1 },
+    "asOf": {
+      "description": "The date the expected results assume as today.",
+      "$ref": "common.schema.json#/$defs/date"
+    },
+    "stage": { "enum": ["scout", "verify", "curate", "draft", "submit"] },
+    "cases": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/case" } }
+  },
+  "$defs": {
+    "scoutInput": {
+      "description": "What the fetch returned, in order: the first response, then a retry or the Playwright render.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceId", "responses"],
+      "properties": {
+        "sourceId": { "$ref": "common.schema.json#/$defs/sourceId" },
+        "responses": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["via", "status"],
+            "properties": {
+              "via": { "enum": ["direct", "retry", "playwright"] },
+              "status": { "type": "integer", "minimum": 100, "maximum": 599 },
+              "contentType": { "type": "string", "maxLength": 100 },
+              "redirectTo": { "$ref": "common.schema.json#/$defs/httpUrl" },
+              "body": { "type": "string", "maxLength": 4000 }
+            }
+          }
+        },
+        "otherSources": {
+          "description": "Another pilot source's answer in the same run, for cross-source matching.",
+          "type": "array",
+          "maxItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["sourceId", "body"],
+            "properties": {
+              "sourceId": { "$ref": "common.schema.json#/$defs/sourceId" },
+              "body": { "type": "string", "maxLength": 4000 }
+            }
+          }
+        }
+      }
+    },
+    "candidateInput": {
+      "description": "A candidate with only the fields the case needs. A missing sourceStatus means scheduled. sourceUrl may be null to test validation.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceId", "title", "startsAt", "locationText"],
+      "properties": {
+        "sourceId": { "$ref": "candidate.schema.json#/properties/sourceId" },
+        "externalId": { "$ref": "candidate.schema.json#/properties/externalId" },
+        "contentHash": { "$ref": "candidate.schema.json#/properties/contentHash" },
+        "kind": { "$ref": "candidate.schema.json#/properties/kind" },
+        "title": { "$ref": "candidate.schema.json#/properties/title" },
+        "sourceText": { "$ref": "candidate.schema.json#/properties/sourceText" },
+        "startsAt": { "$ref": "candidate.schema.json#/properties/startsAt" },
+        "endsAt": { "$ref": "candidate.schema.json#/properties/endsAt" },
+        "allDay": { "$ref": "candidate.schema.json#/properties/allDay" },
+        "locationText": { "$ref": "candidate.schema.json#/properties/locationText" },
+        "sourceStatus": { "$ref": "candidate.schema.json#/properties/sourceStatus" },
+        "change": { "$ref": "candidate.schema.json#/properties/change" },
+        "alsoReportedBy": { "$ref": "candidate.schema.json#/properties/alsoReportedBy" },
+        "sourceUrl": {
+          "anyOf": [{ "$ref": "candidate.schema.json#/properties/sourceUrl" }, { "type": "null" }]
+        }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "stage", "input", "expected", "why"],
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/sourceId" },
+        "ref": {
+          "description": "The case's id in #352's proposal, such as S1 or V10a.",
+          "type": "string",
+          "pattern": "^[A-Z]{1,2}[0-9]{1,2}[a-z]?$"
+        },
+        "stage": { "enum": ["scout", "verify", "curate", "draft", "submit"] },
+        "tags": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "common.schema.json#/$defs/sourceId" }
+        },
+        "input": {
+          "anyOf": [{ "$ref": "#/$defs/scoutInput" }, { "$ref": "#/$defs/candidateInput" }]
+        },
+        "known": { "$ref": "item.schema.json#/properties/known" },
+        "given": { "$ref": "eval-parts.schema.json#/$defs/given" },
+        "expected": { "$ref": "eval-parts.schema.json#/$defs/expected" },
+        "graders": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "items": { "$ref": "eval-parts.schema.json#/$defs/grader" }
+        },
+        "why": { "type": "string", "minLength": 1, "maxLength": 400 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "stage": { "const": "scout" } } },
+          "then": {
+            "properties": {
+              "input": { "$ref": "#/$defs/scoutInput" },
+              "expected": {
+                "required": ["fetchStrategy", "runStatus"],
+                "type": "object",
+                "properties": { "fetchStrategy": true, "runStatus": true }
+              }
+            }
+          },
+          "else": { "properties": { "input": { "$ref": "#/$defs/candidateInput" } } }
+        },
+        {
+          "if": { "properties": { "stage": { "enum": ["verify", "curate"] } } },
+          "then": {
+            "properties": {
+              "expected": {
+                "required": ["decision", "coverage", "route"],
+                "type": "object",
+                "properties": { "decision": true, "coverage": true, "route": true }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "stage": { "enum": ["draft", "submit"] } } },
+          "then": {
+            "properties": {
+              "expected": {
+                "required": ["route"],
+                "type": "object",
+                "properties": { "route": true }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

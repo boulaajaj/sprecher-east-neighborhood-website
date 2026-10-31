@@ -5,9 +5,14 @@
 # Caps the request body on the public form endpoints, so an oversized POST is cut off at Caddy
 # (413) after 256 KB instead of being read in full by Node. That covers the REST endpoint and
 # GraphQL, where form submissions can also be created. The app's own limit on a submission is
-# about 20,000 characters (src/hooks/limitSubmissionSize.ts), at most about 80 KB of JSON even
-# in a script that takes several bytes per character, so 256KB never blocks a real message.
-@sprecherEastFormSubmissions path /api/form-submissions /api/form-submissions/* /api/graphql /api/graphql/*
+# about 20,000 characters (src/modules/contact/domain/submissionSize.ts), at most about 80 KB of
+# JSON even in a script that takes several bytes per character, so 256KB never blocks a real
+# message.
+#
+# The agents' MCP endpoint (#336) shares the cap: one MCP request carries one tool call (a find,
+# or one suggested event or post), a few KB of JSON, so 256KB never blocks a real one. Payload
+# reads the whole body before the plugin sees it.
+@sprecherEastFormSubmissions path /api/form-submissions /api/form-submissions/* /api/graphql /api/graphql/* /api/mcp
 request_body @sprecherEastFormSubmissions {
 	max_size 256KB
 }

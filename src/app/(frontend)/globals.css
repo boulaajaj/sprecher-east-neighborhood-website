@@ -1,7 +1,14 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+/* The theme: token values (the active theme), then their Tailwind mapping (#146) */
+@import '../../themes/default/theme.css';
+@import '../../platform/theme/tailwind.css';
+@import '../../platform/theme/decorations.css';
 
 @config '../../../tailwind.config.mjs';
+
+/* `dark:` follows the site's theme toggle, not the device's setting (#225) */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
 @custom-variant sm (@media (width >= theme(--breakpoint-sm)));
 @custom-variant md (@media (width >= theme(--breakpoint-md)));
@@ -23,6 +30,9 @@
 
 @plugin '@tailwindcss/typography';
 
+/* The contract's token names would otherwise turn into unused classes */
+@source not '../../platform/theme/tokens.ts';
+
 @source inline('lg:col-span-4');
 @source inline('lg:col-span-6');
 @source inline('lg:col-span-8');
@@ -31,12 +41,6 @@
 @source inline('hero-text-shadow');
 @source inline('hero-text-shadow-sm');
 @source inline('bg-card');
-@source inline('border-error');
-@source inline('bg-error/30');
-@source inline('border-success');
-@source inline('bg-success/30');
-@source inline('border-warning');
-@source inline('bg-warning/30');
 
 @theme {
   --breakpoint-sm: 40rem;
@@ -90,124 +94,17 @@
 /* Hero text readability utilities — centralized so components stay clean */
 @layer utilities {
   .hero-text-shadow {
-    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
+    filter: drop-shadow(0 2px 8px color-mix(in srgb, var(--scrim) 60%, transparent));
   }
 
   .hero-text-shadow-sm {
-    filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(0 1px 4px color-mix(in srgb, var(--scrim) 50%, transparent));
   }
 }
 
-/* Sprecher East brand tokens — light theme (default) */
-:root,
-[data-theme='light'] {
+/* Layout sizes the theme doesn't change */
+:root {
   --header-height: 4.5rem; /* ~72px — reduced from legacy 10.4rem to match actual sticky header (py-4 + logo + border) */
-  --background: #f9f8f5;
-  --foreground: #1a1a1a;
-  --card: #ffffff;
-  --card-foreground: #1a1a1a;
-  --popover: #ffffff;
-  --popover-foreground: #1a1a1a;
-  --primary: #3d7a5e;
-  --primary-foreground: #ffffff;
-  --secondary: #f0ede6;
-  --secondary-foreground: #1a1a1a;
-  --muted: #f0ede6;
-  --muted-foreground: #6b6b6b;
-  --accent: #e8923a;
-  /* Dark text on the orange accent: white on #e8923a is 2.4:1 and fails WCAG AA; #1a1a1a is 7.1:1 */
-  --accent-foreground: #1a1a1a;
-  --destructive: #dc2626;
-  --destructive-foreground: #dc2626;
-  --border: #e2ddd6;
-  --input: #e2ddd6;
-  --ring: #3d7a5e;
-  --chart-1: #3d7a5e;
-  --chart-2: #e8923a;
-  --chart-3: #4f9974;
-  --chart-4: #c97830;
-  --chart-5: #2e5e47;
-  --radius: 0.625rem;
-  --success: #3d7a5e;
-  --warning: #e8923a;
-  --error: #dc2626;
-  --surface: #f0ede6;
-  --primary-dark: #2e5e47;
-  --primary-light: #4f9974;
-  --accent-dark: #c97830;
-}
-
-/* Sprecher East brand tokens — dark theme */
-[data-theme='dark'] {
-  --background: #0f1117;
-  --foreground: #e8e6e3;
-  --card: #1a1d27;
-  --card-foreground: #e8e6e3;
-  --popover: #1a1d27;
-  --popover-foreground: #e8e6e3;
-  --primary: #4e9b76;
-  --primary-foreground: #ffffff;
-  --secondary: #1e2130;
-  --secondary-foreground: #e8e6e3;
-  --muted: #1e2130;
-  --muted-foreground: #9ca3af;
-  --accent: #f0a04b;
-  --accent-foreground: #1a1a1a;
-  --destructive: #ef4444;
-  --destructive-foreground: #ef4444;
-  --border: #2d3040;
-  --input: #2d3040;
-  --ring: #4e9b76;
-  --chart-1: #4e9b76;
-  --chart-2: #f0a04b;
-  --chart-3: #5fb88e;
-  --chart-4: #d48a38;
-  --chart-5: #3d7a5e;
-  --success: #4e9b76;
-  --warning: #f0a04b;
-  --error: #ef4444;
-  --surface: #1e2130;
-  --primary-dark: #3d7a5e;
-  --primary-light: #5fb88e;
-  --accent-dark: #d48a38;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-error: var(--error);
-  --color-surface: var(--surface);
-  --color-primary-dark: var(--primary-dark);
-  --color-primary-light: var(--primary-light);
-  --color-accent-dark: var(--accent-dark);
 }
 
 @layer base {

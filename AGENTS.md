@@ -14,6 +14,27 @@ change this file through the same workflow below.
 - **The site is unofficial and AI-assisted**, and says so. Content is factual and inclusive.
 - **The repo is public.** Never commit secrets or real personal data (see
   [security](docs/guidelines/security.md)).
+- **Native first, then plugins, then our code.** Before building a feature, check what Payload,
+  Next.js and React do natively, then official plugins, then well-established free open-source
+  ones. Write custom code only when none fits, and record what each step found on the issue.
+  It's a guide for judgment
+  ([the ladder](docs/guidelines/development.md#native-first-then-plugins-then-our-code)).
+- **Decide routine technical choices yourself.** Use engineering judgment and established
+  practice: built-in features and mature, maintained libraries over custom code, reuse what
+  exists, don't duplicate work already underway, and follow security, privacy, accessibility
+  and usability standards, with fast, simple interactions on mobile first. Add tests and get
+  the code reviewed. Record each decision briefly on its issue. Ask the owner only about genuine
+  product trade-offs, meaningful costs, legal or privacy commitments, or decisions established
+  best practice can't reasonably resolve. Several valid technical approaches are never a reason
+  to wait for him (the owner's rule, 2026-10-24, quoted on #315).
+- **Test every finished flow as a resident would use it:** on a phone, with expired links,
+  wrong input, and recovering from errors (#315).
+- **Push back before building what's probably not the best way.** When the owner asks for
+  something that looks weaker than the standard approach (for example a security trade-off),
+  don't build it as asked. Explain the better option with sources, then stop and wait until he
+  has read it and decided. Building first wastes work on a change that may be thrown away (the
+  owner's rule, 2026-10-23, quoted on #305). This and the rule above fit together: push back
+  when his request is weaker than the standard; decide routine things yourself.
 
 ## The only way code reaches `main` and production
 
@@ -72,7 +93,7 @@ Merging code changes to `main` deploys them to production automatically
    is unchanged. If a PR below changed after the review, this PR needs a new review even when its
    own diff didn't change; it can be short, checking this PR against what changed below. The owner
    doesn't need to be involved, but he can merge, hold or revert anything himself. A PR labeled
-   `needs owner`, or one whose issue is, waits for him: he merges it or removes the label. A stack
+   `needs owner`, or one whose issue is, waits for him until he answers. A stack
    merges one layer at a time from the bottom. Before the next layer, wait for its checks on its
    rebased head and, if the merge started a deploy, for the deploy to succeed
    ([`change-workflow`](.agents/skills/change-workflow/SKILL.md), step 6). The deploy workflow ships
@@ -84,8 +105,9 @@ Merging code changes to `main` deploys them to production automatically
 - Never push to `main` directly, and never merge a PR whose checks or review aren't done.
 - Never bypass a rule: no `--admin`, no `bypass_rules: true`, no other ruleset bypass, even when
   the account you're using has admin rights.
-- Never remove the `needs owner` label yourself. If you find the owner's words later, quote them on
-  the PR and leave the label for him.
+- Never remove the `needs owner` label without the owner's answer: quote his words on the issue
+  or PR, with the date and where he said them, first
+  ([waits for owner](docs/process/project-management.md#waits-for-owner)).
 - **Never change code on the server.** No editing files in `/var/www/sprecher-east`, no
   `git apply` or hotfixes over SSH. If production is broken, fix or revert through a PR.
 - Never commit secrets (`.env.local`, keys, tokens, passwords).
@@ -117,11 +139,18 @@ through the pointers in `.claude/skills/`, and a human reads them as plain Markd
 | ---------------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | [`change-workflow`](.agents/skills/change-workflow/SKILL.md)           | Before any change: issue, branch, PR, review, checks, merge.               |
 | [`stacked-prs`](.agents/skills/stacked-prs/SKILL.md)                   | A PR depends on another open PR, or a PR in a stack has to change.         |
+| [`write-code`](.agents/skills/write-code/SKILL.md)                     | Writing, moving or reviewing code: where it goes, reuse, tests, the rules. |
 | [`self-review`](.agents/skills/self-review/SKILL.md)                   | A change is done: review your own diff before opening or updating the PR.  |
 | [`visual-design-review`](.agents/skills/visual-design-review/SKILL.md) | The change affects how pages look.                                         |
 | [`pr-review`](.agents/skills/pr-review/SKILL.md)                       | You are the independent reviewer of a PR you didn't write.                 |
 | [`wrapped`](.agents/skills/wrapped/SKILL.md)                           | After a merge: verify it, check the deploy, close the loop, report.        |
 | [`project-tracking`](.agents/skills/project-tracking/SKILL.md)         | Picking up, filing or reporting work: epics, milestones, sprint, blockers. |
+
+Two skills come from Vercel, unchanged (MIT, source in each `SOURCE.md`, #424):
+[`vercel-react-best-practices`](.agents/skills/vercel-react-best-practices/SKILL.md) for React and
+Next.js performance, and
+[`vercel-composition-patterns`](.agents/skills/vercel-composition-patterns/SKILL.md) for component
+APIs. `write-code` and the reviews apply them; this repo's own rules come first where they differ.
 
 ## References: what is true here
 
@@ -164,3 +193,13 @@ supported, and the repo doesn't keep a file for each tool.
 
 An adapter holds only what is specific to its tool. Never put a rule, procedure or fact only in an
 adapter: Codex wouldn't see it.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

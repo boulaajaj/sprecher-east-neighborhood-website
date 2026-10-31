@@ -1,7 +1,8 @@
 # 0005: "Load more" is a real link, with offset paging for now
 
 - **Date:** 2026-10-19
-- **Status:** Accepted
+- **Status:** Accepted; the offset paging of "Load more" is superseded by
+  [0014](0014-cursor-paging-for-load-more.md)
 - **Issues and PRs:** #110, #111, #125
 
 ## Context
@@ -25,4 +26,5 @@ search engines and for screen-reader and keyboard users.
 
 ## Links
 
-- Code: `src/utilities/feeds.ts`, `src/components/LoadMore`
+- Code: `src/platform/lib/paging.ts`, `src/platform/ui/LoadMore.client.tsx`, `src/modules/events/data/queries.ts`,
+  `src/modules/news/data/queries.ts` (posts)

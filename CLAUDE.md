@@ -36,10 +36,28 @@ Read the other guidelines (frontend patterns, content marketing, Asana) when a t
 - **Independent review:** run the [`pr-review`](.agents/skills/pr-review/SKILL.md) skill in a
   separate session or a subagent (for example `qa-reviewer`), never in the context that wrote
   the change.
+- **Models and effort** (#522, the owner's choice to save Opus for where it counts):
+  `.claude/settings.json` starts sessions on `opusplan` (Opus in plan mode, Sonnet once the plan is
+  approved) at `medium` effort, and every agent in `.claude/agents/` runs on Sonnet at `medium`.
+  Start the review on Opus at `high` effort (pass the model and effort when you start the
+  reviewer) only when the PR touches sign-in or accounts, access rules, migrations, the deploy or
+  server scripts, or other security code. Use the plain aliases (`opus`, `sonnet`), never a
+  version, so the newest model is always used.
 - **Waiting for checks:** poll `gh pr checks <number>` in the background (`run_in_background`),
   about once a minute and for at most 15 minutes. Don't push while waiting. If the checks still
   haven't finished after 15 minutes, tell the user.
 - **Subagents:** `.claude/agents/` registers each [role guide](docs/roles/README.md) as a subagent
   Claude Code can delegate to. Those files only hold Claude Code settings; edit the guide.
+- **Hooks** (#446, in `.claude/settings.json`, scripts and tests in `.claude/hooks/`): after each
+  Edit or Write, the file is formatted with Prettier and checked with ESLint in the checkout or
+  worktree that holds it, and an error comes back to fix at once. Before each Bash command, the
+  commands `AGENTS.md` forbids (`--admin`, `bypass_rules: true`, a push to `main`) are refused, and
+  so is a commit whose `src/payload-types.ts` change is only `next dev` reformatting it. CI stays
+  the real gate. Hooks run in local and cloud sessions alike.
+- **Security plugin:** `.claude/settings.json` turns on Anthropic's `security-guidance` plugin,
+  which reviews Claude's changes for security mistakes as it works. Local sessions install it once
+  with `claude plugin install security-guidance@claude-plugins-official --scope project` (it needs
+  Python 3.8+). Cloud sessions don't load plugins a repository turns on, so there CodeQL and the
+  reviews cover it.
 - **Browser and dev server:** `.claude/settings.json` allows the Playwright MCP tools used for
   screenshots, and `.claude/launch.json` starts `npm run dev`.

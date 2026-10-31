@@ -48,11 +48,26 @@ gh api "repos/{owner}/{repo}/stacks?pull_request=<number>" -H 'X-GitHub-Api-Vers
   failure modes, and behavior when configuration is missing (local dev, CI).
 - **Security:** no secrets in the diff. Input is validated at boundaries. Access control on
   Payload collections and endpoints is unchanged or intentionally changed.
-- **Framework first:** uses Payload/Next.js features and official plugins rather than custom
-  code ([`docs/guidelines/development.md`](../../../docs/guidelines/development.md)).
+- **Native first, then plugins, then our code:** new custom code (a flow, a token, a limiter, a
+  service) comes with the issue's findings for each step of the
+  [ladder](../../../docs/guidelines/development.md#native-first-then-plugins-then-our-code):
+  native Payload, Next.js and React, official plugins, open-source plugins. Check one or two
+  claims yourself and use judgment, not a checklist. Findings missing, or a step that clearly
+  fits: **Changes requested**. A technical trade-off is the author's to decide, with the reasoning
+  on the issue. Only a genuine product trade-off, a meaningful cost, a legal or privacy
+  commitment, or a decision established best practice can't reasonably resolve, that the owner
+  hasn't decided, is **Waits for owner**.
 - **Guidelines and architecture:** the change follows the guidelines for what it touches
   ([`docs/guidelines/`](../../../docs/guidelines/README.md)) and puts code where
-  [`docs/architecture/`](../../../docs/architecture/README.md) says it goes.
+  [`docs/architecture/`](../../../docs/architecture/README.md) says it goes. For code under
+  `src/`, check it against [`write-code`](../write-code/SKILL.md): the right module and layer, no
+  module importing another, no runtime Payload import outside `data/`, `cms/`, `platform/` and
+  `payload.config.ts`, existing code and libraries reused instead of copied, tests for new rules,
+  and files under 250 lines.
+- **React and Next.js practice:** React and Next.js code follows the CRITICAL and HIGH rules of
+  [`vercel-react-best-practices`](../vercel-react-best-practices/SKILL.md), and shared components
+  follow [`vercel-composition-patterns`](../vercel-composition-patterns/SKILL.md). This repo's own
+  rules come first where they differ (#424).
 - **Tool-neutral guidance:** a new rule, procedure or fact lands in `AGENTS.md`, `docs/` or
   `.agents/skills/`, never only in the Claude Code adapter (`CLAUDE.md`, `.claude/`), where
   Codex wouldn't see it.
@@ -64,6 +79,9 @@ gh api "repos/{owner}/{repo}/stacks?pull_request=<number>" -H 'X-GitHub-Api-Vers
   rollback plan are all spelled out in the PR.
 - **UI changes:** check visually at mobile and desktop widths, in both themes. Check
   accessibility (labels, contrast, focus).
+- **`shared-component` label:** the change reaches every page that uses the changed code. Find
+  those pages (grep the component or helper's imports) and check each one, not only the pages the
+  PR names. Say in the review which pages you checked.
 
 ## 4. Post the review on the PR
 
@@ -92,6 +110,8 @@ verdict is **Changes requested**: it's fixed first, so he gets a clean PR.
   owner's words. The author then merges ([`change-workflow`](../change-workflow/SKILL.md),
   step 6).
 - **Changes requested:** list them. The author fixes them and asks for a re-review.
-- **Waits for owner:** the PR or its issue is labeled `needs owner`, or it changes policy the
-  owner didn't ask for. The author labels the PR `needs owner` and stops; the owner merges it or
-  removes the label.
+- **Waits for owner:** the PR or its issue is labeled `needs owner`, it rests on a genuine product
+  trade-off, a meaningful cost, a legal or privacy commitment, or a decision established best
+  practice can't reasonably resolve, that the owner hasn't decided, or it changes policy he
+  didn't ask for. The author labels the PR `needs owner`, asks him one plain question, and stops until he answers
+  ([waits for owner](../../../docs/process/project-management.md#waits-for-owner)).

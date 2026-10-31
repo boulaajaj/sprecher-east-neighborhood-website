@@ -1,0 +1,83 @@
+import { CalendarDays, Clock, MapPin } from 'lucide-react'
+import { createElement } from 'react'
+
+import { linkNode, p, paragraph, root, text, heading } from '@/endpoints/seed/helpers/lexical'
+import type { ImageRef, RichTextValue } from '@/platform/lib'
+import type { BreadcrumbItem } from '@/platform/ui/Breadcrumbs'
+import type { IconMetaItem, LabelledMetaItem } from '@/platform/ui/MetaList'
+import type { SelectOption } from '@/platform/ui'
+import samplePhoto from '@/endpoints/seed/image-hero1.webp'
+
+/*
+ * Fixed sample props for the component gallery (#466): no database, no network, so a change in a
+ * shared component is the only thing that changes the page.
+ */
+
+/** A day-only date, as Payload stores it (midnight UTC), and a date with a time */
+export const SAMPLE_DAY = '2026-03-03T00:00:00.000Z'
+export const SAMPLE_DATE_TIME = '2026-07-04T23:30:00.000Z'
+
+export const SAMPLE_FACTS: LabelledMetaItem[] = [
+  { label: 'Date', value: 'Saturday, July 4' },
+  { label: 'Time', value: '6:30 PM' },
+  { label: 'Place', value: 'Sprecher Park shelter' },
+]
+
+const icon = (Icon: typeof MapPin) => createElement(Icon, { 'aria-hidden': true })
+
+export const SAMPLE_ICON_FACTS: IconMetaItem[] = [
+  { icon: icon(CalendarDays), value: 'Saturday, July 4' },
+  { icon: icon(Clock), value: '6:30 PM' },
+  { icon: icon(MapPin), value: 'Sprecher Park shelter' },
+]
+
+export const SAMPLE_OPTIONS: readonly SelectOption[] = [
+  { label: 'Parks and green space', value: 'parks' },
+  { label: 'Traffic and streets', value: 'traffic' },
+  { label: 'Events', value: 'events' },
+]
+
+export const SAMPLE_BREADCRUMBS: BreadcrumbItem[] = [
+  { label: 'Home', href: '/' },
+  { label: 'Events', href: '/events' },
+  { label: 'Summer picnic' },
+]
+
+/** An image as the media collection stores it, pointing at a file bundled with the site */
+export const SAMPLE_IMAGE: ImageRef = {
+  id: 0,
+  alt: 'Blurred streaks of blue and orange light (a sample image)',
+  url: samplePhoto.src,
+  width: samplePhoto.width,
+  height: samplePhoto.height,
+  mimeType: 'image/webp',
+  credit: 'Sample Photographer',
+  license: 'cc-by',
+  licenseUrl: 'https://creativecommons.org/licenses/by/4.0/',
+  sourceUrl: 'https://example.com/photo',
+  // Empty, so the URL gets no cache-busting query: next/image allows bundled files without one
+  updatedAt: '',
+  createdAt: '',
+}
+
+export const SAMPLE_PHOTO = samplePhoto
+
+// The seed's Lexical helpers type nodes loosely (as Payload's field type does), so the result is
+// asserted to the renderer's type, as the seed's own documents are when Payload stores them
+export const SAMPLE_RICH_TEXT = root([
+  heading('h2', 'A heading inside rich text'),
+  p('Rich text is what editors write in the CMS. This paragraph shows the body size and spacing.'),
+  paragraph(
+    text('It can hold '),
+    linkNode('a link to another page', '/events'),
+    text(' and '),
+    linkNode('one that opens in a new tab', 'https://example.com', { newTab: true }),
+    text('.'),
+  ),
+  heading('h3', 'A smaller heading'),
+  p('A second paragraph under it.'),
+]) as RichTextValue
+
+export const SAMPLE_CODE = `export function greet(name: string) {
+  return \`Hello, \${name}!\`
+}`

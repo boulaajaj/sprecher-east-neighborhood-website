@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/draft.schema.json",
+  "title": "Editorial draft output",
+  "description": "The content of one suggestion. Field names follow #336's submitSuggestion tool; the server maps them to the Events or Posts fields and converts bodyMarkdown to rich text. For posts, the time and place fields are null.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "collection": {
+      "$ref": "common.schema.json#/$defs/collection"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "bodyMarkdown": {
+      "description": "Under 300 words of Markdown: what, when, where, one action, why it matters to Sprecher East, official links.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 3000
+    },
+    "summary": {
+      "description": "The card text residents see first: one or two plain sentences, no Markdown, no links. Stored as a post's meta description or an event's description.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "categories": {
+      "description": "One or two slugs from $.taxonomy, most specific first (a subcategory over its parent).",
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/categorySlug"
+      },
+      "minItems": 1,
+      "maxItems": 2,
+      "uniqueItems": true
+    },
+    "startsAt": {
+      "anyOf": [
+        {
+          "$ref": "common.schema.json#/$defs/dateTime"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "endsAt": {
+      "anyOf": [
+        {
+          "$ref": "common.schema.json#/$defs/dateTime"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "allDay": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "venue": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "address": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "audience": {
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/audience"
+      },
+      "uniqueItems": true
+    },
+    "officialLinks": {
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/httpUrl"
+      },
+      "minItems": 1,
+      "maxItems": 3
+    },
+    "imageCandidates": {
+      "description": "Images on the source's own pages an editor could ask to use, with the credit the source gives. Links only: never uploaded, never stored on the draft (#363). Empty when the source shows none.",
+      "type": "array",
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["imageUrl", "pageUrl", "credit"],
+        "properties": {
+          "imageUrl": {
+            "description": "At most 280 characters, so the link and the credit fit one report evidence line (500).",
+            "type": "string",
+            "pattern": "^https?://[^\\s]+$",
+            "maxLength": 280
+          },
+          "pageUrl": {
+            "$ref": "common.schema.json#/$defs/httpUrl"
+          },
+          "credit": {
+            "description": "The credit as the source states it, or 'not stated'.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        }
+      }
+    },
+    "confidence": {
+      "enum": ["high", "medium", "low"]
+    },
+    "missing": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "collection",
+    "title",
+    "bodyMarkdown",
+    "summary",
+    "categories",
+    "startsAt",
+    "endsAt",
+    "allDay",
+    "venue",
+    "address",
+    "audience",
+    "officialLinks",
+    "imageCandidates",
+    "confidence",
+    "missing"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "collection": {
+            "const": "posts"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "startsAt": {
+            "type": "null"
+          },
+          "endsAt": {
+            "type": "null"
+          },
+          "allDay": {
+            "type": "null"
+          },
+          "venue": {
+            "type": "null"
+          },
+          "address": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ]
+}

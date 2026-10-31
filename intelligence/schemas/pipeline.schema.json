@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/pipeline.schema.json",
+  "title": "Pipeline settings (pipeline.yaml)",
+  "type": "object",
+  "required": [
+    "version",
+    "enabled",
+    "schedule",
+    "budgets",
+    "sources",
+    "coverage",
+    "area",
+    "stages",
+    "escalation",
+    "routes"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "type": "integer", "minimum": 1 },
+    "enabled": { "type": "boolean" },
+    "schedule": {
+      "type": "object",
+      "required": ["cron", "timezone"],
+      "additionalProperties": false,
+      "properties": {
+        "cron": { "type": "string", "minLength": 1, "maxLength": 50 },
+        "timezone": { "const": "America/Chicago" }
+      }
+    },
+    "budgets": {
+      "type": "object",
+      "required": [
+        "maxUsdPerRun",
+        "maxUsdPerMonth",
+        "maxMinutesPerRun",
+        "maxItemsPerSource",
+        "maxModelItemsPerRun",
+        "maxDraftsPerRun"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "maxUsdPerRun": { "type": "number", "exclusiveMinimum": 0 },
+        "maxUsdPerMonth": { "type": "number", "exclusiveMinimum": 0 },
+        "maxMinutesPerRun": { "type": "number", "exclusiveMinimum": 0 },
+        "maxItemsPerSource": { "type": "number", "exclusiveMinimum": 0 },
+        "maxModelItemsPerRun": { "type": "number", "exclusiveMinimum": 0 },
+        "maxDraftsPerRun": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "sources": { "const": "sources.yaml" },
+    "coverage": { "const": "coverage.md" },
+    "area": { "const": "area.yaml" },
+    "stages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "prompt", "input", "output", "model"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "enum": ["scout", "verify", "curate", "draft", "submit"] },
+          "prompt": { "type": "string", "pattern": "^prompts/[a-z-]+\\.md$" },
+          "input": { "type": "string", "pattern": "^schemas/[a-z-]+\\.schema\\.json$" },
+          "output": { "type": "string", "pattern": "^schemas/[a-z-]+\\.schema\\.json$" },
+          "model": { "enum": ["none", "medium", "high"] }
+        }
+      },
+      "minItems": 5,
+      "maxItems": 5
+    },
+    "escalation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verifyBelowConfidence", "to"],
+      "properties": {
+        "verifyBelowConfidence": {
+          "description": "Rerun verify at this effort when its confidence is below this; still below after the rerun sends the item to review.",
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "to": { "const": "high" }
+      }
+    },
+    "routes": {
+      "description": "Which MCP tool the submit stage calls for each curate decision (prompts/submit.md). The check holds every eval case to it.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["accept", "needs-review", "update", "cancel", "reject", "duplicate"],
+      "properties": {
+        "accept": { "enum": ["submitSuggestion", "reportItem", "none"] },
+        "needs-review": { "enum": ["submitSuggestion", "reportItem", "none"] },
+        "update": { "enum": ["submitSuggestion", "reportItem", "none"] },
+        "cancel": { "enum": ["submitSuggestion", "reportItem", "none"] },
+        "reject": { "enum": ["submitSuggestion", "reportItem", "none"] },
+        "duplicate": { "enum": ["submitSuggestion", "reportItem", "none"] }
+      }
+    }
+  }
+}

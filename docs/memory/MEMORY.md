@@ -1,6 +1,6 @@
 # Sprecher East Neighborhood Website
 
-> **Historical notes.** The phase names below ("Phase 1", "Phase 2") describe the site's rebuild history, not today's roadmap. Current work is tracked in GitHub issues (see #127 and #122); how the code is organized is in [`docs/architecture/`](../architecture/README.md).
+> **Historical notes.** The phase names below ("Phase 1", "Phase 2") describe the site's rebuild history, not today's roadmap, and the folder trees below (`src/components/` and the rest) are from that time too. Current work is tracked in GitHub issues (see #127 and #122); how the code is organized is in [`docs/architecture/`](../architecture/README.md).
 
 ## Single Source of Truth
 

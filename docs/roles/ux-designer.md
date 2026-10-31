@@ -13,11 +13,11 @@ The website must be so intuitive that a first-time visitor — whether a tech-sa
 
 - **CMS**: Payload CMS v3 Website Template — admin panel at `/admin`
 - **Layout Builder**: Pages use the `layout` blocks field for flexible content composition (CTA, Content, Media, Archive and Form blocks); posts embed Banner, Code and Media blocks in their rich text
-- **Hero System**: 3 hero types (HighImpact, MediumImpact, LowImpact) or none, chosen per page. Posts and events use their own fixed heroes (`PostHero`, `EventHero`).
+- **Hero System**: 3 hero types (`PageHero` variants `high`, `medium`, `low`) or none, chosen per page. Posts and events use `PageHeader` (`image` with a photo, `default` without).
 - **Live Preview**: Real-time content preview in admin panel via `window.postMessage` — supports mobile/tablet/desktop breakpoints
 - **Draft Preview**: Unpublished content previewable before publishing via draft routes
 - **Auth**: Payload native auth (email and password); social login is not installed
-- **UI Components**: shadcn/ui (Radix UI primitives + Tailwind) — leverage these for consistent interaction patterns
+- **UI Components**: the UI kit in `src/platform/ui/` (Radix UI primitives, `cva` variants, Tailwind tokens), listed in [`docs/ui/component-set.md`](../ui/component-set.md) — leverage these for consistent interaction patterns
 - **Docs Reference**: https://payloadcms.com/llms-full.txt
 
 ### Admin UX Considerations

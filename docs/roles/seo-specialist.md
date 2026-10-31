@@ -41,8 +41,8 @@ CMS pages, posts and events get this from `generateMeta()`. A custom route sets 
 ```tsx
 import type { Metadata } from 'next'
 
-import { getServerSideURL } from '@/utilities/getURL'
-import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+import { getServerSideURL } from '@/platform/lib/getURL'
+import { mergeOpenGraph } from '@/platform/seo/mergeOpenGraph'
 
 export const metadata: Metadata = {
   // Page name only: the layout's title template adds " — Sprecher East".
@@ -70,21 +70,30 @@ The root layout already sets `twitter.card` to `summary_large_image`.
 
 ### Sitemap
 
-- Auto-generated sitemap.xml at `/sitemap.xml`
-- Include all public pages, published posts, published events
-- Update frequency hints: posts (weekly), events (daily), static pages (monthly)
-- Exclude admin, login, draft content
+- One sitemap, `/sitemap.xml` (`src/app/sitemap.ts`, Next.js's native sitemap): the listing
+  pages, then every published page, post and event
+- Never admin, drafts, or the pages kept out of search results (below)
 
-### robots.txt
+### Keeping pages out of search results
 
-```
-User-agent: *
-Allow: /
-Disallow: /admin/
-Disallow: /api/
-Disallow: /login
-Sitemap: https://sprechereast.com/sitemap.xml
-```
+The owner's decision on #280 (2026-10-24, in a Claude Code session): "Choose B, with appropriate
+scope. Add noindex to sign-in, sign-up, password recovery, and account-management pages. Prevent
+indexing of raw API responses where appropriate. Ensure private API data is protected through
+actual authentication and authorization, not merely search-engine directives. Keep intended
+public neighborhood pages discoverable."
+
+- **Account and confirmation pages** (`/login`, `/sign-up`, `/verify-account`, `/forgot-password`,
+  `/reset-password`, `/account`, `/confirm-email`) set `robots: NOT_INDEXED` from
+  `src/platform/seo/notIndexed.ts` in their metadata. A new page of that kind does the same.
+- **API answers** get an `X-Robots-Tag: noindex` header (`API_HEADERS` in `next.config.js`),
+  except `/api/media/file/`, so the site's images stay in image search.
+- **robots.txt** (`src/app/robots.ts`) blocks only `/admin/*`. Don't add `/api/` or `/login`:
+  robots.txt controls crawling, not indexing, and a crawler that may not fetch a page never reads
+  its `noindex` ([Google: block indexing with noindex](https://developers.google.com/search/docs/crawling-indexing/block-indexing)).
+  Blocking `/api/` would also hide the images.
+- **None of this protects data.** Private collections are protected by their access rules, which
+  `src/platform/payload/accessPolicy.test.ts` checks.
+- Every other public page stays indexable: never put `noindex` on it.
 
 ### Performance (Core Web Vitals)
 
@@ -132,7 +141,7 @@ Sitemap: https://sprechereast.com/sitemap.xml
 
 ## Payload SEO Plugin
 
-The project uses `@payloadcms/plugin-seo` which automatically adds SEO fields to configured collections:
+The project uses `@payloadcms/plugin-seo` without its `collections` option: Pages, Posts and Events each build their own SEO tab from the plugin's fields (#196). The tab has:
 
 - **meta.title** — Page title for search results (auto-generation function available)
 - **meta.description** — Meta description with character count

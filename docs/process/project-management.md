@@ -44,10 +44,31 @@ The allowed labels are in [`.github/label-policy.json`](../../.github/label-poli
   `PR Policy` check enforces this for linked issues.
 - **Markers** (optional, with a fixed meaning):
   - `epic`: a parent issue whose sub-issues are the work.
-  - `needs owner`: needs the owner's login, money or decision. Agents can't do it. Every
+  - `needs owner`: needs the owner's login or money, or his decision on a genuine product
+    trade-off, a meaningful cost, a legal or privacy commitment, or a decision established best
+    practice can't reasonably resolve. Agents can't do it. A choice between technically valid
+    approaches isn't one: agents decide it and record why on the issue ([`AGENTS.md`](../../AGENTS.md#ground-rules)). Every
     `needs owner` issue is listed in the checklist of the owner-actions epic (#169); its parent
     stays the epic it belongs to. The issues that depend on it are marked **blocked by** it, so
     nobody starts them too early.
+  - `shared-component`: a "watch out" flag on a PR that changes shared code many pages use:
+    `src/platform/` (`ui/`, `richtext/`, `theme/`, `lib/`, `turnstile/`), `src/themes/`, the
+    frontend layout and `globals.css`, and the site header, nav, footer and logo. The labeler sets
+    it from the changed paths (#447); its reviewer checks every page that uses the changed code.
+
+### Waits for owner
+
+**Waits for owner** means: that issue or PR is on hold until the owner answers. Until then,
+nobody decides for him, merges it, or starts anything marked blocked by it. Fixing review
+findings on a waiting PR is fine, so he gets a clean one. Other work goes on, and silence is
+never a yes.
+
+When he answers, whoever acts on it quotes his words on the issue or PR (with the date and where
+he said them), then removes the `needs owner` label and carries on as he decided. He can also
+merge or remove the label himself.
+
+How to ask him ([`project-tracking`](../../.agents/skills/project-tracking/SKILL.md) step 5):
+one plain question, the options in a sentence each, a recommendation, and what happens next.
 
 Priority lives only in the `priority:` label. GitHub's issue types (Bug, Feature, Task) are
 optional; the type label stays the required one because the `PR Policy` check reads labels.

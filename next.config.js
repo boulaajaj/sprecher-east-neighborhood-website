@@ -1,3 +1,6 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { withPayload } from '@payloadcms/next/withPayload'
 import { PHASE_PRODUCTION_BUILD } from 'next/constants.js'
 
@@ -11,6 +14,19 @@ const NEXT_PUBLIC_SERVER_URL =
   process.env.__NEXT_PRIVATE_ORIGIN ||
   'http://localhost:3000'
 
+/**
+ * Raw API answers stay out of search results (#280): every `/api/` response but the uploads under
+ * `/api/media/file/`, so the site's images stay in image search. robots.txt must not block `/api/`
+ * instead, or crawlers would never read this header, and images would drop out. It only asks
+ * search engines; access control is what keeps private data private.
+ */
+export const API_HEADERS = [
+  {
+    source: '/api/:path((?!media/file/).*)',
+    headers: [{ key: 'X-Robots-Tag', value: 'noindex' }],
+  },
+]
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   env: {
@@ -21,6 +37,10 @@ const nextConfig = {
     NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? '',
   },
   images: {
+    // Uploads are served by Payload under this path; getMediaUrl keeps them relative (local)
+    localPatterns: [{ pathname: '/api/media/file/**' }],
+    // ImageMedia asks for quality 100; Next 16 allows only 75 unless listed
+    qualities: [100],
     remotePatterns: [
       ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
         const url = new URL(item)
@@ -41,8 +61,19 @@ const nextConfig = {
 
     return webpackConfig
   },
+  // `next dev` prints every server action call with its arguments, which would put the passwords
+  // typed into sign-in and change-password in the terminal, and in any log pasted into an issue
+  logging: { serverFunctions: false },
   reactStrictMode: true,
   redirects,
+  headers: async () => API_HEADERS,
+  // CI type-checks every PR with `tsc --noEmit` (the required "Type-check & Build" check), so
+  // `next build` skips its own type check. On the 1-CPU server that step took over 8 minutes and
+  // pushed the deploy past its time limit (#246)
+  typescript: { ignoreBuildErrors: true },
+  turbopack: {
+    root: path.dirname(fileURLToPath(import.meta.url)),
+  },
 }
 
 /**

@@ -57,7 +57,7 @@ Every finding has:
 If no pattern fits, write a new one, test it at all six widths, and add it to the library before
 prescribing it.
 
-Use design tokens from `globals.css @theme {}` in every fix, and name them. Never hardcode a
+Use design tokens (`src/platform/theme/tokens.ts`) in every fix, and name them. Never hardcode a
 color; the one exception is `rgba(0,0,0,…)` for image scrims and shadows, where no token fits.
 
 End with an **implementation plan**: findings grouped into tasks, with the affected files, the

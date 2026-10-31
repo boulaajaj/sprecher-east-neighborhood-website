@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/verification.schema.json",
+  "title": "Location and fact check output",
+  "description": "Resolves where and when from primary sources. Anything not confirmed is listed in unknowns or flags, never guessed.",
+  "type": "object",
+  "required": [
+    "location",
+    "coverage",
+    "coverageReason",
+    "confidence",
+    "dateConfirmed",
+    "statusConfirmed",
+    "evidence",
+    "unknowns",
+    "flags"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "location": {
+      "type": "object",
+      "required": ["name", "address", "municipality", "verified"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "address": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "municipality": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "verified": {
+          "type": "boolean"
+        }
+      }
+    },
+    "coverage": {
+      "$ref": "common.schema.json#/$defs/coverage"
+    },
+    "coverageReason": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "confidence": {
+      "description": "0 to 1: how sure the stage is of place, date and status together. Below pipeline.yaml's escalation threshold, the runtime reruns verify at high effort.",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "dateConfirmed": {
+      "type": "boolean"
+    },
+    "statusConfirmed": {
+      "enum": ["scheduled", "cancelled", "rescheduled", "unknown"]
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["url", "says", "retrievedAt"],
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "$ref": "common.schema.json#/$defs/httpUrl"
+          },
+          "says": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "retrievedAt": {
+            "$ref": "common.schema.json#/$defs/dateTime"
+          }
+        }
+      },
+      "maxItems": 5
+    },
+    "unknowns": {
+      "type": "array",
+      "items": {
+        "enum": ["date", "time", "location", "address", "status", "organizer", "cost", "audience"]
+      },
+      "uniqueItems": true
+    },
+    "flags": {
+      "$ref": "common.schema.json#/$defs/flags"
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/provenance.schema.json",
+  "title": "Provenance and moderation fields",
+  "description": "The one place for the field names the submit stage writes on every suggested Event or Post (#123, #336). Align the CMS fields with these names, or change them here and in the prompts together.",
+  "type": "object",
+  "required": ["sourceName", "sourceUrl", "externalId", "contentHash", "moderationStatus"],
+  "additionalProperties": false,
+  "properties": {
+    "sourceName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "sourceUrl": {
+      "$ref": "common.schema.json#/$defs/httpUrl"
+    },
+    "externalId": {
+      "description": "The source's own stable ID, prefixed with the source id: legistar-events:28977.",
+      "type": "string",
+      "pattern": "^[a-z0-9-]+:.+$",
+      "maxLength": 200
+    },
+    "contentHash": {
+      "description": "sha256, lowercase hex, of the candidate's substantive fields: title, sourceText, startsAt, endsAt, allDay, locationText and sourceStatus, each trimmed with whitespace collapsed (text also lowercased), null as an empty string, joined by newlines in that order. Retrieval metadata (retrievedAt, ETag, feed order) is never hashed.",
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "moderationStatus": {
+      "const": "suggested"
+    }
+  }
+}

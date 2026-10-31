@@ -1,0 +1,288 @@
+# Source registry for the intelligence agents (#271, #352). Summary: sources.md. Only `valid` is
+# polled; `pilotRank` marks the daily pilot; `fetchStrategy` is `direct` unless stated.
+version: 1
+checkedOn: '2026-10-27'
+sources:
+  - id: legistar-events
+    name: City of Madison meetings (Legistar API)
+    owner: City of Madison Clerk's Office (Legistar, by Granicus)
+    canonicalUrl: https://madison.legistar.com/Calendar.aspx
+    feedUrl: "https://webapi.legistar.com/v1/madison/events?$filter=EventDate%20ge%20datetime'{from}'%20and%20EventDate%20lt%20datetime'{to}'&$orderby=EventDate%20asc"
+    format: json-api
+    scope: Every public meeting of the Common Council, boards, commissions and committees
+    audiences: [everyone, association-leaders, volunteers]
+    reliability: official
+    access: Public records API, no key. One windowed request per run.
+    cadence: daily
+    lastChecked: '2026-10-24'
+    result: valid
+    pilotRank: 1
+    treatment: >-
+      A 14-day window; dedupe on EventId, a newer EventLastModifiedUtc is an update, "Cancelled"
+      is a cancellation. Pass Common Council meetings and public hearings to curate; drop other
+      bodies unless an agenda item names a place in the area (coverage.md).
+    example:
+      title: TRANSPORTATION COMMISSION, 5:00 PM, Virtual
+      date: '2026-10-28'
+      url: https://madison.legistar.com/MeetingDetail.aspx?LEGID=28977&GID=205&G=D66739FE-4C3C-468C-A9F0-0198EFAA8EF8
+    notes: >-
+      Unfiltered queries return placeholder meetings up to 2050: always filter by date. Event 28745
+      (2026-11-03) is Cancelled, "Rescheduled to 10/28/2026", matching event 29306.
+  - id: legistar-matters
+    name: City of Madison legislation (Legistar API)
+    owner: City of Madison Clerk's Office (Legistar, by Granicus)
+    canonicalUrl: https://madison.legistar.com/Legislation.aspx
+    feedUrl: "https://webapi.legistar.com/v1/madison/matters?$filter=MatterLastModifiedUtc%20ge%20datetime'{cursor}'&$orderby=MatterLastModifiedUtc%20asc"
+    format: json-api
+    scope: Ordinances, resolutions and other items before the Council and its committees
+    audiences: [everyone, association-leaders]
+    reliability: official
+    access: Public records API, no key.
+    cadence: daily
+    lastChecked: '2026-10-24'
+    result: valid
+    pilotRank: 3
+    treatment: >-
+      Items changed since the cursor whose title names a place in the area (coverage.md). Match
+      text on our side: a substringof() filter on MatterTitle returned a server error.
+    example:
+      title: MatterId 103134, file 95368, Proposed 2027 Transportation budgets
+      date: '2026-10-23'
+      url: https://webapi.legistar.com/v1/madison/matters/103134
+  - id: mpl-pinney-events
+    name: Madison Public Library, Pinney Library events (iCalendar)
+    owner: Madison Public Library
+    canonicalUrl: https://www.madisonpubliclibrary.org/spaces/events/calendar-subscription-feeds
+    feedUrl: https://www.madisonpubliclibrary.org/events/calendar/library/1940/export.ics
+    format: ics
+    scope: Programs at Pinney Library, the branch nearest the area, plus system-wide closures
+    audiences: [families, youth, seniors, everyone]
+    reliability: official
+    access: Published by the library for public calendar subscription; no terms stated for the feed.
+    cadence: daily
+    lastChecked: '2026-10-24'
+    result: valid
+    pilotRank: 2
+    treatment: >-
+      iCalendar parser; dedupe on UID, a newer LAST-MODIFIED is an update. Keep only DTSTART from
+      today on. Events have no URL property: link the event page from DESCRIPTION when present.
+    example:
+      title: Silent Book Club (UID f893db74-0646-428d-8d98-4568227a4399, 19:00 America/Chicago)
+      date: '2026-11-17'
+      url: https://www.madisonpubliclibrary.org/events/calendar/library-type/1940/237/export.ics
+    notes: >-
+      The check tool cut the all-events file (~89,000 characters) off in May 2026. The Book
+      Discussion feed was read whole (to 2026-12-15). #272 logs a future all-events UID first.
+  - id: madison365-news
+    name: Madison365 (RSS)
+    owner: Madison365 (nonprofit newsroom)
+    canonicalUrl: https://madison365.com/
+    feedUrl: https://madison365.com/feed/
+    format: rss
+    scope: Madison community, culture and civic news
+    audiences: [everyone]
+    reliability: established-media
+    access: Copyrighted news. Use the headline, link and our own summary; never copy the article.
+    cadence: daily
+    lastChecked: '2026-10-24'
+    result: valid
+    pilotRank: 4
+    treatment: >-
+      Dedupe on guid. Most items are citywide or elsewhere: keep only items with a clear benefit to
+      area residents (coverage.md). None of the 10 items on 2026-10-24 named the area.
+    example:
+      title: Five Latino artists selected for LOUD 2026 Micaela Salinas Artist Fellowship
+      date: '2026-10-23'
+      url: https://madison365.com/five-latino-artists-selected-for-loud-2026-micaela-salinas-artist-fellowship/
+    notes: RSS 2.0, lastBuildDate 2026-10-23, guid on every item.
+  - id: spectrum-madison-local
+    name: Spectrum News 1 Madison, local headlines (RSS)
+    owner: Spectrum News 1 Wisconsin
+    canonicalUrl: https://spectrumnews1.com/wi/madison/rss.html
+    feedUrl: http://spectrumlocalnews.com/services/contentfeed.wi%7Cmadison%7Cnews.landing.rss
+    format: rss
+    scope: Madison and statewide news, sports and weather
+    audiences: [everyone]
+    reliability: established-media
+    access: Copyrighted news. Headline, link and our own summary only.
+    cadence: daily
+    lastChecked: '2026-10-24'
+    result: valid
+    pilotRank: null
+    treatment: Hold for after the pilot. Mostly statewide items; low share of local value.
+    example:
+      title: Still warm for late October with more clouds Saturday
+      date: '2026-10-24'
+      url: http://www.spectrumnews1.com/wi/madison/weather/2020/05/13/wisconsin-weather-forecast
+    notes: Not strict RSS 2.0; pubDates such as "06:00 AM CDT" may fail RFC 822 parsers. Plain http.
+  - id: madison-parks-events
+    name: Madison Parks events
+    owner: City of Madison Parks Division
+    canonicalUrl: https://www.cityofmadison.com/parks/events
+    feedUrl: null
+    format: html
+    scope: Parks programs, nature events, golf, recreation centers
+    audiences: [families, youth, seniors, everyone, volunteers]
+    reliability: official
+    access: Public web page. No RSS or iCalendar found; email list only.
+    cadence: none
+    lastChecked: '2026-10-24'
+    result: pending
+    pilotRank: null
+    fetchStrategy: direct-then-playwright
+    robots:
+      { checked: '2026-10-24', result: allowed, url: https://www.cityofmadison.com/robots.txt }
+    treatment: >-
+      Page parsing approved on #352. A direct GET on 2026-10-24 served the list in the HTML (no
+      JavaScript needed), with item links. Stays pending until the collector records a parse.
+    example:
+      title: Bird & Nature Adventures, Aldo Leopold Nature Center
+      date: '2026-10-24'
+      url: https://www.cityofmadison.com/parks/events/2026-10-24/bird-nature-adventures-edna-taylor
+  - id: district16-blog
+    name: District 16 alder blog (Alder Sean O'Brien)
+    owner: City of Madison Common Council, District 16
+    canonicalUrl: https://www.cityofmadison.com/council/district16/blog
+    feedUrl: null
+    format: html
+    scope: The area's alder's weekly meeting highlights and local public meetings
+    audiences: [everyone, association-leaders, volunteers]
+    reliability: official
+    access: Public web page, no feed (#352); parser `parseCityArticles` (#390).
+    cadence: daily
+    lastChecked: '2026-10-27'
+    result: valid
+    pilotRank: 7
+    fetchStrategy: direct-then-playwright
+    robots:
+      &cityRobots {
+        checked: '2026-10-27',
+        result: allowed,
+        url: https://www.cityofmadison.com/robots.txt,
+      }
+    treatment: Posts from the last 14 days, all kept (the area's own alder); verify reads meetings in them.
+    example: null
+  - id: city-news
+    name: City of Madison news releases
+    owner: City of Madison
+    canonicalUrl: https://www.cityofmadison.com/news
+    feedUrl: null
+    format: html
+    scope: Citywide announcements, road work, services
+    audiences: [everyone]
+    reliability: official
+    access: Public web page, no feed; parser `parseCityArticles` (#390).
+    cadence: daily
+    lastChecked: '2026-10-27'
+    result: valid
+    pilotRank: 8
+    robots: *cityRobots
+    treatment: Citywide, so only releases that name the area (area.yaml) go on to a model; posts from the last 14 days.
+    example: null
+  - id: city-public-info-meetings
+    name: City of Madison public information meetings
+    owner: City of Madison
+    canonicalUrl: https://www.cityofmadison.com/events/public-information-meetings
+    feedUrl: null
+    format: html
+    scope: Public information meetings from every City agency, Engineering projects included
+    audiences: [everyone, association-leaders]
+    reliability: official
+    access: Public web page, no feed; parser `parseCityEvents` (#390).
+    cadence: daily
+    lastChecked: '2026-10-27'
+    result: valid
+    pilotRank: 6
+    robots: *cityRobots
+    treatment: Upcoming meetings, all kept (one may affect the area without naming it); page's own times.
+    example: null
+  - id: wisdot-i39-90-94
+    name: WisDOT I-39/90/94 project news and meetings
+    owner: Wisconsin Department of Transportation
+    canonicalUrl: https://www.i399094project.wisconsindot.gov/news-and-meetings
+    feedUrl: null
+    format: html
+    scope: Meetings for the I-39/90/94 corridor study, along the area's east side
+    audiences: [everyone, association-leaders]
+    reliability: official
+    access: Public web page, no feed; parser `parseWisdotMeetings` (#390).
+    cadence: daily
+    lastChecked: '2026-10-27'
+    result: valid
+    pilotRank: 5
+    robots:
+      {
+        checked: '2026-10-27',
+        result: allowed,
+        url: https://www.i399094project.wisconsindot.gov/robots.txt,
+      }
+    treatment: Upcoming corridor meetings only; the time from the box or the page's own text, never guessed.
+    example: null
+  - id: dane-county-press
+    name: Dane County press releases
+    owner: Dane County
+    canonicalUrl: https://www.danecounty.gov/press
+    feedUrl: null
+    format: html
+    scope: County Executive, Sheriff and departments
+    audiences: [everyone]
+    reliability: official
+    access: Public web page. No RSS link; the subscription page disallows automated fetching (robots.txt).
+    cadence: none
+    lastChecked: '2026-10-24'
+    result: restricted
+    pilotRank: null
+    treatment: Not collected. Revisit if the county publishes a feed.
+    example:
+      title: Dane County Awards $96,750 in Grants to Local Arts Organizations
+      date: '2026-10-22'
+      url: https://www.danecounty.gov/PressDetail/11985
+    notes: exec.danecounty.gov/press showed releases from 2016 only, so use the main press page.
+  - id: madison-com
+    name: Wisconsin State Journal (madison.com)
+    owner: Lee Enterprises
+    canonicalUrl: https://madison.com/
+    feedUrl: https://madison.com/search/?f=rss&t=article
+    format: rss
+    scope: Madison news
+    audiences: [everyone]
+    reliability: established-media
+    access: The feed URL redirects automated readers to tollbit.madison.com, a paid bot-access gateway.
+    cadence: none
+    lastChecked: '2026-10-24'
+    result: restricted
+    pilotRank: null
+    treatment: Not collected without a licence; the redirect wasn't followed. Listed in content-marketing.md.
+    example: null
+  - id: captimes
+    name: The Capital Times
+    owner: The Capital Times
+    canonicalUrl: https://captimes.com/
+    feedUrl: https://captimes.com/feed
+    format: rss
+    scope: Madison politics and community news
+    audiences: [everyone]
+    reliability: established-media
+    access: Unknown.
+    cadence: none
+    lastChecked: '2026-10-24'
+    result: invalid
+    pilotRank: null
+    treatment: Not collected. The feed URL listed in content-marketing.md failed with a client error.
+    example: null
+  - id: channel3000
+    name: Channel 3000 (WISC-TV)
+    owner: WISC-TV
+    canonicalUrl: https://www.channel3000.com/rss
+    feedUrl: null
+    format: html
+    scope: Local news, public safety, weather
+    audiences: [everyone]
+    reliability: established-media
+    access: The listed URL is an HTML page; the local-news feed it links to failed with a client error.
+    cadence: none
+    lastChecked: '2026-10-24'
+    result: invalid
+    pilotRank: null
+    treatment: Not collected. content-marketing.md lists this page as a feed; it only links to feeds.
+    example: null

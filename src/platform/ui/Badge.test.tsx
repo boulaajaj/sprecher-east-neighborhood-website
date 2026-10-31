@@ -1,0 +1,78 @@
+// @vitest-environment jsdom
+import { cleanup, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it } from 'vitest'
+
+import { Badge, BadgeList } from './Badge'
+import { expectAccessible } from './testing/expectAccessible'
+
+afterEach(cleanup)
+
+describe('Badge', () => {
+  it('is a category pill by default, in text that passes on its tint (#418)', () => {
+    render(<Badge>Meeting</Badge>)
+
+    const badge = screen.getByText('Meeting')
+    expect(badge.className).toContain('text-primary-strong')
+    expect(badge.className).toContain('bg-primary/10')
+  })
+
+  it('sits on its own scrim over a photo', () => {
+    render(<Badge variant="on-image">Meeting</Badge>)
+
+    expect(screen.getByText('Meeting').className).toContain('text-on-image')
+    expect(screen.getByText('Meeting').className).toContain('bg-scrim/60')
+  })
+
+  it('marks a state in destructive-strong on the destructive tint, with an optional icon (#122)', async () => {
+    const { container } = render(
+      <Badge variant="status">
+        <svg aria-hidden="true" />
+        Cancelled
+      </Badge>,
+    )
+
+    const badge = screen.getByText('Cancelled')
+    expect(badge.className).toContain('text-destructive-strong')
+    expect(badge.className).toContain('bg-destructive/10')
+    expect(badge.className).toContain('[&_svg]:size-3.5')
+    await expectAccessible(container)
+  })
+
+  it('marks an official meeting in the category pill’s pair, set apart by a border (#122)', async () => {
+    const { container } = render(<Badge variant="official">Official meeting</Badge>)
+
+    const badge = screen.getByText('Official meeting')
+    expect(badge.className).toContain('text-primary-strong')
+    expect(badge.className).toContain('bg-primary/10')
+    expect(badge.className).toContain('border-primary/30')
+    await expectAccessible(container)
+  })
+
+  it.each([
+    ['current', 'text-primary-foreground', 'bg-primary-fill', 'Next up'],
+    ['caution', 'text-warning-strong', 'bg-warning/10', 'Depends'],
+    ['neutral', 'text-muted-foreground', 'bg-muted', 'Later'],
+  ] as const)(
+    'marks a timeline step as %s in a contract-checked pair (#507)',
+    async (variant, text, background, label) => {
+      const { container } = render(<Badge variant={variant}>{label}</Badge>)
+
+      const badge = screen.getByText(label)
+      expect(badge.className).toContain(text)
+      expect(badge.className).toContain(background)
+      await expectAccessible(container)
+    },
+  )
+
+  it('lines badges up in a row that wraps, with no accessibility violations', async () => {
+    const { container } = render(
+      <BadgeList>
+        <Badge>Meeting</Badge>
+        <Badge>Parks</Badge>
+      </BadgeList>,
+    )
+
+    expect(container.firstElementChild?.className).toContain('flex-wrap')
+    await expectAccessible(container)
+  })
+})

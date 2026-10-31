@@ -1,77 +1,195 @@
 name: Deploy to VPS
 
+# Builds the site in GitHub Actions and ships the build to the VPS, which only migrates, switches
+# and checks (#245; steps in ops/README.md). CI calls this workflow once its "Type-check & Build"
+# job has passed on a push to main; it can also be run by hand on main to redeploy.
 on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - '**/*.md'
-      - '.claude/**'
-      - '.agents/**'
-      - '.github/**'
-      - '.env.local.example'
-      - 'docs/**'
-      - 'LICENSE'
+  workflow_call:
   workflow_dispatch:
 
-# Only allow one deployment at a time
-concurrency:
-  group: deploy-production
-  cancel-in-progress: false
+permissions:
+  contents: read
+  actions: read # require-checks.sh reads the check results of the commit
 
 jobs:
-  deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-
+  preflight:
+    name: Preflight
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      deploy: ${{ steps.plan.outputs.deploy }}
+      redeploy: ${{ steps.plan.outputs.redeploy }}
+      node: ${{ steps.facts.outputs.node }}
+      server_url: ${{ steps.facts.outputs.server_url }}
+      turnstile_site_key: ${{ steps.facts.outputs.turnstile_site_key }}
+      turnstile_paired: ${{ steps.facts.outputs.turnstile_paired }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # to compare with the commit that is live
+          persist-credentials: false
 
-      # The ops scripts print `::notice` / `::warning` lines, which GitHub shows as annotations on
-      # this run, whether the deploy succeeds or fails (ops/lib.sh).
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.2.5
+      - name: Wait for the required checks
+        id: checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: bash .github/scripts/require-checks.sh
+
+      - uses: ./.github/actions/vps-ssh
+        if: steps.checks.outputs.cancelled != 'true'
         with:
           host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
+          user: ${{ secrets.VPS_USER }}
+          port: ${{ secrets.VPS_PORT || '22' }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT || 22 }}
-          command_timeout: 15m
-          script: |
-            set -e
+          known-hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
 
-            cd /var/www/sprecher-east
+      # Public values only (ops/server-facts.sh); each one is checked before it is used.
+      - name: Read the server's Node version and public settings
+        id: facts
+        if: steps.checks.outputs.cancelled != 'true'
+        run: |
+          set -euo pipefail
+          facts=$(cat ops/lib.sh ops/server-facts.sh | ssh vps 'bash -s')
+          get() { sed -n "s/^$1=//p" <<<"$facts" | tail -n 1; }
+          node=$(get node); url=$(get server_url); key=$(get turnstile_site_key)
+          secret=$(get turnstile_secret); free_kb=$(get free_kb)
+          [[ "$node" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error title=Preflight::unexpected Node version from the server"; exit 1; }
+          [[ "$url" =~ ^https?://[A-Za-z0-9.-]+(:[0-9]+)?$ ]] || { echo "::error title=Preflight::NEXT_PUBLIC_SERVER_URL in .env.local is not a plain origin"; exit 1; }
+          [[ "$key" =~ ^[A-Za-z0-9_-]*$ ]] || { echo "::error title=Preflight::unexpected NEXT_PUBLIC_TURNSTILE_SITE_KEY"; exit 1; }
+          if [ -n "$key" ] && [ "$secret" = yes ]; then paired=yes
+          elif [ -z "$key" ] && [ "$secret" = no ]; then paired=no
+          else echo "::error title=Preflight::only one of the two Turnstile keys is set in .env.local"; exit 1; fi
+          [ "${free_kb:-0}" -gt 3145728 ] || { echo "::error title=Preflight::less than 3 GB free on the server"; exit 1; }
+          {
+            echo "node=$node"; echo "server_url=$url"; echo "turnstile_site_key=$key"
+            echo "turnstile_paired=$paired"; echo "deployed=$(get deployed)"
+          } >> "$GITHUB_OUTPUT"
+          echo "::notice title=Preflight::server runs Node $node; live commit $(get deployed | cut -c1-7)"
 
-            echo "→ Pulling latest code..."
-            git pull origin main
+      # Same files as the old push filter: docs and repo tooling alone don't deploy.
+      - name: Decide whether to deploy
+        id: plan
+        if: steps.checks.outputs.cancelled != 'true'
+        env:
+          DEPLOYED: ${{ steps.facts.outputs.deployed }}
+          SHA: ${{ github.sha }}
+          EVENT: ${{ github.event_name }}
+          RUN_ID: ${{ github.run_id }}
+        run: bash .github/scripts/plan-deploy.sh
 
-            echo "→ Installing dependencies..."
-            npm ci --prefer-offline
+  build:
+    name: Build release
+    needs: preflight
+    if: needs.preflight.outputs.deploy == 'true'
+    runs-on: ubuntu-24.04 # the server runs Ubuntu 24.04 too
+    timeout-minutes: 30
+    # No secrets in this job: it runs npm's install scripts.
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false # npm install scripts run in this job
 
-            echo "→ Ensuring data directory..."
-            mkdir -p data
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ needs.preflight.outputs.node }}
+          cache: npm
 
-            echo "→ Backing up data before migrations (#148)..."
-            bash ops/backup.sh pre-deploy
+      - name: Build
+        env:
+          RELEASE_DIR: /var/www/sprecher-east/releases/${{ needs.preflight.outputs.redeploy == 'true' && format('{0}-run{1}', github.sha, github.run_id) || github.sha }}
+          SHA: ${{ github.sha }}
+          NODE_VERSION: ${{ needs.preflight.outputs.node }}
+          NEXT_PUBLIC_SERVER_URL: ${{ needs.preflight.outputs.server_url }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ needs.preflight.outputs.turnstile_site_key }}
+          TURNSTILE_PAIRED: ${{ needs.preflight.outputs.turnstile_paired }}
+          OUT: ${{ runner.temp }}/release.tar.gz
+        run: bash ops/build-release.sh
 
-            echo "→ Installing the daily backup job (#148)..."
-            bash ops/install-cron.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: ${{ runner.temp }}/release.tar.gz
+          retention-days: 3
+          compression-level: 0 # already gzipped
 
-            echo "→ Running database migrations..."
-            npx payload migrate
+  deploy:
+    name: Deploy
+    needs: [preflight, build]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
 
-            echo "→ Building..."
-            npm run build
+      - uses: actions/download-artifact@v4
+        with:
+          name: release
+          path: ${{ runner.temp }}
 
-            echo "→ Restarting app (listens on 127.0.0.1:3000 only, #118)..."
-            bash ops/restart-app.sh
+      - uses: ./.github/actions/vps-ssh
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          user: ${{ secrets.VPS_USER }}
+          port: ${{ secrets.VPS_PORT || '22' }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          known-hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
 
-            echo "→ Limiting request size on the public form endpoint in Caddy (#124)..."
-            bash ops/caddy-limits.sh
+      # Another deploy may have finished while this one waited for its turn.
+      - name: Check that a newer commit isn't live already
+        id: order
+        env:
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          live=$(cat ops/lib.sh ops/server-facts.sh | ssh vps 'bash -s' | sed -n 's/^deployed=//p')
+          if [ -n "$live" ] && [ "$live" != "$SHA" ] && git merge-base --is-ancestor "$SHA" "$live" 2>/dev/null; then
+            echo "::notice title=Deploy::${live:0:7}, newer than ${SHA:0:7}, is already live; nothing to do"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
 
-            echo "::notice title=Server::disk $(df -h / | awk 'NR == 2 { print $4 " free of " $2 }'), database $(du -h data/payload.db | cut -f1), media $(du -sh public/media 2>/dev/null | cut -f1), page cache $(du -sh .next/server 2>/dev/null | cut -f1)"
-            echo "✓ Deploy complete."
+      # The archive goes into a folder the release never runs from, then is renamed in one step,
+      # so a cut-off upload never looks like a release.
+      - name: Upload the release
+        if: steps.order.outputs.skip != 'true'
+        env:
+          RELEASE: ${{ needs.preflight.outputs.redeploy == 'true' && format('{0}-run{1}', github.sha, github.run_id) || github.sha }}
+        run: |
+          set -euo pipefail
+          # Never run the commands below with an empty or odd name: `rm -rf releases/$RELEASE`
+          # would remove every release (#382)
+          [[ "$RELEASE" =~ ^[0-9a-f]{40}(-run[0-9]+)?$ ]] || { echo "::error::bad release name '$RELEASE'"; exit 1; }
+          # shellcheck disable=SC2029 # $RELEASE (a commit hash) is meant to expand here
+          ssh vps "set -euo pipefail
+            cd /var/www/sprecher-east && mkdir -p releases
+            [ \"\$(readlink current 2>/dev/null)\" != releases/$RELEASE ] || { echo 'release $RELEASE is live; not replacing it' >&2; exit 1; }
+            rm -rf releases/.incoming-$RELEASE releases/$RELEASE
+            mkdir releases/.incoming-$RELEASE
+            tar --no-same-owner -xzf - -C releases/.incoming-$RELEASE
+            mv -T releases/.incoming-$RELEASE releases/$RELEASE" < "$RUNNER_TEMP/release.tar.gz"
+
+      # ops/deploy-release.sh prints `::notice` / `::warning` lines, which GitHub shows as
+      # annotations on this run, whether the deploy succeeds or fails (ops/lib.sh).
+      - name: Put the release live
+        if: steps.order.outputs.skip != 'true'
+        env:
+          RELEASE: ${{ needs.preflight.outputs.redeploy == 'true' && format('{0}-run{1}', github.sha, github.run_id) || github.sha }}
+        run: |
+          [[ "$RELEASE" =~ ^[0-9a-f]{40}(-run[0-9]+)?$ ]] || { echo "::error::bad release name '$RELEASE'"; exit 1; }
+          # shellcheck disable=SC2029 # $RELEASE (a commit hash) is meant to expand here
+          ssh vps "bash /var/www/sprecher-east/releases/$RELEASE/ops/deploy-release.sh"
 
       - name: Check that port 3000 is closed to the internet (#118)
+        # Also after a failed deploy step: the outside view is what tells a failure apart (#338).
+        if: ${{ !cancelled() && steps.order.outputs.skip != 'true' }}
         env:
           HOST: ${{ secrets.VPS_HOST }}
         run: |
@@ -79,4 +197,36 @@ jobs:
             echo "::warning title=Port 3000::reachable from the internet"
           else
             echo "::notice title=Port 3000::not reachable from the internet"
+          fi
+
+      # What a visitor gets, from outside the server (#235): HSTS on the domain, plain HTTP to the
+      # domain and to the server's SSH address (VPS_HOST, the IP or its hostname, which the `:80`
+      # catch-all answers alike) redirected to HTTPS. GitHub masks the secret in the log.
+      - name: Check HTTPS from the internet (#235)
+        if: ${{ !cancelled() && steps.order.outputs.skip != 'true' }}
+        env:
+          URL: ${{ needs.preflight.outputs.server_url }}
+          HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          show() { # <label> <url>
+            curl -s -o /dev/null -D - --max-time 15 "$2" | tr -d '\r' | awk -v label="$1" '
+              NR == 1 { code = $2 }
+              tolower($1) == "location:" { loc = $2 }
+              tolower($1) == "strict-transport-security:" { sub(/^[^:]*:[[:space:]]*/, ""); hsts = $0 }
+              END {
+                printf "::notice title=HTTPS::curl -I %s → %s", label, code ? code : "no answer"
+                if (loc) printf " to %s", loc
+                if (hsts) printf ", Strict-Transport-Security: %s", hsts
+                print ""
+              }'
+          }
+          show "$URL/" "$URL/"
+          show "${URL/https:/http:}/" "${URL/https:/http:}/"
+          show "http://<VPS_HOST>/login" "http://$HOST/login"
+          # Whether plain HTTP to that address reaches the app itself (its /api/version answers
+          # with a build ID), as opposed to a redirect or Caddy's empty answer for an unknown host.
+          if curl -s --max-time 15 "http://$HOST/api/version" | grep -q '"buildId"'; then
+            echo "::warning title=HTTPS::plain HTTP to <VPS_HOST> reaches the app"
+          else
+            echo "::notice title=HTTPS::plain HTTP to <VPS_HOST> does not reach the app"
           fi

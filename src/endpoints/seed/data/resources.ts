@@ -1,17 +1,11 @@
+import type { ResourceCategory } from '@/modules/directory'
+
 type ResourceItem = {
   title: string
   description?: string
   url?: string
   phone?: string
-  category:
-    | 'elected-officials'
-    | 'public-safety'
-    | 'childcare'
-    | 'renting'
-    | 'parks'
-    | 'community'
-    | 'utilities'
-    | 'other'
+  category: ResourceCategory
   order: number
 }
 
@@ -85,7 +79,8 @@ export const resourceItems: ResourceItem[] = [
   // Childcare & Education
   {
     title: 'Elvehjem Elementary School',
-    description: 'Public elementary school serving the Sprecher East neighborhood.',
+    description:
+      'Public elementary school near Sprecher East. MMSD assigns schools by address: check yours with Find Your School on madison.k12.wi.us.',
     url: 'https://elvehjem.mmsd.org/',
     phone: '(608) 204-6800',
     category: 'childcare',

@@ -1,35 +1,30 @@
 import type { Metadata } from 'next'
 
-import { PayloadRedirects } from '@/components/PayloadRedirects'
-import configPromise from '@payload-config'
-import { getPayload, type RequiredDataFromCollectionSlug } from 'payload'
 import { draftMode } from 'next/headers'
-import React, { cache } from 'react'
+import React from 'react'
 import { homeStatic } from '@/endpoints/seed/home-static'
 
-import { RenderBlocks } from '@/blocks/RenderBlocks'
-import { RenderHero } from '@/heros/RenderHero'
-import { generateMeta, HOME_PAGE_SLUG } from '@/utilities/generateMeta'
-import PageClient from './page.client'
-import { LivePreviewListener } from '@/components/LivePreviewListener'
+import {
+  getPageBySlug,
+  listPageSlugs,
+  PageHero,
+  PayloadRedirects,
+  RenderBlocks,
+  toSiteHero,
+} from '@/modules/site/server'
+import { generateMeta } from '@/platform/seo/generateMeta'
+import { HOME_PAGE_SLUG } from '@/platform/payload/documentHref'
+import { LivePreviewListener } from '@/platform/ui/LivePreviewListener.client'
+import { pageBlocks } from './pageBlocks'
+
+// A scheduled publish or unpublish runs outside a request, where Next can't refresh the cache, so
+// the page also re-renders every 10 minutes (#141, decision 0011)
+export const revalidate = 600
 
 export async function generateStaticParams() {
   try {
-    const payload = await getPayload({ config: configPromise })
-    const pages = await payload.find({
-      collection: 'pages',
-      draft: false,
-      limit: 1000,
-      overrideAccess: false,
-      pagination: false,
-      select: {
-        slug: true,
-      },
-    })
-
-    return (
-      pages.docs?.filter((doc) => doc.slug !== HOME_PAGE_SLUG).map(({ slug }) => ({ slug })) ?? []
-    )
+    const pages = await listPageSlugs()
+    return pages.filter(({ slug }) => slug !== HOME_PAGE_SLUG).map(({ slug }) => ({ slug }))
   } catch (error) {
     console.error('[pages] generateStaticParams failed; falling back to []', error)
     return []
@@ -48,16 +43,13 @@ export default async function Page({ params: paramsPromise }: Args) {
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const url = '/' + decodedSlug
-  let page: RequiredDataFromCollectionSlug<'pages'> | null
 
-  page = await queryPageBySlug({
-    slug: decodedSlug,
-  })
-
-  // Remove this code once your website is seeded
-  if (!page && slug === HOME_PAGE_SLUG) {
-    page = homeStatic
-  }
+  // Remove the fallback once your website is seeded. The starter home page has no blocks.
+  const page =
+    (await getPageBySlug(decodedSlug)) ??
+    (slug === HOME_PAGE_SLUG
+      ? { ...homeStatic, hero: toSiteHero(homeStatic.hero), layout: [] }
+      : null)
 
   if (!page) {
     return <PayloadRedirects url={url} />
@@ -67,14 +59,13 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   return (
     <article className="pb-0">
-      <PageClient />
       {/* Allows redirects for valid pages too */}
       <PayloadRedirects disableNotFound url={url} />
 
       {draft && <LivePreviewListener />}
 
-      <RenderHero {...hero} />
-      <RenderBlocks blocks={layout} />
+      {hero && <PageHero {...hero} />}
+      <RenderBlocks blocks={layout} components={pageBlocks} />
     </article>
   )
 }
@@ -83,30 +74,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const { slug = HOME_PAGE_SLUG } = await paramsPromise
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
-  const page = await queryPageBySlug({
-    slug: decodedSlug,
-  })
+  const page = await getPageBySlug(decodedSlug)
 
   return generateMeta({ doc: page })
 }
-
-const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
-  const { isEnabled: draft } = await draftMode()
-
-  const payload = await getPayload({ config: configPromise })
-
-  const result = await payload.find({
-    collection: 'pages',
-    draft,
-    limit: 1,
-    pagination: false,
-    overrideAccess: draft,
-    where: {
-      slug: {
-        equals: slug,
-      },
-    },
-  })
-
-  return result.docs?.[0] || null
-})

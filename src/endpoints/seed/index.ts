@@ -4,7 +4,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-import { ROLES } from '../../access/roles'
+import { ROLES } from '@/platform/lib'
 import { contactForm as contactFormData } from './contact-form'
 import { contact as contactPageData } from './contact-page'
 import { home } from './home'
@@ -20,7 +20,9 @@ import { post2 } from './post-2'
 import { post3 } from './post-3'
 import { faqItems } from './data/faq'
 import { resourceItems } from './data/resources'
+import { seedCategories } from './data/categories'
 import { eventItems } from './data/events'
+import { FORUM_DEFAULT_URL } from '@/modules/site'
 
 const collections: CollectionSlug[] = [
   'categories',
@@ -36,7 +38,8 @@ const collections: CollectionSlug[] = [
   'search',
 ]
 
-const globals: GlobalSlug[] = ['header', 'footer']
+// The navigation globals; Payload's own `payload-jobs-stats` is left alone
+const globals = ['header', 'footer'] as const satisfies readonly GlobalSlug[]
 
 // Next.js revalidation errors are normal when seeding the database without a server running
 // i.e. running `yarn seed` locally instead of using the admin UI within an active app
@@ -129,7 +132,11 @@ export const seed = async ({
         email: 'demo-author@example.com',
         password: seedPassword,
         role: ROLES.admin,
+        // The demo admin can sign in at once: with `auth.verify` on, Payload would otherwise
+        // store it unverified and email example.com a link (#187)
+        _verified: true,
       },
+      disableVerificationEmail: true,
     }),
     payload.create({
       collection: 'media',
@@ -226,13 +233,25 @@ export const seed = async ({
 
   payload.logger.info(`— Seeding events...`)
 
-  for (const event of eventItems) {
+  const categoryIds = new Map<string, number>()
+  for (const [slug, title] of Object.entries(seedCategories)) {
+    const category = await payload.create({
+      collection: 'categories',
+      depth: 0,
+      data: { title, slug },
+    })
+    categoryIds.set(slug, category.id)
+  }
+
+  for (const { category, ...event } of eventItems) {
+    const categoryId = categoryIds.get(category)
     await payload.create({
       collection: 'events',
       depth: 0,
       context: { disableRevalidate: true },
       data: {
         ...event,
+        categories: categoryId === undefined ? [] : [categoryId],
         _status: 'published',
       },
     })
@@ -272,12 +291,25 @@ export const seed = async ({
 
   payload.logger.info(`— Seeding pages...`)
 
+  // The home page's "this week" strip lists the Family category (#122)
+  const requireCategory = (ids: Map<string, number>, slug: string) => {
+    const id = ids.get(slug)
+    if (id === undefined) throw new Error(`The seed has no "${slug}" category`)
+    return id
+  }
+
   const [_homePage, contactPage, aboutPageDoc, getInvolvedDoc, _associationDoc] = await Promise.all(
     [
       payload.create({
         collection: 'pages',
         depth: 0,
-        data: home({ heroImage: imageHomeDoc, metaImage: image1Doc }),
+        data: home({
+          heroImage: imageHomeDoc,
+          metaImage: image1Doc,
+          familyCategoryId: requireCategory(categoryIds, 'family'),
+          corridorPostId: post2Doc.id,
+          comingTogetherPostId: post1Doc.id,
+        }),
       }),
       payload.create({
         collection: 'pages',
@@ -366,6 +398,7 @@ export const seed = async ({
     payload.updateGlobal({
       slug: 'footer',
       data: {
+        forumUrl: FORUM_DEFAULT_URL,
         navItems: [
           {
             link: {
@@ -379,13 +412,6 @@ export const seed = async ({
               type: 'custom',
               label: 'FAQ',
               url: '/faq',
-            },
-          },
-          {
-            link: {
-              type: 'custom',
-              label: 'Admin',
-              url: '/admin',
             },
           },
           {
@@ -419,7 +445,7 @@ async function loadLocalImage(filename: string, mimetype: string): Promise<File>
 
   for (const filePath of possiblePaths) {
     try {
-      const data = await fs.readFile(filePath)
+      const data = await fs.readFile(/*turbopackIgnore: true*/ filePath)
       return {
         name: filename,
         data: Buffer.from(data),

@@ -3,20 +3,45 @@
 Engineering principles for building and maintaining this codebase. They apply to everyone who
 changes it, human or AI agent.
 
-## Framework First
+## Native First, Then Plugins, Then Our Code
 
-Before writing custom code, check whether the framework already provides the capability. Payload CMS, Next.js, and their plugin ecosystems cover most common needs — authentication, email, forms, media, access control, search, SEO, redirects. Use official plugins, adapters, and built-in APIs. Custom code is a last resort, not a starting point.
+The owner's rule (#262): never reinvent the wheel. Before any feature, go down this ladder in
+order and stop at the first step that does the job:
 
-When evaluating whether to build vs. use:
+1. **Native features and configuration.** What Payload, Next.js and React already do, often with
+   one config option: auth (`verify`, forgot and reset password, lockout), hooks, access control,
+   jobs, email adapters, routing, caching, server actions, metadata, images. Also the
+   dependencies we already have: Radix, `cva`, `clsx` and `tailwind-merge`, `react-hook-form`,
+   `lucide-react`. Read the docs for the version in `package.json` (Payload:
+   https://payloadcms.com/llms-full.txt).
+2. **Official plugins and adapters.** `@payloadcms/*` and the frameworks' own packages, including
+   ones we don't use yet.
+3. **Well-established, free, open-source plugins or libraries** that meet the package rules in
+   [security](security.md#before-adding-any-new-package). Prefer one that does more than we need
+   over a narrow one we'd have to extend.
+4. **Our own code**, only when nothing above fits because the need is specific to this site. It
+   goes in the owning module's `domain/` and `use-cases/`
+   ([architecture](../architecture/README.md)).
 
-- Search the framework's documentation and plugin registry first
-- Check for official examples or templates that solve the problem
-- If a plugin exists, use it even if the custom solution seems simpler — the plugin will be maintained upstream
+**Write the findings down** before writing custom code: on the issue, one line per step saying
+what was checked, with a link, and why it doesn't fit.
+
+**This is a guide for judgment, not a hard gate.** Be reasonable and proportionate: don't decide
+by reflex that a plugin always wins, or that our own code always does. When the choice between a
+plugin and our own code is a technical trade-off, decide it yourself and record the reasoning on
+the issue. Only a genuine product trade-off, a meaningful cost, a legal or privacy commitment,
+or a decision established best practice can't reasonably resolve goes to the owner (label
+`needs owner`), with the findings and a recommendation
+([`AGENTS.md`](../../AGENTS.md#ground-rules), #315).
+
+Using a plugin doesn't skip the architecture: its setup lives in the owning module's `cms/` and is
+composed in `payload.config.ts`, and the module's own types still face the rest of the site. The
+enterprise layering is intentional.
 
 ## SOLID Principles
 
 - **Single Responsibility**: Each module, component, collection, and function does one thing well. A form handler validates and persists — it doesn't also send emails (that's a hook).
-- **Open/Closed**: Extend behavior through hooks, plugins, and composition — not by modifying existing modules. Payload hooks and Next.js middleware are the extension points.
+- **Open/Closed**: Extend behavior through hooks, plugins, and composition — not by modifying existing modules. Payload hooks and the Next.js proxy (`src/proxy.ts`, Next 16's name for middleware) are the extension points.
 - **Liskov Substitution**: Data access functions return consistent shapes regardless of the underlying source. Shared components are interchangeable without breaking layouts.
 - **Interface Segregation**: API responses and component props include only what the consumer needs. Use Payload's `select` and `depth` parameters. Don't pass entire objects when 3 fields suffice.
 - **Dependency Inversion**: Business logic depends on abstractions (Payload Local API, data layer interfaces), not concrete implementations (raw SQL, direct file reads).
@@ -55,19 +80,19 @@ All external input (API requests, form submissions, webhook payloads, URL parame
 
 The search order:
 
-1. **Shared utilities** (`src/utilities/`) — URL handling, metadata, formatting, data transforms
-2. **Shared components** (`src/components/`) — UI rendering, links, media, rich text, structured data
-3. **Reusable field configs** (`src/fields/`) — slug, link, hero field groups
-4. **Access control helpers** (`src/access/`) — auth and permission checks
+1. **Shared utilities** (`src/platform/lib/`, `src/platform/seo/`) — URL handling, metadata, formatting, data transforms
+2. **Shared components** (`src/platform/ui/`, `src/platform/richtext/`) — UI rendering, links, media, rich text, structured data
+3. **Reusable field configs** (`src/platform/payload/link.ts`, `src/modules/site/cms/`, and Payload's `slugField()`) — slug, link, hero field groups
+4. **Access control helpers** (`src/platform/payload/`) — auth and permission checks
 
 If no abstraction exists for a pattern you need more than once, **create one first** as a shared utility or component, then use it everywhere. Never copy-paste logic between files.
 
 Examples of violations this rule prevents:
 
-- Reading `process.env.NEXT_PUBLIC_SERVER_URL` directly → use `getServerSideURL()` from `src/utilities/getURL.ts`
-- Writing `dangerouslySetInnerHTML={{ __html: JSON.stringify(...) }}` → use `JsonLd` from `src/components/JsonLd.tsx`
-- Duplicating Payload access control logic → use helpers from `src/access/`
-- Repeating OpenGraph defaults → use `mergeOpenGraph()` from `src/utilities/mergeOpenGraph.ts`
+- Reading `process.env.NEXT_PUBLIC_SERVER_URL` directly → use `getServerSideURL()` from `src/platform/lib/getURL.ts`
+- Writing `dangerouslySetInnerHTML={{ __html: JSON.stringify(...) }}` → use `JsonLd` from `src/platform/ui/JsonLd.tsx`
+- Duplicating Payload access control logic → use helpers from `src/platform/payload/roles.ts`
+- Repeating OpenGraph defaults → use `mergeOpenGraph()` from `src/platform/seo/mergeOpenGraph.ts`
 
 Constants, configuration, enum values, and type definitions used in multiple places must also be defined once and imported everywhere. Duplication across files leads to silent inconsistency.
 
@@ -80,7 +105,8 @@ In development, failures should be visible and informative (console warnings, fa
 ## Respect Template Conventions
 
 See [`docs/architecture/`](../architecture/README.md) for where new code belongs, and
-[`payload-cms.md`](payload-cms.md) for today's template folders (blocks, collections, fields, hooks).
+[`payload-cms.md`](payload-cms.md) for the Payload patterns (collections, blocks, heroes, hooks,
+fields).
 
 ## Fix Everything You Touch
 
