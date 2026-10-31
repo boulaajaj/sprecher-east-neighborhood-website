@@ -20,6 +20,7 @@ import * as migration_20261027_072713_this_week_strip from './20261027_072713_th
 import * as migration_20261027_150134_top_issues from './20261027_150134_top_issues'
 import * as migration_20261027_184942_search_status_source from './20261027_184942_search_status_source'
 import * as migration_20261027_193414_forum_url from './20261027_193414_forum_url'
+import * as migration_20261031_214018_guest_role from './20261031_214018_guest_role'
 
 export const migrations = [
   {
@@ -131,5 +132,10 @@ export const migrations = [
     up: migration_20261027_193414_forum_url.up,
     down: migration_20261027_193414_forum_url.down,
     name: '20261027_193414_forum_url',
+  },
+  {
+    up: migration_20261031_214018_guest_role.up,
+    down: migration_20261031_214018_guest_role.down,
+    name: '20261031_214018_guest_role',
   },
 ]

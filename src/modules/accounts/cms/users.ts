@@ -13,6 +13,7 @@ import {
 import { toResetPasswordEmail, toResetPasswordLink } from '../domain/resetEmail'
 import { USERS } from '../domain/usersCollection'
 import { toVerifyAccountEmail, toVerifyAccountLink } from '../domain/verifyAccountEmail'
+import { firstAccountIsAdmin } from './firstAccountIsAdmin'
 import { forgotPasswordFromSiteOnly } from './forgotPasswordFromSiteOnly'
 import { verifyEndpointFromSiteOnly } from './verifyFromSiteOnly'
 import { noPasswordSignInForAgents } from './noPasswordSignInForAgents'
@@ -70,7 +71,7 @@ export const Users: CollectionConfig = {
   },
   hooks: {
     // Your own password changes only on /account, after your current one is checked (#233)
-    beforeChange: [requireCurrentPassword],
+    beforeChange: [firstAccountIsAdmin, requireCurrentPassword],
     // An agent's MCP API key is its only credential (#336)
     beforeLogin: [noPasswordSignInForAgents],
     // Forgot password only from the site's page (#282), then no reset email to an account whose
@@ -87,10 +88,13 @@ export const Users: CollectionConfig = {
       name: 'role',
       type: 'select',
       required: true,
-      defaultValue: ROLES.resident,
+      defaultValue: ROLES.guest,
       options: [
         { label: 'Admin', value: ROLES.admin },
         { label: 'Editor', value: ROLES.editor },
+        // The default: an account whose address nobody has verified (#520)
+        { label: 'Guest', value: ROLES.guest },
+        // A verified neighbour; how an address is verified is #314
         { label: 'Resident', value: ROLES.resident },
         // Suggests events and posts through its MCP API key only; no admin panel, no password
         // sign-in (#336)
@@ -107,7 +111,7 @@ export const Users: CollectionConfig = {
       },
     },
     // How often this account's verification email was sent again, and since when (#289). Only
-    // the server reads and writes them: hidden from the API and the admin panel, and a resident's
+    // the server reads and writes them: hidden from the API and the admin panel, and a guest's
     // own update can't set them (#299).
     {
       name: 'verificationResends',

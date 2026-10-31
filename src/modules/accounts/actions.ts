@@ -90,8 +90,8 @@ export async function resetPassword(input: unknown): Promise<ActionResult<ResetP
 }
 
 /**
- * Creates a resident account and has Payload email its verification link (#187). The role is
- * always resident. `robotCheckToken` is the Turnstile token the form got (decision 0007). Input
+ * Creates a guest account and has Payload email its verification link (#187). The role is
+ * always guest. `robotCheckToken` is the Turnstile token the form got (decision 0007). Input
  * that doesn't parse, a failed robot check and too many sign-ups are refused; past those, the
  * answer is the same whether or not an account already uses the email.
  */

@@ -83,7 +83,7 @@ patterns are in [`payload-cms.md`](../guidelines/payload-cms.md).
 
 ### User Roles (Access Control)
 
-The three roles (`admin`, `editor`, `resident`) and what each may do are in the
+The roles (`admin`, `editor`, `guest`, `resident`, `agent`) and what each may do are in the
 [security guidelines](../guidelines/security.md#when-handling-auth-and-sessions).
 
 ### Auth Architecture

@@ -515,7 +515,7 @@ export interface User {
   /**
    * Controls access level. Only admins can change roles.
    */
-  role: 'admin' | 'editor' | 'resident' | 'agent'
+  role: 'admin' | 'editor' | 'guest' | 'resident' | 'agent'
   verificationResends?: number | null
   verificationResendsSince?: string | null
   verificationSetsPassword?: boolean | null
