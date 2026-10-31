@@ -55,6 +55,7 @@ describe('signUp', () => {
       data: { name: 'Ana', email: 'ana@example.com', password, role: 'guest' },
       depth: 0,
       overrideAccess: true,
+      context: { signUp: true },
     })
     // No session: the account can't sign in until its email is verified
     expect(edges.signInHelper).not.toHaveBeenCalled()

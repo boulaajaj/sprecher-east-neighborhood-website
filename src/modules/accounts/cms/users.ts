@@ -92,7 +92,7 @@ export const Users: CollectionConfig = {
       options: [
         { label: 'Admin', value: ROLES.admin },
         { label: 'Editor', value: ROLES.editor },
-        // The default: an account whose address nobody has verified (#520)
+        // The default: an account whose home address nobody has verified (#520)
         { label: 'Guest', value: ROLES.guest },
         // A verified neighbour; how an address is verified is #314
         { label: 'Resident', value: ROLES.resident },

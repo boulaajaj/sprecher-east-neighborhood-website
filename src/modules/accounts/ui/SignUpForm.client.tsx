@@ -15,7 +15,7 @@ import { NewPasswordFields } from './NewPasswordFields.client'
 import { SIGN_UP_SENT, toSignUpErrorMessage } from './signUpMessages'
 
 /**
- * Creates a resident account (#187). `email` fills in the address the confirm page sent, or is
+ * Creates a guest account (#187). `email` fills in the address the confirm page sent, or is
  * `null`; it leaves the address bar and the history as soon as the form loads. Past the robot
  * check and the limits, every sign-up gets the same answer, and the account can't sign in until
  * Payload's link is opened.

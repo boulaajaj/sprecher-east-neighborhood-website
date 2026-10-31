@@ -219,6 +219,8 @@ pm2 start sprecher-east
 rm -rf /root/restore                      # it holds a copy of .env.local
 ```
 
+Until the database has an account, the first one created becomes an admin: Payload's first registration at `/admin` does it. So if the restore left `users` empty, register the owner's account there right away. The public sign-up always makes guests.
+
 Then open the site and Admin, and check the restored content. `env.local` in the archive is there
 for reference if the server's `.env.local` was lost; copy values back by hand. Once the restore
 looks right, delete `public/media.before-restore`.

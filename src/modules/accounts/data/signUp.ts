@@ -10,6 +10,7 @@ import { getServerSideURL } from '@/platform/lib/getURL'
 import { sha256Hex } from '@/platform/lib/sha256'
 
 import type { SignUpValues, VerifyAccountValues } from '../domain/credentials'
+import { SIGN_UP_CONTEXT } from '../domain/signUpContext'
 import { USERS } from '../domain/usersCollection'
 import { takeResend } from '../domain/verificationResends'
 import { toVerifyAccountEmail, toVerifyAccountLink } from '../domain/verifyAccountEmail'
@@ -36,6 +37,8 @@ export async function createResidentAccount({
     // stays closed to visitors. This is the one way a visitor gets an account, and the server
     // decides everything about it but the name, email and password.
     overrideAccess: true,
+    // Always a guest, even on an empty database: only Payload's first registration makes an admin
+    context: { [SIGN_UP_CONTEXT]: true },
   })
 }
 

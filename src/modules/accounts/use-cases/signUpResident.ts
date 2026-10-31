@@ -15,7 +15,7 @@ import { logServerFailure } from './logServerFailure'
 const guard = createRequestGuard('Sign-up', SIGN_UP_LIMITS)
 
 /**
- * Creates a resident account, which Payload emails a verification link to (#187). First the
+ * Creates a guest account, which Payload emails a verification link to (#187). First the
  * limits and the robot check (decision 0007); none of them depends on the email. Then every
  * request gets the same answer: an email an account already uses is refused by Payload and
  * answered like a new one, and a failure is logged rather than shown, as for a reset link (#269),

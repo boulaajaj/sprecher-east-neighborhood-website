@@ -2,6 +2,8 @@ import { REST_PATCH, REST_POST } from '@payloadcms/next/routes'
 import type { Payload, SanitizedConfig } from 'payload'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 
+import type { User } from '@/payload-types'
+
 /**
  * Roles on the users collection (#520, #354), against the real config on in-memory SQLite: the
  * first account on an empty database is an admin, every later one is a guest, and nobody but an
@@ -77,10 +79,10 @@ describe('roles of new accounts', () => {
     expect(created.role).toBe('guest')
   })
 
-  it('makes a later account a guest', async () => {
+  it('stores the default role, guest, when none is given', async () => {
     const created = await payload.create({
       collection: 'users',
-      data: { email: 'third@example.com', password: PASSWORD, role: 'guest' },
+      data: { email: 'third@example.com', password: PASSWORD } as User,
       disableVerificationEmail: true,
       overrideAccess: true,
     })
