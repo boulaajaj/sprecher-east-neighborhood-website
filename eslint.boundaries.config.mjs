@@ -34,8 +34,13 @@ const LAYER_LIMITS = [
     ['cms/**', '{index,server,cms}.ts'],
     'ui/ imports only domain/, use-cases/, actions.ts and, in server components, data/',
   ],
-  // A plain read has no use case (#521), so a server component may read data/; browser code may not
-  ['ui/**/*.client.tsx', ['data/**'], 'client components get DTOs as props and never import data/'],
+  // A plain read has no use case (#521), so a server component may read data/; browser code (the
+  // *.client files, headless use* hooks and the ui/api.ts browser clients) may not
+  [
+    'ui/**/{*.client.{ts,tsx},use*.ts,api.ts}',
+    ['data/**'],
+    'client code gets DTOs as props and never imports data/ (rule 5)',
+  ],
   [
     'index.ts',
     ['{use-cases,data,cms,ui}/**', '{server,actions,cms}.ts'],

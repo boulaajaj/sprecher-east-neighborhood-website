@@ -84,12 +84,12 @@ describe('the top issues block, through the page query', () => {
     })
 
     const { getPageBySlug } = await import('@/modules/site/server')
-    const { toTopIssues } = await import('@/modules/news/server')
+    const { toTopIssuesBlockProps } = await import('@/modules/news/server')
     const page = await getPageBySlug('home')
     const block = page?.layout.find((b) => b.blockType === 'topIssues')
     if (block?.blockType !== 'topIssues') throw new Error('The page has no top issues block')
 
-    expect(toTopIssues(block)).toEqual({
+    expect(toTopIssuesBlockProps(block)).toEqual({
       id: expect.any(String),
       heading: 'Top issues right now',
       reviewedAt: '2026-10-26T00:00:00.000Z',

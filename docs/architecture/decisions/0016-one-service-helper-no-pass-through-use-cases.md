@@ -33,7 +33,13 @@ server call.
 ## Consequences
 
 - Fewer files to open to follow a read; one place for catching and logging.
-- A page's read that throws still reaches Next's error handling, as before.
+- A page's read that throws still reaches Next's error handling, as before: `error.tsx` for the
+  page, and `global-error.tsx` for the root layout's header and footer reads.
+- **Trade-off for the owner:** plain reads don't go through the helper (wrapping them in a
+  catch-and-fallback would hide an outage as an empty list), so timing, request IDs or retries added
+  to `runUseCase` and `runAction` later won't cover them.
+- Nothing in lint tells a read from a write, so that `server.ts` exports only reads from `data/` is
+  checked in review alone.
 - A plain read that later needs a rule gets a use case then.
 
 ## Links

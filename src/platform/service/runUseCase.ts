@@ -5,7 +5,7 @@ import type { ActionResult } from '@/platform/lib'
 import { logServerFailure } from './logServerFailure'
 
 /** The failure code for "our side broke", the only one that is logged by `runAction`. */
-export const SERVER_ERROR = 'server-error'
+const SERVER_ERROR = 'server-error'
 
 /**
  * Runs a server call that must not throw to its caller. A failure is logged without personal data

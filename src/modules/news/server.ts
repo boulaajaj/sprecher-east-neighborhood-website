@@ -6,7 +6,7 @@ export { findPostPage, findSearchResults, listPostSlugs } from './data/queries'
 export { findRecentPosts } from './use-cases/findRecentPosts'
 export { getPostBySlug } from './use-cases/getPostBySlug'
 export { listPostPageNumbers } from './use-cases/listPostPageNumbers'
-export { toTopIssuesBlockProps as toTopIssues } from './data/mappers'
+export { toTopIssuesBlockProps } from './data/mappers'
 
 export { PostGrid } from './ui/PostGrid'
 export { PostCardPreview } from './ui/PostCardPreview'
