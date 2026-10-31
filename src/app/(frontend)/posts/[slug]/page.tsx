@@ -15,7 +15,6 @@ import {
   findRecentPosts,
   getPostBySlug,
   listPostSlugs,
-  PostCardPreview,
   postHeaderProps,
   postJsonLd,
   SidebarPosts,
@@ -73,8 +72,6 @@ export default async function Post({ params: paramsPromise }: Args) {
       {draft && <LivePreviewListener />}
 
       <PageHeader {...postHeaderProps(post)} />
-
-      {draft && <PostCardPreview post={post} />}
 
       <div className={cn(post.heroImage && 'pt-8')}>
         <div className="container">
