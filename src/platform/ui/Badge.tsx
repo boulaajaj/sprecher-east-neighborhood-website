@@ -1,0 +1,60 @@
+import { cva, type VariantProps } from 'class-variance-authority'
+import React from 'react'
+
+import { cn } from '@/platform/lib/cn'
+
+/*
+ * A short label, such as a post's or an event's category (#418). `category` is the pill on cards
+ * and plain pages: primary-strong on the primary tint, which the theme contract checks at 4.5:1
+ * on the page, a surface and a card (the plain primary text it had was 3.9 to 4.5:1). `on-image`
+ * sits on a photo, on a scrim of its own (60%), so it passes even over white (`SCRIM_PAIRS`).
+ * `status` marks a state the reader must not miss, such as a cancelled event (#122):
+ * destructive-strong on the destructive tint, which the contract checks like `Alert`'s error tone
+ * (`TINTED_PAIRS`). Its words say the state, and an icon may go before them, so colour is never
+ * the only signal. `official` marks an official meeting (#122): the category pill's checked pair
+ * (primary-strong on the primary tint), set apart by its border, weight and icon rather than a
+ * new colour, so it reads as distinct but calm. Three tones mark how certain a step is, for the
+ * editorial timeline (#507), each with its own words: `current` (primary-foreground on the primary
+ * fill, the button pair) for what's next; `caution` (warning-strong on the warning tint, `Alert`'s
+ * warning pair) for what depends on something else; `neutral` (muted-foreground on muted) for what
+ * is expected later. Every pair is one the theme contract checks.
+ */
+const badgeVariants = cva(
+  'inline-flex max-w-full items-center gap-1 rounded-full px-3 py-1 text-xs font-medium [overflow-wrap:anywhere] [&_svg]:size-3.5 [&_svg]:shrink-0',
+  {
+    variants: {
+      variant: {
+        category: 'bg-primary/10 text-primary-strong',
+        'on-image':
+          'border border-on-image/30 bg-scrim/60 tracking-wide text-on-image uppercase backdrop-blur-sm',
+        status:
+          'border border-destructive/30 bg-destructive/10 font-semibold text-destructive-strong',
+        official: 'border border-primary/30 bg-primary/10 font-semibold text-primary-strong',
+        current: 'bg-primary-fill font-semibold text-primary-foreground',
+        caution: 'border border-warning/40 bg-warning/10 font-semibold text-warning-strong',
+        neutral: 'border border-border bg-muted text-muted-foreground',
+      },
+    },
+    defaultVariants: { variant: 'category' },
+  },
+)
+
+export type BadgeProps = VariantProps<typeof badgeVariants> & {
+  className?: string
+  children: React.ReactNode
+}
+
+export function Badge({ variant, className, children }: BadgeProps) {
+  return <span className={cn(badgeVariants({ variant }), className)}>{children}</span>
+}
+
+/** Badges in a row that wraps on small screens */
+export function BadgeList({
+  className,
+  children,
+}: {
+  className?: string
+  children: React.ReactNode
+}) {
+  return <div className={cn('flex flex-wrap gap-2', className)}>{children}</div>
+}

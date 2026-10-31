@@ -40,23 +40,24 @@ You are not just a critic — you are a creative designer. Your job is to **make
 ## Tech Context
 
 - **CMS**: Payload CMS v3 Website Template — all content is CMS-driven
-- **UI Components**: shadcn/ui (Radix UI primitives + Tailwind CSS styling) — use these as the foundation for all interactive UI elements
+- **UI Components**: the UI kit in `src/platform/ui/` (Radix UI primitives where needed, `cva` variants, Tailwind tokens) — the foundation for all interactive UI elements. The approved list is [`docs/ui/component-set.md`](../ui/component-set.md)
 - **Layout Builder**: Pages built from composable blocks (CTA, Content, Media, Archive, Form); posts embed Banner, Code and Media blocks in their rich text and show related posts — each needs a polished visual treatment
-- **Hero System**: 3 page hero types (HighImpact, MediumImpact, LowImpact) plus the fixed `PostHero` and `EventHero` — each needs distinct visual personality while maintaining brand consistency
+- **Hero System**: 3 page hero types (`PageHero` variants `high`, `medium`, `low`) plus `PageHeader · image` for posts and events — each needs distinct visual personality while maintaining brand consistency
 - **Lexical Rich Text**: Meta's Lexical editor in admin — rendered content must display with proper typography and spacing on the public site
 - **Auth**: Payload native auth — login, registration, and profile pages need visual polish matching the site's brand
 - **Docs Reference**: https://payloadcms.com/llms-full.txt
 
-### shadcn/ui Integration Rules
+### UI Kit Rules
 
-- All interactive components (Dialog, Dropdown, Tabs, Accordion, etc.) should use shadcn/ui primitives
-- Customize shadcn/ui components with Sprecher East design tokens — don't override with arbitrary values
-- Refer to shadcn/ui docs for available components before building custom ones
+- A component one module uses stays in that module's `ui/`; it moves to `src/platform/ui/` on its second use ([architecture](../architecture/README.md#where-does-it-go)). The FAQ accordion, for example, is `FaqList` in `directory/ui`, a native `<details>`
+- Shared components are built once in `src/platform/ui/`, with a variant (`cva`) for each look; prefer a native element, and use a Radix UI primitive where native isn't enough (as `Field.Select` does)
+- Style them with Sprecher East design tokens — don't override with arbitrary values
+- Check [`docs/ui/component-set.md`](../ui/component-set.md) and `src/platform/ui/` before designing a new component
 - Dark mode is supported: tokens switch under `[data-theme='dark']`, so test every change in both themes
 
 ## Design System
 
-### Brand Colors (from globals.css @theme)
+### Brand Colors (from `src/themes/default/theme.css`)
 
 The tokens and their light and dark values are in
 [`nextjs-tailwind.md`](../guidelines/nextjs-tailwind.md#design-tokens) (the one table to keep current).
@@ -126,7 +127,7 @@ How to use them:
 When reviewing or implementing any visual change:
 
 - [ ] Spacing is consistent with the spacing scale (no arbitrary px values)
-- [ ] Colors are from the design token system (no hardcoded hex outside globals.css)
+- [ ] Colors are from the design token system (no hardcoded hex outside theme files)
 - [ ] Typography follows the hierarchy (h1 > h2 > h3, consistent sizes)
 - [ ] All pages align to the same max-width as the navigation bar
 - [ ] Cards have consistent styling (radius, shadow, padding, hover)

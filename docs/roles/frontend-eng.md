@@ -18,14 +18,14 @@ Where code goes: [`docs/architecture/`](../architecture/README.md).
 - **Client Components**: Use Payload REST API at `/api/{collection}` only when client-side interactivity requires it
 - **Live Preview**: Use `useLivePreview()` hook from `@payloadcms/live-preview-react` for real-time admin preview
 - **Draft Preview**: Use Next.js draft mode with Payload's preview URL feature
-- **On-demand Revalidation**: `afterChange` hooks call `revalidatePath()` / `revalidateTag()` for instant cache updates
+- **On-demand Revalidation**: `afterChange` hooks call `revalidatePath()` for paths and `expireCacheTag()` from `src/platform/payload/expireCacheTag.ts` for cache tags (since Next 16, `revalidateTag()` needs a second argument; the helper passes it)
 - **Select and Depth**: Always use `select` and `depth` parameters to minimize response size
 
 ## Development Principles
 
-### Framework First
+### Native First
 
-Before writing custom code, check whether Next.js or Payload already provides the capability:
+Follow [the ladder](../guidelines/development.md#native-first-then-plugins-then-our-code). Before writing custom code, check whether Next.js, React or Payload already provides the capability:
 
 - **Routing**: Use Next.js App Router file-based routing — never build a custom router
 - **Data fetching**: Use Server Components with `async/await` — never use `useEffect` for initial data loads
@@ -89,7 +89,7 @@ the [current folders](../project.md#architecture). File size and naming: [conven
 
 ### Layout Consistency
 
-- All pages use the same `Container` component with consistent max-width
+- All pages use the same max-width: the `container` class, until the planned `Section` component and its `width` ([`docs/ui/component-set.md`](../ui/component-set.md)) take over
 - Content areas must visually align with navigation bar edges
 - Consistent spacing rhythm across all pages
 
@@ -110,7 +110,7 @@ the [current folders](../project.md#architecture). File size and naming: [conven
 
 - [ ] TypeScript compiles with no errors
 - [ ] All interactive elements are keyboard accessible
-- [ ] Components follow the template architecture (blocks in src/blocks/, heros in src/heros/, shared in src/components/)
+- [ ] Components follow the [architecture](../architecture/README.md#where-does-it-go) (a module's components in its `ui/`, page-builder blocks and heroes in `src/modules/site/ui/`, shared ones in `src/platform/ui/`)
 - [ ] No hardcoded content that should come from CMS
 - [ ] Responsive at all six [test widths](../guidelines/nextjs-tailwind.md#responsive-design--6-viewport-testing) (320 to 1920px)
 - [ ] No `console.log` left in code

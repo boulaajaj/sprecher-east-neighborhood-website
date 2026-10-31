@@ -64,6 +64,7 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations
+    'payload-mcp-api-keys': PayloadMcpApiKeyAuthOperations
   }
   blocks: {}
   collections: {
@@ -76,10 +77,14 @@ export interface Config {
     media: Media
     categories: Category
     users: User
+    'email-confirmations': EmailConfirmation
+    'agent-runs': AgentRun
+    'agent-review-items': AgentReviewItem
     redirects: Redirect
     forms: Form
     'form-submissions': FormSubmission
     search: Search
+    'payload-mcp-api-keys': PayloadMcpApiKey
     'payload-kv': PayloadKv
     'payload-jobs': PayloadJob
     'payload-folders': FolderInterface
@@ -88,6 +93,9 @@ export interface Config {
     'payload-migrations': PayloadMigration
   }
   collectionsJoins: {
+    'agent-runs': {
+      reviewItems: 'agent-review-items'
+    }
     'payload-folders': {
       documentsAndFolders: 'payload-folders' | 'media'
     }
@@ -102,10 +110,14 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>
     categories: CategoriesSelect<false> | CategoriesSelect<true>
     users: UsersSelect<false> | UsersSelect<true>
+    'email-confirmations': EmailConfirmationsSelect<false> | EmailConfirmationsSelect<true>
+    'agent-runs': AgentRunsSelect<false> | AgentRunsSelect<true>
+    'agent-review-items': AgentReviewItemsSelect<false> | AgentReviewItemsSelect<true>
     redirects: RedirectsSelect<false> | RedirectsSelect<true>
     forms: FormsSelect<false> | FormsSelect<true>
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>
     search: SearchSelect<false> | SearchSelect<true>
+    'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>
     'payload-folders': PayloadFoldersSelect<false> | PayloadFoldersSelect<true>
@@ -122,18 +134,22 @@ export interface Config {
   globals: {
     header: Header
     footer: Footer
+    'payload-jobs-stats': PayloadJobsStat
   }
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>
     footer: FooterSelect<false> | FooterSelect<true>
+    'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>
   }
   locale: null
   widgets: {
     collections: CollectionsWidget
   }
-  user: User
+  user: User | PayloadMcpApiKey
   jobs: {
     tasks: {
+      deleteExpiredContactMessages: TaskDeleteExpiredContactMessages
+      deleteExpiredEmailConfirmations: TaskDeleteExpiredEmailConfirmations
       schedulePublish: TaskSchedulePublish
       inline: {
         input: unknown
@@ -144,6 +160,24 @@ export interface Config {
   }
 }
 export interface UserAuthOperations {
+  forgotPassword: {
+    email: string
+    password: string
+  }
+  login: {
+    email: string
+    password: string
+  }
+  registerFirstUser: {
+    email: string
+    password: string
+  }
+  unlock: {
+    email: string
+    password: string
+  }
+}
+export interface PayloadMcpApiKeyAuthOperations {
   forgotPassword: {
     email: string
     password: string
@@ -211,9 +245,21 @@ export interface Page {
       | null
     media?: (number | null) | Media
   }
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[]
+  layout: (
+    | CallToActionBlock
+    | ContentBlock
+    | MediaBlock
+    | ArchiveBlock
+    | FormBlock
+    | EventsThisWeekBlock
+    | TopIssuesBlock
+  )[]
   meta?: {
     title?: string | null
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media
     description?: string | null
   }
   publishedAt?: string | null
@@ -253,6 +299,10 @@ export interface Post {
   categories?: (number | Category)[] | null
   meta?: {
     title?: string | null
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media
     description?: string | null
   }
   publishedAt?: string | null
@@ -268,6 +318,26 @@ export interface Post {
    */
   generateSlug?: boolean | null
   slug: string
+  /**
+   * Set on suggestions from outside sources. Empty for content staff write.
+   */
+  moderationStatus?: ('suggested' | 'approved' | 'rejected') | null
+  /**
+   * Who published this first, for example a city calendar.
+   */
+  sourceName?: string | null
+  sourceUrl?: string | null
+  /**
+   * The source’s own ID; the same one can’t be stored twice.
+   */
+  externalId?: string | null
+  /**
+   * A fingerprint of the content; it can’t be stored twice.
+   */
+  contentHash?: string | null
+  audience?:
+    | ('everyone' | 'families' | 'youth' | 'seniors' | 'volunteers' | 'association-leaders')[]
+    | null
   updatedAt: string
   createdAt: string
   _status?: ('draft' | 'published') | null
@@ -294,6 +364,22 @@ export interface Media {
     }
     [k: string]: unknown
   } | null
+  /**
+   * Who made the image, as it should be credited, for example "Jane Doe".
+   */
+  credit?: string | null
+  /**
+   * Under what terms the site may show it.
+   */
+  license?: ('own' | 'permission' | 'cc-by' | 'cc-by-sa' | 'cc0' | 'other') | null
+  /**
+   * The license itself, for example https://creativecommons.org/licenses/by-sa/4.0/. Creative Commons licenses need it: the photo credit links to it.
+   */
+  licenseUrl?: string | null
+  /**
+   * Where the image came from, when it isn’t our own.
+   */
+  sourceUrl?: string | null
   folder?: (number | null) | FolderInterface
   updatedAt: string
   createdAt: string
@@ -403,6 +489,10 @@ export interface Category {
    */
   generateSlug?: boolean | null
   slug: string
+  /**
+   * Shown on agent suggestions in this category until an editor picks another image. A subcategory without one uses its parent’s. Use a photo we own or may use, with its credit filled in.
+   */
+  defaultImage?: (number | null) | Media
   parent?: (number | null) | Category
   breadcrumbs?:
     | {
@@ -425,7 +515,11 @@ export interface User {
   /**
    * Controls access level. Only admins can change roles.
    */
-  role: 'admin' | 'editor' | 'resident'
+  role: 'admin' | 'editor' | 'resident' | 'agent'
+  verificationResends?: number | null
+  verificationResendsSince?: string | null
+  verificationSetsPassword?: boolean | null
+  verifiedTokenHash?: string | null
   updatedAt: string
   createdAt: string
   email: string
@@ -434,6 +528,8 @@ export interface User {
   salt?: string | null
   hash?: string | null
   resetPasswordRequestedAt?: string | null
+  _verified?: boolean | null
+  _verificationToken?: string | null
   loginAttempts?: number | null
   lockUntil?: string | null
   sessions?:
@@ -781,6 +877,75 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EventsThisWeekBlock".
+ */
+export interface EventsThisWeekBlock {
+  heading: string
+  /**
+   * How many days the strip shows, starting today. 7 shows today and the next six days.
+   */
+  days: number
+  /**
+   * Each row lists its events, soonest first. A row with no events in those days is hidden; when every row is empty, the strip says so and links to all events.
+   */
+  rows: {
+    title: string
+    source: 'all' | 'official' | 'category'
+    /**
+     * The row lists this category’s events and links to its events page.
+     */
+    category?: (number | null) | Category
+    limit: number
+    id?: string | null
+  }[]
+  id?: string | null
+  blockName?: string | null
+  blockType: 'eventsThisWeek'
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TopIssuesBlock".
+ */
+export interface TopIssuesBlock {
+  heading: string
+  /**
+   * The day you last checked the list. Residents see "Updated" with this date; leave it empty to show none.
+   */
+  reviewedAt?: string | null
+  /**
+   * Up to five, most important first. Drag to reorder. An issue whose post or page isn’t published is hidden.
+   */
+  items: {
+    /**
+     * A few words. It is the link residents tap.
+     */
+    title: string
+    /**
+     * One sentence, shown below the title.
+     */
+    summary?: string | null
+    link?: {
+      type?: ('reference' | 'custom') | null
+      newTab?: boolean | null
+      reference?:
+        | ({
+            relationTo: 'pages'
+            value: number | Page
+          } | null)
+        | ({
+            relationTo: 'posts'
+            value: number | Post
+          } | null)
+      url?: string | null
+    }
+    id?: string | null
+  }[]
+  id?: string | null
+  blockName?: string | null
+  blockType: 'topIssues'
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events".
  */
 export interface Event {
@@ -789,9 +954,18 @@ export interface Event {
   date: string
   timeStart?: string | null
   timeEnd?: string | null
-  category?:
-    | ('meeting' | 'social' | 'volunteer' | 'workshop' | 'sports' | 'community' | 'other')
-    | null
+  /**
+   * A cancelled event stays listed and is marked as cancelled.
+   */
+  cancelled?: boolean | null
+  /**
+   * Set for a public body’s own meeting (Common Council, a city commission, the County Board).
+   */
+  officialBody?: ('city' | 'county') | null
+  /**
+   * The body’s own agenda page, starting with https://
+   */
+  agendaUrl?: string | null
   /**
    * Featured events appear prominently on the homepage
    */
@@ -823,14 +997,39 @@ export interface Event {
   } | null
   meta?: {
     title?: string | null
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media
     description?: string | null
   }
   publishedAt?: string | null
+  categories?: (number | Category)[] | null
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
   generateSlug?: boolean | null
   slug: string
+  /**
+   * Set on suggestions from outside sources. Empty for content staff write.
+   */
+  moderationStatus?: ('suggested' | 'approved' | 'rejected') | null
+  /**
+   * Who published this first, for example a city calendar.
+   */
+  sourceName?: string | null
+  sourceUrl?: string | null
+  /**
+   * The source’s own ID; the same one can’t be stored twice.
+   */
+  externalId?: string | null
+  /**
+   * A fingerprint of the content; it can’t be stored twice.
+   */
+  contentHash?: string | null
+  audience?:
+    | ('everyone' | 'families' | 'youth' | 'seniors' | 'volunteers' | 'association-leaders')[]
+    | null
   updatedAt: string
   createdAt: string
   _status?: ('draft' | 'published') | null
@@ -918,6 +1117,135 @@ export interface Faq {
   _status?: ('draft' | 'published') | null
 }
 /**
+ * Addresses typed into a public form, and when they were confirmed by link. Unconfirmed ones are deleted automatically 48 hours after their last link. A confirmed one is deleted automatically 12 months after the person’s last message, unless they have an account or a message on hold. To remove an address on request sooner, delete it here.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "email-confirmations".
+ */
+export interface EmailConfirmation {
+  id: number
+  email: string
+  /**
+   * When the link was clicked. Empty: not confirmed yet.
+   */
+  confirmedAt?: string | null
+  welcomeSentAt?: string | null
+  /**
+   * When the latest confirmation link was sent.
+   */
+  lastSentAt?: string | null
+  tokenHash?: string | null
+  tokenExpiresAt?: string | null
+  sendCount?: number | null
+  sendWindowStart?: string | null
+  updatedAt: string
+  createdAt: string
+}
+/**
+ * What each neighborhood agent run checked, suggested and asks editors to review.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "agent-runs".
+ */
+export interface AgentRun {
+  id: number
+  /**
+   * Set from the API key.
+   */
+  agent?: (number | null) | User
+  runId: string
+  agentName: string
+  pipelineVersion: number
+  repoCommit: string
+  startedAt: string
+  finishedAt?: string | null
+  status: 'running' | 'succeeded' | 'partial' | 'failed' | 'stopped-budget' | 'disabled'
+  sourcesChecked?:
+    | {
+        sourceId: string
+        fetchStrategy: 'direct' | 'playwright' | 'none'
+        cursor?: string | null
+        status: 'ok' | 'not-modified' | 'error' | 'skipped' | 'blocked'
+        error?: string | null
+        id?: string | null
+      }[]
+    | null
+  counts?: {
+    seen?: number | null
+    proposed?: number | null
+    updates?: number | null
+    rejected?: number | null
+    duplicates?: number | null
+    needsReview?: number | null
+    deferred?: number | null
+  }
+  errors?: string[] | null
+  cost?: {
+    inputTokens?: number | null
+    outputTokens?: number | null
+    /**
+     * In US dollars.
+     */
+    usd?: number | null
+  }
+  /**
+   * What the agent asked an editor to look at during this run.
+   */
+  reviewItems?: {
+    docs?: (number | AgentReviewItem)[]
+    hasNextPage?: boolean
+    totalDocs?: number
+  }
+  updatedAt: string
+  createdAt: string
+}
+/**
+ * What the agents ask an editor to look at. They never changed the content.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "agent-review-items".
+ */
+export interface AgentReviewItem {
+  id: number
+  run: number | AgentRun
+  agent?: (number | null) | User
+  kind: 'needs-review' | 'update' | 'cancel' | 'rejected-invalid'
+  targetCollection?: ('events' | 'posts') | null
+  targetId?: number | null
+  externalId?: string | null
+  summary: string
+  evidence?:
+    | {
+        url: string
+        says: string
+        retrievedAt: string
+        id?: string | null
+      }[]
+    | null
+  flags?:
+    | (
+        | 'missing-date'
+        | 'missing-time'
+        | 'missing-location'
+        | 'ambiguous-location'
+        | 'similar-name'
+        | 'unverified-claim'
+        | 'conflicting-sources'
+        | 'cancelled'
+        | 'rescheduled'
+        | 'past'
+        | 'partisan'
+        | 'prompt-injection'
+        | 'needs-date'
+        | 'wrong-offset'
+        | 'image-candidate'
+      )[]
+    | null
+  sourceUrl?: string | null
+  updatedAt: string
+  createdAt: string
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -957,6 +1285,31 @@ export interface FormSubmission {
         id?: string | null
       }[]
     | null
+  /**
+   * From the form’s email field.
+   */
+  senderEmail?: string | null
+  /**
+   * Ticked once the sender clicks the confirmation link we email them.
+   */
+  emailConfirmed?: boolean | null
+  heldEmails?:
+    | {
+        [k: string]: unknown
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null
+  /**
+   * Keep this message past the automatic deletion (48 hours if never confirmed, otherwise 12 months after the sender’s last message), for an active matter or a retention requirement. Untick it when that no longer applies.
+   */
+  retentionHold?: boolean | null
+  /**
+   * Why it is kept longer.
+   */
+  retentionHoldReason?: string | null
   updatedAt: string
   createdAt: string
 }
@@ -985,6 +1338,9 @@ export interface Search {
     description?: string | null
     image?: (number | null) | Media
   }
+  cancelled?: boolean | null
+  sourceName?: string | null
+  sourceUrl?: string | null
   categories?:
     | {
         relationTo?: string | null
@@ -995,6 +1351,76 @@ export interface Search {
     | null
   updatedAt: string
   createdAt: string
+}
+/**
+ * API keys control which collections, resources, tools, and prompts MCP clients can access
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-mcp-api-keys".
+ */
+export interface PayloadMcpApiKey {
+  id: number
+  /**
+   * The user that the API key is associated with.
+   */
+  user: number | User
+  /**
+   * A useful label for the API key.
+   */
+  label?: string | null
+  /**
+   * The purpose of the API key.
+   */
+  description?: string | null
+  events?: {
+    /**
+     * Allow clients to find events.
+     */
+    find?: boolean | null
+  }
+  posts?: {
+    /**
+     * Allow clients to find posts.
+     */
+    find?: boolean | null
+  }
+  categories?: {
+    /**
+     * Allow clients to find categories.
+     */
+    find?: boolean | null
+  }
+  agentRuns?: {
+    /**
+     * Allow clients to find agent-runs.
+     */
+    find?: boolean | null
+    /**
+     * Allow clients to create agent-runs.
+     */
+    create?: boolean | null
+    /**
+     * Allow clients to update agent-runs.
+     */
+    update?: boolean | null
+  }
+  'payload-mcp-tool'?: {
+    /**
+     * Suggest an event or a news post, with its card summary and one or two category slugs from the categories find. It is stored as an unpublished draft for staff to review, never published, with the first category’s default image. Answers {"status":"created","id"} or, when the same externalId or contentHash is already stored, {"status":"duplicate","id"}.
+     */
+    submitSuggestion?: boolean | null
+    /**
+     * Report something for an editor on your current run: needs-review, update, cancel or rejected-invalid, with a summary, evidence and the source link. It never changes the content it points at.
+     */
+    reportItem?: boolean | null
+  }
+  updatedAt: string
+  createdAt: string
+  enableAPIKey?: boolean | null
+  apiKey?: string | null
+  apiKeyIndex?: string | null
+  hasAPIKey?: boolean | null
+  collection: 'payload-mcp-api-keys'
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1065,7 +1491,11 @@ export interface PayloadJob {
     | {
         executedAt: string
         completedAt: string
-        taskSlug: 'inline' | 'schedulePublish'
+        taskSlug:
+          | 'inline'
+          | 'deleteExpiredContactMessages'
+          | 'deleteExpiredEmailConfirmations'
+          | 'schedulePublish'
         taskID: string
         input?:
           | {
@@ -1098,10 +1528,26 @@ export interface PayloadJob {
         id?: string | null
       }[]
     | null
-  taskSlug?: ('inline' | 'schedulePublish') | null
+  taskSlug?:
+    | (
+        | 'inline'
+        | 'deleteExpiredContactMessages'
+        | 'deleteExpiredEmailConfirmations'
+        | 'schedulePublish'
+      )
+    | null
   queue?: string | null
   waitUntil?: string | null
   processing?: boolean | null
+  meta?:
+    | {
+        [k: string]: unknown
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null
   updatedAt: string
   createdAt: string
 }
@@ -1149,6 +1595,18 @@ export interface PayloadLockedDocument {
         value: number | User
       } | null)
     | ({
+        relationTo: 'email-confirmations'
+        value: number | EmailConfirmation
+      } | null)
+    | ({
+        relationTo: 'agent-runs'
+        value: number | AgentRun
+      } | null)
+    | ({
+        relationTo: 'agent-review-items'
+        value: number | AgentReviewItem
+      } | null)
+    | ({
         relationTo: 'redirects'
         value: number | Redirect
       } | null)
@@ -1165,14 +1623,23 @@ export interface PayloadLockedDocument {
         value: number | Search
       } | null)
     | ({
+        relationTo: 'payload-mcp-api-keys'
+        value: number | PayloadMcpApiKey
+      } | null)
+    | ({
         relationTo: 'payload-folders'
         value: number | FolderInterface
       } | null)
   globalSlug?: string | null
-  user: {
-    relationTo: 'users'
-    value: number | User
-  }
+  user:
+    | {
+        relationTo: 'users'
+        value: number | User
+      }
+    | {
+        relationTo: 'payload-mcp-api-keys'
+        value: number | PayloadMcpApiKey
+      }
   updatedAt: string
   createdAt: string
 }
@@ -1182,10 +1649,15 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number
-  user: {
-    relationTo: 'users'
-    value: number | User
-  }
+  user:
+    | {
+        relationTo: 'users'
+        value: number | User
+      }
+    | {
+        relationTo: 'payload-mcp-api-keys'
+        value: number | PayloadMcpApiKey
+      }
   key?: string | null
   value?:
     | {
@@ -1246,11 +1718,14 @@ export interface PagesSelect<T extends boolean = true> {
         mediaBlock?: T | MediaBlockSelect<T>
         archive?: T | ArchiveBlockSelect<T>
         formBlock?: T | FormBlockSelect<T>
+        eventsThisWeek?: T | EventsThisWeekBlockSelect<T>
+        topIssues?: T | TopIssuesBlockSelect<T>
       }
   meta?:
     | T
     | {
         title?: T
+        image?: T
         description?: T
       }
   publishedAt?: T
@@ -1346,6 +1821,50 @@ export interface FormBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EventsThisWeekBlock_select".
+ */
+export interface EventsThisWeekBlockSelect<T extends boolean = true> {
+  heading?: T
+  days?: T
+  rows?:
+    | T
+    | {
+        title?: T
+        source?: T
+        category?: T
+        limit?: T
+        id?: T
+      }
+  id?: T
+  blockName?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TopIssuesBlock_select".
+ */
+export interface TopIssuesBlockSelect<T extends boolean = true> {
+  heading?: T
+  reviewedAt?: T
+  items?:
+    | T
+    | {
+        title?: T
+        summary?: T
+        link?:
+          | T
+          | {
+              type?: T
+              newTab?: T
+              reference?: T
+              url?: T
+            }
+        id?: T
+      }
+  id?: T
+  blockName?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
@@ -1358,6 +1877,7 @@ export interface PostsSelect<T extends boolean = true> {
     | T
     | {
         title?: T
+        image?: T
         description?: T
       }
   publishedAt?: T
@@ -1370,6 +1890,12 @@ export interface PostsSelect<T extends boolean = true> {
       }
   generateSlug?: T
   slug?: T
+  moderationStatus?: T
+  sourceName?: T
+  sourceUrl?: T
+  externalId?: T
+  contentHash?: T
+  audience?: T
   updatedAt?: T
   createdAt?: T
   _status?: T
@@ -1383,7 +1909,9 @@ export interface EventsSelect<T extends boolean = true> {
   date?: T
   timeStart?: T
   timeEnd?: T
-  category?: T
+  cancelled?: T
+  officialBody?: T
+  agendaUrl?: T
   featured?: T
   locationType?: T
   locationName?: T
@@ -1397,11 +1925,19 @@ export interface EventsSelect<T extends boolean = true> {
     | T
     | {
         title?: T
+        image?: T
         description?: T
       }
   publishedAt?: T
+  categories?: T
   generateSlug?: T
   slug?: T
+  moderationStatus?: T
+  sourceName?: T
+  sourceUrl?: T
+  externalId?: T
+  contentHash?: T
+  audience?: T
   updatedAt?: T
   createdAt?: T
   _status?: T
@@ -1461,6 +1997,10 @@ export interface FaqSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T
   caption?: T
+  credit?: T
+  license?: T
+  licenseUrl?: T
+  sourceUrl?: T
   folder?: T
   updatedAt?: T
   createdAt?: T
@@ -1556,6 +2096,7 @@ export interface CategoriesSelect<T extends boolean = true> {
   title?: T
   generateSlug?: T
   slug?: T
+  defaultImage?: T
   parent?: T
   breadcrumbs?:
     | T
@@ -1575,6 +2116,10 @@ export interface CategoriesSelect<T extends boolean = true> {
 export interface UsersSelect<T extends boolean = true> {
   name?: T
   role?: T
+  verificationResends?: T
+  verificationResendsSince?: T
+  verificationSetsPassword?: T
+  verifiedTokenHash?: T
   updatedAt?: T
   createdAt?: T
   email?: T
@@ -1583,6 +2128,8 @@ export interface UsersSelect<T extends boolean = true> {
   salt?: T
   hash?: T
   resetPasswordRequestedAt?: T
+  _verified?: T
+  _verificationToken?: T
   loginAttempts?: T
   lockUntil?: T
   sessions?:
@@ -1592,6 +2139,93 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T
         expiresAt?: T
       }
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "email-confirmations_select".
+ */
+export interface EmailConfirmationsSelect<T extends boolean = true> {
+  email?: T
+  confirmedAt?: T
+  welcomeSentAt?: T
+  lastSentAt?: T
+  tokenHash?: T
+  tokenExpiresAt?: T
+  sendCount?: T
+  sendWindowStart?: T
+  updatedAt?: T
+  createdAt?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "agent-runs_select".
+ */
+export interface AgentRunsSelect<T extends boolean = true> {
+  agent?: T
+  runId?: T
+  agentName?: T
+  pipelineVersion?: T
+  repoCommit?: T
+  startedAt?: T
+  finishedAt?: T
+  status?: T
+  sourcesChecked?:
+    | T
+    | {
+        sourceId?: T
+        fetchStrategy?: T
+        cursor?: T
+        status?: T
+        error?: T
+        id?: T
+      }
+  counts?:
+    | T
+    | {
+        seen?: T
+        proposed?: T
+        updates?: T
+        rejected?: T
+        duplicates?: T
+        needsReview?: T
+        deferred?: T
+      }
+  errors?: T
+  cost?:
+    | T
+    | {
+        inputTokens?: T
+        outputTokens?: T
+        usd?: T
+      }
+  reviewItems?: T
+  updatedAt?: T
+  createdAt?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "agent-review-items_select".
+ */
+export interface AgentReviewItemsSelect<T extends boolean = true> {
+  run?: T
+  agent?: T
+  kind?: T
+  targetCollection?: T
+  targetId?: T
+  externalId?: T
+  summary?: T
+  evidence?:
+    | T
+    | {
+        url?: T
+        says?: T
+        retrievedAt?: T
+        id?: T
+      }
+  flags?: T
+  sourceUrl?: T
+  updatedAt?: T
+  createdAt?: T
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1755,6 +2389,11 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
         value?: T
         id?: T
       }
+  senderEmail?: T
+  emailConfirmed?: T
+  heldEmails?: T
+  retentionHold?: T
+  retentionHoldReason?: T
   updatedAt?: T
   createdAt?: T
 }
@@ -1774,6 +2413,9 @@ export interface SearchSelect<T extends boolean = true> {
         description?: T
         image?: T
       }
+  cancelled?: T
+  sourceName?: T
+  sourceUrl?: T
   categories?:
     | T
     | {
@@ -1784,6 +2426,49 @@ export interface SearchSelect<T extends boolean = true> {
       }
   updatedAt?: T
   createdAt?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-mcp-api-keys_select".
+ */
+export interface PayloadMcpApiKeysSelect<T extends boolean = true> {
+  user?: T
+  label?: T
+  description?: T
+  events?:
+    | T
+    | {
+        find?: T
+      }
+  posts?:
+    | T
+    | {
+        find?: T
+      }
+  categories?:
+    | T
+    | {
+        find?: T
+      }
+  agentRuns?:
+    | T
+    | {
+        find?: T
+        create?: T
+        update?: T
+      }
+  'payload-mcp-tool'?:
+    | T
+    | {
+        submitSuggestion?: T
+        reportItem?: T
+      }
+  updatedAt?: T
+  createdAt?: T
+  enableAPIKey?: T
+  apiKey?: T
+  apiKeyIndex?: T
+  hasAPIKey?: T
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1821,6 +2506,7 @@ export interface PayloadJobsSelect<T extends boolean = true> {
   queue?: T
   waitUntil?: T
   processing?: T
+  meta?: T
   updatedAt?: T
   createdAt?: T
 }
@@ -1923,6 +2609,28 @@ export interface Footer {
         id?: string | null
       }[]
     | null
+  /**
+   * The neighborhood forum’s https address. The footer and every post link to it; leave it empty to hide those links.
+   */
+  forumUrl?: string | null
+  updatedAt?: string | null
+  createdAt?: string | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs-stats".
+ */
+export interface PayloadJobsStat {
+  id: number
+  stats?:
+    | {
+        [k: string]: unknown
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null
   updatedAt?: string | null
   createdAt?: string | null
 }
@@ -1968,6 +2676,17 @@ export interface FooterSelect<T extends boolean = true> {
             }
         id?: T
       }
+  forumUrl?: T
+  updatedAt?: T
+  createdAt?: T
+  globalType?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs-stats_select".
+ */
+export interface PayloadJobsStatsSelect<T extends boolean = true> {
+  stats?: T
   updatedAt?: T
   createdAt?: T
   globalType?: T
@@ -1981,6 +2700,22 @@ export interface CollectionsWidget {
     [k: string]: unknown
   }
   width: 'full'
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskDeleteExpiredContactMessages".
+ */
+export interface TaskDeleteExpiredContactMessages {
+  input?: unknown
+  output?: unknown
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskDeleteExpiredEmailConfirmations".
+ */
+export interface TaskDeleteExpiredEmailConfirmations {
+  input?: unknown
+  output?: unknown
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2004,10 +2739,15 @@ export interface TaskSchedulePublish {
           value: number | Event
         } | null)
     global?: string | null
-    user?: {
-      relationTo: 'users'
-      value: number | User
-    } | null
+    user?:
+      | ({
+          relationTo: 'users'
+          value: number | User
+        } | null)
+      | ({
+          relationTo: 'payload-mcp-api-keys'
+          value: number | PayloadMcpApiKey
+        } | null)
   }
   output?: unknown
 }
@@ -2046,6 +2786,164 @@ export interface CodeBlock {
   id?: string | null
   blockName?: string | null
   blockType: 'code'
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TimelineBlock".
+ */
+export interface TimelineBlock {
+  /**
+   * In the order they happen, oldest first. Two to twelve milestones.
+   */
+  entries: {
+    /**
+     * As readers should see it: "Dec 5, 2024", "Spring 2027", "Not set".
+     */
+    date: string
+    status: 'done' | 'next' | 'conditional' | 'later'
+    title: string
+    /**
+     * One or two plain sentences. Optional.
+     */
+    description?: string | null
+    /**
+     * Optional, for example "Read the decision".
+     */
+    linkLabel?: string | null
+    /**
+     * A site path (/events) or https:// address.
+     */
+    linkUrl?: string | null
+    id?: string | null
+  }[]
+  id?: string | null
+  blockName?: string | null
+  blockType: 'timeline'
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StepsBlock".
+ */
+export interface StepsBlock {
+  /**
+   * In the order a reader does them. Keep headings short and alike: "Join…".
+   */
+  steps: {
+    heading: string
+    /**
+     * One or two plain sentences. Optional.
+     */
+    body?: string | null
+    /**
+     * Optional, for example "Find your alder".
+     */
+    linkLabel?: string | null
+    /**
+     * A site path (/events) or https:// address.
+     */
+    linkUrl?: string | null
+    id?: string | null
+  }[]
+  id?: string | null
+  blockName?: string | null
+  blockType: 'steps'
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "KeyFactsBlock".
+ */
+export interface KeyFactsBlock {
+  /**
+   * Two to six facts. They sit side by side on wide screens.
+   */
+  facts: {
+    /**
+     * Short: "2040s", "$10M", "Not set".
+     */
+    value: string
+    /**
+     * What it is: "earliest construction".
+     */
+    label: string
+    icon:
+      | 'info'
+      | 'date'
+      | 'time'
+      | 'money'
+      | 'taxes'
+      | 'government'
+      | 'place'
+      | 'people'
+      | 'traffic'
+      | 'walking'
+      | 'biking'
+      | 'noise'
+      | 'construction'
+    certainty: 'confirmed' | 'estimate' | 'unknown'
+    /**
+     * Optional, for example "City budget".
+     */
+    linkLabel?: string | null
+    /**
+     * A site path (/events) or https:// address.
+     */
+    linkUrl?: string | null
+    id?: string | null
+  }[]
+  id?: string | null
+  blockName?: string | null
+  blockType: 'keyFacts'
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "OutcomeForkBlock".
+ */
+export interface OutcomeForkBlock {
+  /**
+   * The open question, as a reader would ask it.
+   */
+  question: string
+  /**
+   * Two or three possible answers, each with what it would mean.
+   */
+  outcomes: {
+    /**
+     * The answer: "If they agree".
+     */
+    title: string
+    tone: 'go' | 'stop' | 'open'
+    /**
+     * What happens then, in one or two plain sentences.
+     */
+    description: string
+    id?: string | null
+  }[]
+  id?: string | null
+  blockName?: string | null
+  blockType: 'outcomeFork'
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DiagramKeyBlock".
+ */
+export interface DiagramKeyBlock {
+  /**
+   * One per numbered marker on the image above, in number order. Don’t type the numbers.
+   */
+  items: {
+    /**
+     * Short: "North roundabout".
+     */
+    label: string
+    /**
+     * One line: what it is or does. Optional.
+     */
+    text?: string | null
+    id?: string | null
+  }[]
+  id?: string | null
+  blockName?: string | null
+  blockType: 'diagramKey'
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

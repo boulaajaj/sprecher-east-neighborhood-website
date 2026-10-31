@@ -21,7 +21,7 @@ Where code goes: [`docs/architecture/`](../architecture/README.md).
 - Same spacing, typography, and color usage across all pages
 - Cards, buttons, and interactive elements are styled consistently
 - No page looks visually disconnected from the rest of the site
-- Design tokens from `globals.css @theme` are used everywhere (no hardcoded colors/sizes)
+- Design tokens (`src/platform/theme/tokens.ts`) are used everywhere (no hardcoded colors/sizes)
 - Mobile layouts are clean and usable (no overflow, no tiny touch targets)
 
 ### UX Integrity
@@ -80,7 +80,7 @@ Where code goes: [`docs/architecture/`](../architecture/README.md).
 - TypeScript compiles without errors
 - No `console.log` statements in production code
 - No `@ts-ignore` or `any` types without justification
-- Components follow the template architecture (blocks, heros, components in correct locations)
+- Code sits where [`docs/architecture/`](../architecture/README.md) says: the owning module and layer, shared code in `src/platform/`
 - No hardcoded content that should come from CMS
 - No secrets, API keys, or credentials in code
 - Dependencies are up to date (no known vulnerabilities in production deps)

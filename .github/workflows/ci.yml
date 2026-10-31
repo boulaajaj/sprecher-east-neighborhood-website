@@ -45,9 +45,13 @@ jobs:
         if: steps.filter.outputs.code == 'true'
         run: npm ci
 
+      # `next typegen` writes the route types in .next/types (page, layout and route handler props),
+      # which tsconfig.json includes, so `tsc` checks them too (#248)
       - name: Type-check
         if: steps.filter.outputs.code == 'true'
-        run: npx tsc --noEmit
+        run: |
+          npx next typegen
+          npx tsc --noEmit
 
       - name: Unit tests
         if: steps.filter.outputs.code == 'true'
@@ -68,3 +72,117 @@ jobs:
           PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET || 'ci-build-placeholder-secret-32chars!' }}
           DATABASE_URI: file:./data/payload.db
           NEXT_PUBLIC_SERVER_URL: http://localhost:3000
+
+  # The intelligence agents' prompts, sources, schemas and eval cases (#337): validated against
+  # their JSON Schemas, and every field a prompt names must exist. Then the runner's tests, which
+  # run the scout and submit evals as code, and an audit of its own dependencies (#364). Skipped
+  # when they're untouched.
+  intelligence:
+    name: Intelligence check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Detect changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            intelligence:
+              - 'intelligence/**'
+              - 'scripts/check-intelligence.mjs'
+              - 'package-lock.json'
+
+      - uses: actions/setup-node@v6
+        if: steps.filter.outputs.intelligence == 'true'
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            intelligence/runner/package-lock.json
+
+      - name: Install dependencies
+        if: steps.filter.outputs.intelligence == 'true'
+        run: npm ci
+
+      - name: Check intelligence/
+        if: steps.filter.outputs.intelligence == 'true'
+        run: node scripts/check-intelligence.mjs
+
+      - name: Runner tests and audit
+        if: steps.filter.outputs.intelligence == 'true'
+        working-directory: intelligence/runner
+        run: |
+          npm ci
+          npm test
+          npm audit --audit-level=high --omit=dev
+
+  # Files, exports and packages nothing uses (#445). Not a required check yet, and the deploy
+  # doesn't wait for it; it becomes required once it has stayed green on main for a while.
+  knip:
+    name: Unused code (knip)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      # Node 22: on Node 20 knip exits 13 at random (#455)
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Knip
+        run: npm run knip
+
+  # The account and contact flows as a resident uses them, on a phone and a desktop (#311):
+  # Playwright against a production build with a fresh database, emails caught by a local SMTP
+  # server and the robot check off (e2e/serve.mjs). Not a required check yet, and the deploy
+  # doesn't wait for it; it becomes required once it has stayed green on main for a while.
+  e2e:
+    name: End-to-end tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install the browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run the flows
+        run: npx playwright test
+
+      - name: Keep the report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+
+  # Pushes to main deploy once the build above has passed; the deploy also waits for the Lint
+  # checks (#245). Pull requests skip this job.
+  deploy:
+    name: Deploy
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      actions: read
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit

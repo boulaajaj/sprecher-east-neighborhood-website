@@ -1,25 +1,21 @@
 frontend:
   - changed-files:
-      - any-glob-to-any-file: ['src/app/**', 'src/components/**']
+      - any-glob-to-any-file:
+          ['src/app/**', 'src/modules/*/ui/**', 'src/platform/ui/**', 'src/platform/richtext/**']
 
 cms:
   - changed-files:
       - any-glob-to-any-file:
           [
             'src/payload.config.ts',
-            'src/collections/**',
-            'src/blocks/**',
-            'src/fields/**',
-            'src/globals/**',
-            'src/access/**',
-            'src/hooks/**',
-            'src/plugins/**',
+            'src/modules/*/cms/**',
+            'src/platform/payload/**',
             'src/app/(payload)/**',
           ]
 
 auth:
   - changed-files:
-      - any-glob-to-any-file: ['src/collections/Users/**', 'src/access/**']
+      - any-glob-to-any-file: ['src/modules/accounts/**', 'src/modules/verification/**']
 
 documentation:
   - changed-files:
@@ -59,4 +55,23 @@ process:
             '.github/workflows/pr-policy.yml',
             '.github/workflows/issue-labels.yml',
             '.github/workflows/issue-fix-summary.yml',
+          ]
+
+# A "watch out" marker (#447): the change reaches every page that uses this code
+shared-component:
+  - changed-files:
+      - any-glob-to-any-file:
+          [
+            'src/platform/ui/**',
+            'src/platform/richtext/**',
+            'src/platform/theme/**',
+            'src/themes/**',
+            'src/platform/lib/**',
+            'src/platform/turnstile/**',
+            'src/app/(frontend)/globals.css',
+            'src/app/(frontend)/layout.tsx',
+            'src/modules/site/ui/SiteHeader*',
+            'src/modules/site/ui/HeaderNav*',
+            'src/modules/site/ui/SiteFooter*',
+            'src/modules/site/ui/Logo*',
           ]

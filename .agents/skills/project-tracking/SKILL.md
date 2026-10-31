@@ -104,13 +104,30 @@ parent epic too: it says what the issue is part of.
    A sub-issue has one parent. Don't move an issue to another epic just to group it; use a label
    or a link in the epic's description instead.
 
-5. **Needs the owner?** If only the owner can do it (a login, a payment, a decision), or it
-   changes policy he didn't ask for ([`AGENTS.md`](../../../AGENTS.md) step 3):
+5. **Needs the owner?** Only if he alone can do it (a login, a payment), it needs his decision on
+   a genuine product trade-off, a meaningful cost, a legal or privacy commitment, or a decision
+   established best practice can't reasonably resolve, or it changes policy he didn't ask for
+   ([`AGENTS.md`](../../../AGENTS.md) step 3). A choice between technically valid approaches
+   isn't one: decide it, record why on the issue, and carry on. If it does:
    - label it `needs owner`
    - add it to the checklist in the owner-actions epic (#169); its parent stays its own epic
    - mark the issues that depend on it as blocked by it
+   - stop: it waits for him
+     ([waits for owner](../../../docs/process/project-management.md#waits-for-owner))
 
-   Tell the owner in one line what you need from him.
+   Ask him on the issue, and in the chat too when he's there. Make it easy to answer:
+
+   ```markdown
+   **Question:** Should volunteers sign up with a phone number as well as an email?
+
+   - **A. Email only (recommended):** less personal data to keep and protect.
+   - **B. Email and phone:** organizers can text people, but we store and guard more data.
+
+   Reply A or B. Until then, this issue and #123 wait.
+   ```
+
+   One question per message, plain words, no code or file names unless he asks. When there are
+   several, ask the most important first and the next once he has answered.
 
 ## 4. While working
 

@@ -27,7 +27,7 @@ each; otherwise do them one after another.
 
 1. Search for existing utilities and helpers that could replace new code: the shared folders in
    the [DRY search order](../../../docs/guidelines/development.md#dry--dont-repeat-yourself),
-   and files next to the changed ones.
+   and files next to the changed ones ([`write-code`](../write-code/SKILL.md) §1).
 2. Flag any new function that duplicates an existing one, and name the one to use instead.
 3. Flag inline logic an existing utility already covers: hand-rolled string or path handling,
    custom environment checks, ad-hoc type guards.
@@ -44,6 +44,9 @@ each; otherwise do them one after another.
    already exists.
 6. **Guidelines**: anything against [development](../../../docs/guidelines/development.md) or
    [security](../../../docs/guidelines/security.md).
+7. **Component API**: a shared component or one meant for reuse follows
+   [`vercel-composition-patterns`](../vercel-composition-patterns/SKILL.md) (explicit variants,
+   compound parts, no boolean-prop modes).
 
 ### Efficiency
 
@@ -53,6 +56,9 @@ each; otherwise do them one after another.
 4. **Existence checks before acting** (TOCTOU): do the operation and handle the error instead.
 5. **Memory**: unbounded structures, missing cleanup, listener leaks.
 6. **Overly broad operations**: reading or loading everything when a part is enough.
+7. **React and Next.js**: React and Next.js code is checked against the CRITICAL and HIGH rules of
+   [`vercel-react-best-practices`](../vercel-react-best-practices/SKILL.md) (waterfalls, bundle
+   size, server-side work, data sent to client components).
 
 ### Visual design
 

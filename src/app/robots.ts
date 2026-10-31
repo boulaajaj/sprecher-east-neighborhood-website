@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { getServerSideURL } from '@/utilities/getURL'
+import { getServerSideURL } from '@/platform/lib/getURL'
 
 export default function robots(): MetadataRoute.Robots {
   const siteUrl = getServerSideURL()
@@ -11,10 +11,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/admin/*'],
       },
     ],
-    sitemap: [
-      `${siteUrl}/pages-sitemap.xml`,
-      `${siteUrl}/posts-sitemap.xml`,
-      `${siteUrl}/events-sitemap.xml`,
-    ],
+    sitemap: `${siteUrl}/sitemap.xml`,
   }
 }

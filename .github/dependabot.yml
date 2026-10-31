@@ -20,6 +20,21 @@ updates:
           - 'minor'
     # Major versions get individual PRs (may be breaking)
 
+  # The intelligence runner's own dependencies (#364)
+  - package-ecosystem: 'npm'
+    directory: '/intelligence/runner'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+    open-pull-requests-limit: 5
+    labels:
+      - 'dependencies'
+    groups:
+      runner-updates:
+        update-types:
+          - 'patch'
+          - 'minor'
+
   # GitHub Actions
   - package-ecosystem: 'github-actions'
     directory: '/'

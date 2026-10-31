@@ -108,7 +108,8 @@ Open it as a draft (`--draft`) while work is incomplete.
    `git range-diff <old base>..<reviewed head> <new base>..<current head>`; it should show only `=`
    lines. Unless the PR waits for the owner (an issue or PR labeled `needs owner`, or a policy
    change he didn't ask for, `AGENTS.md` step 3), note the head SHA and go to step 6. If it waits
-   for him, label the PR `needs owner` and stop; he merges it or removes the label.
+   for him, label the PR `needs owner`, ask him one plain question, and stop
+   ([waits for owner](../../../docs/process/project-management.md#waits-for-owner)).
 5. **A PR below yours changed** (stacked PRs): rebase yours onto it and push, as in
    [`stacked-prs`](../stacked-prs/SKILL.md) step 4.
 
@@ -136,7 +137,9 @@ A `409` means a merge of this PR is already running: poll it instead of starting
 - **A stack merges one layer at a time, from the bottom.** Merge the lowest open layer. GitHub
   then retargets the next layer to `main` and rebases it. Wait for that layer's checks on its new
   head, and, if the previous merge started a deploy, for it to succeed, before merging it.
-- The merge triggers `Deploy to VPS` (docs-only changes don't deploy). Then run
+- The merge's CI run deploys it, in its `Deploy / …` jobs, once the required checks pass
+  (docs-only changes don't deploy; [`wrapped`](../wrapped/SKILL.md) step 2 says where to look).
+  Then run
   [`wrapped`](../wrapped/SKILL.md): verify the merge, read the deploy's annotations, check the
   site (`https://sprechereast.com`) and the behavior that changed, and report.
 - A failed deploy is fixed or reverted through a new PR, never on the server.

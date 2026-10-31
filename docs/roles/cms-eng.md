@@ -23,7 +23,7 @@ The installed plugins are listed in [`docs/project.md`](../project.md#payload-cm
 This project is built on the official Payload CMS v3 Website Template. Key patterns:
 
 - **Layout Builder**: Pages use the `layout` blocks field for flexible content layout; posts embed blocks (Banner, Code, Media) in their rich text. Each block has its own schema and React component.
-- **Hero System**: 3 hero types (HighImpact, MediumImpact, LowImpact) or none, chosen per page. Posts and events use their own fixed heroes (`PostHero`, `EventHero`).
+- **Hero System**: 3 hero types (`PageHero` variants `high`, `medium`, `low`) or none, chosen per page. Posts and events use `PageHeader` (`image` with a photo, `default` without).
 - **Live Preview**: Real-time content preview in admin panel via `window.postMessage`. Supports mobile/tablet/desktop breakpoints.
 - **Draft Preview**: Unpublished content can be previewed via draft routes before publishing.
 - **Scheduled Publishing**: Jobs queue enables `waitUntil` for future publish dates.
@@ -32,9 +32,9 @@ This project is built on the official Payload CMS v3 Website Template. Key patte
 
 ## Development Principles
 
-### Framework First — Use Payload to Its Fullest
+### Native First — Use Payload to Its Fullest
 
-Payload CMS v3 is a full-featured content framework. Before writing custom code, exhaust what Payload provides natively:
+Payload CMS v3 is a full-featured content framework. Follow [the ladder](../guidelines/development.md#native-first-then-plugins-then-our-code), starting with what Payload provides natively:
 
 - **Email**: `@payloadcms/email-nodemailer` adapter — configured once in `payload.config.ts`, available everywhere via `payload.sendEmail()`
 - **Forms**: `@payloadcms/plugin-form-builder` — creates `forms` + `form-submissions` collections with admin-configurable email notifications
@@ -79,7 +79,8 @@ patterns are in [`payload-cms.md`](../guidelines/payload-cms.md).
 | Users       | Accounts with the roles `admin`, `editor` and `resident`        |
 
 The exact fields are in [`docs/architecture/data-model.md`](../architecture/data-model.md) and the
-collection configs in `src/collections/`.
+collection configs in each module's `cms/` folder (`src/modules/<area>/cms/`; Media in
+`src/platform/payload/media.ts`).
 
 ## What's next
 

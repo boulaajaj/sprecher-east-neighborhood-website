@@ -1,0 +1,59 @@
+# Pipeline settings for the neighborhood intelligence agents (#337). A runtime reads this file
+# first; README.md explains each setting. Change it only through a PR.
+version: 1
+# Kill switch: false stops every run before it fetches anything. See README.md, "Turning it off".
+enabled: true
+schedule:
+  cron: '40 6 * * *'
+  timezone: America/Chicago
+budgets:
+  maxUsdPerRun: 0.5
+  maxUsdPerMonth: 15
+  maxMinutesPerRun: 15
+  maxItemsPerSource: 50
+  # Sampling while the sources are new (#390): a few items per run, taken in turns by source
+  maxModelItemsPerRun: 6
+  maxDraftsPerRun: 10
+# Verify reruns at high effort when its confidence is below this; still below, the item goes to
+# review (README.md, "The pipeline").
+escalation:
+  verifyBelowConfidence: 0.6
+  to: high
+# The MCP tool the submit stage calls for each curate decision (prompts/submit.md).
+routes:
+  accept: submitSuggestion
+  needs-review: reportItem
+  update: reportItem
+  cancel: reportItem
+  reject: none
+  duplicate: none
+sources: sources.yaml
+coverage: coverage.md
+# The words code uses to spot the area in an item's text (#390).
+area: area.yaml
+stages:
+  - id: scout
+    prompt: prompts/scout.md
+    input: schemas/sources.schema.json
+    output: schemas/candidate.schema.json
+    model: none
+  - id: verify
+    prompt: prompts/verify.md
+    input: schemas/item.schema.json
+    output: schemas/verification.schema.json
+    model: medium
+  - id: curate
+    prompt: prompts/curate.md
+    input: schemas/item.schema.json
+    output: schemas/curation.schema.json
+    model: medium
+  - id: draft
+    prompt: prompts/draft.md
+    input: schemas/item.schema.json
+    output: schemas/draft.schema.json
+    model: medium
+  - id: submit
+    prompt: prompts/submit.md
+    input: schemas/item.schema.json
+    output: schemas/submission.schema.json
+    model: none

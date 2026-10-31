@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/suggestion.schema.json",
+  "title": "submitSuggestion arguments (#336)",
+  "description": "Creates one suggested draft. The server converts bodyMarkdown with Payload's converter, stores summary as the card text, links the categories by slug (an unknown slug is refused), gives the draft the first category's default image (or its parent's), forces an unpublished draft with moderationStatus suggested, and refuses a duplicate externalId or contentHash. It answers { id, status: created | duplicate }.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "collection": {
+      "$ref": "draft.schema.json#/properties/collection"
+    },
+    "title": {
+      "$ref": "draft.schema.json#/properties/title"
+    },
+    "bodyMarkdown": {
+      "$ref": "draft.schema.json#/properties/bodyMarkdown"
+    },
+    "summary": {
+      "$ref": "draft.schema.json#/properties/summary"
+    },
+    "categories": {
+      "$ref": "draft.schema.json#/properties/categories"
+    },
+    "startsAt": {
+      "$ref": "draft.schema.json#/properties/startsAt"
+    },
+    "endsAt": {
+      "$ref": "draft.schema.json#/properties/endsAt"
+    },
+    "allDay": {
+      "$ref": "draft.schema.json#/properties/allDay"
+    },
+    "venue": {
+      "$ref": "draft.schema.json#/properties/venue"
+    },
+    "address": {
+      "$ref": "draft.schema.json#/properties/address"
+    },
+    "sourceName": {
+      "$ref": "provenance.schema.json#/properties/sourceName"
+    },
+    "sourceUrl": {
+      "$ref": "provenance.schema.json#/properties/sourceUrl"
+    },
+    "externalId": {
+      "$ref": "provenance.schema.json#/properties/externalId"
+    },
+    "contentHash": {
+      "$ref": "provenance.schema.json#/properties/contentHash"
+    },
+    "audience": {
+      "$ref": "draft.schema.json#/properties/audience"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    }
+  },
+  "required": [
+    "collection",
+    "title",
+    "bodyMarkdown",
+    "summary",
+    "categories",
+    "sourceName",
+    "sourceUrl",
+    "externalId",
+    "contentHash",
+    "audience",
+    "runId"
+  ]
+}

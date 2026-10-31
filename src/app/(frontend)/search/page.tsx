@@ -1,81 +1,41 @@
 import type { Metadata } from 'next/types'
 
-import { CollectionArchive } from '@/components/CollectionArchive'
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 import React from 'react'
-import { Search } from '@/search/Component'
-import PageClient from './page.client'
-import type { CardPostData } from '@/components/Card'
+
+import { parseSearchQuery } from '@/modules/news'
+import { findSearchResults, PostGrid, SearchBox } from '@/modules/news/server'
+import { EmptyState } from '@/platform/ui/EmptyState'
+import { PageHeader } from '@/platform/ui/PageHeader'
 
 type Args = {
   searchParams: Promise<{
-    q: string
+    q?: string | string[]
   }>
 }
-export default async function Page({ searchParams: searchParamsPromise }: Args) {
-  const { q: query } = await searchParamsPromise
-  const payload = await getPayload({ config: configPromise })
 
-  const posts = await payload.find({
-    collection: 'search',
-    depth: 1,
-    limit: 12,
-    select: {
-      title: true,
-      slug: true,
-      categories: true,
-      meta: true,
-    },
-    // pagination: false reduces overhead if you don't need totalDocs
-    pagination: false,
-    ...(query
-      ? {
-          where: {
-            or: [
-              {
-                title: {
-                  like: query,
-                },
-              },
-              {
-                'meta.description': {
-                  like: query,
-                },
-              },
-              {
-                'meta.title': {
-                  like: query,
-                },
-              },
-              {
-                slug: {
-                  like: query,
-                },
-              },
-            ],
-          },
-        }
-      : {}),
-  })
+export default async function Page({ searchParams: searchParamsPromise }: Args) {
+  const { q } = await searchParamsPromise
+  const query = parseSearchQuery(q)
+  const results = await findSearchResults(query)
 
   return (
     <div className="pt-24 pb-24">
-      <PageClient />
-      <div className="container mb-12 md:mb-16">
-        <h1 className="mb-6 text-4xl font-bold tracking-tight text-foreground md:text-5xl">
-          Search
-        </h1>
-        <div className="max-w-[50rem]">
-          <Search />
-        </div>
-      </div>
+      <PageHeader title="Search">
+        <SearchBox initialQuery={query} />
+      </PageHeader>
 
-      {posts.docs && posts.docs.length > 0 ? (
-        <CollectionArchive posts={posts.docs as CardPostData[]} />
+      {results.length > 0 ? (
+        <div className="container">
+          <PostGrid posts={results} headingLevel="h2" />
+        </div>
       ) : (
-        <div className="container py-12 text-center">
-          <p className="text-muted-foreground">No results found.</p>
+        <div className="container">
+          <EmptyState
+            variant="plain"
+            title="No results found."
+            // Only a search that was typed can be retried with other words
+            description={query ? 'Try different words, or check the spelling.' : undefined}
+          />
         </div>
       )}
     </div>

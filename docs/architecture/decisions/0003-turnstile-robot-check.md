@@ -29,4 +29,5 @@ The public contact form needs protection from bots without making residents solv
 ## Links
 
 - Cloudflare server-side validation (https://developers.cloudflare.com/turnstile/get-started/server-side-validation/)
-- Code: `src/utilities/turnstile.ts`, `src/hooks/verifyHumanSubmission.ts`
+- Code: `src/platform/lib/humanCheck.ts`, `src/platform/turnstile/turnstileVerifier.ts`,
+  `src/modules/contact/cms/verifyHumanSubmission.ts`

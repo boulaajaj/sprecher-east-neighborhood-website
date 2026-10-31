@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprechereast.com/intelligence/schemas/common.schema.json",
+  "title": "Shared definitions",
+  "$defs": {
+    "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "dateTime": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?(Z|[+-]\\d{2}:\\d{2})$"
+    },
+    "httpUrl": { "type": "string", "pattern": "^https?://[^\\s]+$", "maxLength": 2048 },
+    "sourceId": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "audience": {
+      "description": "Same values as AUDIENCES in src/platform/lib/reviewQueue.ts, the Events and Posts audience field.",
+      "enum": ["everyone", "families", "youth", "seniors", "volunteers", "association-leaders"]
+    },
+    "coverage": {
+      "description": "Where an item sits against coverage.md: core area, nearby catchment, citywide or countywide with a resident benefit, outside, or not yet known.",
+      "enum": ["core", "catchment", "citywide", "outside", "unknown"]
+    },
+    "decision": { "enum": ["accept", "reject", "needs-review", "update", "cancel", "duplicate"] },
+    "flag": {
+      "enum": [
+        "missing-date",
+        "missing-time",
+        "missing-location",
+        "ambiguous-location",
+        "similar-name",
+        "unverified-claim",
+        "conflicting-sources",
+        "cancelled",
+        "rescheduled",
+        "past",
+        "partisan",
+        "prompt-injection",
+        "needs-date",
+        "wrong-offset",
+        "image-candidate"
+      ]
+    },
+    "flags": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/flag" },
+      "uniqueItems": true,
+      "maxItems": 20
+    },
+    "collection": { "enum": ["events", "posts"] },
+    "categorySlug": {
+      "description": "A category's slug in the CMS category tree that events and posts share (#362), as Payload's slug field makes it (lowercase letters, digits, - and _; \"Sports & Recreation\" becomes sports--recreation).",
+      "type": "string",
+      "pattern": "^[a-z0-9_-]+$",
+      "maxLength": 100
+    },
+    "taxonomy": {
+      "description": "The CMS category tree, filled by the runtime from the find tool at the start of a run (#363): every category's slug, title and parent slug (null at the top). Drafts may only use these slugs.",
+      "type": "array",
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["slug", "title", "parent"],
+        "properties": {
+          "slug": { "$ref": "#/$defs/categorySlug" },
+          "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "parent": { "anyOf": [{ "$ref": "#/$defs/categorySlug" }, { "type": "null" }] }
+        }
+      }
+    },
+    "documentId": {
+      "description": "A Payload document id (numeric with SQLite), unique only within its collection.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "fetchStrategy": {
+      "description": "How a source is fetched: direct (plain GET, the default) or direct-then-playwright (a headless browser only when the direct fetch trips a fallback trigger, README.md).",
+      "enum": ["direct", "direct-then-playwright"]
+    },
+    "fetchUsed": {
+      "description": "In a run log: the last strategy tried for the source (direct, or playwright after a fallback); none when the source wasn't polled.",
+      "enum": ["direct", "playwright", "none"]
+    }
+  }
+}

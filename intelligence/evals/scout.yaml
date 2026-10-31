@@ -1,0 +1,161 @@
+# Scout eval cases (#352): what fetching and normalizing must produce. Scout is code, so these
+# become unit tests for the collector (#272). Graders name fields of schemas/candidate.schema.json.
+version: 1
+asOf: '2026-10-24'
+stage: scout
+cases:
+  - id: scout-legistar-local-time
+    ref: S1
+    stage: scout
+    tags: [timezone]
+    input:
+      sourceId: legistar-events
+      responses:
+        - via: direct
+          status: 200
+          contentType: application/json
+          body: '[{"EventId":29400,"EventBodyName":"COMMON COUNCIL","EventDate":"2026-10-24T00:00:00","EventTime":"7:00 PM","EventLocation":"Virtual"}]'
+    expected: { fetchStrategy: direct, runStatus: ok, candidateCount: 1 }
+    graders:
+      - { check: equals, field: $.startsAt, value: '2026-10-24T19:00:00-05:00' }
+      - { check: equals, field: $.externalId, value: 'legistar-events:29400' }
+    why: Legistar gives a local date and time; October is CDT, so the offset is -05:00.
+  - id: scout-ics-all-day
+    ref: S2
+    stage: scout
+    tags: [all-day, no-fabrication]
+    input:
+      sourceId: mpl-pinney-events
+      responses:
+        - via: direct
+          status: 200
+          contentType: text/calendar
+          body: |
+            BEGIN:VCALENDAR
+            BEGIN:VEVENT
+            UID:5a1e0c2e-0000-4000-8000-000000000001
+            DTSTART;VALUE=DATE:20261024
+            SUMMARY:Friends of Pinney book sale
+            END:VEVENT
+            END:VCALENDAR
+    expected: { fetchStrategy: direct, runStatus: ok, candidateCount: 1 }
+    graders:
+      - { check: equals, field: $.allDay, value: true }
+      - { check: equals, field: $.startsAt, value: '2026-10-24T00:00:00-05:00' }
+      - { check: isNull, field: $.endsAt }
+    why: An all-day item stays all-day; no start time is invented.
+  - id: scout-rss-script-stripped
+    ref: S3
+    stage: scout
+    tags: [injection]
+    input:
+      sourceId: madison365-news
+      responses:
+        - via: direct
+          status: 200
+          contentType: application/rss+xml
+          body: '<rss><channel><item><guid>m365-1</guid><title>Free concert</title><description><![CDATA[<script>alert(1)</script>Free concert Saturday.]]></description></item></channel></rss>'
+    expected: { fetchStrategy: direct, runStatus: ok, candidateCount: 1 }
+    graders:
+      - { check: notContains, field: $.sourceText, value: '<script' }
+    why: Markup is stripped before any model sees the text.
+  - id: scout-cross-source-match
+    ref: S4
+    stage: scout
+    tags: [duplicate]
+    input:
+      sourceId: legistar-events
+      responses:
+        - via: direct
+          status: 200
+          contentType: application/json
+          body: '[{"EventId":29410,"EventBodyName":"DISTRICT 16 LISTENING SESSION","EventDate":"2026-11-12T00:00:00","EventTime":"6:00 PM","EventLocation":"Pinney Library"}]'
+      otherSources:
+        - sourceId: district16-blog
+          body: '<article><h2>District 16 listening session</h2><p>November 12, 6:00 PM, Pinney Library</p></article>'
+    expected: { fetchStrategy: direct, runStatus: ok, candidateCount: 1 }
+    graders:
+      - { check: contains, field: '$.alsoReportedBy[].sourceId', value: district16-blog }
+    why: 'One meeting, two sources: one candidate from the higher-ranked source, citing both.'
+  - id: scout-js-shell-fallback
+    ref: S5
+    stage: scout
+    tags: [fetch-fallback]
+    input:
+      sourceId: district16-blog
+      responses:
+        - via: direct
+          status: 200
+          contentType: text/html
+          body: '<html><body><div id="app"></div><script src="/app.js"></script></body></html>'
+        - via: playwright
+          status: 200
+          contentType: text/html
+          body: '<article><h2>Week of November 2nd</h2><time datetime="2026-11-02">November 2, 2026</time></article>'
+    expected: { fetchStrategy: playwright, runStatus: ok, candidateCount: 1 }
+    why: A page with no text where posts should be is a JavaScript shell, a fallback trigger.
+  - id: scout-server-error-retry
+    ref: S6
+    stage: scout
+    tags: [retry]
+    input:
+      sourceId: madison-parks-events
+      responses:
+        - { via: direct, status: 503 }
+        - { via: retry, status: 503 }
+    given:
+      sources: [{ id: madison-parks-events, result: valid, pilotRank: 6, cadence: daily }]
+    expected: { fetchStrategy: direct, runStatus: error, retries: 1, candidateCount: 0 }
+    why: A 5xx is retried once, never sent to Playwright; fetchStrategy is direct, the last tried. The source waits for the next run.
+  - id: scout-restricted-not-fetched
+    ref: S7
+    stage: scout
+    tags: [robots, compliance]
+    input:
+      sourceId: dane-county-press
+      responses: []
+    expected: { fetchStrategy: none, runStatus: skipped, candidateCount: 0 }
+    why: A restricted source is never polled, whatever its strategy.
+  - id: scout-paywall-redirect-blocked
+    ref: S8
+    stage: scout
+    tags: [paywall, compliance]
+    input:
+      sourceId: madison365-news
+      responses:
+        - via: direct
+          status: 302
+          redirectTo: https://tollbit.madison.com/search/?f=rss
+    expected: { fetchStrategy: direct, runStatus: blocked, candidateCount: 0 }
+    why: "Synthetic: Madison365's feed answered 200 on 2026-10-24. A redirect to a paid bot gateway is a gate; it isn't followed and Playwright isn't tried. fetchStrategy is direct, the last tried."
+  - id: scout-recurring-one-cancelled
+    ref: X1
+    stage: scout
+    tags: [recurring, cancellation]
+    input:
+      sourceId: mpl-pinney-events
+      responses:
+        - via: direct
+          status: 200
+          contentType: text/calendar
+          body: |
+            BEGIN:VCALENDAR
+            BEGIN:VEVENT
+            UID:5a1e0c2e-0000-4000-8000-000000000002
+            DTSTART;TZID=America/Chicago:20261103T103000
+            RRULE:FREQ=WEEKLY;COUNT=3
+            SUMMARY:Toddler Storytime
+            END:VEVENT
+            BEGIN:VEVENT
+            UID:5a1e0c2e-0000-4000-8000-000000000002
+            RECURRENCE-ID;TZID=America/Chicago:20261110T103000
+            DTSTART;TZID=America/Chicago:20261110T103000
+            STATUS:CANCELLED
+            SUMMARY:Toddler Storytime
+            END:VEVENT
+            END:VCALENDAR
+    expected: { fetchStrategy: direct, runStatus: ok, candidateCount: 3 }
+    graders:
+      - check: model
+        rubric: Exactly one of the three candidates, 2026-11-10, has sourceStatus cancelled; the other two are scheduled and each instance has its own externalId.
+    why: Each instance is its own candidate, so only the cancelled one is withheld downstream.

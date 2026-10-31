@@ -41,8 +41,6 @@ export const text = (value: string): LexicalNode => textNode(value)
 
 export const boldText = (value: string): LexicalNode => textNode(value, 1)
 
-export const italicText = (value: string): LexicalNode => textNode(value, 2)
-
 export const linkNode = (
   label: string,
   url: string,

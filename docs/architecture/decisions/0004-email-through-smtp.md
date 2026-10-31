@@ -24,7 +24,10 @@ the visitor typed (`{{email}}`) would let anyone make the site send mail to any 
 - Owner notifications work; visitor confirmations don't, until a safe design exists (fixed text,
   one validated address, robot check on, possibly verification).
 - The contact form's recipient is set in Admin, not in code.
+- Amended by 0007: the site's own confirmation link may go to a typed address ([0007](0007-email-confirmation.md)). Form
+  emails keep the rule above.
 
 ## Links
 
-- Code: `src/utilities/email.ts`, `src/hooks/formSubmissionGuards.ts`
+- Code: `src/platform/email/emailAdapter.ts`, `src/modules/contact/domain/formEmails.ts`,
+  `src/modules/contact/cms/guardFormEmails.ts`, `src/modules/contact/cms/rateLimits.ts`

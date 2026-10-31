@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Caps the request body on the public form endpoints at Caddy, so an oversized POST is cut off
-# at 256 KB instead of being read in full by Node (#124).
+# Caps the request body on the public form endpoints and the agents' MCP endpoint (#336) at
+# Caddy, so an oversized POST is cut off at 256 KB instead of being read in full by Node (#124).
 #
 # The limit lives in ops/caddy/form-limits.caddy, copied to /etc/caddy. Each Caddy site block
 # that proxies to the app gets one line importing it. Nothing else in the Caddyfile changes,
@@ -26,21 +26,13 @@ CADDYFILE="${CADDYFILE:-/etc/caddy/Caddyfile}"
 LIMITS_FILE="${LIMITS_FILE:-/etc/caddy/sprecher-east-form-limits.caddy}"
 RELOAD_CADDY="${RELOAD_CADDY:-systemctl reload caddy}"
 APP_PORT="${APP_PORT:-3000}"
-SOURCE="$APP_DIR/ops/caddy/form-limits.caddy"
+SOURCE="$CODE_DIR/ops/caddy/form-limits.caddy"
 IMPORT_LINE="import $LIMITS_FILE"
 
 if ! command -v caddy >/dev/null || [ ! -f "$CADDYFILE" ]; then
   report "WARNING: Caddy or $CADDYFILE not found, so no request body limit was added"
   exit 0
 fi
-
-# Never print Caddy's own output: the Caddyfile could hold credentials and the deploy log is public.
-caddy_accepts() { caddy validate --config "$1" --adapter caddyfile >/dev/null 2>&1; }
-caddy_version() {
-  local v
-  v=$(caddy version 2>/dev/null | awk '{ print $1; exit }' || true)
-  echo "${v:-unknown}"
-}
 
 # Status code for a POST of the given body (read from stdin) to the form endpoint, through Caddy.
 post_status() {
@@ -134,7 +126,7 @@ added=$(grep -c '^+' <<<"$changes" || true)
 
 limits_changed=no
 if ! cmp -s "$SOURCE" "$LIMITS_FILE"; then limits_changed=yes; fi
-limit_text="$(sed -n 's/^[[:space:]]*max_size[[:space:]]*//p' "$SOURCE") on the form endpoints, Caddy $(caddy_version)"
+limit_text="$(sed -n 's/^[[:space:]]*max_size[[:space:]]*//p' "$SOURCE") on the form and MCP endpoints, Caddy $(caddy_version)"
 
 if [ "$added" -eq 0 ] && [ "$limits_changed" = no ]; then
   report "Caddy request body limit already in place: $limit_text"

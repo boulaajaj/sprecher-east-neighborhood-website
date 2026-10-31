@@ -6,7 +6,8 @@ module.exports = {
       script: 'node_modules/.bin/next',
       // Listen on loopback only: the internet reaches the app through Caddy, never directly (#118).
       args: 'start -H 127.0.0.1',
-      cwd: '/var/www/sprecher-east',
+      // The live release: a link the deploy switches to each new build (#245, ops/README.md)
+      cwd: '/var/www/sprecher-east/current',
       instances: 1,
       exec_mode: 'fork',
       watch: false,
