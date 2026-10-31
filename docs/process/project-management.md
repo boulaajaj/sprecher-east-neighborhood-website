@@ -84,21 +84,27 @@ optional; the type label stays the required one because the `PR Policy` check re
 
 ## The board
 
-GitHub Project "Sprecher East", owned by `boulaajaj`. The full setup is in #90. Until it exists,
-there's no Sprint or Size field: plan from the milestone.
+[GitHub Project #2 "Sprecher East"](https://github.com/users/boulaajaj/projects/2), owned by
+`boulaajaj` and linked to this repo. It's private, so only the owner's account can open it. It was
+built on 2026-10-21 from the spec in #90.
 
 | Status      | Means                                                                                     |
 | ----------- | ----------------------------------------------------------------------------------------- |
 | Backlog     | Captured, not ready yet.                                                                  |
 | Ready       | Meets the Definition of Ready (below). Can go into a sprint.                              |
-| In progress | Someone (person or agent) is working on it. A PR may be open as a draft.                  |
-| In review   | The PR is open and waiting for its independent review or checks.                          |
+| In progress | Someone (person or agent) is working on it.                                               |
+| In review   | A PR that closes it is open, even as a draft. Linking the PR moves the issue here.        |
 | Done        | Merged: the issue closes and the item moves here on its own. `wrapped` checks any deploy. |
 
 - **Fields:** Status, Sprint, Size (S is under half a day, M is 1–2 days, L is up to 3 days),
   plus the built-in Labels, Milestone, Parent issue and Sub-issue progress.
-- **Views:** This sprint (board), Backlog (grouped by epic), Roadmap (by milestone), and Done last
-  7 days.
+- **Views:** This sprint (board), Backlog (everything not Done; each epic expands to its
+  sub-issues), Roadmap (grouped by milestone, dated by Sprint), and Done last 7 days (issues closed
+  as completed, `reason:completed`).
+- **Automations:** new issues and PRs from this repo join in Backlog, and a sub-issue joins with its
+  parent. Linking a PR moves an issue to In review. Merging its PR, or closing it for any reason
+  (also as not planned), moves it to Done. Moving an item to Done by hand doesn't close the issue.
+  Closed items are archived after two weeks.
 - **Access:** changing the board needs the owner's account with the `project` scope: the owner in
   the web UI, or an agent on his computer signed in with `gh` and that scope. Agents in cloud
   sessions can't reach a board on a personal account, so they keep issue state, labels, parents
@@ -111,7 +117,7 @@ An issue is **Ready** when it has:
 - what and why, in plain language
 - acceptance criteria someone else could check
 - a parent epic, labels (type, area, priority) and a size. When the board can't be read (cloud
-  sessions, or until #90 is done), skip Size and say so on the issue
+  sessions), skip Size and say so on the issue
   ([`project-tracking`](../../.agents/skills/project-tracking/SKILL.md) §1)
 - no open blocker: nothing it's **blocked by** is still open
 - no `needs owner` label: that work waits for the owner, not for a sprint
