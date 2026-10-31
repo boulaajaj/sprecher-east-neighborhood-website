@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 const findPostsAfter = vi.hoisted(() =>
   vi.fn(async () => ({ docs: [], nextCursor: null, totalDocs: 0 })),
 )
-vi.mock('./use-cases/findPostsAfter', () => ({ findPostsAfter }))
+vi.mock('./data/queries', () => ({ findPostsAfter }))
 
 import { loadMorePosts } from './actions'
 

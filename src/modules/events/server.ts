@@ -6,7 +6,7 @@ export { findEventPage } from './use-cases/findEventPage'
 export { findEventsThisWeek } from './use-cases/findEventsThisWeek'
 export { findUpcomingEvents } from './use-cases/findUpcomingEvents'
 export { getEventBySlug } from './use-cases/getEventBySlug'
-export { listEventSlugs } from './use-cases/listEventSlugs'
+export { listEventSlugs } from './data/queries'
 
 export { EventCardPreview } from './ui/EventCardPreview'
 export { eventHeaderProps } from './ui/eventHeader'

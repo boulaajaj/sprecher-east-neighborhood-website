@@ -8,11 +8,11 @@ import { MetaList } from '@/platform/ui/MetaList'
 import { Text } from '@/platform/ui/Text'
 
 import { toForumUrl } from '../domain/forum'
-import { getFooterNav } from '../use-cases/getFooterNav'
+import { getFooter } from '../data/globals'
 import { Logo } from './Logo'
 
 export async function SiteFooter() {
-  const footerData = await getFooterNav()
+  const footerData = await getFooter()
 
   const navItems = footerData?.navItems || []
   // One click to the forum from every page, home included (#485)

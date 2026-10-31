@@ -1,6 +1,7 @@
 import 'server-only'
 
 import type { HumanVerifier } from '@/platform/lib'
+import { runAction, runUseCase } from '@/platform/service'
 
 import { toVerifyAccountFailure } from '../data/failures'
 import {
@@ -12,7 +13,6 @@ import {
 } from '../data/signUp'
 import type { VerifyAccountValues } from '../domain/credentials'
 import type { ActionResult, VerifyAccountFailure } from '../domain/types'
-import { logServerFailure } from './logServerFailure'
 
 /**
  * Verifies an account from its link (#187), once the robot check passes (#303): the page's
@@ -36,28 +36,28 @@ export async function verifyAccountFromLink(
       return { ok: false, failure: 'robot-check' }
     }
   }
-  try {
-    const pending = await findPendingVerification(token)
-    if (!pending && (await wasVerifiedWithToken(token))) {
-      return { ok: false, failure: 'already-verified' }
-    }
-    if (pending?.setsPassword) {
-      if (!newPassword) return { ok: false, failure: 'needs-password' }
-      await setPasswordFromVerification(pending.id, newPassword)
-    }
-    await verifyAccountToken({ token })
-    if (pending) {
-      try {
-        await recordVerifiedToken(pending.id, token)
-      } catch (error) {
-        // The account is verified either way; only the "already confirmed" answer is lost
-        logServerFailure('Recording a used verification link', error)
+  return runAction<VerifyAccountFailure>(
+    'Account verification',
+    async () => {
+      const pending = await findPendingVerification(token)
+      if (!pending && (await wasVerifiedWithToken(token))) {
+        return { ok: false, failure: 'already-verified' }
       }
-    }
-    return { ok: true }
-  } catch (error) {
-    const failure = toVerifyAccountFailure(error)
-    if (failure === 'server-error') logServerFailure('Account verification', error)
-    return { ok: false, failure }
-  }
+      if (pending?.setsPassword) {
+        if (!newPassword) return { ok: false, failure: 'needs-password' }
+        await setPasswordFromVerification(pending.id, newPassword)
+      }
+      await verifyAccountToken({ token })
+      if (pending) {
+        // The account is verified either way; only the "already confirmed" answer is lost
+        await runUseCase(
+          'Recording a used verification link',
+          () => recordVerifiedToken(pending.id, token),
+          undefined,
+        )
+      }
+      return { ok: true }
+    },
+    toVerifyAccountFailure,
+  )
 }

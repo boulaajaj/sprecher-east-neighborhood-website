@@ -82,6 +82,7 @@ grows should split its top level "into domain oriented modules which are interna
   `richTextToPlainText` turns rich text into plain text (Payload's converter) for JSON-LD.
 - `turnstile/`: the robot check (decision 0003), the widget and the server verifier, used by the
   contact form and sign-up; its interface `HumanVerifier` is in `lib/`.
+- `service/`: how a server call that must not throw runs and logs a failure (#521).
 - `email/` and `seo/`.
 
 Routes that serve no single area (`/api/version`, draft preview under `/next/`, the seed route)
@@ -94,11 +95,11 @@ modules' slug lists.
 ```text
 src/modules/events/
   index.ts      types and pure rules only: safe for the proxy, client components and scripts
-  server.ts     server-only entry: re-exports use cases and the components pages render
+  server.ts     server-only entry: re-exports use cases, plain `data/` reads and the components pages render
   actions.ts    server actions ("Load more"); each validates its input and calls a use case
   cms.ts        Payload entry: collection and global configs, blocks, plugin setup for this area
   domain/       types (DTOs included) and rules in plain TypeScript; unit-tested
-  use-cases/    findUpcomingEvents: check who is asking, load through data/, apply rules, return DTOs
+  use-cases/    findUpcomingEvents: who is asking, load, apply rules, return DTOs; none for a plain read
   data/         Local API queries; map documents to the domain's types
   cms/          collection config, fields, hooks, plugin options, admin components (RowLabel)
   ui/           React components, headless hooks (useEventFilters), and a browser client for
@@ -121,13 +122,13 @@ The site's core idea (what an event is, which categories it can have, who may se
 TypeScript in the middle. Payload, Next.js, outside services and the look sit around it, so each
 can be upgraded or replaced without rewriting the core.
 
-| Layer        | Where                                         | Holds                                                                     |
-| ------------ | --------------------------------------------- | ------------------------------------------------------------------------- |
-| Domain       | `domain/`                                     | Types (DTOs included), rules and calculations. Uses only `platform/lib/`. |
-| Application  | `use-cases/`, `actions.ts`                    | Use cases: check who is asking, load, apply domain rules, return DTOs.    |
-| Adapters     | `data/`, `cms/`, `platform/payload/`, clients | Payload queries and configs, Cloudflare, SMTP.                            |
-| Presentation | `app/`, `ui/`, `platform/ui/`                 | Pages and components that render DTOs. No business rules.                 |
-| Theme        | `src/themes/default/`                         | Token values: colors, fonts, radius, shadows.                             |
+| Layer        | Where                                         | Holds                                                                            |
+| ------------ | --------------------------------------------- | -------------------------------------------------------------------------------- |
+| Domain       | `domain/`                                     | Types (DTOs included), rules and calculations. Uses only `platform/lib/`.        |
+| Application  | `use-cases/`, `actions.ts`                    | Use cases: who is asking, load, domain rules, return DTOs (not for plain reads). |
+| Adapters     | `data/`, `cms/`, `platform/payload/`, clients | Payload queries and configs, Cloudflare, SMTP.                                   |
+| Presentation | `app/`, `ui/`, `platform/ui/`                 | Pages and components that render DTOs. No business rules.                        |
+| Theme        | `src/themes/default/`                         | Token values: colors, fonts, radius, shadows.                                    |
 
 One deliberate shortcut: use cases call `data/` functions directly, not through an interface,
 because Payload's Local API is already that abstraction ([0002](decisions/0002-no-repository-layer.md)).
@@ -149,7 +150,7 @@ What this buys:
 ## Dependency rules
 
 1. **Inward only.** Presentation (`ui/`, `app/`) → application (`use-cases/`, `actions.ts`) →
-   domain, and adapters (`data/`, `cms/`) → domain. `domain/` imports no framework and nothing
+   domain, and adapters (`data/`, `cms/`) → domain. A plain read needs no use case (#521). `domain/` imports no framework and nothing
    from `data/`, `cms/` or `ui/`; it may use `platform/lib/`.
 2. **Entry files only.** Outside a module, import it only through its entry files: `index.ts`
    (types and pure rules) from anywhere, including `src/proxy.ts` and client components;
@@ -162,10 +163,10 @@ What this buys:
    the form block from `contact` to `site`'s Pages collection factory. `platform/` imports no
    module.
 4. **Server-only code stays out of the CMS config.** `data/`, `use-cases/` and `server.ts` start
-   with `import 'server-only'`, and only `use-cases/` and `actions.ts` import `data/`. `cms/` and
+   with `import 'server-only'`, and only `use-cases/`, `actions.ts`, `server.ts` and server components in `ui/` import `data/`. `cms/` and
    `cms.ts` never reach anything server-only: the Payload CLI (migrations, seed) loads every hook
    outside Next.js, where `server-only` throws. Hooks use the `req.payload` they are given.
-5. **Client components** get DTOs as props and never import `data/`, `use-cases/` or `server.ts`.
+5. **Client components** (`*.client.tsx`) get DTOs as props and never import `data/`, `use-cases/` or `server.ts`.
    To change something they call a server action (sign-up, sign-in, sign-out and passwords in `accounts`),
    or one of Payload's own REST endpoints through the owning module's browser client (`ui/api.ts`:
    form submissions in `contact`, where the robot check runs).
@@ -205,8 +206,8 @@ the theme test (#146). Vitest aliases
 | You are adding…                                                       | Put it in                                                                                                |
 | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | A business rule (the event categories, `isEventScope`)                | the module's `domain/`, with a unit test                                                                 |
-| A use case other code calls (list, submit, publish)                   | the module's `use-cases/`, exported from `server.ts`; a server action in `actions.ts` calls it           |
-| A database read or write                                              | the module's `data/`, called only from `use-cases/` or `actions.ts`; in a hook, `req.payload`            |
+| A use case other code calls (list, submit, publish)                   | the module's `use-cases/`, exported from `server.ts`; a server action calls it. A plain read has none    |
+| A database read or write                                              | the module's `data/`, called from `use-cases/`, `actions.ts`, `server.ts`; in a hook, `req.payload`      |
 | A color, font, corner radius or shadow                                | a token in `platform/theme/tokens.ts`, with its value in `src/themes/default/`                           |
 | A seasonal ornament or other per-theme behaviour tokens can't express | an option in `platform/theme/options.ts` (with a default), set per theme in `platform/theme/registry.ts` |
 | A button size, card style or other UI variant                         | the primitive in `platform/ui/` (its `cva` variants), not in the feature component                       |
