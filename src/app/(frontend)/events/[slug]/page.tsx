@@ -12,7 +12,6 @@ import { RichText } from '@/platform/richtext/RichText'
 import { richTextBlocks } from '@/platform/richtext/richTextBlocks'
 import { SidebarCTA } from '@/platform/ui/SidebarCTA'
 import {
-  EventCardPreview,
   eventHeaderProps,
   EventLocation,
   SidebarEvents,
@@ -68,8 +67,6 @@ export default async function EventPage({ params: paramsPromise }: Args) {
       {draft && <LivePreviewListener />}
 
       <PageHeader {...eventHeaderProps(event)} />
-
-      {draft && <EventCardPreview event={event} />}
 
       <div className={cn(hasHeroImage && 'pt-8')}>
         <div className="container">

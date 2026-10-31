@@ -11,7 +11,6 @@ export { listPostSlugs } from './use-cases/listPostSlugs'
 export { toTopIssues } from './use-cases/toTopIssues'
 
 export { PostGrid } from './ui/PostGrid'
-export { PostCardPreview } from './ui/PostCardPreview'
 export { postHeaderProps } from './ui/postHeader'
 export { postJsonLd } from './ui/postJsonLd'
 export { PostsFeed } from './ui/PostsFeed.client'
