@@ -51,6 +51,9 @@ Merging code changes to `main` deploys them to production automatically
    The issue forms apply these automatically (`.github/workflows/issue-labels.yml`). The
    allowed values live in one place: `.github/label-policy.json`.
 
+   The issue is groomed into **Ready** first, and set **In progress** when you start, one task at
+   a time ([how we work](docs/process/project-management.md#grooming-and-one-task-at-a-time)).
+
 2. **Branch and pull request.** Work on a branch, never on `main`. Open a PR that:
    - links the issue with a closing keyword (`Closes #123`), or with `Part of #123` when an
      issue needs several PRs (the last one uses `Closes`)
