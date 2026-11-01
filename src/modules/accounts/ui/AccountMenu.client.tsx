@@ -13,7 +13,7 @@ import { useAccount } from './AccountProvider.client'
  * The header's account links: "Log In" and "Sign Up" for a visitor (#296); the account's name
  * and "Sign Out" when signed in. The mobile menu also has "Dashboard" (the admin) for an admin or
  * editor (#378), as the admin bar is hidden on phones; on desktop the admin bar has it, and one
- * more link in the bar would overflow it at 1024 px (#383). `bar` is the desktop header,
+ * more link in the bar would overflow it at 960 px (#383). `bar` is the desktop header,
  * `drawer` the mobile menu.
  */
 export function AccountMenu({ variant }: { variant: 'bar' | 'drawer' }) {
@@ -66,11 +66,16 @@ export function AccountMenu({ variant }: { variant: 'bar' | 'drawer' }) {
         size="sm"
         current={pathname === ACCOUNT_PATH}
         title={account.name || undefined}
-        className="max-w-40"
+        className="max-w-40 compact:max-w-28 compact:px-2"
       >
         <span className="truncate">{label}</span>
       </Link>
-      <Button variant="ghost" size="sm" onClick={signOut}>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={signOut}
+        className="whitespace-nowrap compact:px-2"
+      >
         Sign Out
       </Button>
     </>

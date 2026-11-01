@@ -50,7 +50,7 @@ export const SiteHeaderBar: React.FC<SiteHeaderBarProps> = ({
   // Close the mobile menu if the viewport grows past the desktop breakpoint (e.g. a tablet
   // rotated with the menu open): its close button hides there, and the scroll lock would stay
   useEffect(() => {
-    const desktop = window.matchMedia('(min-width: 64rem)') // Tailwind's lg, in rem so it tracks font size
+    const desktop = window.matchMedia('(min-width: 60rem)') // Tailwind's lg (globals.css), in rem so it tracks font size
     const onChange = (event: MediaQueryListEvent) => {
       if (event.matches) setMobileOpen(false)
     }
@@ -64,13 +64,16 @@ export const SiteHeaderBar: React.FC<SiteHeaderBarProps> = ({
         scrolled ? 'shadow-md' : 'shadow-sm'
       }`}
     >
-      <div className="container flex items-center justify-between py-4">
+      <div className="container flex items-center justify-between py-4 compact:px-4!">
         <NextLink href="/" className="shrink-0">
           <Logo loading="eager" priority="high" />
         </NextLink>
 
         {/* Desktop nav */}
-        {/* Desktop nav starts at lg: below 1024px the items don't fit and the page scrolls sideways */}
+        {/* Desktop nav starts at lg (960px): below it the items don't fit and the page scrolls sideways.
+            In the compact band (960 to 1023px) the bar is tighter (side padding, link padding, the
+            Contact gap and the account name), so a signed-in header still fits a phone's desktop
+            mode, about 980px (#545) */}
         <div className="hidden items-center gap-1 lg:flex">
           <HeaderNav data={data} pathname={pathname} />
           {accountMenu}
@@ -78,7 +81,7 @@ export const SiteHeaderBar: React.FC<SiteHeaderBarProps> = ({
             href="/contact"
             size="sm"
             aria-current={pathname === '/contact' ? 'page' : undefined}
-            className="ml-3"
+            className="ml-3 compact:ml-2"
           >
             Contact
           </Button>

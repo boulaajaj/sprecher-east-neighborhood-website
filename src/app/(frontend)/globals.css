@@ -13,6 +13,9 @@
 @custom-variant sm (@media (width >= theme(--breakpoint-sm)));
 @custom-variant md (@media (width >= theme(--breakpoint-md)));
 @custom-variant lg (@media (width >= theme(--breakpoint-lg)));
+/* Only the band between the new `lg` (960px) and the old one (1024px): a phone's desktop mode, a
+   small tablet. The header uses it to stay on one row; everything from 1024px up is as it was. */
+@custom-variant compact (@media (width >= theme(--breakpoint-lg)) and (width < 64rem));
 @custom-variant xl (@media (width >= theme(--breakpoint-xl)));
 @custom-variant 2xl (@media (width >= theme(--breakpoint-2xl)));
 
@@ -45,7 +48,9 @@
 @theme {
   --breakpoint-sm: 40rem;
   --breakpoint-md: 48rem;
-  --breakpoint-lg: 64rem;
+  /* 960px, not 1024: a phone's "desktop site" mode lays the page out about 980px wide, and it must
+     get the desktop layout (#545). SiteHeaderBar.client.tsx repeats this value for matchMedia. */
+  --breakpoint-lg: 60rem;
   --breakpoint-xl: 80rem;
   --breakpoint-2xl: 86rem;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -74,7 +79,8 @@
 
   @variant lg {
     .container {
-      max-width: var(--breakpoint-lg);
+      /* The content width stays what it was (1024px) now that `lg` starts earlier (#545) */
+      max-width: 64rem;
     }
   }
 
