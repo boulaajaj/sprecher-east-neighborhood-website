@@ -80,7 +80,7 @@ name, the snippet, and why it works.
 | Mobile S  | 320px  | Text wrapping, touch targets (44px min), no horizontal overflow        |
 | Mobile L  | 430px  | Same as above, verify nothing breaks at slightly wider mobile          |
 | Tablet    | 768px  | Grid columns transition, image aspect ratios, nav layout               |
-| Tablet L  | 1024px | Desktop layout kicks in, spacing feels balanced                        |
+| Tablet L  | 1024px | Desktop layout in place (starts at 960px, #545)                        |
 | Desktop   | 1280px | Full layout, nothing feels too wide or too narrow                      |
 | Desktop L | 1920px | Content centered, no ultra-wide stretching, max-width constraints work |
 
