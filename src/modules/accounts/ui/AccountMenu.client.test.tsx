@@ -52,6 +52,30 @@ describe('AccountMenu', () => {
     expect(screen.queryByRole('button', { name: 'Sign Out' })).toBeNull()
   })
 
+  it('holds the visitor links’ room in the bar while the server answers, hidden from everyone (#281)', async () => {
+    let answer: (account: null) => void = () => {}
+    mocks.getSignedInAccount.mockReturnValue(
+      new Promise<null>((resolve) => {
+        answer = resolve
+      }),
+    )
+    render(header())
+
+    // Nothing to click or read yet, so a visitor can't follow a link that may belong to someone else
+    expect(screen.queryByRole('link', { name: 'Log In' })).toBeNull()
+    const bar = screen.getByRole('navigation', { name: 'Bar' })
+    const placeholder = bar.querySelector('[aria-hidden="true"]')
+    expect(placeholder?.className).toContain('invisible')
+    expect(placeholder?.textContent).toBe('Log InSign Up')
+    expect(
+      within(screen.getByRole('navigation', { name: 'Drawer' })).queryByText('Log In'),
+    ).toBeNull()
+
+    answer(null)
+    expect(await screen.findAllByRole('link', { name: 'Log In' })).toHaveLength(2)
+    expect(bar.querySelector('[aria-hidden="true"]')).toBeNull()
+  })
+
   it('shows the signed-in account’s name in both menus, asking the server once', async () => {
     mocks.getSignedInAccount.mockResolvedValue({ name: 'Ada', staff: false })
     render(header())
