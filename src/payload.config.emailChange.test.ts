@@ -1,4 +1,4 @@
-import { REST_PATCH } from '@payloadcms/next/routes'
+import { GRAPHQL_POST, REST_PATCH } from '@payloadcms/next/routes'
 import type { Payload, SanitizedConfig } from 'payload'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 
@@ -23,6 +23,8 @@ beforeAll(async () => {
 }, 60_000)
 
 const password = 'member-password-for-tests'
+// The fixed refusal text (src/modules/accounts/domain/emailChange.ts)
+const EMAIL_CHANGE_NOT_ALLOWED = 'Your email can’t be changed this way. Ask an admin for help.'
 
 async function makeVerifiedAccount(email: string, role: 'guest' | 'resident' | 'editor') {
   const user = await payload.create({
@@ -58,11 +60,18 @@ async function restPatchEmail(id: number, token: string, email: string) {
 describe('changing your own email', () => {
   beforeAll(async () => {
     // The first account on an empty database becomes an admin (#354); it is not one tested
-    await payload.create({
+    const first = await payload.create({
       collection: 'users',
       data: { email: 'first@example.com', password, name: 'First', role: 'guest' },
       disableVerificationEmail: true,
       overrideAccess: true,
+    })
+    // Verified, as opening the emailed link would, so this admin can sign in
+    await payload.db.updateOne({
+      collection: 'users',
+      id: first.id,
+      data: { _verified: true },
+      returning: false,
     })
   })
 
@@ -76,9 +85,9 @@ describe('changing your own email', () => {
     },
   )
 
-  it('is refused in a Local API update made as the member', async () => {
+  it('is refused in a Local API update made as the member, with the fixed text', async () => {
     const member = await makeVerifiedAccount('guest-local@example.com', 'guest')
-    const user = await payload.findByID({
+    const doc = await payload.findByID({
       collection: 'users',
       id: member.id,
       depth: 0,
@@ -89,10 +98,27 @@ describe('changing your own email', () => {
         collection: 'users',
         id: member.id,
         data: { email: 'changed-local@example.com' },
-        user,
+        user: { ...doc, collection: 'users' },
         overrideAccess: false,
       }),
-    ).rejects.toThrow()
+    ).rejects.toThrow(EMAIL_CHANGE_NOT_ALLOWED)
+    expect(await storedEmail(member.id)).toBe(member.email)
+  })
+
+  it('is refused over GraphQL, with the fixed text', async () => {
+    const member = await makeVerifiedAccount('guest-graphql@example.com', 'guest')
+    const handler = GRAPHQL_POST(Promise.resolve(config))
+    const response = await handler(
+      new Request('http://localhost:3000/api/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `JWT ${member.token}` },
+        body: JSON.stringify({
+          query: `mutation { updateUser(id: ${member.id}, data: { email: "changed-graphql@example.com" }) { id } }`,
+        }),
+      }),
+    )
+    const body = (await response.json()) as { errors?: { message: string }[] }
+    expect(JSON.stringify(body.errors)).toContain(EMAIL_CHANGE_NOT_ALLOWED)
     expect(await storedEmail(member.id)).toBe(member.email)
   })
 
@@ -110,14 +136,14 @@ describe('changing your own email', () => {
     expect(response.status).toBe(200)
   })
 
-  it('still lets an admin change another account’s email', async () => {
-    const member = await makeVerifiedAccount('guest-admin-edit@example.com', 'guest')
-    await payload.update({
+  it('still lets a signed-in admin change another account’s email', async () => {
+    const admin = await payload.login({
       collection: 'users',
-      id: member.id,
-      data: { email: 'by-admin@example.com' },
-      overrideAccess: true,
+      data: { email: 'first@example.com', password },
     })
+    const member = await makeVerifiedAccount('guest-admin-edit@example.com', 'guest')
+    const response = await restPatchEmail(member.id, admin.token ?? '', 'by-admin@example.com')
+    expect(response.status).toBe(200)
     expect(await storedEmail(member.id)).toBe('by-admin@example.com')
   })
 })
