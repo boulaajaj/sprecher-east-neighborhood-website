@@ -16,7 +16,11 @@ export async function findFaqEntries(): Promise<FaqEntry[]> {
 
   const result = await payload.find({
     collection: 'faq',
-    depth: 0,
+    // Depth 1 fills in the pages and posts an answer links to, so its links keep their address
+    // (#227); only their slugs are read. A document the reader may not see stays an id, and the
+    // renderer shows that link as plain text.
+    depth: 1,
+    populate: { pages: { slug: true }, posts: { slug: true } },
     limit: MAX_LIST_SIZE,
     sort: 'order',
     overrideAccess: false,
