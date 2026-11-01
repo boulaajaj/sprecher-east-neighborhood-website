@@ -10,12 +10,21 @@ import { revalidateListPage } from './revalidateListPage'
 
 const revalidate = revalidateListPage('resources')
 
-// A link row's URL is required: Payload's own text check (required, maxLength) runs first, then
-// the web-address check, so a row can't save with only a label
-const validateLinkUrl: TextFieldSingleValidation = (value, args) => {
-  const native = text(value, args)
-  return native === true ? checkResourceUrl(value) : native
-}
+// A custom `validate` replaces Payload's own, so each runs Payload's text check first (required,
+// maxLength), then ours. A link row's URL is required, so a row can't save with only a label
+const withTextCheck =
+  (check: (value: string | null | undefined, siblingData: unknown) => true | string) =>
+  (
+    ...[value, args]: Parameters<TextFieldSingleValidation>
+  ): ReturnType<TextFieldSingleValidation> => {
+    const native = text(value, args)
+    return native === true ? check(value, args.siblingData) : native
+  }
+
+const validateUrl = withTextCheck((value) => checkResourceUrl(value))
+const validateCredit = withTextCheck((value, siblingData) =>
+  checkPhotoCredit(value, (siblingData as { photo?: unknown } | undefined)?.photo),
+)
 
 export const Resources: CollectionConfig<'resources'> = {
   slug: 'resources',
@@ -39,7 +48,7 @@ export const Resources: CollectionConfig<'resources'> = {
       name: 'url',
       type: 'text',
       admin: { placeholder: 'https://...' },
-      validate: checkResourceUrl,
+      validate: validateUrl,
     },
     {
       name: 'links',
@@ -60,7 +69,7 @@ export const Resources: CollectionConfig<'resources'> = {
           required: true,
           maxLength: 2048,
           admin: { placeholder: 'https://...' },
-          validate: validateLinkUrl,
+          validate: validateUrl,
         },
       ],
     },
@@ -103,8 +112,7 @@ export const Resources: CollectionConfig<'resources'> = {
             description:
               'Required with a photo. Shown as "Photo: …", so leave out "Photo:", for example "City of Madison, Alder Sean O’Brien".',
           },
-          validate: (value: string | null | undefined, { siblingData }: { siblingData: unknown }) =>
-            checkPhotoCredit(value, (siblingData as { photo?: unknown } | undefined)?.photo),
+          validate: validateCredit,
         },
         {
           name: 'photoSourceUrl',
@@ -115,7 +123,7 @@ export const Resources: CollectionConfig<'resources'> = {
             placeholder: 'https://...',
             description: 'Optional: the page the photo came from. The credit links to it.',
           },
-          validate: checkResourceUrl,
+          validate: validateUrl,
         },
       ],
     },

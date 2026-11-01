@@ -86,6 +86,13 @@ describe('the resources collection (#393)', () => {
     expect(await errorsOf({ photo: image })).toEqual(['photoCredit'])
   })
 
+  it('keeps each text field’s length limit alongside its own check', async () => {
+    const long = `https://example.com/${'a'.repeat(2048)}`
+    expect(await errorsOf({ photo: image, photoCredit: 'x'.repeat(201) })).toEqual(['photoCredit'])
+    expect(await errorsOf({ photoSourceUrl: long })).toEqual(['photoSourceUrl'])
+    expect(await errorsOf({ links: [{ label: 'Blog', url: long }] })).toEqual(['links.0.url'])
+  })
+
   it('still lets an editor delete a photo a resource and its versions use', async () => {
     const extra = await sharp({
       create: { width: 4, height: 4, channels: 3, background: { r: 9, g: 9, b: 9 } },
