@@ -18,6 +18,7 @@ Guidelines say how things should be. Step-by-step procedures are Agent Skills in
 | [UI/UX design](ui-ux-design.md)                     | You change how anything looks: hierarchy, spacing, color, accessibility.       |
 | [Frontend patterns](frontend-patterns/README.md)    | You need a tested snippet for a hero, section, card, CTA, motion or backdrop.  |
 | [Content marketing](content-marketing.md)           | You plan, research or write blog posts and neighborhood news.                  |
+| [Social media](social-media.md)                     | You plan or write posts and replies for Nextdoor, Facebook or other platforms. |
 | [Asana (legacy)](asana-workflow.md)                 | A task is still mirrored in Asana. GitHub issues are the source of truth.      |
 
 ## Changing a guideline

@@ -84,7 +84,7 @@ curl -s -X POST -H "Authorization: Bearer $ASANA_PAT" \
   "https://app.asana.com/api/1.0/tasks"
 ```
 
-Key GIDs (set as user env vars — see onboarding docs in strategy repo):
+Key GIDs (set as user env vars — the archived strategy repo has the old onboarding notes):
 
 - Workspace: `$ASANA_WORKSPACE_GID`
 - Sprint Board project: `$ASANA_PROJECT_GID`
