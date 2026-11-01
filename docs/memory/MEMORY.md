@@ -4,9 +4,9 @@
 
 ## Single Source of Truth
 
-- **Strategy docs (private):** GitHub: `boulaajaj/sprecher-east-strategy` (PRIVATE)
+- **Strategy docs (private, archived):** GitHub: `boulaajaj/sprecher-east-strategy`, read-only history since #538
 - **Website code (public):** This repo → GitHub: `boulaajaj/sprecher-east-neighborhood-website` (PUBLIC)
-- **Asana role tags:** All tasks use `[R#-Role]` prefix — see `Asana-Task-Reference.md` in strategy repo
+- **Asana role tags:** All tasks use `[R#-Role]` prefix (history only: the archived strategy repo)
 
 ## Project Summary
 

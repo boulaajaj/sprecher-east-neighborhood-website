@@ -1,6 +1,6 @@
 # Content Marketing & Community Research
 
-Operational instructions for the A-Content (Content & Voice) and B-Research (Research & Quality) agents. Source: `Marketing-Community-Engagement-Strategy.md` in the strategy repo.
+Operational instructions for the A-Content (Content & Voice) and B-Research (Research & Quality) agents. It lives here now; the archived strategy repo is only history.
 
 ## Weekly Blog Post Workflow
 
@@ -105,6 +105,24 @@ Track these metrics to measure content effectiveness:
 - Aggregate across 12 weeks, identify top themes, adjust calendar, assess impact on neighborhood initiatives
 
 **12-week targets:** 150 unique visitors/post, 10-15 social shares+comments/post, 50% forum member increase from baseline.
+
+## Sources: every factual claim must be checkable
+
+Every factual claim on the site can be traced to a source a neighbor can open. This applies to every
+agent and person who writes content.
+
+| Needs a source                                       | Doesn't need one                     |
+| ---------------------------------------------------- | ------------------------------------ |
+| Boundaries, districts, schools, park sizes           | A welcome or a thank-you             |
+| Dates, times, votes, costs, any statistic            | Our own policies (free, no sign-up)  |
+| Any official designation or what a city body decided | Opinions clearly labeled as opinions |
+
+- Prefer the official page (City of Madison, WisDOT, Dane County) over a news story about it.
+- A longer piece links its sources in the text or ends with a short "Sources" list, and says when
+  it was last checked.
+- If a claim can't be sourced, leave it out or label it as unverified. Never publish a guess.
+- The independent reviewer checks sources before anything goes live
+  ([`pr-review`](../../.agents/skills/pr-review/SKILL.md) for code; the editor's own check for content).
 
 ## Agent Coordination
 
