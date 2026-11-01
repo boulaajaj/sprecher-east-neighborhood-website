@@ -23,14 +23,7 @@ import type { RichTextBlocks } from './RichText'
 export const richTextBlocks = {
   banner: ({ node }) => <BannerBlock className="col-start-2 mb-4" {...node.fields} />,
   mediaBlock: ({ node }) => (
-    <MediaBlock
-      className="col-span-3 col-start-1"
-      imgClassName="m-0"
-      {...node.fields}
-      captionClassName="mx-auto max-w-[48rem]"
-      enableGutter={false}
-      disableInnerContainer={true}
-    />
+    <MediaBlock {...node.fields} placement="inline" captionClassName="mx-auto max-w-[48rem]" />
   ),
   code: ({ node }) => <CodeBlock className="col-start-2" {...node.fields} />,
   timeline: ({ node }) => <Timeline className="col-start-2" {...toTimelineProps(node.fields)} />,

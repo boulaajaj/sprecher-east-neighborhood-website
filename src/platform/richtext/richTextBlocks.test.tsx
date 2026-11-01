@@ -59,17 +59,14 @@ describe('richTextBlocks', () => {
     })
   })
 
-  it('draws a media block across all columns, without its own gutter or container', () => {
+  it('draws a media block inline, with no section padding or container of its own', () => {
     const fields: MediaFields = { blockType: 'mediaBlock', media: 4 }
     const element = richTextBlocks.mediaBlock(argsFor(fields))
 
     expect(element.type).toBe(MediaBlock)
     expect(element.props).toMatchObject({
-      className: 'col-span-3 col-start-1',
-      imgClassName: 'm-0',
+      placement: 'inline',
       captionClassName: 'mx-auto max-w-[48rem]',
-      enableGutter: false,
-      disableInnerContainer: true,
       media: 4,
     })
   })
