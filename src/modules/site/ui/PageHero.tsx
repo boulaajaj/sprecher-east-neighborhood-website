@@ -104,7 +104,8 @@ function FrostedText({ body }: { body: RichTextValue }) {
 function MediumHero({ body, image, links }: PhotoHeroProps) {
   return (
     <div>
-      <Section as="div" spacing="none" className="mb-8">
+      {/* Clear of the site header, with the same space as the low hero (#202) */}
+      <Section as="div" spacing="none" className="mt-16 mb-8">
         {body && <RichText className="mb-6" data={body} enableGutter={false} />}
         <HeroLinks links={links} />
       </Section>
