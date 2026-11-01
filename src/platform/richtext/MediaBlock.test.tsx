@@ -94,10 +94,11 @@ describe('MediaBlock spacing (#541)', () => {
     expect(container.querySelector('.container')).toBeNull()
   })
 
-  it('wraps the caption in a container in the page builder', () => {
+  it('does not nest a second container around the caption in the page builder', () => {
     const { container } = render(<MediaBlock blockType="mediaBlock" media={mediaWithCaption} />)
 
-    expect(screen.getByText('Source: WisDOT').closest('.container')).not.toBeNull()
-    expect(wrapper(container).className).toContain('py-10')
+    // One container, the block's own: a nested one would indent the caption 16px each side
+    expect(container.querySelectorAll('.container')).toHaveLength(1)
+    expect(screen.getByText('Source: WisDOT').closest('.container')).toBe(wrapper(container))
   })
 })

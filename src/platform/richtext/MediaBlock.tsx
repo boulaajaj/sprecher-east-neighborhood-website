@@ -50,7 +50,9 @@ export const MediaBlock: React.FC<Props> = (props) => {
         />
       )}
       {caption && (
-        <div className={cn('mt-6', { container: !inline }, captionClassName)}>
+        // No container of its own in either placement: the block's own container (section) or the
+        // article column (inline) already sets the width, and a nested one would indent the caption
+        <div className={cn('mt-6', captionClassName)}>
           <RichText data={caption} enableGutter={false} />
         </div>
       )}
