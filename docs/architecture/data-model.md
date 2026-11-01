@@ -170,14 +170,15 @@ in), so in effect 12 months after the person's last message. The hourly task
 
 ### resources
 
-| Field                  | Type           | Required | Notes                                                                                                    |
-| ---------------------- | -------------- | -------- | -------------------------------------------------------------------------------------------------------- |
-| `title`                | text           | Yes      |                                                                                                          |
-| `description`, `phone` | textarea, text | No       |                                                                                                          |
-| `url`                  | text           | No       | Validated: must start with `http://` or `https://`                                                       |
-| `category`             | select         | Yes      | `elected-officials`, `public-safety`, `childcare`, `renting`, `parks`, `community`, `utilities`, `other` |
-| `order`                | number         | No       | Default 99; lower first within category; sidebar; also the default sort. No `slug` field                 |
-| `publishedAt`          | date           | No       | Sidebar. Set by hook `populatePublishedAt`                                                               |
+| Field                                    | Type                       | Required              | Notes                                                                                                                                                                                                                                                       |
+| ---------------------------------------- | -------------------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `title`                                  | text                       | Yes                   |                                                                                                                                                                                                                                                             |
+| `description`, `phone`                   | textarea, text             | No                    |                                                                                                                                                                                                                                                             |
+| `url`, `links`                           | text, array                | No                    | `url` is "Visit Website", validated: must start with `http://` or `https://`. `links`: up to 3 rows of `label` (max 60) and `url` (validated the same), shown after it                                                                                      |
+| `category`                               | select                     | Yes                   | `elected-officials`, `public-safety`, `childcare`, `renting`, `parks`, `community`, `utilities`, `other`                                                                                                                                                    |
+| `photo`, `photoCredit`, `photoSourceUrl` | upload → media, text, text | No; credit with photo | Portrait group, in admin only for `elected-officials`, used only with the official's permission (#393). The credit is required with a photo and shown as "Photo: …" (so no leading "Photo:"); the source is validated like `url` and the credit links to it |
+| `order`                                  | number                     | No                    | Default 99; lower first within category; sidebar; also the default sort. No `slug` field                                                                                                                                                                    |
+| `publishedAt`                            | date                       | No                    | Sidebar. Set by hook `populatePublishedAt`                                                                                                                                                                                                                  |
 
 ### team-members
 
@@ -212,7 +213,7 @@ The footer also has `forumUrl` (text, default `https://discourse.sprechereast.or
 - `posts.heroImage` → media (one); `posts.relatedPosts` → posts (many); `posts.categories` → categories (many); `posts.authors` → users (many).
 - `posts.content` (Lexical): `mediaBlock` blocks → media; link nodes → pages | posts. Every rich-text field built on the site's default editor can hold the same link nodes: `faq.answer`, `events.content`, `pages.hero.richText`, the `cta`, `content`, `archive` and `formBlock` rich text, `media.caption`, `forms.confirmationMessage`, `forms.emails[].message` and the `banner` block's text.
 - `events.heroImage` → media (one); `team-members.photo` → media (one). `pages.meta.image`, `posts.meta.image`, `events.meta.image` → media (one), from each collection's SEO tab (`meta_image_id`, and `version_meta_image_id` in the version tables). `categories.parent` → categories (one); `categories.breadcrumbs[].doc` → categories; `media.folder` → payload-folders (one).
-- `header.navItems[].link.reference`, `footer.navItems[].link.reference` → pages | posts (one). `redirects.to.reference` → pages | posts (one); `form-submissions.form` → forms (one, required); `search.doc` → posts | events (one, required); `search.meta.image` → media (one). `users`, `resources`: no outgoing relations; `faq` only through rich-text links.
+- `header.navItems[].link.reference`, `footer.navItems[].link.reference` → pages | posts (one). `redirects.to.reference` → pages | posts (one); `form-submissions.form` → forms (one, required); `search.doc` → posts | events (one, required); `search.meta.image` → media (one). `resources.photo` → media (one). `users`: no outgoing relations; `faq` only through rich-text links.
 
 ## Hooks that change data or caches
 

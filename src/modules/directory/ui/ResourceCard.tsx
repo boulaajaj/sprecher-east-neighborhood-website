@@ -3,14 +3,42 @@ import { ExternalLink, Phone } from 'lucide-react'
 
 import { Link } from '@/platform/ui'
 import { Card, CardFooter, CardTitle } from '@/platform/ui/Card'
+import { ImageCredit } from '@/platform/ui/ImageCredit'
+import { Media } from '@/platform/ui/Media'
 
+import { resourcePortrait } from '../domain/resourcePortrait'
+import { isResourceUrl } from '../domain/resourceUrl'
 import type { ResourceSummary } from '../domain/types'
 
-/** One entry in the resources directory: its name, what it is, and how to reach it. */
+/**
+ * One entry in the resources directory: its name, what it is, and how to reach it. An elected
+ * official's card can also show their portrait, with its credit (#393).
+ */
 export function ResourceCard({ resource }: { resource: ResourceSummary }) {
+  const portrait = resourcePortrait(resource)
+  const links = (resource.links ?? []).filter(({ url }) => isResourceUrl(url))
+
+  const title = <CardTitle className="mb-1.5 text-base">{resource.title}</CardTitle>
+
   return (
     <Card as="article" className="flex flex-col">
-      <CardTitle className="mb-1.5 text-base">{resource.title}</CardTitle>
+      {portrait ? (
+        <div className="mb-3 flex items-center gap-4">
+          <Media
+            resource={portrait}
+            size="80px"
+            className="shrink-0"
+            pictureClassName="block size-20 overflow-hidden rounded-full bg-surface"
+            imgClassName="size-full object-cover"
+          />
+          <div className="min-w-0">
+            {title}
+            <ImageCredit image={portrait} />
+          </div>
+        </div>
+      ) : (
+        title
+      )}
       {resource.description && (
         <p className="mb-3 text-sm leading-relaxed text-muted-foreground">{resource.description}</p>
       )}
@@ -25,6 +53,17 @@ export function ResourceCard({ resource }: { resource: ResourceSummary }) {
             Visit Website
           </Link>
         )}
+        {links.map(({ id, label, url }) => (
+          <Link
+            key={id ?? url}
+            href={url}
+            variant="action"
+            external
+            icon={<ExternalLink aria-hidden="true" />}
+          >
+            {label}
+          </Link>
+        ))}
         {resource.phone && (
           <Link href={`tel:${resource.phone}`} variant="action" icon={<Phone aria-hidden="true" />}>
             {resource.phone}

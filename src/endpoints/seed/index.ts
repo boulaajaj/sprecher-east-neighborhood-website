@@ -15,6 +15,7 @@ import { image1 } from './image-1'
 import { image2 } from './image-2'
 import { image3 } from './image-3'
 import { imageHero1 } from './image-hero-1'
+import { placeholderPortrait, placeholderPortraitFile } from './placeholder-portrait'
 import { post1 } from './post-1'
 import { post2 } from './post-2'
 import { post3 } from './post-3'
@@ -219,13 +220,23 @@ export const seed = async ({
 
   payload.logger.info(`— Seeding resources...`)
 
-  for (const resource of resourceItems) {
+  const portraitDoc = await payload.create({
+    collection: 'media',
+    data: placeholderPortrait,
+    file: await placeholderPortraitFile(),
+  })
+
+  for (const { placeholderPortraitCredit, ...resource } of resourceItems) {
     await payload.create({
       collection: 'resources',
       depth: 0,
       context: { disableRevalidate: true },
       data: {
         ...resource,
+        ...(placeholderPortraitCredit && {
+          photo: portraitDoc.id,
+          photoCredit: placeholderPortraitCredit,
+        }),
         _status: 'published',
       },
     })

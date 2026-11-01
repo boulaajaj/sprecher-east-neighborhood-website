@@ -7,6 +7,9 @@ type ResourceItem = {
   phone?: string
   category: ResourceCategory
   order: number
+  links?: { label: string; url: string }[]
+  /** Shows the seed's placeholder portrait (never a real photo), with this credit (#393) */
+  placeholderPortraitCredit?: string
 }
 
 export const resourceItems: ResourceItem[] = [
@@ -19,6 +22,8 @@ export const resourceItems: ResourceItem[] = [
     phone: '(608) 572-7560',
     category: 'elected-officials',
     order: 1,
+    links: [{ label: 'Alder blog', url: 'https://www.cityofmadison.com/council/district16/blog' }],
+    placeholderPortraitCredit: 'Placeholder image, not the alder',
   },
   {
     title: 'Mayor Satya Rhodes-Conway',

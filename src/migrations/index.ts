@@ -21,6 +21,7 @@ import * as migration_20261027_150134_top_issues from './20261027_150134_top_iss
 import * as migration_20261027_184942_search_status_source from './20261027_184942_search_status_source'
 import * as migration_20261027_193414_forum_url from './20261027_193414_forum_url'
 import * as migration_20261031_214018_guest_role from './20261031_214018_guest_role'
+import * as migration_20261101_182251_resource_portraits from './20261101_182251_resource_portraits'
 
 export const migrations = [
   {
@@ -137,5 +138,10 @@ export const migrations = [
     up: migration_20261031_214018_guest_role.up,
     down: migration_20261031_214018_guest_role.down,
     name: '20261031_214018_guest_role',
+  },
+  {
+    up: migration_20261101_182251_resource_portraits.up,
+    down: migration_20261101_182251_resource_portraits.down,
+    name: '20261101_182251_resource_portraits',
   },
 ]
