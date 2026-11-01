@@ -64,9 +64,12 @@ export function Form<Input extends FieldValues, Output>({
   const showSuccess = status === 'success' && !feedbackHidden && successMessage
   const showError = status === 'error' && !feedbackHidden
 
-  // A success often replaces what had focus (the button); move focus to the message instead
+  // A success often replaces what had focus (the button); move focus to the message instead, and
+  // scroll it clear of the sticky header (`scroll-mt-24` below), or its first line hides (#551)
   useEffect(() => {
-    if (status === 'success') successRef.current?.focus()
+    if (status !== 'success') return
+    successRef.current?.focus()
+    successRef.current?.scrollIntoView({ block: 'start' })
   }, [status])
 
   const submit = form.handleSubmit(async (values) => {
@@ -93,7 +96,7 @@ export function Form<Input extends FieldValues, Output>({
       className={cn('grid items-start gap-6 *:col-span-full sm:grid-cols-2', className)}
     >
       {showSuccess && (
-        <div ref={successRef} tabIndex={-1} className="outline-none">
+        <div ref={successRef} tabIndex={-1} className="scroll-mt-24 outline-none">
           <Alert tone="success">{successMessage}</Alert>
         </div>
       )}

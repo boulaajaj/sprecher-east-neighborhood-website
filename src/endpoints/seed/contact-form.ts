@@ -8,10 +8,7 @@ const CONTACT_EMAIL_FROM = process.env.CONTACT_EMAIL_FROM
 const CONTACT_NOTIFY_EMAIL = process.env.CONTACT_NOTIFY_EMAIL
 
 export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
-  confirmationMessage: root([
-    heading('h2', 'Thank you for reaching out!'),
-    p('Your message has been received. We\u2019ll get back to you as soon as possible.'),
-  ]),
+  confirmationMessage: root([heading('h2', 'Thanks, neighbor!')]),
   confirmationType: 'message',
   // Notify the site owner; never email the address a visitor types in (the form-builder
   // guard drops such emails anyway). Recipient comes from the environment, not the source.

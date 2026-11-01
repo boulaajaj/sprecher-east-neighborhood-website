@@ -61,8 +61,8 @@ grows should split its top level "into domain oriented modules which are interna
 
 `src/platform/` holds what every module uses, and imports no module:
 
-- `lib/`: pure helpers for dates, text, URLs and shared content types; no framework, so the domain
-  may use them.
+- `lib/`: pure helpers for dates, text, URLs, the message catalog and shared content types; no
+  framework, so the domain may use them.
 - `payload/`: role checks and access functions (every module uses them), the `media` uploads
   collection, the CMS link field (`link()`, used by site's and news's blocks) and `resolveLink()`, the default rich-text editor (`defaultLexical`), the `populatePublishedAt` hook and
   the admin dashboard components. Plugin setup is composed in `payload.config.ts`, because each
