@@ -1,8 +1,9 @@
 import type { Metadata } from 'next/types'
 
 import React from 'react'
-import { toResourceSections } from '@/modules/directory'
+import { RESOURCE_SECTION_NOTES, toResourceSections } from '@/modules/directory'
 import { ResourceCard, findResources } from '@/modules/directory/server'
+import { cn } from '@/platform/lib/cn'
 import { mergeOpenGraph } from '@/platform/seo/mergeOpenGraph'
 import { CardGrid, CardGridItem } from '@/platform/ui/CardGrid'
 import { EmptyState } from '@/platform/ui/EmptyState'
@@ -24,20 +25,31 @@ export default async function ResourcesPage() {
       />
 
       <div className="container space-y-16">
-        {sections.map(({ category, label, items }) => (
-          <section key={category}>
-            <Text variant="section" className="mb-6 border-b border-border pb-3">
-              {label}
-            </Text>
-            <CardGrid gap="sm">
-              {items.map((resource) => (
-                <CardGridItem key={resource.id}>
-                  <ResourceCard resource={resource} />
-                </CardGridItem>
-              ))}
-            </CardGrid>
-          </section>
-        ))}
+        {sections.map(({ category, label, items }) => {
+          const note = RESOURCE_SECTION_NOTES[category]
+          return (
+            <section key={category}>
+              <Text
+                variant="section"
+                className={cn('border-b border-border pb-3', note ? 'mb-3' : 'mb-6')}
+              >
+                {label}
+              </Text>
+              {note && (
+                <Text variant="small" className="mb-6">
+                  {note}
+                </Text>
+              )}
+              <CardGrid gap="sm">
+                {items.map((resource) => (
+                  <CardGridItem key={resource.id}>
+                    <ResourceCard resource={resource} />
+                  </CardGridItem>
+                ))}
+              </CardGrid>
+            </section>
+          )
+        })}
 
         {sections.length === 0 && (
           <EmptyState title="Resources are being added." description="Check back soon!" />

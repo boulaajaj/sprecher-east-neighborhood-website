@@ -1065,6 +1065,16 @@ export interface Resource {
   title: string
   description?: string | null
   url?: string | null
+  /**
+   * Up to three more links shown on the card, for example "Alder blog". "Visit Website" above stays the main link.
+   */
+  links?:
+    | {
+        label: string
+        url: string
+        id?: string | null
+      }[]
+    | null
   phone?: string | null
   category:
     | 'elected-officials'
@@ -1075,6 +1085,15 @@ export interface Resource {
     | 'community'
     | 'utilities'
     | 'other'
+  photo?: (number | null) | Media
+  /**
+   * Required with a photo. Shown as "Photo: …", so leave out "Photo:", for example "City of Madison, Alder Sean O’Brien".
+   */
+  photoCredit?: string | null
+  /**
+   * Optional: the page the photo came from. The credit links to it.
+   */
+  photoSourceUrl?: string | null
   /**
    * Lower numbers appear first within category
    */
@@ -1968,8 +1987,18 @@ export interface ResourcesSelect<T extends boolean = true> {
   title?: T
   description?: T
   url?: T
+  links?:
+    | T
+    | {
+        label?: T
+        url?: T
+        id?: T
+      }
   phone?: T
   category?: T
+  photo?: T
+  photoCredit?: T
+  photoSourceUrl?: T
   order?: T
   publishedAt?: T
   updatedAt?: T
