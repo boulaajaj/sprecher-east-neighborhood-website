@@ -1,4 +1,5 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, TextFieldSingleValidation } from 'payload'
+import { text } from 'payload/shared'
 
 import { draftContentAccess } from '@/platform/payload/draftContentAccess'
 import { populatePublishedAt } from '@/platform/payload/populatePublishedAt'
@@ -8,6 +9,13 @@ import { checkPhotoCredit, checkResourceUrl, PORTRAIT_CATEGORY } from '../domain
 import { revalidateListPage } from './revalidateListPage'
 
 const revalidate = revalidateListPage('resources')
+
+// A link row's URL is required: Payload's own text check (required, maxLength) runs first, then
+// the web-address check, so a row can't save with only a label
+const validateLinkUrl: TextFieldSingleValidation = (value, args) => {
+  const native = text(value, args)
+  return native === true ? checkResourceUrl(value) : native
+}
 
 export const Resources: CollectionConfig<'resources'> = {
   slug: 'resources',
@@ -52,7 +60,7 @@ export const Resources: CollectionConfig<'resources'> = {
           required: true,
           maxLength: 2048,
           admin: { placeholder: 'https://...' },
-          validate: checkResourceUrl,
+          validate: validateLinkUrl,
         },
       ],
     },
@@ -82,6 +90,9 @@ export const Resources: CollectionConfig<'resources'> = {
           name: 'photo',
           type: 'upload',
           relationTo: 'media',
+          // A portrait is an image: the media library also holds PDFs and videos, which the
+          // card can't draw as one. Payload applies this when choosing and when saving
+          filterOptions: { mimeType: { contains: 'image/' } },
         },
         {
           name: 'photoCredit',
