@@ -67,6 +67,17 @@ describe('PageHero', () => {
     await expectAccessible(container)
   })
 
+  it('medium and low start clear of the site header, with the same space (#202)', () => {
+    for (const hero of [
+      <PageHero key="medium" variant="medium" body={body} image={image} links={links} />,
+      <PageHero key="low" variant="low" body={body} />,
+    ]) {
+      const { container } = inMain(hero)
+      expect(container.querySelector('h1')?.closest('.mt-16')).not.toBeNull()
+      cleanup()
+    }
+  })
+
   it('low: the title and text only', async () => {
     const { container } = inMain(<PageHero variant="low" body={body} />)
 
