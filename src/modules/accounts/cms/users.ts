@@ -10,6 +10,7 @@ import {
   serverOnlyFieldAccess,
 } from '@/platform/payload/roles'
 
+import { RESET_LINK_LIFETIME_MS } from '../domain/linkLifetimes'
 import { toResetPasswordEmail, toResetPasswordLink } from '../domain/resetEmail'
 import { USERS } from '../domain/usersCollection'
 import { toVerifyAccountEmail, toVerifyAccountLink } from '../domain/verifyAccountEmail'
@@ -59,6 +60,7 @@ export const Users: CollectionConfig = {
     // instead of /admin/reset, so residents never land in the admin (#269). The link uses the
     // configured site address, never the request's Host header.
     forgotPassword: {
+      expiration: RESET_LINK_LIFETIME_MS,
       generateEmailHTML: (args) => resetEmailFor(args?.token).html,
       generateEmailSubject: (args) => resetEmailFor(args?.token).subject,
     },

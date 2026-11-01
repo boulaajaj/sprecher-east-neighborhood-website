@@ -2,6 +2,9 @@
 // A module's domain may import these and nothing else from platform/.
 export { parseClientIp } from './clientIp'
 export type { ImageRef, ResolvedLink, RichTextValue } from './content'
+export { formatDuration } from './formatDuration'
+export { CONFIRMATION_LINK_LIFETIME_MS } from './linkLifetimes'
+export { message, type MessageKey } from './messages'
 export { isSingleAddress, parseEmailAddress } from './emailAddress'
 export { escapeMarkup } from './escapeMarkup'
 export { toEmailHtml, type OutgoingEmail } from './emailLayout'

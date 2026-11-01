@@ -56,7 +56,7 @@ async function requestReset(page: Page, email: string, nth: number) {
   const form = page.getByRole('form', { name: 'Reset password' })
   await form.getByLabel('Email').fill(email)
   await form.getByRole('button', { name: 'Send Reset Link' }).click()
-  await expect(page.getByRole('status')).toContainText('If an account uses that email')
+  await expect(page.getByRole('status')).toContainText('If that email has an account')
   return linkTo(await nthEmailTo(email, nth), '/reset-password')
 }
 
@@ -245,12 +245,12 @@ test.describe('forgot password and reset', () => {
     const form = page.getByRole('form', { name: 'Reset password' })
     await form.getByLabel('Email').fill(nobody)
     await form.getByRole('button', { name: 'Send Reset Link' }).click()
-    await expect(page.getByRole('status')).toContainText('If an account uses that email')
+    await expect(page.getByRole('status')).toContainText('If that email has an account')
 
     await page.goto('/forgot-password')
     await form.getByLabel('Email').fill(resident.email)
     await form.getByRole('button', { name: 'Send Reset Link' }).click()
-    await expect(page.getByRole('status')).toContainText('If an account uses that email')
+    await expect(page.getByRole('status')).toContainText('If that email has an account')
 
     // The second email to this resident: the first was the sign-up confirmation
     const reset = linkTo(await nthEmailTo(resident.email, 2), '/reset-password')

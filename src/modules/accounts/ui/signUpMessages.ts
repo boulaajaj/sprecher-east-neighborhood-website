@@ -1,7 +1,7 @@
+import { message } from '@/platform/lib'
 import { FORM_MESSAGES } from '@/platform/ui'
 
 import type { SignUpFailure, VerifyAccountFailure } from '../domain/types'
-import { VERIFICATION_RESENDS } from '../domain/verificationResends'
 import { GUARD_MESSAGES } from './guardMessages'
 
 /**
@@ -9,7 +9,7 @@ import { GUARD_MESSAGES } from './guardMessages'
  * already uses the email (docs/guidelines/security.md), and it gives everyone the same hint about
  * resending, rather than saying when an address reached its cap (#289).
  */
-export const SIGN_UP_SENT = `Check your email. If the address can have a new account, we’ve sent it a link to confirm it. Open the link to finish, then log in. No email after a few minutes? Check your spam folder, then sign up again to get a new link. After ${VERIFICATION_RESENDS.perWindow} tries, wait ${VERIFICATION_RESENDS.windowMs / 3_600_000} hours.`
+export const SIGN_UP_SENT = message('accounts.signUp.sent')
 
 /** What a visitor reads when signing up fails. `offline`: no answer came back. */
 export function toSignUpErrorMessage(failure: SignUpFailure | 'offline'): string {

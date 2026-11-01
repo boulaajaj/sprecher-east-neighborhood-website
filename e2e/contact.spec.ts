@@ -32,6 +32,9 @@ test.describe('contact the neighborhood team', () => {
     await expectAccessible(page)
     await sendMessage(page, email)
     await expect(page.getByText(/check your email/i)).toBeVisible()
+    // The short thank-you from the seeded form, not the old long one (#551)
+    await expect(page.getByRole('heading', { name: 'Thanks, neighbor!' })).toBeVisible()
+    await expect(page.getByText(/received/i)).toHaveCount(0)
 
     const confirm = await nthEmailTo(email)
     // Nothing reaches the team yet

@@ -22,6 +22,7 @@ that supersedes the old one; don't edit history.
 | [0014](0014-cursor-paging-for-load-more.md)                  | "Load more" asks for what comes after the last item            | 2026-10-27 | Accepted                             |
 | [0015](0015-event-filters-as-pages.md)                       | Each event category filter is a cached page of its own         | 2026-10-27 | Accepted                             |
 | [0016](0016-one-service-helper-no-pass-through-use-cases.md) | One service helper; no use case for a plain read               | 2026-10-31 | Accepted                             |
+| [0017](0017-one-message-catalog.md)                          | One message catalog in code; durations come from the settings  | 2026-11-01 | Accepted                             |
 
 Template for a new record: **Context** (the problem and the forces), **Decision**, **Consequences**
 (what gets easier, what gets harder), **Links** (issues, PRs, sources).
