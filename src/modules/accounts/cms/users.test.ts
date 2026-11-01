@@ -72,7 +72,7 @@ describe('Users', () => {
     )
   })
 
-  it('lets a reset link work for the lifetime the page and email tell people', () => {
+  it('lets a reset link work for the lifetime the forgot-password page tells people', () => {
     const forgot = typeof Users.auth === 'object' ? Users.auth.forgotPassword : undefined
     expect(forgot?.expiration).toBe(RESET_LINK_LIFETIME_MS)
   })

@@ -32,7 +32,10 @@ export function SignUpForm({ email }: { email: string | null }) {
     if (window.location.search) window.history.replaceState(null, '', window.location.pathname)
   }, [])
   useEffect(() => {
-    if (status === 'success') doneRef.current?.focus()
+    if (status !== 'success') return
+    doneRef.current?.focus()
+    // Clear of the sticky header (`scroll-mt-24` below), or the message's first line hides (#551)
+    doneRef.current?.scrollIntoView({ block: 'start' })
   }, [status])
 
   const fail = (failure: SignUpFailure | 'offline') => {
@@ -65,7 +68,7 @@ export function SignUpForm({ email }: { email: string | null }) {
 
   if (status === 'success') {
     return (
-      <div ref={doneRef} tabIndex={-1} className="space-y-6 outline-none">
+      <div ref={doneRef} tabIndex={-1} className="scroll-mt-24 space-y-6 outline-none">
         <Alert tone="success">{SIGN_UP_SENT}</Alert>
         <Link href={SIGN_IN_PATH} variant="action">
           Go to log in

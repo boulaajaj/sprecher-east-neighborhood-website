@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
+import { ACCOUNTS_MESSAGES } from './accounts'
 import { MESSAGES } from './catalog'
+import { CONTACT_MESSAGES } from './contact'
 import { message } from './index'
 
 describe('the message catalog', () => {
@@ -14,6 +16,12 @@ describe('the message catalog', () => {
     for (const [key, sentence] of Object.entries(MESSAGES)) {
       expect(sentence, key).not.toMatch(/\b(\d+|one|two|three|24|an?)\s+(hours?|days?|minutes?)\b/i)
     }
+  })
+
+  it('never lets one area overwrite another’s key', () => {
+    expect(Object.keys(MESSAGES)).toHaveLength(
+      Object.keys(CONTACT_MESSAGES).length + Object.keys(ACCOUNTS_MESSAGES).length,
+    )
   })
 
   it('fills the contact line', () => {

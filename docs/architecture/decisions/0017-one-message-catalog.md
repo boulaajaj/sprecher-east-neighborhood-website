@@ -7,12 +7,14 @@
 
 The messages residents read after sending a form were long, wrote times by hand ("24 hours", "one
 hour") next to the setting that decides them, and could drift from it. The owner (2026-11-01,
-voice session with Claude, quoted on #551): the copy must sound like "a human who understands the
-human experience… in this neighborhood specifically", durations must come from the real settings,
+voice session with Claude, quoted on #551): the copy must sound like a human who understands the
+neighborhood, durations must come from the real settings,
 and the messages should live in one place, in code, so they can be translated later.
 
 Native first (#551): Payload's CMS holds editor content, not interface text tied to security
-behavior; `Intl` formats durations; no i18n library is needed for one language yet.
+behavior. `Intl.DurationFormat` gives "1 hour" or "1 hr", not "an hour" or "a day", and isn't in
+every runtime we target, so `formatDuration` is a small hand-written English table. A translation
+will need a locale-aware version. No i18n library is needed for one language yet.
 
 ## Decision
 
