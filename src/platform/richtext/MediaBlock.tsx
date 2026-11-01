@@ -9,56 +9,48 @@ import type { MediaBlock as MediaBlockProps } from '@/payload-types'
 import { Media } from '@/platform/ui/Media'
 
 type Props = MediaBlockProps & {
-  breakout?: boolean
+  /**
+   * Where the block sits, which decides who owns the space around it (#541):
+   * - `section` (default): a page-builder block. It is its own section, so it brings the
+   *   container and the section padding.
+   * - `inline`: inside rich text. The article flow already spaces its children, so the block opts
+   *   out of the `prose` typography styles (their `picture` margins) and sets one margin, `my-8`,
+   *   like the other rich-text blocks.
+   */
+  placement?: 'section' | 'inline'
   captionClassName?: string
   className?: string
-  enableGutter?: boolean
   imgClassName?: string
   staticImage?: StaticImageData
-  disableInnerContainer?: boolean
 }
 
 export const MediaBlock: React.FC<Props> = (props) => {
   const {
     captionClassName,
     className,
-    enableGutter = true,
     imgClassName,
     media,
+    placement = 'section',
     staticImage,
-    disableInnerContainer,
   } = props
+  const inline = placement === 'inline'
 
   let caption
   if (media && typeof media === 'object') caption = media.caption
 
   return (
-    <div
-      className={cn(
-        'py-10 md:py-14',
-        {
-          container: enableGutter,
-        },
-        className,
-      )}
-    >
+    <div className={cn(inline ? 'my-8' : 'container py-10 md:py-14', className)}>
       {(media || staticImage) && (
         <Media
+          // Only the image opts out of `prose`: the caption below is rich text and keeps it
+          className={cn(inline && 'not-prose')}
           imgClassName={cn('border border-border rounded-[0.8rem]', imgClassName)}
           resource={media}
           src={staticImage}
         />
       )}
       {caption && (
-        <div
-          className={cn(
-            'mt-6',
-            {
-              container: !disableInnerContainer,
-            },
-            captionClassName,
-          )}
-        >
+        <div className={cn('mt-6', { container: !inline }, captionClassName)}>
           <RichText data={caption} enableGutter={false} />
         </div>
       )}
