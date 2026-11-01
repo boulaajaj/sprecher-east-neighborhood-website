@@ -1,104 +1,77 @@
 import { GRAPHQL_POST, REST_PATCH } from '@payloadcms/next/routes'
 import type { Payload, SanitizedConfig } from 'payload'
-import { beforeAll, describe, expect, it, vi } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
+
+import {
+  bootPayload,
+  createAccount,
+  type Account,
+} from '@/platform/payload/testing/inMemoryPayload'
 
 /**
  * An account's email can't be changed to an unconfirmed address (#555). Payload sends a
  * verification link only when an account is created, so an update to `email` would keep the
  * account marked verified without anyone opening a link to the new address. These tests send the
- * writes a signed-in member could try, through Payload's REST handler and the Local API, and check
- * what was stored. Payload runs on an in-memory SQLite database: no file, no network.
+ * writes a signed-in member could try, through Payload's REST and GraphQL handlers and the Local
+ * API, and check what was stored. Payload runs on an in-memory SQLite database.
  */
 
-let config: SanitizedConfig
-let payload: Payload
-
-beforeAll(async () => {
-  vi.stubEnv('DATABASE_URI', 'file::memory:')
-  vi.stubEnv('PAYLOAD_SECRET', 'email-change-test-secret-0123456789')
-  vi.stubEnv('SMTP_HOST', '')
-  const { getPayload } = await import('payload')
-  config = await (await import('@payload-config')).default
-  payload = await getPayload({ config })
-}, 60_000)
-
-const password = 'member-password-for-tests'
 // The fixed refusal text (src/modules/accounts/domain/emailChange.ts)
 const EMAIL_CHANGE_NOT_ALLOWED = 'Your email can’t be changed this way. Ask an admin for help.'
 
-async function makeVerifiedAccount(email: string, role: 'guest' | 'resident' | 'editor') {
-  const user = await payload.create({
-    collection: 'users',
-    data: { email, password, name: role, role },
-    disableVerificationEmail: true,
-    overrideAccess: true,
-  })
-  // Verified, as opening the emailed link would, so the account can sign in
-  await payload.db.updateOne({
-    collection: 'users',
-    id: user.id,
-    data: { _verified: true },
-    returning: false,
-  })
-  const { token } = await payload.login({ collection: 'users', data: { email, password } })
-  return { id: user.id, email, token: token ?? '' }
-}
+let config: SanitizedConfig
+let payload: Payload
+let admin: Account
+
+beforeAll(async () => {
+  ;({ payload, config } = await bootPayload())
+  // The first account on an empty database becomes an admin (#354)
+  admin = await createAccount(payload, 'admin', 'admin')
+}, 60_000)
+
+const tokenFor = async (account: Account) =>
+  (
+    await payload.login({
+      collection: 'users',
+      data: { email: account.email, password: `${account.name}-password-for-tests` },
+    })
+  ).token ?? ''
 
 const storedEmail = async (id: number) =>
   (await payload.findByID({ collection: 'users', id, depth: 0, overrideAccess: true })).email
 
-async function restPatchEmail(id: number, token: string, email: string) {
-  const handler = REST_PATCH(Promise.resolve(config))
-  const request = new Request(`http://localhost:3000/api/users/${id}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', Authorization: `JWT ${token}` },
-    body: JSON.stringify({ email }),
-  })
-  return handler(request, { params: Promise.resolve({ slug: ['users', String(id)] }) })
+async function restPatch(id: number, token: string, body: Record<string, unknown>) {
+  return REST_PATCH(Promise.resolve(config))(
+    new Request(`http://localhost:3000/api/users/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `JWT ${token}` },
+      body: JSON.stringify(body),
+    }),
+    { params: Promise.resolve({ slug: ['users', String(id)] }) },
+  )
 }
 
 describe('changing your own email', () => {
-  beforeAll(async () => {
-    // The first account on an empty database becomes an admin (#354); it is not one tested
-    const first = await payload.create({
-      collection: 'users',
-      data: { email: 'first@example.com', password, name: 'First', role: 'guest' },
-      disableVerificationEmail: true,
-      overrideAccess: true,
-    })
-    // Verified, as opening the emailed link would, so this admin can sign in
-    await payload.db.updateOne({
-      collection: 'users',
-      id: first.id,
-      data: { _verified: true },
-      returning: false,
-    })
-  })
-
   it.each(['guest', 'resident', 'editor'] as const)(
     'is refused over REST for a %s, and the stored email stays',
     async (role) => {
-      const member = await makeVerifiedAccount(`${role}-rest@example.com`, role)
-      const response = await restPatchEmail(member.id, member.token, `new-${role}@example.com`)
+      const member = await createAccount(payload, role, `${role}-rest`)
+      const response = await restPatch(member.id, await tokenFor(member), {
+        email: `new-${role}@example.com`,
+      })
       expect(response.status).toBe(403)
       expect(await storedEmail(member.id)).toBe(member.email)
     },
   )
 
   it('is refused in a Local API update made as the member, with the fixed text', async () => {
-    const member = await makeVerifiedAccount('guest-local@example.com', 'guest')
-    const doc = await payload.findByID({
-      collection: 'users',
-      id: member.id,
-      depth: 0,
-      overrideAccess: true,
-    })
+    const member = await createAccount(payload, 'guest', 'guest-local')
     await expect(
       payload.update({
         collection: 'users',
         id: member.id,
         data: { email: 'changed-local@example.com' },
-        user: { ...doc, collection: 'users' },
+        user: member,
         overrideAccess: false,
       }),
     ).rejects.toThrow(EMAIL_CHANGE_NOT_ALLOWED)
@@ -106,12 +79,14 @@ describe('changing your own email', () => {
   })
 
   it('is refused over GraphQL, with the fixed text', async () => {
-    const member = await makeVerifiedAccount('guest-graphql@example.com', 'guest')
-    const handler = GRAPHQL_POST(Promise.resolve(config))
-    const response = await handler(
+    const member = await createAccount(payload, 'guest', 'guest-graphql')
+    const response = await GRAPHQL_POST(Promise.resolve(config))(
       new Request('http://localhost:3000/api/graphql', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `JWT ${member.token}` },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `JWT ${await tokenFor(member)}`,
+        },
         body: JSON.stringify({
           query: `mutation { updateUser(id: ${member.id}, data: { email: "changed-graphql@example.com" }) { id } }`,
         }),
@@ -123,26 +98,19 @@ describe('changing your own email', () => {
   })
 
   it('still lets a member change other details such as the name', async () => {
-    const member = await makeVerifiedAccount('guest-name@example.com', 'guest')
-    const handler = REST_PATCH(Promise.resolve(config))
-    const response = await handler(
-      new Request(`http://localhost:3000/api/users/${member.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `JWT ${member.token}` },
-        body: JSON.stringify({ name: 'Renamed', email: member.email }),
-      }),
-      { params: Promise.resolve({ slug: ['users', String(member.id)] }) },
-    )
+    const member = await createAccount(payload, 'guest', 'guest-name')
+    const response = await restPatch(member.id, await tokenFor(member), {
+      name: 'Renamed',
+      email: member.email,
+    })
     expect(response.status).toBe(200)
   })
 
   it('still lets a signed-in admin change another account’s email', async () => {
-    const admin = await payload.login({
-      collection: 'users',
-      data: { email: 'first@example.com', password },
+    const member = await createAccount(payload, 'guest', 'guest-admin-edit')
+    const response = await restPatch(member.id, await tokenFor(admin), {
+      email: 'by-admin@example.com',
     })
-    const member = await makeVerifiedAccount('guest-admin-edit@example.com', 'guest')
-    const response = await restPatchEmail(member.id, admin.token ?? '', 'by-admin@example.com')
     expect(response.status).toBe(200)
     expect(await storedEmail(member.id)).toBe('by-admin@example.com')
   })
