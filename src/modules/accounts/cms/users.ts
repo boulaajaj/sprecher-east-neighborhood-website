@@ -18,6 +18,7 @@ import { forgotPasswordFromSiteOnly } from './forgotPasswordFromSiteOnly'
 import { verifyEndpointFromSiteOnly } from './verifyFromSiteOnly'
 import { noPasswordSignInForAgents } from './noPasswordSignInForAgents'
 import { noResetEmailWhileUnverified } from './noResetEmailWhileUnverified'
+import { requireConfirmedEmailChange } from './requireConfirmedEmailChange'
 import { requireCurrentPassword } from './requireCurrentPassword'
 
 /** The reset email for a token Payload just made: its link opens the site's reset page. */
@@ -70,8 +71,9 @@ export const Users: CollectionConfig = {
     },
   },
   hooks: {
-    // Your own password changes only on /account, after your current one is checked (#233)
-    beforeChange: [firstAccountIsAdmin, requireCurrentPassword],
+    // Your own password changes only on /account, after your current one is checked (#233), and
+    // your own email only through the confirm-by-link flow (#555)
+    beforeChange: [firstAccountIsAdmin, requireCurrentPassword, requireConfirmedEmailChange],
     // An agent's MCP API key is its only credential (#336)
     beforeLogin: [noPasswordSignInForAgents],
     // Forgot password only from the site's page (#282), then no reset email to an account whose
