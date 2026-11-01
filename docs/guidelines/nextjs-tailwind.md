@@ -112,7 +112,7 @@ Changes that affect rendering (CSS, Tailwind classes, HTML structure, component 
 
 - `sm: 640px` — mobile → tablet transition
 - `md: 768px` — tablet starts
-- `lg: 1024px` — desktop starts
+- `lg: 960px` — desktop starts (a phone's "desktop site" mode is about 980px wide, #545)
 - `xl: 1280px` — wide desktop
 - `2xl: 1536px` — ultrawide
 

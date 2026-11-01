@@ -34,6 +34,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ data, pathname, mobile, on
           variant="nav"
           size={size}
           current={isActivePath(pathname, link.href)}
+          className={mobile ? undefined : 'compact:px-2'}
           onClick={onNavigate}
         >
           {link.label}
@@ -47,7 +48,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ data, pathname, mobile, on
         icon={<SearchIcon aria-hidden="true" />}
         // In the desktop bar only the magnifier shows, muted until it's the current page
         iconOnly={!mobile}
-        className={mobile ? undefined : 'text-muted-foreground'}
+        className={mobile ? undefined : 'text-muted-foreground compact:px-2'}
         onClick={onNavigate}
       >
         Search

@@ -1,4 +1,7 @@
 // @vitest-environment jsdom
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
+
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -82,5 +85,22 @@ describe('SiteHeaderBar', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Close menu' }))
 
     expect(screen.queryByRole('dialog')).toBeNull()
+  })
+
+  it("closes its menu at the same width the theme's `lg` starts (#545)", () => {
+    // `lg` is 960px so a phone's "desktop site" mode (about 980px) gets the desktop layout; the
+    // header repeats the value for matchMedia, so the two must not drift apart
+    const css = readFileSync(path.resolve(__dirname, '../../../app/(frontend)/globals.css'), 'utf8')
+    const lg = /--breakpoint-lg:\s*([\d.]+rem)/.exec(css)?.[1]
+    const queries: string[] = []
+    vi.stubGlobal('matchMedia', (query: string) => {
+      queries.push(query)
+      return { matches: false, addEventListener: () => {}, removeEventListener: () => {} }
+    })
+
+    renderHeader()
+
+    expect(lg).toBe('60rem')
+    expect(queries).toContain(`(min-width: ${lg})`)
   })
 })
