@@ -64,7 +64,7 @@ export const SiteHeaderBar: React.FC<SiteHeaderBarProps> = ({
         scrolled ? 'shadow-md' : 'shadow-sm'
       }`}
     >
-      <div className="container flex items-center justify-between py-4 compact:px-4">
+      <div className="container flex items-center justify-between py-4 compact:px-4!">
         <NextLink href="/" className="shrink-0">
           <Logo loading="eager" priority="high" />
         </NextLink>
