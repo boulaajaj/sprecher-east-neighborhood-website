@@ -21,40 +21,47 @@ export function AccountMenu({ variant }: { variant: 'bar' | 'drawer' }) {
   const pathname = usePathname()
   const bar = variant === 'bar'
 
+  const visitorLinks = (
+    <>
+      <Link
+        href={SIGN_IN_PATH}
+        variant="nav"
+        size={bar ? 'sm' : undefined}
+        current={pathname === SIGN_IN_PATH}
+      >
+        Log In
+      </Link>
+      {/* Outlined in the bar, so it stands out without competing with the Contact button */}
+      {bar ? (
+        <Button
+          href={SIGN_UP_PATH}
+          variant="secondary"
+          size="sm"
+          aria-current={pathname === SIGN_UP_PATH ? 'page' : undefined}
+          className="ml-2"
+        >
+          Sign Up
+        </Button>
+      ) : (
+        <Link href={SIGN_UP_PATH} variant="nav" current={pathname === SIGN_UP_PATH}>
+          Sign Up
+        </Link>
+      )}
+    </>
+  )
+
   if (loading) {
-    return bar ? <div className="h-9 w-16 animate-pulse rounded-md bg-border" /> : null
+    // While the server answers, the bar holds the room the visitor links take (the common case),
+    // invisible and out of the tab order and the accessibility tree, so the header doesn't shift
+    // when they appear (#281). The mobile menu shows nothing.
+    return bar ? (
+      <div aria-hidden="true" className="invisible contents">
+        {visitorLinks}
+      </div>
+    ) : null
   }
 
-  if (!account) {
-    return (
-      <>
-        <Link
-          href={SIGN_IN_PATH}
-          variant="nav"
-          size={bar ? 'sm' : undefined}
-          current={pathname === SIGN_IN_PATH}
-        >
-          Log In
-        </Link>
-        {/* Outlined in the bar, so it stands out without competing with the Contact button */}
-        {bar ? (
-          <Button
-            href={SIGN_UP_PATH}
-            variant="secondary"
-            size="sm"
-            aria-current={pathname === SIGN_UP_PATH ? 'page' : undefined}
-            className="ml-2"
-          >
-            Sign Up
-          </Button>
-        ) : (
-          <Link href={SIGN_UP_PATH} variant="nav" current={pathname === SIGN_UP_PATH}>
-            Sign Up
-          </Link>
-        )}
-      </>
-    )
-  }
+  if (!account) return visitorLinks
 
   const label = account.name || 'Account'
   return bar ? (

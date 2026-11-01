@@ -1,6 +1,7 @@
 import type { Page } from '@playwright/test'
 
 import { expireResetLink } from './support/db'
+import { expectHeaderSignedIn, expectHeaderSignedOut } from './support/header'
 import { emailsTo, linkTo, nthEmailTo } from './support/mailbox'
 import { expect, expectAccessible, newEmail, newPassword, test } from './support/test'
 
@@ -195,6 +196,14 @@ test.describe('sign in', () => {
 
     await logIn(page, resident.email, resident.password)
     await expect(page).toHaveURL(/\/account/)
+
+    // The header follows the session: after signing in, after a reload, and after signing out (#281)
+    await expectHeaderSignedIn(page, resident.name)
+    await page.reload()
+    const header = await expectHeaderSignedIn(page, resident.name)
+    await header.getByRole('button', { name: 'Sign Out' }).click()
+    await expect(page).toHaveURL('/')
+    await expectHeaderSignedOut(page)
   })
 
   test('after five wrong passwords the account is locked, and a reset gets the resident back in', async ({
