@@ -31,5 +31,16 @@
       "src/modules/site/use-cases/getRedirectTarget.ts"
     ]
   },
-  { "note": "src/platform/ui/README.md", "paths": ["src/platform/ui/**"] }
+  { "note": "src/platform/ui/README.md", "paths": ["src/platform/ui/**"] },
+  {
+    "note": "src/platform/payload/README.md",
+    "paths": [
+      "src/platform/payload/**",
+      "src/platform/lib/**",
+      "src/platform/seo/**",
+      "src/platform/email/**",
+      "src/platform/turnstile/**",
+      "src/platform/service/**"
+    ]
+  }
 ]
