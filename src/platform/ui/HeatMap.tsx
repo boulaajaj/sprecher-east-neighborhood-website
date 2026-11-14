@@ -49,14 +49,18 @@ export type HeatMapProps = {
   max?: number
   /** Makes the days pressable, to choose some of them; the map is then a group of buttons, not an image */
   selection?: DaySelection
+  /** The day that wears the ring: defaults to the last day, `null` for none (a past month has no today) */
+  today?: string | null
+  /** Whether the days after the last one in its week are dashed outlines, "still to come"; a finished period leaves them empty. Defaults to true */
+  toCome?: boolean
   /** A short caption under the squares that says what they show, with a Less-to-More key beside it */
   caption?: string
   className?: string
 }
 
 /**
- * The caption and a Less-to-More key built from the same shades as the squares. Side by side from
- * one line at every width. The swatches are decoration: `label` already lists every value.
+ * The caption and a Less-to-More key built from the same shades as the squares. On one line
+ * at every width. The swatches are decoration: `label` already lists every value.
  */
 function HeatKey({ caption }: { caption: string }) {
   return (
@@ -105,8 +109,11 @@ export function HeatMap({
   max,
   selection,
   caption,
+  today,
+  toCome = true,
   className,
 }: HeatMapProps) {
+  const ringDay = today === undefined ? days[days.length - 1] : today
   const top = max ?? Math.max(0, ...values)
   const square = selection ? PRESSABLE_SQUARE : SQUARE
 
@@ -133,7 +140,7 @@ export function HeatMap({
                   selection ? 'h-11 lg:h-9' : 'h-5',
                   shadeFor(values[index] ?? 0, top),
                 )}
-                ringed={index === days.length - 1}
+                ringed={day === ringDay}
                 selection={selection}
               />
             ))}
@@ -178,6 +185,7 @@ export function HeatMap({
                 {first ? mondayOf(first.day) : ''}
               </span>
               {row.map((cell, colIndex) => {
+                if (cell === undefined && !toCome) return <span key={colIndex} className={square} />
                 if (cell === undefined) {
                   return (
                     <span
@@ -194,7 +202,7 @@ export function HeatMap({
                     day={cell.day}
                     value={cell.value}
                     className={cn(square, shadeFor(cell.value, top))}
-                    ringed={cell.day === days[days.length - 1]}
+                    ringed={cell.day === ringDay}
                     selection={selection}
                   />
                 )

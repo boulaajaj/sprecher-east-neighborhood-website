@@ -95,6 +95,7 @@ export const COMPONENT_GROUPS = [
       'Breadcrumbs',
       'OnThisPage',
       'LoadMoreFooter',
+      'PeriodNav',
       'AdminBar',
       'LivePreviewListener',
       'VersionCheck',
@@ -130,9 +131,13 @@ export const COMPONENT_GROUPS = [
       'ScaledBreakdown',
       'ChartCaption',
       'AreaChart',
-      'HeatMap',
-      'HeatCell',
     ],
+  },
+  {
+    slug: 'activity-maps',
+    title: 'Activity maps',
+    intro: 'Days drawn as squares, darker for more, that can be pressed to choose them.',
+    components: ['HeatMap', 'HeatCell'],
   },
   {
     slug: 'shares',

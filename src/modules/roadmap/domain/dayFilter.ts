@@ -32,17 +32,23 @@ export function matchesDays(issue: PlanIssue, days: readonly string[]): boolean 
 }
 
 /** How many issues were finished and how many were opened on a day */
-export function dayCounts(issues: readonly PlanIssue[], day: string) {
-  const counted = issues.filter((issue) => issue.state !== 'not-planned')
-  return {
-    finished: counted.filter(
-      (issue) =>
-        issue.state === 'done' && issue.closedAt && siteDate(new Date(issue.closedAt)) === day,
-    ).length,
-    opened: counted.filter(
-      (issue) => issue.createdAt && siteDate(new Date(issue.createdAt)) === day,
-    ).length,
+export type DayCount = { finished: number; opened: number }
+
+/** Finished and opened counts for every day something happened; a day with nothing is left out */
+export function activityByDay(issues: readonly PlanIssue[]): Record<string, DayCount> {
+  const activity: Record<string, DayCount> = {}
+  for (const issue of issues) {
+    if (issue.state === 'not-planned') continue
+    const bump = (iso: string | null, kind: keyof DayCount) => {
+      if (!iso) return
+      const day = siteDate(new Date(iso))
+      activity[day] ??= { finished: 0, opened: 0 }
+      activity[day][kind] += 1
+    }
+    bump(issue.createdAt, 'opened')
+    if (issue.state === 'done') bump(issue.closedAt, 'finished')
   }
+  return activity
 }
 
 /** The days of `pick` the level above allows: all of them when nothing is chosen above, none under a single day */

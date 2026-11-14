@@ -181,6 +181,8 @@ const HEAT_WEEKS = Array.from({ length: 26 }, (_, i) => {
   return new Date(Date.UTC(2026, 9, 20 + i)).toISOString().slice(0, 10)
 })
 
+const HEAT_MONTH = Array.from({ length: 31 }, (_, i) => `2026-10-${String(i + 1).padStart(2, '0')}`)
+
 /** The day-by-day squares: a week strip across its box and four weeks as Monday rows */
 export function HeatMapGallery() {
   return (
@@ -220,6 +222,20 @@ export function HeatMapGallery() {
           days={HEAT_WEEKS}
           values={HEAT_WEEKS.map((_, i) => (i * 7) % 6)}
           label="Sample: finished each day over four weeks"
+        />
+      </GalleryVariant>
+      <GalleryVariant
+        label="calendar, a past month, no today and no days to come"
+        className="block"
+      >
+        <HeatMap
+          caption="Work done per day"
+          variant="calendar"
+          days={HEAT_MONTH}
+          values={HEAT_MONTH.map((_, i) => (i * 5) % 7)}
+          today={null}
+          toCome={false}
+          label="Sample: finished each day in October"
         />
       </GalleryVariant>
     </GalleryEntry>

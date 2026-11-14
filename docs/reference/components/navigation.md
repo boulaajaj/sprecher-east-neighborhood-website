@@ -57,6 +57,26 @@ Source: `src/platform/ui/LoadMore.client.tsx`
 - Modules: `events`, `news`
 - Routes: `/dev/gallery`
 
+## `PeriodNav`
+
+Source: `src/platform/ui/PeriodNav.tsx`
+
+| Prop               | Type         | Required | Description                                                          |
+| ------------------ | ------------ | -------- | -------------------------------------------------------------------- |
+| `title`            | `string`     | yes      |                                                                      |
+| `previousLabel`    | `string`     | yes      | What assistive technology calls each button, such as "Earlier month" |
+| `nextLabel`        | `string`     | yes      |                                                                      |
+| `onPrevious`       | `() => void` | yes      |                                                                      |
+| `onNext`           | `() => void` | yes      |                                                                      |
+| `previousDisabled` | `boolean`    | no       | A direction that cannot go any further                               |
+| `nextDisabled`     | `boolean`    | no       |                                                                      |
+| `className`        | `string`     | no       |                                                                      |
+
+**Used by** (direct imports):
+
+- Modules: `roadmap`
+- Routes: `/dev/gallery`
+
 ## `AdminBar`
 
 Source: `src/platform/ui/AdminBar.client.tsx`

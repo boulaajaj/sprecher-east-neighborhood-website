@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  dayCounts,
+  activityByDay,
   effectiveDays,
   epicScope,
   matchesDays,
@@ -54,18 +54,22 @@ describe('matchesDays', () => {
   })
 })
 
-describe('dayCounts', () => {
-  it('counts what was finished and what was opened on a day', () => {
+describe('activityByDay', () => {
+  it('counts what was finished and what was opened on each day, leaving quiet days out', () => {
     const issues = [
       issue(1, { createdAt: '2026-11-12T18:00:00Z' }),
       issue(2, {
         createdAt: '2026-11-12T19:00:00Z',
         state: 'done',
-        closedAt: '2026-11-12T20:00:00Z',
+        closedAt: '2026-11-13T20:00:00Z',
       }),
-      issue(3, { state: 'done', closedAt: '2026-11-12T21:00:00Z' }),
+      issue(3, { state: 'done', createdAt: null, closedAt: '2026-11-13T21:00:00Z' }),
+      issue(4, { state: 'not-planned', createdAt: '2026-11-12T18:00:00Z' }),
     ]
-    expect(dayCounts(issues, '2026-11-12')).toEqual({ finished: 2, opened: 2 })
+    expect(activityByDay(issues)).toEqual({
+      '2026-11-12': { finished: 0, opened: 2 },
+      '2026-11-13': { finished: 2, opened: 0 },
+    })
   })
 })
 
