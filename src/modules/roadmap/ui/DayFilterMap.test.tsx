@@ -34,9 +34,9 @@ describe('DayFilterMap month browsing', () => {
     renderMap()
     expect(screen.getByText('Last four weeks')).toBeTruthy()
     expect(screen.getByRole('group', { name: /^Activity over four weeks/ })).toBeTruthy()
-    expect(
-      (screen.getByRole('button', { name: 'Later month' }) as HTMLButtonElement).disabled,
-    ).toBe(true)
+    expect(screen.getByRole('button', { name: 'Later month' }).getAttribute('aria-disabled')).toBe(
+      'true',
+    )
   })
 
   it('steps back one full calendar month at a time and forward again', () => {
@@ -60,12 +60,12 @@ describe('DayFilterMap month browsing', () => {
     renderMap('2026-10-15')
     fireEvent.click(earlier())
     expect(screen.getByText('October 2026')).toBeTruthy()
-    expect((earlier() as HTMLButtonElement).disabled).toBe(true)
+    expect(earlier().getAttribute('aria-disabled')).toBe('true')
   })
 
   it('cannot go back when everything happened this month', () => {
     renderMap('2026-11-12')
-    expect((earlier() as HTMLButtonElement).disabled).toBe(true)
+    expect(earlier().getAttribute('aria-disabled')).toBe('true')
   })
 
   it('offers every day of the month to press, none still to come', () => {

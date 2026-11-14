@@ -34,14 +34,19 @@ describe('PeriodNav', () => {
     expect(onNext).toHaveBeenCalledTimes(1)
   })
 
-  it('disables a direction that cannot go on', () => {
-    render(<PeriodNav {...props({ previousDisabled: true })} />)
+  it('marks a direction that cannot go on, keeps it focusable and ignores a press', () => {
+    const onPrevious = vi.fn()
+    render(<PeriodNav {...props({ previousDisabled: true, onPrevious })} />)
+    const previous = screen.getByRole('button', { name: 'Earlier month' }) as HTMLButtonElement
+    expect(previous.getAttribute('aria-disabled')).toBe('true')
+    expect(previous.disabled).toBe(false)
+    previous.focus()
+    fireEvent.click(previous)
+    expect(onPrevious).not.toHaveBeenCalled()
+    expect(document.activeElement).toBe(previous)
     expect(
-      (screen.getByRole('button', { name: 'Earlier month' }) as HTMLButtonElement).disabled,
-    ).toBe(true)
-    expect(
-      (screen.getByRole('button', { name: 'Later month' }) as HTMLButtonElement).disabled,
-    ).toBe(false)
+      screen.getByRole('button', { name: 'Later month' }).getAttribute('aria-disabled'),
+    ).toBeNull()
   })
 
   it('announces a change of title politely', () => {

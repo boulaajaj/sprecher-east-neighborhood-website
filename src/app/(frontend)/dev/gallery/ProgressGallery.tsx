@@ -181,9 +181,9 @@ const HEAT_WEEKS = Array.from({ length: 26 }, (_, i) => {
   return new Date(Date.UTC(2026, 9, 20 + i)).toISOString().slice(0, 10)
 })
 
-/** The day-by-day squares: a week strip across its box and four weeks as Monday rows */
 const HEAT_MONTH = Array.from({ length: 31 }, (_, i) => `2026-10-${String(i + 1).padStart(2, '0')}`)
 
+/** The day-by-day squares: a week strip across its box and four weeks as Monday rows */
 export function HeatMapGallery() {
   return (
     <GalleryEntry

@@ -6,6 +6,9 @@ import { cn } from '@/platform/lib/cn'
 import { Button } from './Button'
 import { Text } from './Text'
 
+/** A direction that cannot go on stays focusable (`aria-disabled`, not `disabled`), so keyboard focus isn't lost when a press reaches the end */
+const STOPPED = 'cursor-not-allowed opacity-60'
+
 /*
  * A title with a button on each side to step to the period before and the one after it, such as
  * the month a calendar shows. It holds no state: the caller says what the title is, which way can
@@ -40,8 +43,9 @@ export function PeriodNav({
         variant="ghost"
         size="icon"
         aria-label={previousLabel}
-        disabled={previousDisabled}
-        onClick={onPrevious}
+        aria-disabled={previousDisabled || undefined}
+        className={cn(previousDisabled && STOPPED)}
+        onClick={previousDisabled ? undefined : onPrevious}
       >
         <ChevronLeft aria-hidden="true" />
       </Button>
@@ -54,8 +58,9 @@ export function PeriodNav({
         variant="ghost"
         size="icon"
         aria-label={nextLabel}
-        disabled={nextDisabled}
-        onClick={onNext}
+        aria-disabled={nextDisabled || undefined}
+        className={cn(nextDisabled && STOPPED)}
+        onClick={nextDisabled ? undefined : onNext}
       >
         <ChevronRight aria-hidden="true" />
       </Button>
