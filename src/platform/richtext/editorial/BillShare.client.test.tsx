@@ -119,12 +119,12 @@ describe('BillShare', () => {
     expect(container.querySelector('path[data-pie-slice]')).toBeNull()
   })
 
-  it('lists the bill as a receipt in the rows’ order: the City, schools, county, college, then the total above', () => {
+  it('lists the bill as a receipt from the largest share to the smallest: schools, the City, county, college, then the total above', () => {
     const { container } = render(<BillShare {...PROPS}>x</BillShare>)
     fireEvent.click(screen.getByRole('button', { name: '2026' }))
     expect(rowsOf().map((row) => row?.replace(/\d+%\$[\d,]+$/, '').trim())).toEqual([
-      'City of Madison',
       'Metropolitan Schools',
+      'City of Madison',
       'Dane County',
       'Madison College, MATC',
     ])
@@ -132,7 +132,7 @@ describe('BillShare', () => {
       Array.from(container.querySelectorAll('rect[data-share-bar]')).map((rect) =>
         rect.getAttribute('data-share-bar'),
       ),
-    ).toEqual(['city', 'schools', 'county', 'matc'])
+    ).toEqual(['schools', 'city', 'county', 'matc'])
     expect(bill().lastElementChild?.lastElementChild?.textContent).toMatch(
       /^Total property tax\$8,9\d\d$/,
     )

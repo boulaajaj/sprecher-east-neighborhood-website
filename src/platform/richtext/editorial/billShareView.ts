@@ -8,7 +8,7 @@ import {
 import { formatWholeDollars } from '@/platform/lib/chart/format'
 import type { ShareSlice } from '@/platform/ui/ShareBill'
 
-/** The slices in the order the bar and the receipt show them: the City first */
+/** The order of two bodies with the same share: the City first, the one a reader knows (#1202) */
 const SLICE_ORDER: readonly BillBody[] = ['city', 'schools', 'county', 'matc']
 
 /** A slice's tone: the City highlighted, the others three grays, the schools' the lightest */
@@ -20,7 +20,7 @@ const TONE: Record<BillBody, ShareSlice['tone']> = {
 }
 
 export type Receipt = {
-  /** The bar's slices and the receipt's rows, City first; none until every body has a rate */
+  /** The receipt's rows, the largest share first; none until every body has a rate (#1202) */
   slices: ShareSlice[]
   /** The line under the rows, or null when the bill is not whole */
   total: { label: string; amount: string } | null
@@ -58,6 +58,8 @@ export function receiptFor(bill: Bill | null, homeValue: number | null): Receipt
             ]
           : []
       })
+        // Stable, so equal shares keep SLICE_ORDER; follows the amounts for every year and home value
+        .sort((a, b) => b.share - a.share)
     : []
   return {
     slices,
