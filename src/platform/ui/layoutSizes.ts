@@ -51,11 +51,13 @@ export const FIGURE_GAP = 'my-[var(--figure-gap)]'
 export const LEGEND_GAP = '-mt-[calc(var(--figure-gap)_-_var(--legend-gap))]'
 
 /**
- * How wide a chart's drawing runs (#681). In the page it is a thumbnail, 20rem: the drawing's own
- * 320-unit width at 1:1, so its labels are the size they were designed at. In the enlarged dialog
- * it fills a 40rem body. Both numbers are variables in globals.css; no adapter sets a width.
+ * How wide a chart's drawing runs (#681, #1206). Stacked (a phone, a narrow column) it fills the
+ * width up to 28rem, so its labels stay large; from the chart's `2xl` container it is a thumbnail,
+ * 20rem: the drawing's own 320-unit width at 1:1, with the text beside it. In the enlarged dialog
+ * it fills a 40rem body. The numbers are variables in globals.css; no adapter sets a width.
  */
-export const CHART_SMALL_WIDTH = 'max-w-[var(--chart-small-width)]'
+export const CHART_SMALL_WIDTH =
+  'max-w-[var(--chart-stack-width)] @2xl/chart:max-w-[var(--chart-small-width)]'
 export const CHART_LARGE_WIDTH =
   'max-w-[var(--chart-large-width)] [&_[data-chart-drawing]]:max-w-full'
 

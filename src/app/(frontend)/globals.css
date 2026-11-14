@@ -117,6 +117,9 @@
   /* How wide a chart's drawing runs as a thumbnail in the page and enlarged in its dialog (#681).
      20rem is the drawing's own 320-unit width at 1:1. Classes: platform/ui/layoutSizes.ts */
   --chart-small-width: 20rem;
+  /* Stacked layout (a phone, a narrow column): the drawing fills the width up to this, so its labels stay
+     large for readers who see poorly, without growing huge on a tablet (#1206) */
+  --chart-stack-width: 28rem;
   --chart-large-width: 40rem;
 
   /* The least height of a short page, and of a hero band (#616) */
