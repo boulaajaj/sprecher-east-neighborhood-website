@@ -136,22 +136,25 @@ describe('filterPlan: a pick that matches nothing', () => {
     expect(filterPlan(only13, ['2026-11-12'], {}, NOW).missions).toEqual([])
   })
 
-  it('keeps a project the same way, with its mission', () => {
-    const two = {
+  it('keeps a project the same way, with its mission, when its day has nothing in it', () => {
+    const projectOnly13 = {
       ...only13,
       milestones: [
         mission(3, [
-          epic(40, [finished(400, '2026-11-13T18:00:00Z'), finished(401, '2026-11-12T18:00:00Z')]),
+          epic(40, [finished(400, '2026-11-13T18:00:00Z')]),
+          epic(41, [finished(401, '2026-11-12T18:00:00Z')]),
         ]),
       ],
     }
     const result = filterPlan(
-      two,
+      projectOnly13,
       top,
-      { [missionScope(3)]: ['2026-11-12', '2026-11-13'], [epicScope(40)]: ['2026-11-12'] },
+      { [missionScope(3)]: top, [epicScope(40)]: ['2026-11-12'] },
       NOW,
     )
-    expect(result.missions[0].epics[0].pick).toEqual(['2026-11-12'])
+    const kept = result.missions[0].epics.find(({ epic: e }) => e.number === 40)
+    expect(kept?.pick).toEqual(['2026-11-12'])
+    expect(kept?.epic.children).toEqual([])
     expect(result.total).toBe(1)
   })
 })
