@@ -2,6 +2,8 @@ import React from 'react'
 
 import { cn } from '@/platform/lib/cn'
 
+import { HeatCell, type DaySelection } from './HeatCell'
+
 /*
  * How much happened each day, as squares: darker means more. `week` is a strip of the days it is
  * given that stretches to the width of its box, with a weekday letter above each square;
@@ -15,8 +17,13 @@ const LETTERS = 'MTWTFSS'
 const DAYS_IN_WEEK = 7
 
 /** Shades from least to most, by share of the largest value; a day with nothing is the faintest */
-const SHADES = ['bg-done/30', 'bg-done/50', 'bg-done/75', 'bg-done'] as const
-const NOTHING = 'bg-done/10'
+const SHADES = [
+  'bg-done/30 hover:bg-done/30',
+  'bg-done/50 hover:bg-done/50',
+  'bg-done/75 hover:bg-done/75',
+  'bg-done hover:bg-done',
+] as const
+const NOTHING = 'bg-done/10 hover:bg-done/10'
 
 /** 0 for Monday to 6 for Sunday, read from the text of a `yyyy-mm-dd` day so no time zone moves it */
 export function mondayIndex(day: string): number {
@@ -40,12 +47,15 @@ export type HeatMapProps = {
   variant: 'week' | 'calendar'
   /** The value of the darkest square; share it between maps read side by side. Defaults to the largest value */
   max?: number
+  /** Makes the days pressable, to choose some of them; the map is then a group of buttons, not an image */
+  selection?: DaySelection
   className?: string
 }
 
-const RING = 'ring-2 ring-foreground'
 /** One calendar square; the weekday letters and the dashed days to come share its size */
 const SQUARE = 'block size-7 rounded-md sm:size-8'
+/** Pressable squares are a size larger, the most seven columns and their dates fit in 320 px */
+const PRESSABLE_SQUARE = 'block size-8 rounded-md sm:size-9'
 /** A calendar row: the Monday's date, then seven squares. The first column's width is set here alone */
 const CALENDAR_ROW = 'grid grid-cols-[1.75rem_repeat(7,1fr)] items-center gap-1 sm:gap-1.5'
 
@@ -55,28 +65,41 @@ function mondayOf(day: string): number {
   return new Date(Date.UTC(year, month - 1, date - mondayIndex(day))).getUTCDate()
 }
 
-export function HeatMap({ days, values, label, variant, max, className }: HeatMapProps) {
+/** An image that lists its values, or with a selection a group of buttons named by what it shows */
+const wrapper = (label: string, selection?: DaySelection) =>
+  selection
+    ? ({ role: 'group', 'aria-label': label } as const)
+    : ({ role: 'img', 'aria-label': label } as const)
+
+export function HeatMap({ days, values, label, variant, max, selection, className }: HeatMapProps) {
   const top = max ?? Math.max(0, ...values)
+  const square = selection ? PRESSABLE_SQUARE : SQUARE
 
   if (variant === 'week') {
     return (
-      <div role="img" aria-label={label} className={cn('w-full', className)}>
-        <div aria-hidden="true" className="space-y-1 text-center text-xs text-muted-foreground">
-          <div className="grid auto-cols-fr grid-flow-col gap-1">
+      <div {...wrapper(label, selection)} className={cn('w-full', className)}>
+        <div
+          aria-hidden={selection ? undefined : 'true'}
+          className="space-y-1 text-center text-xs text-muted-foreground"
+        >
+          <div aria-hidden="true" className="grid auto-cols-fr grid-flow-col gap-1">
             {days.map((day) => (
               <span key={day}>{LETTERS[mondayIndex(day)]}</span>
             ))}
           </div>
           <div className="grid auto-cols-fr grid-flow-col gap-1">
             {days.map((day, index) => (
-              <span
+              <HeatCell
                 key={day}
-                data-heat-cell=""
+                day={day}
+                value={values[index] ?? 0}
                 className={cn(
-                  'block h-5 rounded-md',
+                  'block w-full rounded-md',
+                  selection ? 'h-11 lg:h-9' : 'h-5',
                   shadeFor(values[index] ?? 0, top),
-                  index === days.length - 1 && RING,
                 )}
+                ringed={index === days.length - 1}
+                selection={selection}
               />
             ))}
           </div>
@@ -98,9 +121,12 @@ export function HeatMap({ days, values, label, variant, max, className }: HeatMa
   )
 
   return (
-    <div role="img" aria-label={label} className={cn('flex justify-center', className)}>
-      <div aria-hidden="true" className="space-y-1 text-xs text-muted-foreground sm:space-y-1.5">
-        <div className={CALENDAR_ROW}>
+    <div {...wrapper(label, selection)} className={cn('flex justify-center', className)}>
+      <div
+        aria-hidden={selection ? undefined : 'true'}
+        className="space-y-1 text-xs text-muted-foreground sm:space-y-1.5"
+      >
+        <div aria-hidden="true" className={CALENDAR_ROW}>
           <span />
           {[...LETTERS].map((letter, index) => (
             <span key={index} className="text-center">
@@ -121,20 +147,19 @@ export function HeatMap({ days, values, label, variant, max, className }: HeatMa
                     <span
                       key={colIndex}
                       data-heat-future=""
-                      className={cn(SQUARE, 'border border-dashed border-border')}
+                      className={cn(square, 'border border-dashed border-border')}
                     />
                   )
                 }
-                if (cell === null) return <span key={colIndex} className={SQUARE} />
+                if (cell === null) return <span key={colIndex} className={square} />
                 return (
-                  <span
+                  <HeatCell
                     key={cell.day}
-                    data-heat-cell=""
-                    className={cn(
-                      SQUARE,
-                      shadeFor(cell.value, top),
-                      cell.day === days[days.length - 1] && RING,
-                    )}
+                    day={cell.day}
+                    value={cell.value}
+                    className={cn(square, shadeFor(cell.value, top))}
+                    ringed={cell.day === days[days.length - 1]}
+                    selection={selection}
                   />
                 )
               })}

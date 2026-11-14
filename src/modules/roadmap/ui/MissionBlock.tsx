@@ -8,6 +8,7 @@ import { weekActivity } from '../domain/series'
 import { issueProgress } from '../domain/stats'
 import type { PlanMilestone } from '../domain/types'
 import { ActivityMark } from './ActivityMark'
+import type { WeekView } from './WeekMap'
 import { WeekMap } from './WeekMap'
 
 /** What a mission is made of, for its numbers and its week */
@@ -29,8 +30,18 @@ export function DoneCount({ mission, now }: { mission: PlanMilestone; now: Date 
  * whether it was quiet this week and the week as a heat map as wide as the block. Every block is
  * the same size.
  */
-export function MissionBlock({ mission, now }: { mission: PlanMilestone; now: Date }) {
+export function MissionBlock({
+  mission,
+  now,
+  week,
+}: {
+  mission: PlanMilestone
+  now: Date
+  /** Under the day filter: the issues its week counts, and the days that can be pressed */
+  week?: WeekView
+}) {
   const issues = missionIssues(mission)
+  const weekIssues = week?.issues ?? issues
   return (
     <Card as="article" variant="elevated" padding="sm" interactive className="flex flex-col gap-3">
       <div className="flex items-start justify-between gap-2">
@@ -41,11 +52,11 @@ export function MissionBlock({ mission, now }: { mission: PlanMilestone; now: Da
         >
           {mission.title}
         </CardTitle>
-        <ActivityMark quiet={weekActivity(issues, now).quiet} />
+        <ActivityMark quiet={weekActivity(weekIssues, now).quiet} />
       </div>
       <div className="mt-auto space-y-3">
         <DoneCount mission={mission} now={now} />
-        <WeekMap name={mission.title} issues={issues} now={now} />
+        <WeekMap name={mission.title} issues={weekIssues} now={now} selection={week?.selection} />
       </div>
     </Card>
   )

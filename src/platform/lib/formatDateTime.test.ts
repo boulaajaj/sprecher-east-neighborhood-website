@@ -84,3 +84,11 @@ describe('formatDateBadge', () => {
     expect(formatDateBadge('2026-03-04T03:30:00.000Z')).toEqual({ month: 'Mar', day: '3' })
   })
 })
+
+describe('formatDayLabel', () => {
+  it('names a calendar day with its weekday, whatever the clock says', async () => {
+    const { formatDayLabel } = await loadFormat()
+    expect(formatDayLabel('2026-11-13')).toBe('Fri, Nov 13')
+    expect(formatDayLabel('2026-01-01')).toBe('Thu, Jan 1')
+  })
+})

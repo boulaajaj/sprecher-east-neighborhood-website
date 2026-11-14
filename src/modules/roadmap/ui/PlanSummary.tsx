@@ -3,10 +3,11 @@ import React from 'react'
 import { formatDateTime } from '@/platform/lib/formatDateTime'
 import { AreaChart } from '@/platform/ui/AreaChart'
 import { Card } from '@/platform/ui/Card'
-import { HeatMap } from '@/platform/ui/HeatMap'
 import { Text } from '@/platform/ui/Text'
 
+import { dayCounts } from '../domain/dayFilter'
 import { RECENT_DAYS } from '../domain/stats'
+import { DayFilterMap } from './DayFilterMap.client'
 import { planSeries } from '../domain/series'
 import type { Plan } from '../domain/types'
 
@@ -49,6 +50,9 @@ function Graph({ name, figure, figureId, children }: GraphProps) {
 export function PlanSummary({ plan, now }: { plan: Plan; now: Date }) {
   const { days, finished, doneTotal, open } = planSeries(plan, now, WINDOW_DAYS)
   const list = (values: number[]) => values.join(', ')
+  const issues = [...plan.milestones.flatMap((m) => m.epics), ...plan.unscheduled].flatMap(
+    (epic) => epic.children,
+  )
 
   return (
     <div className="space-y-4">
@@ -86,13 +90,13 @@ export function PlanSummary({ plan, now }: { plan: Plan; now: Date }) {
           />
         </Graph>
       </div>
-      <HeatMap
-        variant="calendar"
+      <Text variant="small">Updated {formatDateTime(plan.generatedAt)}.</Text>
+      <DayFilterMap
         days={days}
         values={finished}
-        label={`Activity over four weeks, issues finished each day: ${list(finished)}`}
+        counts={days.map((day) => dayCounts(issues, day))}
+        label={`Activity over four weeks, issues finished each day: ${list(finished)}. Press a day to show only the issues opened or finished on it.`}
       />
-      <Text variant="small">Updated {formatDateTime(plan.generatedAt)}.</Text>
     </div>
   )
 }

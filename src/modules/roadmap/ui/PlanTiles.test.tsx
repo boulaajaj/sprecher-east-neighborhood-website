@@ -125,8 +125,8 @@ describe('PlanTiles', () => {
   it('draws each mission’s week as a heat map named with its values', () => {
     const { container } = renderTiles()
     const labels = within(layout(container, 'blocks'))
-      .getAllByRole('img')
-      .map((img) => img.getAttribute('aria-label'))
+      .getAllByRole('group')
+      .map((group) => group.getAttribute('aria-label'))
     expect(labels).toHaveLength(3)
     expect(labels[0]).toBe('Newest mission, finished each day this week: 0, 0, 0, 0, 1, 0, 0')
   })
@@ -147,7 +147,11 @@ describe('PlanTiles', () => {
     const projects = [...box.querySelectorAll('details')]
     expect(projects).toHaveLength(1)
     expect(projects[0].open).toBe(false)
-    expect(within(box).getAllByRole('img').length).toBe(2)
+    expect(
+      within(box)
+        .getAllByRole('group')
+        .filter((group) => group.getAttribute('aria-label')?.includes('finished each day')),
+    ).toHaveLength(2)
     expect(within(projects[0]).getByText('Issue 21')).toBeTruthy()
     expect(within(projects[0]).getByText(/Closed/)).toBeTruthy()
   })

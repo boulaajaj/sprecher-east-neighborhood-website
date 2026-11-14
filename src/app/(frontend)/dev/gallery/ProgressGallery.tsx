@@ -9,6 +9,7 @@ import { ShareBill, type ShareSlice } from '@/platform/ui/ShareBill'
 import { Text } from '@/platform/ui/Text'
 
 import { GalleryEntry, GalleryVariant } from './GalleryEntry'
+import { HeatMapSelectable } from './HeatMapSelectable.client'
 
 const SLICES: ShareSlice[] = [
   {
@@ -202,6 +203,12 @@ export function HeatMapGallery() {
           values={[0, 0, 0, 0, 0]}
           label="Sample: nothing finished"
         />
+      </GalleryVariant>
+      <GalleryVariant label="week, days to press" className="block max-w-sm">
+        <HeatMapSelectable />
+      </GalleryVariant>
+      <GalleryVariant label="week, two days enabled" className="block max-w-sm">
+        <HeatMapSelectable limited />
       </GalleryVariant>
       <GalleryVariant label="calendar, four weeks" className="block">
         <HeatMap

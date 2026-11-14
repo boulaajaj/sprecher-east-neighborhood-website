@@ -5,10 +5,9 @@ import { EmptyState } from '@/platform/ui/EmptyState'
 import { Text } from '@/platform/ui/Text'
 
 import { planActivity } from '../domain/activity'
+import { leanPlan } from '../domain/filterPlan'
 import type { Plan } from '../domain/types'
-import { EpicBox } from './EpicBox'
-import { MissionAccordion } from './MissionAccordion'
-import { MissionBlock } from './MissionBlock'
+import { PlanMissions } from './PlanMissions.client'
 
 /**
  * The plan as missions, the one with the latest activity first: blocks of the same size on a tablet
@@ -26,40 +25,13 @@ export function PlanTiles({ plan, now }: { plan: Plan; now: Date }) {
     )
   }
 
-  const activity = planActivity(plan.milestones, now)
-  const byNumber = new Map(plan.milestones.map((mission) => [mission.number, mission]))
-  const ordered = activity.missions.flatMap(
-    ({ milestoneNumber }) => byNumber.get(milestoneNumber) ?? [],
+  const order = planActivity(plan.milestones, now).missions.map(
+    ({ milestoneNumber }) => milestoneNumber,
   )
 
   return (
     <div className="space-y-8">
-      {activity.missions.length > 0 && (
-        <>
-          <div
-            data-plan-layout="blocks"
-            className="hidden gap-4 md:grid md:grid-cols-2 lg:grid-cols-3"
-          >
-            {ordered.map((mission) => (
-              <MissionBlock key={mission.number} mission={mission} now={now} />
-            ))}
-          </div>
-          <div data-plan-layout="accordions" className="space-y-3 md:hidden">
-            {ordered.map((mission) => (
-              <MissionAccordion key={mission.number} mission={mission} now={now} />
-            ))}
-          </div>
-        </>
-      )}
-
-      {plan.unscheduled.length > 0 && (
-        <section className="space-y-4">
-          <Text variant="subsection">Projects not yet in a mission</Text>
-          {plan.unscheduled.map((epic) => (
-            <EpicBox key={epic.number} epic={epic} now={now} />
-          ))}
-        </section>
-      )}
+      <PlanMissions plan={leanPlan(plan)} order={order} now={now} />
 
       <div className="flex flex-wrap items-center gap-3">
         <Text variant="small">Missing something?</Text>
