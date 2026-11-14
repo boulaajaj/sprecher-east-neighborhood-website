@@ -56,11 +56,11 @@ export type HeatMapProps = {
 
 /**
  * The caption and a Less-to-More key built from the same shades as the squares. Side by side from
- * 640 px, stacked on a phone. The swatches are decoration: `label` already lists every value.
+ * one line at every width. The swatches are decoration: `label` already lists every value.
  */
 function HeatKey({ caption }: { caption: string }) {
   return (
-    <div className="flex flex-col gap-1 pt-1 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex items-center justify-between gap-2 pt-1 text-xs text-muted-foreground">
       <span>{caption}</span>
       <span className="flex items-center gap-1">
         <span>Less</span>
@@ -79,9 +79,9 @@ function HeatKey({ caption }: { caption: string }) {
 }
 
 /** One calendar square; the weekday letters and the dashed days to come share its size */
-const SQUARE = 'block size-7 rounded-md sm:size-8'
+const SQUARE = 'block h-7 w-full rounded-md sm:h-8'
 /** Pressable squares are a size larger, the most seven columns and their dates fit in 320 px */
-const PRESSABLE_SQUARE = 'block size-8 rounded-md sm:size-9'
+const PRESSABLE_SQUARE = 'block h-11 w-full rounded-md sm:h-10'
 /** A calendar row: the Monday's date, then seven squares. The first column's width is set here alone */
 const CALENDAR_ROW = 'grid grid-cols-[1.75rem_repeat(7,1fr)] items-center gap-1 sm:gap-1.5'
 
@@ -157,10 +157,10 @@ export function HeatMap({
   )
 
   return (
-    <div {...wrapper(label, selection)} className={cn('flex justify-center', className)}>
+    <div {...wrapper(label, selection)} className={cn('w-full', className)}>
       <div
         aria-hidden={selection ? undefined : 'true'}
-        className="space-y-1 text-xs text-muted-foreground sm:space-y-1.5"
+        className="w-full space-y-1 text-xs text-muted-foreground sm:space-y-1.5"
       >
         <div aria-hidden="true" className={CALENDAR_ROW}>
           <span />
