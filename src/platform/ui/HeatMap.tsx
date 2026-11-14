@@ -49,7 +49,33 @@ export type HeatMapProps = {
   max?: number
   /** Makes the days pressable, to choose some of them; the map is then a group of buttons, not an image */
   selection?: DaySelection
+  /** A short caption under the squares that says what they show, with a Less-to-More key beside it */
+  caption?: string
   className?: string
+}
+
+/**
+ * The caption and a Less-to-More key built from the same shades as the squares. Side by side from
+ * 640 px, stacked on a phone. The swatches are decoration: `label` already lists every value.
+ */
+function HeatKey({ caption }: { caption: string }) {
+  return (
+    <div className="flex flex-col gap-1 pt-1 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+      <span>{caption}</span>
+      <span className="flex items-center gap-1">
+        <span>Less</span>
+        {[NOTHING, ...SHADES].map((shade) => (
+          <span
+            key={shade}
+            aria-hidden="true"
+            data-heat-key-swatch=""
+            className={cn('size-3 rounded-sm', shade)}
+          />
+        ))}
+        <span>More</span>
+      </span>
+    </div>
+  )
 }
 
 /** One calendar square; the weekday letters and the dashed days to come share its size */
@@ -71,7 +97,16 @@ const wrapper = (label: string, selection?: DaySelection) =>
     ? ({ role: 'group', 'aria-label': label } as const)
     : ({ role: 'img', 'aria-label': label } as const)
 
-export function HeatMap({ days, values, label, variant, max, selection, className }: HeatMapProps) {
+export function HeatMap({
+  days,
+  values,
+  label,
+  variant,
+  max,
+  selection,
+  caption,
+  className,
+}: HeatMapProps) {
   const top = max ?? Math.max(0, ...values)
   const square = selection ? PRESSABLE_SQUARE : SQUARE
 
@@ -103,6 +138,7 @@ export function HeatMap({ days, values, label, variant, max, selection, classNam
               />
             ))}
           </div>
+          {caption && <HeatKey caption={caption} />}
         </div>
       </div>
     )
@@ -166,6 +202,7 @@ export function HeatMap({ days, values, label, variant, max, selection, classNam
             </div>
           )
         })}
+        {caption && <HeatKey caption={caption} />}
       </div>
     </div>
   )

@@ -210,8 +210,9 @@ export function HeatMapGallery() {
       <GalleryVariant label="week, two days enabled" className="block max-w-sm">
         <HeatMapSelectable limited />
       </GalleryVariant>
-      <GalleryVariant label="calendar, four weeks" className="block">
+      <GalleryVariant label="calendar, four weeks, with caption and key" className="block">
         <HeatMap
+          caption="Work done per day"
           variant="calendar"
           days={HEAT_WEEKS}
           values={HEAT_WEEKS.map((_, i) => (i * 7) % 6)}

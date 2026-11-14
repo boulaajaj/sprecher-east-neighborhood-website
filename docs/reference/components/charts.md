@@ -222,6 +222,7 @@ Source: `src/platform/ui/HeatMap.tsx`
 | `variant`   | `"week" \| "calendar"` | yes      |                                                                                                         |
 | `max`       | `number`               | no       | The value of the darkest square; share it between maps read side by side. Defaults to the largest value |
 | `selection` | `DaySelection`         | no       | Makes the days pressable, to choose some of them; the map is then a group of buttons, not an image      |
+| `caption`   | `string`               | no       | A short caption under the squares that says what they show, with a Less-to-More key beside it           |
 | `className` | `string`               | no       |                                                                                                         |
 
 **Used by** (direct imports):

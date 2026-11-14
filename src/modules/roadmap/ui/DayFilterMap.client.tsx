@@ -32,12 +32,13 @@ export function DayFilterMap({
   const { top, toggleTop } = usePlanFilter()
 
   return (
-    <div className="space-y-3">
+    <div className="my-2 space-y-4 sm:my-3">
       <HeatMap
         variant="calendar"
         days={days}
         values={values}
         label={label}
+        caption="Work done per day"
         selection={{ selected: top, onToggle: toggleTop }}
       />
       {top.length > 0 && (

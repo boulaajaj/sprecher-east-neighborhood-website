@@ -224,3 +224,42 @@ describe('HeatMap selectable', () => {
     await expectAccessible(container)
   })
 })
+
+describe('HeatMap caption and key', () => {
+  const props: HeatMapProps = {
+    variant: 'calendar',
+    days: week,
+    values: [0, 1, 2, 3, 4, 5, 6],
+    label: 'Finished each day: 0, 1, 2, 3, 4, 5, 6',
+  }
+
+  it('puts the caption and a Less-to-More key under the squares', () => {
+    const { container } = render(<HeatMap {...props} caption="Work done per day" />)
+    const caption = screen.getByText('Work done per day')
+    const rows = container.querySelectorAll('[data-heat-row]')
+    expect(rows[rows.length - 1].compareDocumentPosition(caption)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+    expect(screen.getByText('Less')).toBeTruthy()
+    expect(screen.getByText('More')).toBeTruthy()
+  })
+
+  it('draws one swatch per shade step, the same classes the squares use', () => {
+    const { container } = render(<HeatMap {...props} caption="Work done per day" />)
+    const swatches = [...container.querySelectorAll('[data-heat-key-swatch]')]
+    expect(swatches).toHaveLength(5)
+    const squares = new Set(cells(container).map((c) => c.className.match(/bg-done[^ ]*/)?.[0]))
+    for (const swatch of swatches)
+      expect(squares.has(swatch.className.match(/bg-done[^ ]*/)?.[0])).toBe(true)
+  })
+
+  it('shows nothing extra without a caption', () => {
+    render(<HeatMap {...props} />)
+    expect(screen.queryByText('Less')).toBeNull()
+  })
+
+  it('has no axe violations with a caption', async () => {
+    const { container } = render(<HeatMap {...props} caption="Work done per day" />)
+    await expectAccessible(container)
+  })
+})
