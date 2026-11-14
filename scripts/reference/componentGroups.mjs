@@ -137,7 +137,7 @@ export const COMPONENT_GROUPS = [
     slug: 'shares',
     title: 'Shares of a whole',
     intro: 'One whole drawn as a bar, or as a bill with a receipt.',
-    components: ['BarTrack', 'ShareBar', 'ShareBill'],
+    components: ['BarTrack', 'ShareBill'],
   },
   {
     slug: 'rich-text',
