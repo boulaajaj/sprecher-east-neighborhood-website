@@ -253,6 +253,22 @@ describe('HeatMap caption and key', () => {
       expect(squares.has(swatch.className.match(/bg-done[^ ]*/)?.[0])).toBe(true)
   })
 
+  it('keeps the caption and the key on one line, the caption left and the key right, at every width', () => {
+    render(<HeatMap {...props} caption="Work done per day" />)
+    const row = screen.getByText('Work done per day').parentElement as HTMLElement
+    expect(row.className).toContain('justify-between')
+    expect(row.className).not.toMatch(/flex-col|sm:flex-row/)
+    expect(row.className).not.toContain('flex-wrap')
+  })
+
+  it('fills the width of its box, so the squares stretch with the graphs above', () => {
+    const { container } = render(<HeatMap {...props} caption="Work done per day" />)
+    const group = container.firstElementChild as HTMLElement
+    expect(group.className).not.toContain('justify-center')
+    expect((group.firstElementChild as HTMLElement).className).toContain('w-full')
+    for (const cell of cells(container)) expect(cell.className).toContain('w-full')
+  })
+
   it('shows nothing extra without a caption', () => {
     render(<HeatMap {...props} />)
     expect(screen.queryByText('Less')).toBeNull()
