@@ -71,8 +71,8 @@ describe('the whole bill: the rows and their bars (#1030, #1111, #1196)', () => 
       (li) => li.children[0]?.textContent,
     )
     expect(names).toEqual([
-      'City of Madison',
       'Metropolitan Schools',
+      'City of Madison',
       'Dane County',
       'Madison College, MATC',
     ])
