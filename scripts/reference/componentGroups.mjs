@@ -131,6 +131,7 @@ export const COMPONENT_GROUPS = [
       'ChartCaption',
       'AreaChart',
       'HeatMap',
+      'HeatCell',
     ],
   },
   {

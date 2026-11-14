@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen } from '@testing-library/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { HeatMap, mondayIndex } from './HeatMap'
+import { HeatMap, type HeatMapProps, mondayIndex } from './HeatMap'
 import { expectAccessible } from './testing/expectAccessible'
 
 afterEach(cleanup)
@@ -138,5 +138,89 @@ describe('HeatMap week with fewer than seven days', () => {
     )
     expect(cells(container)).toHaveLength(3)
     expect(container.textContent).toBe('MTW')
+  })
+})
+
+describe('HeatMap selectable', () => {
+  const values = [0, 1, 2, 3, 4, 5, 6]
+  const show = (selection: Partial<NonNullable<HeatMapProps['selection']>> = {}) => {
+    const onToggle = vi.fn()
+    const view = render(
+      <HeatMap
+        variant="week"
+        days={week}
+        values={values}
+        label="Finished each day"
+        selection={{ selected: [], onToggle, ...selection }}
+      />,
+    )
+    return { ...view, onToggle }
+  }
+
+  it('is a named group with one pressed-state button per day, none pressed by default', () => {
+    show()
+    expect(screen.getByRole('group', { name: 'Finished each day' })).toBeTruthy()
+    const buttons = screen.getAllByRole('button')
+    expect(buttons).toHaveLength(7)
+    expect(buttons.every((b) => b.getAttribute('aria-pressed') === 'false')).toBe(true)
+    expect(buttons[4].getAttribute('aria-label')).toBe('Fri, Nov 13: 4')
+  })
+
+  it('marks the selected days pressed and ringed, and reports a press with its day', () => {
+    const { onToggle } = show({ selected: ['2026-11-13'] })
+    const friday = screen.getByRole('button', { name: 'Fri, Nov 13: 4' })
+    expect(friday.getAttribute('aria-pressed')).toBe('true')
+    expect(friday.className).toContain('ring-2')
+    fireEvent.click(screen.getByRole('button', { name: 'Thu, Nov 12: 3' }))
+    expect(onToggle).toHaveBeenCalledWith('2026-11-12')
+  })
+
+  it('makes the days that are not enabled unavailable: disabled, named so, and never pressed', () => {
+    const { onToggle } = show({
+      selected: ['2026-11-13'],
+      enabled: ['2026-11-12', '2026-11-13'],
+      unavailableReason: 'not selected above',
+    })
+    const monday = screen.getByRole('button', {
+      name: 'Mon, Nov 9: 0, not available, not selected above',
+    })
+    expect(monday).toHaveProperty('disabled', true)
+    fireEvent.click(monday)
+    expect(onToggle).not.toHaveBeenCalled()
+    expect(
+      screen.getAllByRole('button').filter((b) => !(b as HTMLButtonElement).disabled),
+    ).toHaveLength(2)
+  })
+
+  it('keeps a pressed day that cannot be pressed in its shade and ring, not slashed', () => {
+    show({ selected: ['2026-11-13'], enabled: [] })
+    const friday = screen.getByRole('button', { name: 'Fri, Nov 13: 4' })
+    expect(friday).toHaveProperty('disabled', true)
+    expect(friday.getAttribute('aria-pressed')).toBe('true')
+    expect(friday.className).toContain('ring-2')
+    expect(friday.querySelector('svg')).toBeNull()
+    expect(screen.getByRole('button', { name: /^Thu, Nov 12: 3, not available/ })).toBeTruthy()
+  })
+
+  it('makes the calendar days pressable too and leaves the days to come out of it', () => {
+    const onToggle = vi.fn()
+    const { container } = render(
+      <HeatMap
+        variant="calendar"
+        days={week.slice(0, 5)}
+        values={[0, 1, 2, 3, 4]}
+        label="Four weeks"
+        selection={{ selected: [], onToggle }}
+      />,
+    )
+    expect(screen.getAllByRole('button')).toHaveLength(5)
+    expect(container.querySelectorAll('[data-heat-future]').length).toBeGreaterThan(0)
+    fireEvent.click(screen.getByRole('button', { name: 'Wed, Nov 11: 2' }))
+    expect(onToggle).toHaveBeenCalledWith('2026-11-11')
+  })
+
+  it('passes an accessibility check, with a selection and with unavailable days', async () => {
+    const { container } = show({ selected: ['2026-11-12'], enabled: ['2026-11-12', '2026-11-13'] })
+    await expectAccessible(container)
   })
 })

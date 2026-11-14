@@ -48,12 +48,11 @@ const figure = (name: string) => screen.getByTestId(`figure-${name}`).textConten
 describe('PlanSummary', () => {
   it('draws three named graphs and the four-week map, each listing its values', () => {
     render(<PlanSummary plan={plan(children)} now={NOW} />)
-    const graphs = screen.getAllByRole('img')
-    expect(graphs).toHaveLength(4)
+    expect(screen.getAllByRole('img')).toHaveLength(3)
     expect(screen.getByRole('img', { name: /^Finished each day.*: .*\b1\b/ })).toBeTruthy()
     expect(screen.getByRole('img', { name: /^Done in all/ })).toBeTruthy()
     expect(screen.getByRole('img', { name: /^Still open/ })).toBeTruthy()
-    expect(screen.getByRole('img', { name: /^Activity over four weeks/ })).toBeTruthy()
+    expect(screen.getByRole('group', { name: /^Activity over four weeks/ })).toBeTruthy()
   })
 
   it('gives each graph one small figure: finished this week, done in all, still open', () => {

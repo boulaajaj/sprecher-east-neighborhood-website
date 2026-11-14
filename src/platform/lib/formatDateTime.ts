@@ -67,3 +67,12 @@ export const formatDateBadge = (timestamp: string): { month: string; day: string
     day: date.toLocaleDateString('en-US', { day: 'numeric', timeZone: tz }),
   }
 }
+
+/** A calendar day (`yyyy-mm-dd`) as "Fri, Nov 13". It is a day, not an instant, so no time zone moves it. */
+export const formatDayLabel = (day: string): string =>
+  new Date(`${day}T00:00:00.000Z`).toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC',
+  })

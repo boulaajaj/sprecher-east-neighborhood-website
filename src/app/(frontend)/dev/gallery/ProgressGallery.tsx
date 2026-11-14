@@ -3,6 +3,8 @@ import React from 'react'
 import { ProgressBar } from '@/platform/ui/ProgressBar'
 import { AreaChart } from '@/platform/ui/AreaChart'
 import { HeatMap } from '@/platform/ui/HeatMap'
+
+import { HeatMapSelectable } from './HeatMapSelectable.client'
 import { ShareBar } from '@/platform/ui/ShareBar.client'
 import { Disclosure } from '@/platform/ui/Disclosure'
 import { BarTrack } from '@/platform/ui/BarTrack'
@@ -225,6 +227,12 @@ export function HeatMapGallery() {
           values={[0, 0, 0, 0, 0]}
           label="Sample: nothing finished"
         />
+      </GalleryVariant>
+      <GalleryVariant label="week, days to press" className="block max-w-sm">
+        <HeatMapSelectable />
+      </GalleryVariant>
+      <GalleryVariant label="week, two days enabled" className="block max-w-sm">
+        <HeatMapSelectable limited />
       </GalleryVariant>
       <GalleryVariant label="calendar, four weeks" className="block">
         <HeatMap
