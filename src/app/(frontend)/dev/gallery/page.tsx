@@ -14,7 +14,6 @@ import {
   AreaChartGallery,
   HeatMapGallery,
   ProgressGallery,
-  ShareBarGallery,
   BarTrackGallery,
   ShareBillGallery,
 } from './ProgressGallery'
@@ -69,7 +68,6 @@ export default function GalleryPage() {
         <FieldsGallery />
         <DisplayGallery />
         <ProgressGallery />
-        <ShareBarGallery />
         <BarTrackGallery />
         <ShareBillGallery />
         <AreaChartGallery />

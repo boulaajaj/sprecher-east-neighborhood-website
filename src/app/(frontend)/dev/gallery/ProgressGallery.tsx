@@ -3,15 +3,13 @@ import React from 'react'
 import { ProgressBar } from '@/platform/ui/ProgressBar'
 import { AreaChart } from '@/platform/ui/AreaChart'
 import { HeatMap } from '@/platform/ui/HeatMap'
-
-import { HeatMapSelectable } from './HeatMapSelectable.client'
-import { ShareBar } from '@/platform/ui/ShareBar.client'
 import { Disclosure } from '@/platform/ui/Disclosure'
 import { BarTrack } from '@/platform/ui/BarTrack'
 import { ShareBill, type ShareSlice } from '@/platform/ui/ShareBill'
 import { Text } from '@/platform/ui/Text'
 
 import { GalleryEntry, GalleryVariant } from './GalleryEntry'
+import { HeatMapSelectable } from './HeatMapSelectable.client'
 
 const SLICES: ShareSlice[] = [
   {
@@ -42,28 +40,6 @@ export function ProgressGallery() {
       <GalleryVariant label="empty, and full" className="block max-w-md space-y-3">
         <ProgressBar value={0} max={0} label="Sample: nothing to count yet" />
         <ProgressBar value={8} max={8} label="Sample: 8 of 8 done" />
-      </GalleryVariant>
-    </GalleryEntry>
-  )
-}
-
-/** The share bar: one whole in slices of four tones, a narrow slice leaving its label to the text */
-export function ShareBarGallery() {
-  return (
-    <GalleryEntry
-      name="ShareBar"
-      description="One whole as a flat bar of slices as wide as their shares; every slice shows its percent, and a slice too narrow for it is drawn wider, the extra taken from the others."
-    >
-      <GalleryVariant label="four tones, one highlighted" className="block max-w-3xl">
-        <ShareBar
-          slices={SLICES.map((slice) => ({
-            key: slice.key,
-            share: slice.share,
-            tone: slice.tone,
-            label: `${slice.percent}%`,
-          }))}
-          label="Sample: a whole split in four"
-        />
       </GalleryVariant>
     </GalleryEntry>
   )

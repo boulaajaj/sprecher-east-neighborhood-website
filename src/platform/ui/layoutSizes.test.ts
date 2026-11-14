@@ -27,7 +27,9 @@ describe('layout sizes', () => {
     expect(READING_WIDTH_LG).toBe('lg:max-w-[var(--reading-width)]')
     expect(PAGE_MIN_HEIGHT).toBe('min-h-[var(--page-min-height)]')
     expect(HERO_MIN_HEIGHT).toBe('min-h-[var(--hero-min-height)]')
-    expect(CHART_SMALL_WIDTH).toBe('max-w-[var(--chart-small-width)]')
+    expect(CHART_SMALL_WIDTH).toBe(
+      'max-w-[var(--chart-stack-width)] @2xl/chart:max-w-[var(--chart-small-width)]',
+    )
     expect(CHART_LARGE_WIDTH).toContain('max-w-[var(--chart-large-width)]')
     expect(FIGURE_GAP).toBe('my-[var(--figure-gap)]')
     expect(LEGEND_GAP).toBe('-mt-[calc(var(--figure-gap)_-_var(--legend-gap))]')
@@ -56,6 +58,7 @@ describe('layout sizes', () => {
       '--figure-gap',
       '--legend-gap',
       '--chart-small-width',
+      '--chart-stack-width',
       '--chart-large-width',
     ]) {
       const definitions = globalsCss.match(new RegExp(`^\\s*${name}:`, 'gm')) ?? []
