@@ -5,14 +5,12 @@ import { AreaChart } from '@/platform/ui/AreaChart'
 import { Card } from '@/platform/ui/Card'
 import { Text } from '@/platform/ui/Text'
 
-import { dayCounts } from '../domain/dayFilter'
+import { activityByDay } from '../domain/dayFilter'
+import { ROLLING_DAYS } from '../domain/mapWindow'
 import { RECENT_DAYS } from '../domain/stats'
 import { DayFilterMap } from './DayFilterMap.client'
 import { planSeries } from '../domain/series'
 import type { Plan } from '../domain/types'
-
-/** How many days the graphs and the map look back: four whole weeks */
-const WINDOW_DAYS = 28
 
 const sum = (values: number[]) => values.reduce((total, value) => total + value, 0)
 
@@ -48,11 +46,13 @@ function Graph({ name, figure, figureId, children }: GraphProps) {
  * a tablet puts finished on top and the other two side by side, a desktop puts all three in a row.
  */
 export function PlanSummary({ plan, now }: { plan: Plan; now: Date }) {
-  const { days, finished, doneTotal, open } = planSeries(plan, now, WINDOW_DAYS)
+  const { days, finished, doneTotal, open } = planSeries(plan, now, ROLLING_DAYS)
   const list = (values: number[]) => values.join(', ')
   const issues = [...plan.milestones.flatMap((m) => m.epics), ...plan.unscheduled].flatMap(
     (epic) => epic.children,
   )
+  const activity = activityByDay(issues)
+  const since = Object.keys(activity).sort()[0] ?? null
 
   return (
     <div className="space-y-4">
@@ -91,12 +91,7 @@ export function PlanSummary({ plan, now }: { plan: Plan; now: Date }) {
         </Graph>
       </div>
       <Text variant="small">Updated {formatDateTime(plan.generatedAt)}.</Text>
-      <DayFilterMap
-        days={days}
-        values={finished}
-        counts={days.map((day) => dayCounts(issues, day))}
-        label={`Activity over four weeks, issues finished each day: ${list(finished)}. Press a day to show only the issues opened or finished on it.`}
-      />
+      <DayFilterMap activity={activity} now={now} since={since} />
     </div>
   )
 }

@@ -25,6 +25,7 @@ import { isGalleryEnabled } from './isGalleryEnabled'
 import { DismissAndZoomGallery } from './DismissAndZoomGallery'
 import { LayoutGallery } from './LayoutGallery'
 import { RichTextGallery } from './RichTextGallery'
+import { PeriodNavGallery } from './PeriodNavGallery.client'
 import { TabsGallery } from './TabsGallery'
 
 export const metadata: Metadata = {
@@ -72,6 +73,7 @@ export default function GalleryPage() {
         <ShareBillGallery />
         <AreaChartGallery />
         <HeatMapGallery />
+        <PeriodNavGallery />
         <TabsGallery />
         <HeadersGallery />
         <LayoutGallery />
