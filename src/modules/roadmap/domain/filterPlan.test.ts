@@ -111,6 +111,51 @@ describe('filterPlan', () => {
   })
 })
 
+describe('filterPlan: a pick that matches nothing', () => {
+  const only13 = {
+    ...plan,
+    milestones: [mission(3, [epic(40, [finished(400, '2026-11-13T18:00:00Z')])])],
+    unscheduled: [],
+  }
+  const top = ['2026-11-12', '2026-11-13']
+
+  it('keeps the mission, so the day just pressed stays selected and can be pressed again', () => {
+    const result = filterPlan(only13, top, { [missionScope(3)]: ['2026-11-12'] }, NOW)
+    expect(result.missions).toHaveLength(1)
+    expect(result.missions[0].pick).toEqual(['2026-11-12'])
+    expect(result.missions[0].epics).toEqual([])
+    expect(result.total).toBe(0)
+  })
+
+  it('shows a project with no issues when no day is chosen', () => {
+    const empty = { ...only13, milestones: [mission(3, [epic(40, [])])] }
+    expect(filterPlan(empty, [], {}, NOW).missions[0].epics).toHaveLength(1)
+  })
+
+  it('still hides a mission that has nothing only because of the days above', () => {
+    expect(filterPlan(only13, ['2026-11-12'], {}, NOW).missions).toEqual([])
+  })
+
+  it('keeps a project the same way, with its mission', () => {
+    const two = {
+      ...only13,
+      milestones: [
+        mission(3, [
+          epic(40, [finished(400, '2026-11-13T18:00:00Z'), finished(401, '2026-11-12T18:00:00Z')]),
+        ]),
+      ],
+    }
+    const result = filterPlan(
+      two,
+      top,
+      { [missionScope(3)]: ['2026-11-12', '2026-11-13'], [epicScope(40)]: ['2026-11-12'] },
+      NOW,
+    )
+    expect(result.missions[0].epics[0].pick).toEqual(['2026-11-12'])
+    expect(result.total).toBe(1)
+  })
+})
+
 describe('leanPlan', () => {
   it('empties every description and keeps the rest', () => {
     const wordy: Plan = {
