@@ -29,7 +29,7 @@ export function PlanMissions({ plan, order, now }: { plan: Plan; order: number[]
     issues: level.weekIssues,
     // Under a single chosen day nothing can be pressed: that day is fixed and the rest are unavailable
     selection: {
-      selected: level.locked ? top : level.pick,
+      selected: level.locked ? level.parent : level.pick,
       enabled: level.enabled,
       unavailableReason: 'not selected above',
       onToggle: (day) => togglePick(level.scope, day),
@@ -46,15 +46,15 @@ export function PlanMissions({ plan, order, now }: { plan: Plan; order: number[]
 
   return (
     <div className="space-y-8">
-      {filtering && (
-        <div role="status">
+      <div role="status" className="empty:hidden">
+        {filtering && (
           <Text variant="small">
             {nothing
               ? 'Nothing matches.'
               : `Showing ${filtered.total} ${filtered.total === 1 ? 'issue' : 'issues'} opened or finished on ${days.map(formatDayLabel).join(', ')}.`}
           </Text>
-        </div>
-      )}
+        )}
+      </div>
 
       {nothing && (
         <EmptyState

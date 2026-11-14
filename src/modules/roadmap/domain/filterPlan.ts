@@ -23,8 +23,10 @@ export type Level = {
   pick: string[]
   /** The strip's days that can be pressed */
   enabled: string[]
-  /** One day is chosen above, so the strip is only for reading */
+  /** One day is chosen above, so nothing can be picked here */
   locked: boolean
+  /** The days the level above filters by: the one fixed day when `locked` */
+  parent: string[]
 }
 
 export type ScopedEpic = Level & { epic: PlanEpic }
@@ -62,6 +64,7 @@ function level(
     pick,
     enabled: stripEnabled(parent, lastDays(now, STRIP_DAYS)),
     locked: parent.length === 1,
+    parent: [...parent],
     days: effectiveDays(parent, pick),
   }
 }

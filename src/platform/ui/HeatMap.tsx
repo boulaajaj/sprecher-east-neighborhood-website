@@ -54,6 +54,8 @@ export type HeatMapProps = {
 
 /** One calendar square; the weekday letters and the dashed days to come share its size */
 const SQUARE = 'block size-7 rounded-md sm:size-8'
+/** Pressable squares are a size larger, the most seven columns and their dates fit in 320 px */
+const PRESSABLE_SQUARE = 'block size-8 rounded-md sm:size-9'
 /** A calendar row: the Monday's date, then seven squares. The first column's width is set here alone */
 const CALENDAR_ROW = 'grid grid-cols-[1.75rem_repeat(7,1fr)] items-center gap-1 sm:gap-1.5'
 
@@ -71,6 +73,7 @@ const wrapper = (label: string, selection?: DaySelection) =>
 
 export function HeatMap({ days, values, label, variant, max, selection, className }: HeatMapProps) {
   const top = max ?? Math.max(0, ...values)
+  const square = selection ? PRESSABLE_SQUARE : SQUARE
 
   if (variant === 'week') {
     return (
@@ -92,7 +95,7 @@ export function HeatMap({ days, values, label, variant, max, selection, classNam
                 value={values[index] ?? 0}
                 className={cn(
                   'block w-full rounded-md',
-                  selection ? 'h-7' : 'h-5',
+                  selection ? 'h-11 lg:h-9' : 'h-5',
                   shadeFor(values[index] ?? 0, top),
                 )}
                 ringed={index === days.length - 1}
@@ -144,17 +147,17 @@ export function HeatMap({ days, values, label, variant, max, selection, classNam
                     <span
                       key={colIndex}
                       data-heat-future=""
-                      className={cn(SQUARE, 'border border-dashed border-border')}
+                      className={cn(square, 'border border-dashed border-border')}
                     />
                   )
                 }
-                if (cell === null) return <span key={colIndex} className={SQUARE} />
+                if (cell === null) return <span key={colIndex} className={square} />
                 return (
                   <HeatCell
                     key={cell.day}
                     day={cell.day}
                     value={cell.value}
-                    className={cn(SQUARE, shadeFor(cell.value, top))}
+                    className={cn(square, shadeFor(cell.value, top))}
                     ringed={cell.day === days[days.length - 1]}
                     selection={selection}
                   />

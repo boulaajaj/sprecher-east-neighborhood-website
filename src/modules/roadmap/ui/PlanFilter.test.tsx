@@ -147,6 +147,21 @@ describe('the plan page day filter', () => {
     ).toBe('true')
   })
 
+  it('fixes a project’s week to the one day its mission picked, not to every day on top', () => {
+    const { container } = renderPage()
+    pressDay('Thu, Nov 12: 1')
+    pressDay('Fri, Nov 13: 1')
+    const phone = container.querySelector('[data-plan-layout="accordions"]') as HTMLElement
+    const strip = (name: RegExp) => within(phone).getByRole('group', { name })
+    fireEvent.click(
+      within(strip(/^Events, finished each day/)).getByRole('button', { name: 'Fri, Nov 13: 1' }),
+    )
+    const pressed = within(strip(/^Issue 10, finished each day/))
+      .getAllByRole('button')
+      .filter((button) => button.getAttribute('aria-pressed') === 'true')
+    expect(pressed.map((button) => button.getAttribute('aria-label'))).toEqual(['Fri, Nov 13: 1'])
+  })
+
   it('drops a mission’s pick when its day leaves the top', () => {
     const { container } = renderPage()
     pressDay('Thu, Nov 12: 1')
