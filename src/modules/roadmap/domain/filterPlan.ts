@@ -1,6 +1,7 @@
 import {
   type Picks,
   type Scope,
+  allowedPick,
   effectiveDays,
   epicScope,
   matchesDays,
@@ -69,10 +70,18 @@ function level(
   }
 }
 
+/**
+ * Whether the level itself holds a pick the level above allows. Such a level stays on the page
+ * even when the day has nothing in it, so the day just pressed stays selected and can be pressed
+ * again; a level with nothing only because of the days above is hidden.
+ */
+const pressed = (parent: readonly string[], pick: readonly string[]) =>
+  allowedPick(parent, pick).length > 0
+
 function scopeEpic(epic: PlanEpic, parent: readonly string[], picks: Picks, now: Date) {
   const { days, ...rest } = level(epicScope(epic.number), epic.children, parent, picks, now)
   const children = epic.children.filter((issue) => matchesDays(issue, days))
-  if (days.length > 0 && children.length === 0) return null
+  if (days.length > 0 && children.length === 0 && !pressed(parent, rest.pick)) return null
   return { ...rest, epic: { ...epic, children } }
 }
 
@@ -80,7 +89,7 @@ function scopeMission(mission: PlanMilestone, top: readonly string[], picks: Pic
   const issues = mission.epics.flatMap((epic) => epic.children)
   const { days, ...rest } = level(missionScope(mission.number), issues, top, picks, now)
   const epics = mission.epics.flatMap((epic) => scopeEpic(epic, days, picks, now) ?? [])
-  if (days.length > 0 && epics.length === 0) return null
+  if (days.length > 0 && epics.length === 0 && !pressed(top, rest.pick)) return null
   return { ...rest, mission: { ...mission, epics: epics.map((scoped) => scoped.epic) }, epics }
 }
 

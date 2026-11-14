@@ -46,7 +46,7 @@ export function dayCounts(issues: readonly PlanIssue[], day: string) {
 }
 
 /** The days of `pick` the level above allows: all of them when nothing is chosen above, none under a single day */
-function allowedPick(parent: readonly string[], pick: readonly string[]): string[] {
+export function allowedPick(parent: readonly string[], pick: readonly string[]): string[] {
   if (parent.length === 0) return [...pick]
   if (parent.length === 1) return []
   return pick.filter((day) => parent.includes(day))
