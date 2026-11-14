@@ -1,6 +1,6 @@
 # Plan page
 
-Status: agreed (2026-11-12)
+Status: agreed (2026-11-12), built and live (2026-11-14)
 
 - **Purpose:** show neighbors, in the open, what the volunteers are working on and how far along each part is.
 - **Audience:** a neighbor who is curious, who wants to know if something they care about is moving, or who is thinking about helping. They arrive from a post or the home page, usually on a phone, and skim. The owner reads it too, as a view of where to push next.
@@ -26,3 +26,13 @@ From the owner's review of the page as it was (2026-11-11, voice session).
 - The big numbers at the top all look alike, in one color, so none stands out or says what it means.
 - The "open" and "done" labels say little on their own.
 - Charts of activity over time are more engaging than bare counts, as long as they serve the reader's question above.
+
+## Chosen design (2026-11-13 and 2026-11-14)
+
+The owner chose it after reviewing mockups, in voice and text sessions. It replaces the earlier idea of a ring or bar per mission.
+
+- **Top of the page:** three small smooth graphs by day over four weeks (finished per day, done in all, still open), each with a day timeline and one small figure, and no explanatory sentences.
+- **Activity map:** four weeks of days as squares, darker for more finished work, with a short caption under it, a Less-to-More key made from the same shades, and room around it. Pills for chosen days sit below.
+- **Day filter:** pressing a day shows only the issues opened or finished on it; several days mean any of them. Each chosen day is a quiet pill with its finished and opened counts and a way to remove it. The top commands the lower levels: a mission's or project's own week strip can only narrow within the days above, and days not chosen above look unavailable. Only issues are filtered, and they stay linkable.
+- **Missions and projects:** missions are blocks, projects open as a dropdown on a phone, each with the same graph style.
+- **Kept simple:** the map shows finished work only. Showing opened work on the squares as well was parked as not planned (2026-11-14), because the pills already give both counts and a busier map goes against "not too busy". Revisit if neighbors miss it.
