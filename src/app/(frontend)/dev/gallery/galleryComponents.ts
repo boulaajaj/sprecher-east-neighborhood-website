@@ -19,7 +19,6 @@ export const GALLERY_COMPONENTS = [
   'Disclosure',
   'ProgressBar',
   'BarTrack',
-  'ShareBar',
   'ShareBill',
   'Tabs',
   'PageHeader',
